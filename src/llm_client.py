@@ -1,7 +1,8 @@
-"""DeepSeek OpenAI-compatible client with caching and retry."""
+"""DeepSeek OpenAI-compatible client with caching, retry, and async concurrency."""
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import json
 import os
@@ -139,3 +140,127 @@ class LLMClient:
             results.append(self.chat(system, user))
             time.sleep(delay)
         return results
+
+    # ── 异步并发接口 ──────────────────────────────────────────────
+
+    def _build_body(self, messages: list[dict]) -> dict:
+        body: dict[str, Any] = {
+            "model": self.model,
+            "messages": messages,
+            "temperature": self.temperature,
+            "max_tokens": self.max_tokens,
+        }
+        if self.request_logprobs:
+            body["logprobs"] = True
+            body["top_logprobs"] = 5
+        return body
+
+    def _parse_raw(self, raw: dict, cache_key: str) -> LLMResponse:
+        choice = raw["choices"][0]
+        content = choice["message"]["content"]
+        usage = raw.get("usage", {})
+        logprobs_data = None
+        if self.request_logprobs and choice.get("logprobs"):
+            logprobs_data = choice["logprobs"].get("content", [])
+        return LLMResponse(
+            model=self.model,
+            prompt_hash=cache_key,
+            raw_response=content,
+            reasoning=content,
+            input_tokens=usage.get("prompt_tokens", 0),
+            output_tokens=usage.get("completion_tokens", 0),
+            logprobs=logprobs_data,
+        )
+
+    async def _async_single(
+        self,
+        client: httpx.AsyncClient,
+        semaphore: asyncio.Semaphore,
+        system: str,
+        user: str,
+        bypass_cache: bool = False,
+        max_retries: int = 5,
+    ) -> LLMResponse:
+        messages = [
+            {"role": "system", "content": system},
+            {"role": "user", "content": user},
+        ]
+        cache_key = self._cache_key(messages)
+
+        if not bypass_cache:
+            cached = self._load_cache(cache_key)
+            if cached:
+                return LLMResponse(**cached["parsed"])
+
+        last_exc = None
+        for attempt in range(max_retries):
+            try:
+                async with semaphore:
+                    resp = await client.post(
+                        f"{self.base_url}/chat/completions",
+                        headers={
+                            "Authorization": f"Bearer {self.api_key}",
+                            "Content-Type": "application/json",
+                        },
+                        json=self._build_body(messages),
+                    )
+                    resp.raise_for_status()
+                    raw = resp.json()
+            except (httpx.HTTPStatusError, httpx.ConnectError) as e:
+                last_exc = e
+                wait = min(60, 4 * (2 ** attempt))
+                await asyncio.sleep(wait)
+                continue
+            break
+        else:
+            raise last_exc  # type: ignore[misc]
+
+        parsed = self._parse_raw(raw, cache_key)
+        self._save_cache(cache_key, {"raw": raw, "parsed": parsed.model_dump()}, messages=messages)
+        return parsed
+
+    async def _batch_chat_async(
+        self,
+        prompts: list[tuple[str, str]],
+        max_concurrency: int,
+        bypass_cache: bool,
+    ) -> list[LLMResponse]:
+        semaphore = asyncio.Semaphore(max_concurrency)
+        async with httpx.AsyncClient(timeout=120.0) as client:
+            tasks = [
+                self._async_single(client, semaphore, s, u, bypass_cache)
+                for s, u in prompts
+            ]
+            return list(await asyncio.gather(*tasks))
+
+    def batch_chat_concurrent(
+        self,
+        prompts: list[tuple[str, str]],
+        max_concurrency: int = 10,
+        bypass_cache: bool = False,
+    ) -> list[LLMResponse]:
+        """Send multiple prompts concurrently via asyncio.
+
+        Args:
+            prompts: list of (system, user) tuples.
+            max_concurrency: max parallel requests (default 10).
+            bypass_cache: skip cache lookup if True.
+
+        Returns:
+            list of LLMResponse in the same order as prompts.
+        """
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = None
+
+        if loop and loop.is_running():
+            # Inside Jupyter or already-running event loop: use nest_asyncio
+            import nest_asyncio
+            nest_asyncio.apply()
+            return loop.run_until_complete(
+                self._batch_chat_async(prompts, max_concurrency, bypass_cache)
+            )
+        return asyncio.run(
+            self._batch_chat_async(prompts, max_concurrency, bypass_cache)
+        )

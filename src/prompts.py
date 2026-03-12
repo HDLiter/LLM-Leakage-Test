@@ -89,20 +89,12 @@ def counterfactual_generator_prompt(news_text: str, variant_type: str) -> tuple[
             "例如：利好→利空，上涨→下跌，扩张→收缩，放松→收紧。"
             "保持其他细节（日期、实体、数字）不变。"
         ),
-        "swap_entity": (
-            "请对以下新闻进行全面的实体替换，使其无法被识别为特定真实事件：\n"
-            "1. 将所有机构名、人名、公司名替换为虚构但合理的名称\n"
-            '2. 将专有政策名称替换为虚构的政策名称（如"双减政策"→"优学计划"，"活跃资本市场"→"振兴产业基金"）\n'
-            "3. 将行业特征词和专有术语替换为同类但不同的表述\n"
-            "4. 确保替换后的新闻读起来像一篇全新的、无法与任何真实事件对应的新闻\n"
-            "保持新闻的逻辑结构和论述方向不变。"
-        ),
         "alter_numbers": (
-            "请修改以下新闻中的数量信息，使其与原文有明显差异：\n"
-            "1. 如果新闻包含具体数字（百分比、金额等），将其替换为合理但不同的数字（变化幅度30%-100%），年份除外\n"
-            '2. 如果新闻缺少可改数字，则修改程度词和幅度词（如"大幅"→"小幅"，"严禁"→"限制"，"全面"→"部分"，"显著"→"略微"）\n'
-            '3. 调整频率词（如"持续"→"偶尔"，"多次"→"首次"）\n'
-            "确保修改后的新闻在数量感知上与原文有明显区别。保持新闻结构不变。"
+            "请修改以下新闻中的数量信息，使其可能导致不同的市场判断方向：\n"
+            "1. 修改数字使其可能导致不同的市场判断方向（如'上涨8%'→'下跌3%'，'盈利50亿'→'亏损20亿'）\n"
+            "2. 如果新闻缺少可改数字，则反转程度词（如'大幅上涨'→'小幅下跌'，'严禁'→'适度放开'）\n"
+            "3. 目标：修改后的新闻在数量维度上应能支持与原文不同甚至相反的市场判断\n"
+            "确保修改后的新闻内部逻辑自洽。保持新闻结构不变。"
         ),
     }
 
@@ -120,7 +112,7 @@ def memorization_probe_prompt(question: str) -> tuple[str, str]:
 
 # ── Timeliness judge prompt ─────────────────────────────────────
 
-def timeliness_judge_prompt(news_date: str, response_text: str) -> tuple[str, str]:
+def timeliness_judge_prompt(news_date: str, news_content: str, response_text: str) -> tuple[str, str]:
     """Judge whether a response contains future information."""
     system = (
         "你是一个时间线审查员。你的任务是检查一段分析文本中是否包含了"
@@ -128,14 +120,47 @@ def timeliness_judge_prompt(news_date: str, response_text: str) -> tuple[str, st
     )
     user = (
         f"新闻发布日期：{news_date}\n\n"
+        f"原始新闻全文：\n{news_content}\n\n"
         f"以下是对该新闻的分析文本：\n{response_text}\n\n"
         "请检查分析中是否引用了发布日期之后的事件、数据或结果。\n"
+        "注意：如果模型的分析中提到的信息已经在原始新闻中出现，则不算泄露。\n"
+        "只有模型引用了新闻文本中未提及的、发布日期之后才可能知道的信息，才算泄露。\n"
         "输出 JSON：{\"has_future_info\": true/false, \"evidence\": [\"...\"], \"severity\": \"none\"/\"minor\"/\"major\"}"
     )
     return system, user
 
 
 # ── LLM-based masking prompt ──────────────────────────────────
+
+def entity_swap_prompt(news_text: str) -> tuple[str, str]:
+    """Prompt for comprehensive entity replacement (used in notebook 03 ablation)."""
+    system = "你是一个金融新闻改写专家。请严格按照要求修改新闻，保持语言风格一致。仅输出修改后的新闻文本，不要添加任何解释。"
+    user = (
+        "请对以下新闻进行全面的实体替换：\n"
+        "1. 将所有机构名、人名、公司名替换为完全虚构的、现实中不存在的名称（如'星辰科技'、'瀚海资本'、'明远集团'）。严禁使用任何真实存在的实体名称。\n"
+        "2. 将专有政策名称替换为虚构名称\n"
+        "3. 将行业特征词替换为同类但不同的表述\n"
+        "4. 确保替换后的新闻内部逻辑自洽，论述方向和结论不变\n"
+        "5. 替换后的新闻应无法与任何真实事件对应\n\n"
+        f"原文：\n{news_text}"
+    )
+    return system, user
+
+
+def placebo_rewrite_prompt(news_text: str) -> tuple[str, str]:
+    """Prompt for generating self-contradictory placebo news (used in notebook 03)."""
+    system = "你是一个金融新闻改写专家。请严格按照要求修改新闻。仅输出修改后的新闻文本，不要添加任何解释。"
+    user = (
+        "请改写以下新闻，使其变成一篇自相矛盾、无法得出合理市场判断的文本：\n"
+        "1. 保留原文的句式结构和大致篇幅\n"
+        "2. 替换所有实体为虚构名称\n"
+        "3. 让实体、数字、行业之间互相矛盾（如火锅企业宣布半导体产能扩张）\n"
+        "4. 混入相互矛盾的政策信号（如同时加息和降息）\n"
+        "5. 目标：一个理性分析者无法从这篇新闻中得出任何确定的市场方向判断\n\n"
+        f"原文：\n{news_text}"
+    )
+    return system, user
+
 
 def llm_masking_prompt(text: str, dimensions: list[str]) -> tuple[str, str]:
     """Build prompt for LLM-based natural masking.
@@ -186,15 +211,10 @@ def counterfactual_validation_prompt(
             "评估标准：核心结论方向是否被有效反转？"
             "语义方向应与原文相反（利好↔利空）。semantic_shift >= 7 为合格。"
         ),
-        "swap_entity": (
-            "评估标准：\n"
-            "1. 实体可识别性：替换后能否通过机构名、政策名、行业特征词识别出原始事件？entity_anonymity >= 7 为合格。\n"
-            "2. 不仅要替换机构名，还要替换专有政策名称和行业特征词。"
-        ),
         "alter_numbers": (
             "评估标准：\n"
-            "1. 数字/程度词是否有明显变化？numeric_change >= 6 为合格。\n"
-            "2. 如果原文无具体数字，程度词和幅度词是否被有效调整？\n"
+            "1. 数字/程度词是否有明显变化，且变化方向可能导致不同的市场判断？numeric_change >= 6 为合格。\n"
+            "2. 如果原文无具体数字，程度词和幅度词是否被有效反转？\n"
             "3. 变体不应与原文几乎相同。"
         ),
     }

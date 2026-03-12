@@ -24,7 +24,6 @@ class NewsCategory(str, Enum):
 
 class VariantType(str, Enum):
     REVERSE_OUTCOME = "reverse_outcome"
-    SWAP_ENTITY = "swap_entity"
     ALTER_NUMBERS = "alter_numbers"
 
 

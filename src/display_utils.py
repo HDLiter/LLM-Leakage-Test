@@ -6,7 +6,115 @@ and probe results.
 
 from __future__ import annotations
 
+import json
+import re
+
 from IPython.display import HTML, Markdown, display
+
+
+def strip_markdown_json(raw: str) -> str:
+    """Strip markdown code fences and extract clean text/JSON."""
+    text = raw.strip()
+    if text.startswith("```"):
+        text = re.sub(r'^```\w*\n?', '', text)
+        text = re.sub(r'\n?```\s*$', '', text)
+    return text.strip()
+
+
+def show_parsed_prediction(raw: str) -> str:
+    """Extract JSON from raw LLM response and format as readable prediction text."""
+    text = strip_markdown_json(raw)
+    try:
+        data = json.loads(text)
+    except (json.JSONDecodeError, TypeError):
+        # Try to find JSON object in text
+        start = text.find("{")
+        end = text.rfind("}")
+        if start != -1 and end != -1:
+            try:
+                data = json.loads(text[start:end + 1])
+            except json.JSONDecodeError:
+                return text[:300]
+        else:
+            return text[:300]
+
+    # 5-bin format
+    if "strong_bear" in data:
+        dist = [data.get(k, 0) for k in ["strong_bear", "weak_bear", "neutral", "weak_bull", "strong_bull"]]
+        total = sum(dist)
+        if total > 0:
+            bull = (dist[3] + dist[4]) / total
+            bear = (dist[0] + dist[1]) / total
+        else:
+            bull = bear = 0.2
+        if bull > bear + 0.1:
+            arrow, direction = "\u2191", "看涨"
+        elif bear > bull + 0.1:
+            arrow, direction = "\u2193", "看跌"
+        else:
+            arrow, direction = "\u2192", "中性"
+        conf = max(bull, bear, (dist[2] / total) if total > 0 else 0.2)
+        reasoning = data.get("reasoning", "")
+        summary = reasoning[:80] + "..." if len(reasoning) > 80 else reasoning
+        return f"{arrow} {direction} | 置信度: {conf:.0%} | {summary}"
+
+    # binary format
+    if "direction" in data:
+        d = data["direction"]
+        arrow = "\u2191" if d == "up" else ("\u2193" if d == "down" else "\u2192")
+        reasoning = data.get("reasoning", "")
+        summary = reasoning[:80] + "..." if len(reasoning) > 80 else reasoning
+        return f"{arrow} {d} | {summary}"
+
+    # scalar format
+    if "score" in data:
+        s = float(data["score"])
+        arrow = "\u2191" if s > 0.1 else ("\u2193" if s < -0.1 else "\u2192")
+        reasoning = data.get("reasoning", "")
+        summary = reasoning[:80] + "..." if len(reasoning) > 80 else reasoning
+        return f"{arrow} score={s:.2f} | {summary}"
+
+    return text[:300]
+
+
+def show_counterfactual_result(
+    case_id: str,
+    original_text: str,
+    cf_text: str,
+    orig_raw: str,
+    cf_raw: str,
+    variant_type: str,
+) -> None:
+    """Display a counterfactual attack result card with input comparison and parsed predictions."""
+    orig_pred = show_parsed_prediction(orig_raw)
+    cf_pred = show_parsed_prediction(cf_raw)
+
+    html = f"""
+    <div style="border:1px solid #ddd; border-radius:8px; margin:10px 0; font-size:13px; overflow:hidden;">
+        <div style="background:#e3f2fd; padding:8px 12px; font-weight:bold;">
+            [{case_id}] {variant_type}
+        </div>
+        <table style="width:100%; border-collapse:collapse;">
+        <tr style="background:#f5f5f5;">
+            <th style="width:50%; padding:6px 10px; border:1px solid #ddd; text-align:left;">原始新闻</th>
+            <th style="width:50%; padding:6px 10px; border:1px solid #ddd; text-align:left;">反事实新闻</th>
+        </tr>
+        <tr>
+            <td style="padding:8px 10px; border:1px solid #ddd; vertical-align:top; white-space:pre-wrap; max-height:150px; overflow-y:auto;">{original_text[:300]}</td>
+            <td style="padding:8px 10px; border:1px solid #ddd; vertical-align:top; white-space:pre-wrap; max-height:150px; overflow-y:auto;">{cf_text[:300]}</td>
+        </tr>
+        <tr style="background:#f5f5f5;">
+            <th style="padding:6px 10px; border:1px solid #ddd; text-align:left;">原始预测</th>
+            <th style="padding:6px 10px; border:1px solid #ddd; text-align:left;">反事实预测</th>
+        </tr>
+        <tr>
+            <td style="padding:8px 10px; border:1px solid #ddd; vertical-align:top;">{orig_pred}</td>
+            <td style="padding:8px 10px; border:1px solid #ddd; vertical-align:top;">{cf_pred}</td>
+        </tr>
+        </table>
+    </div>
+    """
+    display(HTML(html))
 
 
 def show_llm_response(label: str, text: str, max_len: int = 800) -> None:
@@ -76,7 +184,7 @@ def show_timeliness_leakage(
     Highlights evidence phrases in the model response and shows the
     known future outcome for comparison.
     """
-    sev_color = "#F44336" if severity == "major" else "#FF9800"
+    sev_color = "#F44336" if severity == "major" else ("#FF9800" if severity == "minor" else "#4CAF50")
     sev_label = severity.upper()
 
     # Highlight evidence in response text

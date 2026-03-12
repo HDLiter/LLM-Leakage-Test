@@ -58,3 +58,61 @@ def show_probe_result(
     </div>
     """
     display(HTML(html))
+
+
+def show_timeliness_leakage(
+    case_id: str,
+    news_title: str,
+    news_date: str,
+    news_content: str,
+    response_text: str,
+    evidence: list[str],
+    known_outcome: str,
+    outcome_date: str,
+    severity: str,
+) -> None:
+    """Display a timeliness leakage case as a rich HTML card.
+
+    Highlights evidence phrases in the model response and shows the
+    known future outcome for comparison.
+    """
+    sev_color = "#F44336" if severity == "major" else "#FF9800"
+    sev_label = severity.upper()
+
+    # Highlight evidence in response text
+    highlighted = response_text
+    for phrase in evidence:
+        highlighted = highlighted.replace(
+            phrase,
+            f'<mark style="background:#FFEB3B;padding:0 2px;">{phrase}</mark>',
+        )
+
+    evidence_items = "".join(f"<li>{e}</li>" for e in evidence) if evidence else "<li>（无）</li>"
+
+    html = f"""
+    <div style="border:2px solid {sev_color}; border-radius:8px; margin:12px 0; font-size:13px; overflow:hidden;">
+        <div style="background:{sev_color}; color:white; padding:10px 14px; display:flex; justify-content:space-between; align-items:center;">
+            <strong>[{case_id}] {news_title}</strong>
+            <span style="background:white; color:{sev_color}; padding:2px 10px; border-radius:12px; font-weight:bold; font-size:12px;">{sev_label}</span>
+        </div>
+        <div style="padding:12px 14px;">
+            <div style="margin-bottom:10px;">
+                <div style="font-weight:bold; color:#555; margin-bottom:4px;">原始新闻 ({news_date})</div>
+                <div style="background:#f8f8f8; padding:8px; border-radius:4px; white-space:pre-wrap; max-height:200px; overflow-y:auto;">{news_content}</div>
+            </div>
+            <div style="margin-bottom:10px;">
+                <div style="font-weight:bold; color:#555; margin-bottom:4px;">模型分析</div>
+                <div style="background:#f8f8f8; padding:8px; border-radius:4px; white-space:pre-wrap; max-height:300px; overflow-y:auto;">{highlighted}</div>
+            </div>
+            <div style="margin-bottom:10px;">
+                <div style="font-weight:bold; color:#555; margin-bottom:4px;">泄露证据</div>
+                <ul style="margin:4px 0; padding-left:20px;">{evidence_items}</ul>
+            </div>
+            <div style="background:#FFF3E0; padding:8px; border-radius:4px; border-left:4px solid #FF9800;">
+                <div style="font-weight:bold; color:#E65100; margin-bottom:4px;">已知后续结果 ({outcome_date})</div>
+                <div>{known_outcome}</div>
+            </div>
+        </div>
+    </div>
+    """
+    display(HTML(html))

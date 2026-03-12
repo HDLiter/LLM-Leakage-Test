@@ -128,6 +128,38 @@ def llm_mask(client: "LLMClient", text: str, config: MaskingConfig) -> str:
 
 # ── Counterfactual validation ─────────────────────────────────
 
+def extract_json_robust(text: str) -> dict | None:
+    """Extract the first top-level JSON object from text, handling nested braces."""
+    start = text.find("{")
+    if start == -1:
+        return None
+    depth = 0
+    in_string = False
+    i = start
+    while i < len(text):
+        ch = text[i]
+        if in_string:
+            if ch == "\\" :
+                i += 2  # skip escaped char entirely
+                continue
+            if ch == '"':
+                in_string = False
+        else:
+            if ch == '"':
+                in_string = True
+            elif ch == "{":
+                depth += 1
+            elif ch == "}":
+                depth -= 1
+                if depth == 0:
+                    try:
+                        return json.loads(text[start:i + 1])
+                    except json.JSONDecodeError:
+                        return None
+        i += 1
+    return None
+
+
 def validate_counterfactual(
     client: "LLMClient",
     original: str,
@@ -141,18 +173,13 @@ def validate_counterfactual(
     system, user = counterfactual_validation_prompt(original, variant, variant_type)
     response = client.chat(system, user)
 
-    # Parse JSON from response
-    match = re.search(r'\{[^{}]*"pass"[^{}]*\}', response.raw_response, re.DOTALL)
-    if not match:
+    result = extract_json_robust(response.raw_response)
+    if not result or "pass" not in result:
         return {"pass": False, "reason": "Failed to parse validation response", "scores": {}}
-    try:
-        result = json.loads(match.group())
-        # Normalise the pass field (could be string "true"/"false")
-        if isinstance(result.get("pass"), str):
-            result["pass"] = result["pass"].lower() == "true"
-        return result
-    except (json.JSONDecodeError, KeyError):
-        return {"pass": False, "reason": "JSON parse error", "scores": {}}
+    # Normalise the pass field (could be string "true"/"false")
+    if isinstance(result.get("pass"), str):
+        result["pass"] = result["pass"].lower() == "true"
+    return result
 
 
 # ── LLM-assisted counterfactual generation ──────────────────────
@@ -242,7 +269,7 @@ def generate_counterfactuals_batch(
     client: "LLMClient",
     test_cases: list,
     validate: bool = True,
-    max_workers: int = 10,
+    max_workers: int | None = None,
 ) -> list[CounterfactualVariant]:
     """Generate counterfactual variants for multiple test cases concurrently.
 
@@ -250,6 +277,10 @@ def generate_counterfactuals_batch(
     The generate→validate→retry chain within each pair stays serial.
     """
     from concurrent.futures import ThreadPoolExecutor, as_completed
+    from . import DEFAULT_CONCURRENCY
+
+    if max_workers is None:
+        max_workers = DEFAULT_CONCURRENCY
 
     tasks = [
         (tc, vt)

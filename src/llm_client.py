@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from . import DEFAULT_CONCURRENCY
 import hashlib
 import json
 import os
@@ -236,14 +237,14 @@ class LLMClient:
     def batch_chat_concurrent(
         self,
         prompts: list[tuple[str, str]],
-        max_concurrency: int = 10,
+        max_concurrency: int = DEFAULT_CONCURRENCY,
         bypass_cache: bool = False,
     ) -> list[LLMResponse]:
         """Send multiple prompts concurrently via asyncio.
 
         Args:
             prompts: list of (system, user) tuples.
-            max_concurrency: max parallel requests (default 10).
+            max_concurrency: max parallel requests (default DEFAULT_CONCURRENCY).
             bypass_cache: skip cache lookup if True.
 
         Returns:

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from . import DEFAULT_CONCURRENCY
 from .masking import apply_masking
 from .models import MaskingConfig, TestCase, CounterfactualVariant, LLMResponse
 from .prompts import scoring_prompt, llm_masking_prompt
@@ -17,7 +18,7 @@ def _mask_texts_concurrent(
     config: MaskingConfig,
     test_cases: list[TestCase],
     variant_map: dict[str, dict],
-    max_concurrency: int = 10,
+    max_concurrency: int = DEFAULT_CONCURRENCY,
 ) -> tuple[dict[int, str], dict[tuple[int, str], str]]:
     """Apply masking to all texts, using concurrent LLM calls when mask_mode='llm'.
 
@@ -73,7 +74,7 @@ def run_counterfactual_attack(
     test_cases: list[TestCase],
     variant_map: dict[str, dict],
     output_format: str = "5-bin",
-    max_concurrency: int = 10,
+    max_concurrency: int = DEFAULT_CONCURRENCY,
 ) -> tuple[list[LLMResponse], list[LLMResponse], list[tuple]]:
     """Run counterfactual attack for one strategy config.
 
@@ -109,7 +110,7 @@ def run_scoring_batch(
     config: MaskingConfig,
     texts: list[str],
     output_format: str = "5-bin",
-    max_concurrency: int = 10,
+    max_concurrency: int = DEFAULT_CONCURRENCY,
 ) -> list[LLMResponse]:
     """Score a list of texts with the given config, concurrently.
 

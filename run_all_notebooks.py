@@ -2,7 +2,7 @@
 
 Usage:
     python run_all_notebooks.py              # normal run
-    python run_all_notebooks.py --clear-cache  # delete data/cache before running
+    python run_all_notebooks.py --clear-cache  # delete data/cache,generated,results before running
     python run_all_notebooks.py --clear-output # only clear notebook outputs, don't execute
 """
 
@@ -25,16 +25,23 @@ NOTEBOOKS = [
     "notebooks/06_prompt_optimization.ipynb",
 ]
 
-CACHE_DIR = PROJECT_ROOT / "data" / "cache"
+REGENERABLE_DIRS = [
+    PROJECT_ROOT / "data" / "cache",
+    PROJECT_ROOT / "data" / "generated",
+    PROJECT_ROOT / "data" / "results",
+]
 
 
 def clear_cache() -> None:
-    if CACHE_DIR.exists():
-        count = sum(1 for _ in CACHE_DIR.iterdir())
-        shutil.rmtree(CACHE_DIR)
-        print(f"Deleted cache: {CACHE_DIR} ({count} files)")
-    else:
-        print(f"No cache directory found at {CACHE_DIR}")
+    deleted = 0
+    for d in REGENERABLE_DIRS:
+        if d.exists():
+            count = sum(1 for _ in d.iterdir())
+            shutil.rmtree(d)
+            print(f"Deleted: {d} ({count} files)")
+            deleted += count
+    if not deleted:
+        print("No regenerable data directories found")
 
 
 def clear_outputs() -> None:
@@ -83,7 +90,7 @@ def run_notebook(path: str) -> bool:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run all experiment notebooks")
     parser.add_argument("--clear-cache", action="store_true",
-                        help="Delete data/cache directory before running")
+                        help="Delete data/cache, data/generated, and data/results before running")
     parser.add_argument("--clear-output", action="store_true",
                         help="Only clear notebook outputs, don't execute")
     args = parser.parse_args()

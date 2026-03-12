@@ -23,6 +23,19 @@ cp .env.example .env
 jupyter notebook
 ```
 
+## 批量运行
+
+```bash
+# 顺序执行全部 notebook（每个 notebook 使用独立内核）
+python run_all_notebooks.py
+
+# 清除 API 缓存后重新运行（强制重新调用 LLM）
+python run_all_notebooks.py --clear-cache
+
+# 仅清空 notebook 输出（不执行）
+python run_all_notebooks.py --clear-output
+```
+
 ## 项目结构
 
 ```

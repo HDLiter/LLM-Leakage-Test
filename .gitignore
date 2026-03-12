@@ -3,6 +3,7 @@
 
 # API cache and experiment results (regenerable)
 data/cache/
+data/generated/
 data/results/
 
 # Python

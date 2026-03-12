@@ -236,3 +236,40 @@ def generate_all_counterfactuals(
         cf = generate_counterfactual(client, news_text, case_id, vt, validate=validate)
         variants.append(cf)
     return variants
+
+
+def generate_counterfactuals_batch(
+    client: "LLMClient",
+    test_cases: list,
+    validate: bool = True,
+    max_workers: int = 10,
+) -> list[CounterfactualVariant]:
+    """Generate counterfactual variants for multiple test cases concurrently.
+
+    Each (test_case, variant_type) pair runs in a separate thread.
+    The generate→validate→retry chain within each pair stays serial.
+    """
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
+    tasks = [
+        (tc, vt)
+        for tc in test_cases
+        for vt in VariantType
+    ]
+
+    results: list[tuple[int, CounterfactualVariant]] = []
+
+    with ThreadPoolExecutor(max_workers=max_workers) as pool:
+        futures = {
+            pool.submit(
+                generate_counterfactual,
+                client, tc.news.content, tc.id, vt, validate,
+            ): idx
+            for idx, (tc, vt) in enumerate(tasks)
+        }
+        for future in as_completed(futures):
+            idx = futures[future]
+            results.append((idx, future.result()))
+
+    results.sort(key=lambda x: x[0])
+    return [cf for _, cf in results]

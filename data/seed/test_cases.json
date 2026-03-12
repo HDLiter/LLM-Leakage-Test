@@ -1,0 +1,1037 @@
+{
+  "test_cases": [
+    {
+      "id": "tc_001",
+      "news": {
+        "id": "cls_20240924_001",
+        "title": "央行宣布降准降息，推出多项金融支持政策",
+        "content": "2024年9月24日，中国人民银行行长潘功胜在国新办发布会上宣布，将下调存款准备金率0.5个百分点，预计释放长期流动性约1万亿元。同时下调7天期逆回购操作利率0.2个百分点，从1.7%降至1.5%。此外，降低存量房贷利率，统一房贷最低首付比例至15%。",
+        "publish_time": "2024-09-24T10:00:00",
+        "category": "policy",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "A股在9月24日至10月8日期间大幅上涨，上证指数从约2800点涨至3600点以上，涨幅超25%",
+      "outcome_date": "2024-10-08",
+      "sector": "金融",
+      "key_entities": [
+        "中国人民银行",
+        "潘功胜",
+        "国新办"
+      ],
+      "key_numbers": [
+        "0.5个百分点",
+        "1万亿元",
+        "0.2个百分点",
+        "1.7%",
+        "1.5%",
+        "15%"
+      ],
+      "expected_direction": "up",
+      "subcategory": "货币政策",
+      "memorization_likelihood": "high"
+    },
+    {
+      "id": "tc_002",
+      "news": {
+        "id": "cls_20240205_001",
+        "title": "A股三大指数大幅低开，沪指跌破2700点",
+        "content": "2024年2月5日，A股三大指数集体大幅低开。沪指跌破2700点关口，创近5年新低。深成指跌超3%，创业板指跌超4%。两市超4800只个股下跌，市场恐慌情绪蔓延。融资盘强制平仓和量化基金集中卖出被认为是主要推手。",
+        "publish_time": "2024-02-05T09:30:00",
+        "category": "macro",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "2月5日触底后，国家队大规模入市，沪指在2月底回升至3000点上方",
+      "outcome_date": "2024-02-29",
+      "sector": "大盘",
+      "key_entities": [
+        "沪指",
+        "深成指",
+        "创业板指"
+      ],
+      "key_numbers": [
+        "2700点",
+        "5年",
+        "3%",
+        "4%",
+        "4800只"
+      ],
+      "expected_direction": "down",
+      "subcategory": "市场危机",
+      "memorization_likelihood": "high"
+    },
+    {
+      "id": "tc_003",
+      "news": {
+        "id": "cls_20230724_001",
+        "title": "中央政治局会议定调下半年经济工作",
+        "content": "2023年7月24日，中共中央政治局召开会议，分析研究当前经济形势。会议指出要活跃资本市场，提振投资者信心。要适时调整优化房地产政策，因城施策用好政策工具箱。要加大宏观政策调控力度，着力扩大内需。",
+        "publish_time": "2023-07-24T18:00:00",
+        "category": "policy",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "政治局会议后A股短暂上涨，但随后持续下跌，未能扭转熊市趋势",
+      "outcome_date": "2023-08-31",
+      "sector": "大盘",
+      "key_entities": [
+        "中共中央政治局"
+      ],
+      "key_numbers": [],
+      "expected_direction": "up",
+      "subcategory": "经济会议",
+      "memorization_likelihood": "high"
+    },
+    {
+      "id": "tc_004",
+      "news": {
+        "id": "cls_20210723_001",
+        "title": "中办国办印发意见：进一步减轻义务教育阶段学生作业负担和校外培训负担",
+        "content": "2021年7月23日，中共中央办公厅、国务院办公厅印发《关于进一步减轻义务教育阶段学生作业负担和校外培训负担的意见》。意见要求学科类培训机构一律不得上市融资，严禁资本化运作。已上市的要进行清理整治。",
+        "publish_time": "2021-07-23T20:00:00",
+        "category": "policy",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "教育板块暴跌，新东方、好未来等中概教育股单日跌幅超50%，A股教育板块连续跌停",
+      "outcome_date": "2021-07-26",
+      "sector": "教育",
+      "key_entities": [
+        "中共中央办公厅",
+        "国务院办公厅"
+      ],
+      "key_numbers": [],
+      "expected_direction": "down",
+      "subcategory": "教育监管",
+      "memorization_likelihood": "high"
+    },
+    {
+      "id": "tc_005",
+      "news": {
+        "id": "cls_20240301_001",
+        "title": "证监会主席吴清首次公开亮相，强调从严监管",
+        "content": "2024年3月1日，新任证监会主席吴清在新闻发布会上表示，将坚持从严监管，加大对欺诈发行、财务造假等违法行为的打击力度。将完善退市制度，加快推进注册制改革。强调保护中小投资者合法权益。",
+        "publish_time": "2024-03-01T11:00:00",
+        "category": "policy",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "市场对新主席表态反应积极，沪指在3月初小幅上涨，但整体仍在3000点附近震荡",
+      "outcome_date": "2024-03-15",
+      "sector": "大盘",
+      "key_entities": [
+        "证监会",
+        "吴清"
+      ],
+      "key_numbers": [],
+      "expected_direction": "neutral",
+      "subcategory": "监管人事",
+      "memorization_likelihood": "medium"
+    },
+    {
+      "id": "tc_006",
+      "news": {
+        "id": "cls_20211015_001",
+        "title": "多地限电停产，能耗双控政策持续加码",
+        "content": "2021年10月15日，受能耗双控政策影响，江苏、浙江、广东等多省工业企业被要求限电停产。部分上市公司发布公告称生产受到影响。电力供应紧张导致动力煤期货价格创历史新高，突破1800元/吨。",
+        "publish_time": "2021-10-15T14:00:00",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "煤炭板块短期大涨后，国家发改委出手干预煤价，煤炭股随后大幅回调",
+      "outcome_date": "2021-10-31",
+      "sector": "煤炭",
+      "key_entities": [
+        "江苏",
+        "浙江",
+        "广东"
+      ],
+      "key_numbers": [
+        "1800元/吨"
+      ],
+      "expected_direction": "down",
+      "subcategory": "能耗双控",
+      "memorization_likelihood": "medium"
+    },
+    {
+      "id": "tc_007",
+      "news": {
+        "id": "cls_20220316_001",
+        "title": "国务院金融稳定发展委员会召开专题会议",
+        "content": "2022年3月16日，国务院金融稳定发展委员会召开专题会议，研究当前经济形势和资本市场问题。会议强调要保持资本市场平稳运行，对中概股问题要积极沟通。关于平台经济治理，要完成整改并推动平台经济规范健康发展。",
+        "publish_time": "2022-03-16T18:00:00",
+        "category": "policy",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "金稳委会议后A股和港股大幅反弹，恒生科技指数单日涨超20%",
+      "outcome_date": "2022-03-17",
+      "sector": "科技",
+      "key_entities": [
+        "国务院金融稳定发展委员会"
+      ],
+      "key_numbers": [],
+      "expected_direction": "up",
+      "subcategory": "金融维稳",
+      "memorization_likelihood": "high"
+    },
+    {
+      "id": "tc_008",
+      "news": {
+        "id": "cls_20230828_001",
+        "title": "财政部、税务总局宣布印花税减半征收",
+        "content": "2023年8月27日，财政部、税务总局宣布自8月28日起证券交易印花税实施减半征收。同日证监会宣布阶段性收紧IPO节奏，规范大股东减持行为。三大利好政策同时出台，被市场称为'组合拳'。",
+        "publish_time": "2023-08-28T09:00:00",
+        "category": "policy",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "8月28日A股高开低走，沪指冲高后回落，此后继续下跌至2024年2月",
+      "outcome_date": "2023-09-15",
+      "sector": "大盘",
+      "key_entities": [
+        "财政部",
+        "税务总局",
+        "证监会"
+      ],
+      "key_numbers": [],
+      "expected_direction": "up",
+      "subcategory": "交易制度",
+      "memorization_likelihood": "high"
+    },
+    {
+      "id": "tc_009",
+      "news": {
+        "id": "cls_20240118_001",
+        "title": "国家数据局等17部门联合印发数据要素发展意见",
+        "content": "2024年1月18日，国家数据局等17个部门联合印发《'数据要素×'三年行动计划（2024—2026年）》，提出到2026年底数据要素应用广度和深度大幅拓展，数据产业年均增速超过20%。重点领域包括工业制造、现代农业、金融服务等12个行业。",
+        "publish_time": "2024-01-18T10:00:00",
+        "category": "policy",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "数据要素概念股短期活跃，但受大盘拖累整体表现平淡",
+      "outcome_date": "2024-02-01",
+      "sector": "科技",
+      "key_entities": [
+        "国家数据局"
+      ],
+      "key_numbers": [
+        "17个部门",
+        "2026年",
+        "20%",
+        "12个行业"
+      ],
+      "expected_direction": "neutral",
+      "subcategory": "数据要素",
+      "memorization_likelihood": "low"
+    },
+    {
+      "id": "tc_010",
+      "news": {
+        "id": "cls_20210827_001",
+        "title": "工信部召开互联网行业专项整治行动会议",
+        "content": "2021年8月27日，工信部召开互联网行业专项整治行动会议，要求重点整治扰乱市场秩序、侵害用户权益、威胁数据安全、违反资源管理规定四类问题。涉及即时通信、网上购物、新闻资讯等8类共计43款APP。",
+        "publish_time": "2021-08-27T16:00:00",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "互联网板块持续承压，中概互联ETF在2021年下半年持续下跌",
+      "outcome_date": "2021-09-15",
+      "sector": "互联网",
+      "key_entities": [
+        "工信部"
+      ],
+      "key_numbers": [
+        "8类",
+        "43款"
+      ],
+      "expected_direction": "down",
+      "subcategory": "互联网整治",
+      "memorization_likelihood": "medium"
+    },
+    {
+      "id": "tc_011",
+      "news": {
+        "id": "cls_20240507_001",
+        "title": "国务院发布新'国九条'，全面加强资本市场监管",
+        "content": "2024年4月12日，国务院印发《关于加强监管防范风险推动资本市场高质量发展的若干意见》，共9条。强调严把发行上市准入关，严格上市公司持续监管，加大退市力度。提出未来5年基本形成资本市场高质量发展的总体框架。",
+        "publish_time": "2024-04-12T20:00:00",
+        "category": "policy",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "新国九条发布后小盘股和ST股大面积跌停，市场风格向大盘蓝筹切换",
+      "outcome_date": "2024-04-30",
+      "sector": "大盘",
+      "key_entities": [
+        "国务院"
+      ],
+      "key_numbers": [
+        "9条",
+        "5年"
+      ],
+      "expected_direction": "down",
+      "subcategory": "资本市场改革",
+      "memorization_likelihood": "high"
+    },
+    {
+      "id": "tc_012",
+      "news": {
+        "id": "cls_20220415_001",
+        "title": "央行宣布全面降准0.25个百分点",
+        "content": "2022年4月15日，中国人民银行宣布于4月25日下调金融机构存款准备金率0.25个百分点。此次降准共计释放长期资金约5300亿元。央行表示将加大对实体经济特别是受疫情严重影响行业和中小微企业的支持力度。",
+        "publish_time": "2022-04-15T18:00:00",
+        "category": "policy",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "降准幅度低于市场预期的0.5个百分点，A股次日低开，市场反应偏负面",
+      "outcome_date": "2022-04-18",
+      "sector": "金融",
+      "key_entities": [
+        "中国人民银行"
+      ],
+      "key_numbers": [
+        "0.25个百分点",
+        "5300亿元"
+      ],
+      "expected_direction": "neutral",
+      "subcategory": "货币政策",
+      "memorization_likelihood": "medium"
+    },
+    {
+      "id": "tc_013",
+      "news": {
+        "id": "cls_20230110_001",
+        "title": "蚂蚁集团被罚71.23亿元，平台经济整改基本完成",
+        "content": "2023年7月7日，中国人民银行等金融管理部门对蚂蚁集团及旗下机构处以罚款合计约71.23亿元。监管部门表示蚂蚁集团已完成相关整改工作，金融管理部门对平台企业的集中整改基本完成。",
+        "publish_time": "2023-07-07T17:00:00",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "市场解读为利空出尽，阿里巴巴港股次日上涨，平台经济板块整体回暖",
+      "outcome_date": "2023-07-14",
+      "sector": "互联网",
+      "key_entities": [
+        "蚂蚁集团",
+        "中国人民银行"
+      ],
+      "key_numbers": [
+        "71.23亿元"
+      ],
+      "expected_direction": "up",
+      "subcategory": "平台经济",
+      "memorization_likelihood": "high"
+    },
+    {
+      "id": "tc_014",
+      "news": {
+        "id": "cls_20240924_002",
+        "title": "证监会发布市值管理指引，鼓励上市公司回购增持",
+        "content": "2024年9月24日，证监会发布《上市公司监管指引第10号——市值管理》，明确要求主要指数成份股公司制定市值管理制度，鼓励上市公司通过回购、增持、分红等方式提升投资价值。长期破净公司应披露估值提升计划。",
+        "publish_time": "2024-09-24T16:00:00",
+        "category": "policy",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "配合924降准降息组合拳，破净股和高股息板块在随后行情中表现突出",
+      "outcome_date": "2024-10-08",
+      "sector": "大盘",
+      "key_entities": [
+        "证监会"
+      ],
+      "key_numbers": [],
+      "expected_direction": "up",
+      "subcategory": "市值管理",
+      "memorization_likelihood": "medium"
+    },
+    {
+      "id": "tc_015",
+      "news": {
+        "id": "cls_20210310_001",
+        "title": "碳中和目标推动新能源板块持续走强",
+        "content": "2021年3月10日，政府工作报告明确提出2030年碳达峰、2060年碳中和目标。多家券商发布研报看好光伏、风电、新能源汽车产业链。宁德时代市值突破万亿，成为创业板首家万亿市值公司。",
+        "publish_time": "2021-03-10T12:00:00",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "新能源板块在2021年上半年持续上涨，宁德时代股价在年内翻倍",
+      "outcome_date": "2021-06-30",
+      "sector": "新能源",
+      "key_entities": [
+        "宁德时代"
+      ],
+      "key_numbers": [
+        "2030年",
+        "2060年",
+        "万亿"
+      ],
+      "expected_direction": "up",
+      "subcategory": "碳中和",
+      "memorization_likelihood": "high"
+    },
+    {
+      "id": "tc_016",
+      "news": {
+        "id": "cls_20200519_001",
+        "title": "康美药业财务造假被证监会处罚，虚增营收近300亿",
+        "content": "2020年5月19日，证监会对康美药业财务造假案作出行政处罚，认定公司2016年至2018年累计虚增营业收入约291.28亿元，虚增货币资金约886亿元。这是A股史上最大规模的财务造假案之一。",
+        "publish_time": "2020-05-19T16:00:00",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "康美药业股价持续下跌，最终被实施ST并面临退市风险，投资者发起集体诉讼",
+      "outcome_date": "2020-06-30",
+      "sector": "医药",
+      "key_entities": [
+        "康美药业",
+        "证监会"
+      ],
+      "key_numbers": [
+        "291.28亿元",
+        "886亿元"
+      ],
+      "expected_direction": "down",
+      "subcategory": "财务造假",
+      "memorization_likelihood": "high"
+    },
+    {
+      "id": "tc_017",
+      "news": {
+        "id": "cls_20200402_001",
+        "title": "瑞幸咖啡自曝财务造假22亿，股价暴跌75%",
+        "content": "2020年4月2日，瑞幸咖啡发布公告承认公司COO及部分员工伪造交易，虚增2019年第二至第四季度销售额约22亿元人民币。消息公布后瑞幸咖啡美股盘前暴跌超80%，随后被纳斯达克要求退市。",
+        "publish_time": "2020-04-02T20:00:00",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "瑞幸咖啡于2020年6月被纳斯达克停牌并退市，中概股信任危机蔓延",
+      "outcome_date": "2020-06-29",
+      "sector": "消费",
+      "key_entities": [
+        "瑞幸咖啡",
+        "纳斯达克"
+      ],
+      "key_numbers": [
+        "22亿元",
+        "75%",
+        "80%"
+      ],
+      "expected_direction": "down",
+      "subcategory": "财务造假",
+      "memorization_likelihood": "high"
+    },
+    {
+      "id": "tc_018",
+      "news": {
+        "id": "cls_20210913_001",
+        "title": "恒大集团债务危机全面爆发，理财产品逾期兑付",
+        "content": "2021年9月13日，中国恒大集团旗下恒大财富出现理财产品逾期兑付。恒大总负债超过1.97万亿元，涉及银行贷款、信托融资、境内外债券等多种融资渠道。市场担忧恒大债务危机可能引发系统性风险。",
+        "publish_time": "2021-09-13T10:00:00",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "恒大股价持续暴跌，港股多次停牌，最终进入清盘程序，房地产板块全面承压",
+      "outcome_date": "2021-12-31",
+      "sector": "房地产",
+      "key_entities": [
+        "中国恒大",
+        "恒大财富"
+      ],
+      "key_numbers": [
+        "1.97万亿元"
+      ],
+      "expected_direction": "down",
+      "subcategory": "债务危机",
+      "memorization_likelihood": "high"
+    },
+    {
+      "id": "tc_019",
+      "news": {
+        "id": "cls_20230420_001",
+        "title": "牧原股份一季度巨亏超26亿，猪周期底部持续",
+        "content": "2023年4月20日，牧原股份发布2023年一季报，公司实现营收约262亿元，归母净利润亏损约26.44亿元。生猪销售均价持续低于成本线，行业产能去化缓慢，猪周期底部特征明显。",
+        "publish_time": "2023-04-20T20:00:00",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "牧原股份股价在2023年上半年持续走低，养殖板块整体低迷",
+      "outcome_date": "2023-06-30",
+      "sector": "农业",
+      "key_entities": [
+        "牧原股份"
+      ],
+      "key_numbers": [
+        "262亿元",
+        "26.44亿元"
+      ],
+      "expected_direction": "down",
+      "subcategory": "业绩亏损",
+      "memorization_likelihood": "medium"
+    },
+    {
+      "id": "tc_020",
+      "news": {
+        "id": "cls_20210416_001",
+        "title": "贵州茅台一季度净利润同比增长超26%，业绩超预期",
+        "content": "2021年4月16日，贵州茅台发布2021年一季报，实现营收约275亿元，归母净利润约139亿元，同比增长约26.56%。公司直销渠道占比持续提升，产品结构优化带动盈利能力增强。",
+        "publish_time": "2021-04-16T20:00:00",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "茅台股价在业绩发布后走强，2021年上半年白酒板块整体表现优异",
+      "outcome_date": "2021-06-30",
+      "sector": "消费",
+      "key_entities": [
+        "贵州茅台"
+      ],
+      "key_numbers": [
+        "275亿元",
+        "139亿元",
+        "26.56%"
+      ],
+      "expected_direction": "up",
+      "subcategory": "业绩超预期",
+      "memorization_likelihood": "high"
+    },
+    {
+      "id": "tc_021",
+      "news": {
+        "id": "cls_20220106_001",
+        "title": "国家能源集团与中国神华推进煤电一体化整合",
+        "content": "2022年1月6日，国电电力发布公告称，公司控股股东国家能源集团正在筹划与中国神华的煤电资产整合方案。此次整合旨在推动煤电一体化运营，提升能源保供能力和运营效率，涉及资产规模超千亿元。",
+        "publish_time": "2022-01-06T18:00:00",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "国电电力和中国神华股价在整合预期下走强，煤电板块估值修复",
+      "outcome_date": "2022-03-31",
+      "sector": "电力",
+      "key_entities": [
+        "国家能源集团",
+        "中国神华",
+        "国电电力"
+      ],
+      "key_numbers": [
+        "千亿元"
+      ],
+      "expected_direction": "up",
+      "subcategory": "并购重组",
+      "memorization_likelihood": "medium"
+    },
+    {
+      "id": "tc_022",
+      "news": {
+        "id": "cls_20200114_001",
+        "title": "美团完成摩拜单车品牌整合，共享单车全面并入美团生态",
+        "content": "2020年1月14日，美团宣布摩拜单车品牌正式更名为美团单车，未来将全面接入美团APP。此次品牌整合标志着美团对摩拜的收购整合基本完成，共享出行业务将作为美团本地生活服务的重要流量入口。",
+        "publish_time": "2020-01-14T10:00:00",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "市场对整合反应平淡，美团股价短期波动不大，投资者更关注外卖主业增长",
+      "outcome_date": "2020-02-28",
+      "sector": "互联网",
+      "key_entities": [
+        "美团",
+        "摩拜单车"
+      ],
+      "key_numbers": [],
+      "expected_direction": "neutral",
+      "subcategory": "品牌整合",
+      "memorization_likelihood": "medium"
+    },
+    {
+      "id": "tc_023",
+      "news": {
+        "id": "cls_20200619_001",
+        "title": "中国中免借壳国旅联合上市获批，免税龙头登陆A股",
+        "content": "2020年6月19日，中国旅游集团中免股份有限公司通过借壳国旅联合正式登陆A股市场。公司是全球最大的旅游零售运营商之一，独占海南离岛免税牌照优势。上市首日市值突破3000亿元。",
+        "publish_time": "2020-06-19T09:30:00",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "中国中免上市后股价持续上涨，2020年下半年涨幅超100%，成为消费白马龙头",
+      "outcome_date": "2020-12-31",
+      "sector": "消费",
+      "key_entities": [
+        "中国中免",
+        "国旅联合",
+        "中国旅游集团"
+      ],
+      "key_numbers": [
+        "3000亿元"
+      ],
+      "expected_direction": "up",
+      "subcategory": "借壳上市",
+      "memorization_likelihood": "high"
+    },
+    {
+      "id": "tc_024",
+      "news": {
+        "id": "cls_20220715_001",
+        "title": "紫光集团进入破产重整程序，半导体巨头命运未卜",
+        "content": "2022年7月15日，紫光集团破产重整方案获债权人会议表决通过。智路建广联合体作为战略投资人，将投入不超过600亿元参与重整。紫光集团旗下拥有长江存储、紫光展锐等核心半导体资产。",
+        "publish_time": "2022-07-15T16:00:00",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "紫光集团债券大幅折价，旗下上市公司紫光国微等股价承压下跌",
+      "outcome_date": "2022-09-30",
+      "sector": "半导体",
+      "key_entities": [
+        "紫光集团",
+        "智路建广",
+        "长江存储",
+        "紫光展锐"
+      ],
+      "key_numbers": [
+        "600亿元"
+      ],
+      "expected_direction": "down",
+      "subcategory": "破产重整",
+      "memorization_likelihood": "high"
+    },
+    {
+      "id": "tc_025",
+      "news": {
+        "id": "cls_20200608_001",
+        "title": "中国中车合并五年回顾：市值缩水超六成",
+        "content": "2020年6月8日，中国中车迎来南北车合并五周年。合并时总市值一度突破万亿元，被称为\"中国神车\"。但五年后市值缩水至约3000亿元，较高点下跌超60%。市场反思央企合并是否真正创造了协同价值。",
+        "publish_time": "2020-06-08T12:00:00",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "中国中车股价在2020年维持低位震荡，合并效应未能体现，市场情绪偏中性",
+      "outcome_date": "2020-09-30",
+      "sector": "制造",
+      "key_entities": [
+        "中国中车"
+      ],
+      "key_numbers": [
+        "万亿元",
+        "3000亿元",
+        "60%"
+      ],
+      "expected_direction": "neutral",
+      "subcategory": "合并回顾",
+      "memorization_likelihood": "medium"
+    },
+    {
+      "id": "tc_026",
+      "news": {
+        "id": "cls_20230829_001",
+        "title": "华为Mate60 Pro突然开售，搭载自研麒麟9000S芯片",
+        "content": "2023年8月29日，华为未经预告突然开售Mate60 Pro手机，经拆解确认搭载自研麒麟9000S芯片，采用7nm工艺。这标志着华为在美国制裁下实现了芯片技术突破，引发市场对国产半导体产业链的强烈关注。",
+        "publish_time": "2023-08-29T12:00:00",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "华为产业链概念股大幅上涨，半导体板块连续走强，国产替代主题持续发酵",
+      "outcome_date": "2023-09-30",
+      "sector": "半导体",
+      "key_entities": [
+        "华为",
+        "麒麟9000S"
+      ],
+      "key_numbers": [
+        "7nm"
+      ],
+      "expected_direction": "up",
+      "subcategory": "技术突破",
+      "memorization_likelihood": "high"
+    },
+    {
+      "id": "tc_027",
+      "news": {
+        "id": "cls_20230103_001",
+        "title": "比亚迪2022年全年销量超186万辆，超越特斯拉成全球新能源车销冠",
+        "content": "2023年1月3日，比亚迪公布2022年全年销量数据，累计销售新能源汽车约186.35万辆，同比增长超150%，超越特斯拉成为全球新能源汽车销量冠军。其中12月单月销量突破23万辆创历史新高。",
+        "publish_time": "2023-01-03T09:00:00",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "比亚迪股价在2023年初走强，A股和港股均创阶段新高",
+      "outcome_date": "2023-02-28",
+      "sector": "汽车",
+      "key_entities": [
+        "比亚迪",
+        "特斯拉"
+      ],
+      "key_numbers": [
+        "186.35万辆",
+        "150%",
+        "23万辆"
+      ],
+      "expected_direction": "up",
+      "subcategory": "销量突破",
+      "memorization_likelihood": "high"
+    },
+    {
+      "id": "tc_028",
+      "news": {
+        "id": "cls_20200716_001",
+        "title": "中芯国际科创板上市首日大涨超200%，市值突破6000亿",
+        "content": "2020年7月16日，中芯国际正式登陆科创板，发行价27.46元/股，开盘价95元，首日涨幅超200%。公司是中国大陆最大的晶圆代工企业，此次科创板上市募资超500亿元，创科创板募资纪录。",
+        "publish_time": "2020-07-16T09:30:00",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "中芯国际上市后带动半导体板块热度，但股价在高位回落，年内震荡调整",
+      "outcome_date": "2020-09-30",
+      "sector": "半导体",
+      "key_entities": [
+        "中芯国际"
+      ],
+      "key_numbers": [
+        "27.46元",
+        "95元",
+        "200%",
+        "6000亿",
+        "500亿元"
+      ],
+      "expected_direction": "up",
+      "subcategory": "科创板上市",
+      "memorization_likelihood": "high"
+    },
+    {
+      "id": "tc_029",
+      "news": {
+        "id": "cls_20240126_001",
+        "title": "药明康德被美国国会提案列入制裁名单，CXO板块重挫",
+        "content": "2024年1月26日，美国国会提出《生物安全法案》，拟将药明康德、药明生物等中国生物技术公司列入限制清单。消息传出后药明康德A股和港股均大幅下跌，单日跌幅超15%，CXO板块全线重挫。",
+        "publish_time": "2024-01-26T10:00:00",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "药明康德股价持续下跌，2024年上半年累计跌幅超40%，CXO板块估值大幅压缩",
+      "outcome_date": "2024-06-30",
+      "sector": "CXO",
+      "key_entities": [
+        "药明康德",
+        "药明生物"
+      ],
+      "key_numbers": [
+        "15%",
+        "40%"
+      ],
+      "expected_direction": "down",
+      "subcategory": "制裁风险",
+      "memorization_likelihood": "high"
+    },
+    {
+      "id": "tc_030",
+      "news": {
+        "id": "cls_20220623_001",
+        "title": "宁德时代发布麒麟电池，能量密度创全球新高",
+        "content": "2022年6月23日，宁德时代正式发布第三代CTP技术麒麟电池，系统集成度创全球新高，体积利用率突破72%，能量密度可达255Wh/kg。麒麟电池可实现整车1000公里续航，计划2023年量产上市。",
+        "publish_time": "2022-06-23T14:00:00",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "宁德时代股价在麒麟电池发布后企稳反弹，新能源板块情绪回暖",
+      "outcome_date": "2022-08-31",
+      "sector": "新能源",
+      "key_entities": [
+        "宁德时代"
+      ],
+      "key_numbers": [
+        "72%",
+        "255Wh/kg",
+        "1000公里"
+      ],
+      "expected_direction": "up",
+      "subcategory": "技术突破",
+      "memorization_likelihood": "high"
+    },
+    {
+      "id": "tc_031",
+      "news": {
+        "id": "cls_20210623_001",
+        "title": "国家医保局推进第五批药品集采，涉及61个品种",
+        "content": "2021年6月23日，国家医保局组织开展第五批国家药品集中采购，共涉及61个品种。部分品种降价幅度超90%，创历史新高。集采常态化推进对医药行业盈利模式产生深远影响，仿制药企业利润空间被大幅压缩。",
+        "publish_time": "2021-06-23T16:00:00",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "医药板块在2021年下半年持续下跌，CXO和创新药赛道也受到情绪拖累",
+      "outcome_date": "2021-09-30",
+      "sector": "医药",
+      "key_entities": [
+        "国家医保局"
+      ],
+      "key_numbers": [
+        "61个品种",
+        "90%"
+      ],
+      "expected_direction": "down",
+      "subcategory": "集采政策",
+      "memorization_likelihood": "high"
+    },
+    {
+      "id": "tc_032",
+      "news": {
+        "id": "cls_20200820_001",
+        "title": "央行住建部约谈房企，\"三道红线\"融资新规出台",
+        "content": "2020年8月20日，中国人民银行、住建部召开重点房地产企业座谈会，明确提出\"三道红线\"融资管理规则：剔除预收款后资产负债率不超70%、净负债率不超100%、现金短债比不低于1倍。不达标企业将被限制融资增速。",
+        "publish_time": "2020-08-20T18:00:00",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "房地产板块开始长期下行，高杠杆房企融资受限，恒大等企业后续爆发债务危机",
+      "outcome_date": "2020-12-31",
+      "sector": "房地产",
+      "key_entities": [
+        "中国人民银行",
+        "住建部"
+      ],
+      "key_numbers": [
+        "70%",
+        "100%",
+        "1倍"
+      ],
+      "expected_direction": "down",
+      "subcategory": "融资监管",
+      "memorization_likelihood": "high"
+    },
+    {
+      "id": "tc_033",
+      "news": {
+        "id": "cls_20230201_001",
+        "title": "ChatGPT用户破亿引爆全球AI热潮，A股AI概念全线涨停",
+        "content": "2023年2月1日，OpenAI旗下ChatGPT月活用户突破1亿，成为史上增长最快的消费级应用。A股市场AI概念股全线爆发，昆仑万维、三六零、科大讯飞等多只个股涨停。算力、数据、应用三大方向全面受益。",
+        "publish_time": "2023-02-01T09:30:00",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "AI概念成为2023年上半年最强主线，相关个股涨幅数倍，TMT板块成交占比超40%",
+      "outcome_date": "2023-06-30",
+      "sector": "科技",
+      "key_entities": [
+        "OpenAI",
+        "ChatGPT",
+        "昆仑万维",
+        "三六零",
+        "科大讯飞"
+      ],
+      "key_numbers": [
+        "1亿",
+        "40%"
+      ],
+      "expected_direction": "up",
+      "subcategory": "AI概念",
+      "memorization_likelihood": "high"
+    },
+    {
+      "id": "tc_034",
+      "news": {
+        "id": "cls_20230815_001",
+        "title": "光伏产业链价格全线崩塌，硅料价格较高点跌超70%",
+        "content": "2023年8月15日，光伏产业链价格持续下跌。多晶硅料价格从2022年高点的30万元/吨跌至不足8万元/吨，跌幅超70%。组件价格跌破1元/W心理关口。行业产能严重过剩，企业开工率大幅下降。",
+        "publish_time": "2023-08-15T10:00:00",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "光伏板块在2023年下半年持续下跌，隆基绿能等龙头股价腰斩",
+      "outcome_date": "2023-12-31",
+      "sector": "光伏",
+      "key_entities": [
+        "隆基绿能"
+      ],
+      "key_numbers": [
+        "30万元/吨",
+        "8万元/吨",
+        "70%",
+        "1元/W"
+      ],
+      "expected_direction": "down",
+      "subcategory": "产能过剩",
+      "memorization_likelihood": "high"
+    },
+    {
+      "id": "tc_035",
+      "news": {
+        "id": "cls_20230710_001",
+        "title": "白酒板块消费复苏不及预期，库存压力显现",
+        "content": "2023年7月10日，多家白酒企业中报预告显示消费复苏力度不及预期。批价方面，五粮液批价跌破900元，国窖1573批价回落至800元附近。渠道库存偏高，经销商信心不足，白酒板块估值承压。",
+        "publish_time": "2023-07-10T14:00:00",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "白酒板块在2023年下半年震荡走弱，但未出现大幅下跌，整体表现中性偏弱",
+      "outcome_date": "2023-09-30",
+      "sector": "白酒",
+      "key_entities": [
+        "五粮液",
+        "国窖1573"
+      ],
+      "key_numbers": [
+        "900元",
+        "800元"
+      ],
+      "expected_direction": "neutral",
+      "subcategory": "消费复苏",
+      "memorization_likelihood": "medium"
+    },
+    {
+      "id": "tc_036",
+      "news": {
+        "id": "cls_20220810_001",
+        "title": "美国芯片法案签署，半导体国产替代加速推进",
+        "content": "2022年8月10日，美国总统拜登正式签署《芯片与科学法案》，对中国半导体产业实施更严格的出口管制。A股半导体板块逆势走强，市场认为国产替代逻辑进一步强化，设备和材料环节最为受益。",
+        "publish_time": "2022-08-10T09:00:00",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "半导体国产替代概念在2022年下半年持续活跃，北方华创等设备股创新高",
+      "outcome_date": "2022-12-31",
+      "sector": "半导体",
+      "key_entities": [
+        "拜登",
+        "北方华创"
+      ],
+      "key_numbers": [],
+      "expected_direction": "up",
+      "subcategory": "国产替代",
+      "memorization_likelihood": "high"
+    },
+    {
+      "id": "tc_037",
+      "news": {
+        "id": "cls_20210315_001",
+        "title": "十四五规划纲要发布，军工装备现代化目标明确",
+        "content": "2021年3月15日，《中华人民共和国国民经济和社会发展第十四个五年规划和2035年远景目标纲要》正式发布，明确提出加快武器装备现代化，确保2027年实现建军百年奋斗目标。军工行业景气度有望持续上行。",
+        "publish_time": "2021-03-15T10:00:00",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "军工板块在2021年走出结构性行情，中航沈飞、航发动力等核心标的涨幅显著",
+      "outcome_date": "2021-12-31",
+      "sector": "军工",
+      "key_entities": [
+        "中航沈飞",
+        "航发动力"
+      ],
+      "key_numbers": [
+        "2027年",
+        "2035年"
+      ],
+      "expected_direction": "up",
+      "subcategory": "十四五规划",
+      "memorization_likelihood": "medium"
+    },
+    {
+      "id": "tc_038",
+      "news": {
+        "id": "cls_20230901_001",
+        "title": "碳酸锂期货价格跌破20万元/吨，较高点暴跌超65%",
+        "content": "2023年9月1日，碳酸锂期货主力合约价格跌破20万元/吨，较2022年11月高点的近60万元/吨暴跌超65%。下游需求增速放缓叠加上游产能集中释放，锂电产业链面临严峻的去库存压力。",
+        "publish_time": "2023-09-01T15:00:00",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "锂电板块在2023年下半年持续走弱，天齐锂业等锂矿股跌幅超50%",
+      "outcome_date": "2023-12-31",
+      "sector": "锂电",
+      "key_entities": [
+        "天齐锂业"
+      ],
+      "key_numbers": [
+        "20万元/吨",
+        "60万元/吨",
+        "65%",
+        "50%"
+      ],
+      "expected_direction": "down",
+      "subcategory": "价格崩塌",
+      "memorization_likelihood": "high"
+    },
+    {
+      "id": "tc_039",
+      "news": {
+        "id": "cls_20240315_001",
+        "title": "银行板块高股息策略持续受追捧，工商银行股价创历史新高",
+        "content": "2024年3月15日，银行板块延续强势表现，工商银行A股股价创历史新高。在市场风险偏好下降的背景下，银行股凭借5%以上的股息率和低估值优势，成为险资和被动基金的重点配置方向。",
+        "publish_time": "2024-03-15T15:00:00",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "银行板块在2024年上半年持续走强，成为少数正收益板块之一",
+      "outcome_date": "2024-06-30",
+      "sector": "银行",
+      "key_entities": [
+        "工商银行"
+      ],
+      "key_numbers": [
+        "5%"
+      ],
+      "expected_direction": "up",
+      "subcategory": "高股息",
+      "memorization_likelihood": "medium"
+    },
+    {
+      "id": "tc_040",
+      "news": {
+        "id": "cls_20200113_001",
+        "title": "中美签署第一阶段经贸协议，贸易摩擦暂时缓和",
+        "content": "2020年1月15日，中美在华盛顿签署第一阶段经贸协议。但随后新冠疫情爆发，叠加美国对华为等企业加大制裁力度，中美关系再度紧张。2020年全年贸易摩擦反复升级，市场避险情绪上升。",
+        "publish_time": "2020-01-15T22:00:00",
+        "category": "macro",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "A股在2020年初因疫情和贸易摩擦双重冲击大幅下跌，沪指一度跌至2646点",
+      "outcome_date": "2020-03-23",
+      "sector": "大盘",
+      "key_entities": [
+        "华为"
+      ],
+      "key_numbers": [
+        "2646点"
+      ],
+      "expected_direction": "down",
+      "subcategory": "贸易摩擦",
+      "memorization_likelihood": "high"
+    },
+    {
+      "id": "tc_041",
+      "news": {
+        "id": "cls_20220616_001",
+        "title": "美联储加息75个基点，创28年来最大单次加息幅度",
+        "content": "2022年6月16日，美联储宣布加息75个基点，将联邦基金利率目标区间上调至1.50%-1.75%，为1994年以来最大单次加息幅度。美联储主席鲍威尔表示不排除7月继续加息75个基点的可能性。全球资本市场剧烈波动。",
+        "publish_time": "2022-06-16T02:00:00",
+        "category": "macro",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "A股受外围冲击短期承压，但在稳增长政策支撑下走出独立行情，下半年震荡为主",
+      "outcome_date": "2022-09-30",
+      "sector": "大盘",
+      "key_entities": [
+        "美联储",
+        "鲍威尔"
+      ],
+      "key_numbers": [
+        "75个基点",
+        "1.50%",
+        "1.75%"
+      ],
+      "expected_direction": "down",
+      "subcategory": "美联储加息",
+      "memorization_likelihood": "high"
+    },
+    {
+      "id": "tc_042",
+      "news": {
+        "id": "cls_20221111_001",
+        "title": "国务院发布优化疫情防控二十条措施",
+        "content": "2022年11月11日，国务院联防联控机制发布进一步优化疫情防控的二十条措施，包括取消次密接判定、缩短隔离时间、取消中风险区判定等。市场将此解读为防控政策转向的重要信号，消费复苏预期大幅升温。",
+        "publish_time": "2022-11-11T18:00:00",
+        "category": "macro",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "消费板块大幅反弹，旅游、餐饮、航空等板块连续涨停，恒生指数单月涨超25%",
+      "outcome_date": "2022-12-31",
+      "sector": "消费",
+      "key_entities": [
+        "国务院联防联控机制"
+      ],
+      "key_numbers": [
+        "二十条",
+        "25%"
+      ],
+      "expected_direction": "up",
+      "subcategory": "防控优化",
+      "memorization_likelihood": "high"
+    }
+  ]
+}

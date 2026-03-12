@@ -1,0 +1,284 @@
+{
+  "probes": [
+    {
+      "id": "mp_001",
+      "probe_type": "price_query",
+      "question": "2024年9月30日沪深300指数的收盘价大约是多少？",
+      "ground_truth": "约4017点",
+      "tolerance": "±3%"
+    },
+    {
+      "id": "mp_002",
+      "probe_type": "price_query",
+      "question": "2024年2月5日上证指数的最低点大约是多少？",
+      "ground_truth": "约2635点",
+      "tolerance": "±3%"
+    },
+    {
+      "id": "mp_003",
+      "probe_type": "trend_prediction",
+      "question": "2024年9月24日到10月8日，A股市场整体走势如何？",
+      "ground_truth": "大幅上涨，上证指数从约2800点涨至3600点以上",
+      "tolerance": "方向正确+幅度级别正确"
+    },
+    {
+      "id": "mp_004",
+      "probe_type": "trend_prediction",
+      "question": "2023年下半年A股市场的整体趋势是什么？",
+      "ground_truth": "持续下跌，上证指数从3200点附近跌至2900点以下",
+      "tolerance": "方向正确"
+    },
+    {
+      "id": "mp_005",
+      "probe_type": "event_impact",
+      "question": "2021年7月23日双减政策对教育板块股价有什么影响？",
+      "ground_truth": "教育板块暴跌，中概教育股单日跌幅超50%",
+      "tolerance": "定性对齐"
+    },
+    {
+      "id": "mp_006",
+      "probe_type": "event_impact",
+      "question": "2022年3月16日金稳委会议后，A股和港股表现如何？",
+      "ground_truth": "大幅反弹，恒生科技指数单日涨超20%",
+      "tolerance": "定性对齐"
+    },
+    {
+      "id": "mp_007",
+      "probe_type": "market_performance",
+      "question": "2024年9月最后一周涨幅最大的A股板块是哪个？",
+      "ground_truth": "券商板块涨幅居前，多只券商股连续涨停",
+      "tolerance": "板块正确"
+    },
+    {
+      "id": "mp_008",
+      "probe_type": "market_performance",
+      "question": "2021年全年A股表现最好的行业板块是什么？",
+      "ground_truth": "新能源（含光伏、锂电）板块表现最佳",
+      "tolerance": "行业正确"
+    },
+    {
+      "id": "mp_009",
+      "probe_type": "price_query",
+      "question": "2024年10月8日上证指数的开盘价大约是多少？",
+      "ground_truth": "约3674点（跳空高开后冲至3674点）",
+      "tolerance": "±3%"
+    },
+    {
+      "id": "mp_010",
+      "probe_type": "trend_prediction",
+      "question": "2024年4月新国九条发布后，小盘股的表现如何？",
+      "ground_truth": "小盘股和ST股大面积跌停，市场风格切换至大盘蓝筹",
+      "tolerance": "方向正确"
+    },
+    {
+      "id": "mp_011",
+      "probe_type": "event_impact",
+      "question": "2023年8月28日印花税减半对A股有什么影响？",
+      "ground_truth": "A股高开低走，短期未能扭转下跌趋势",
+      "tolerance": "定性对齐"
+    },
+    {
+      "id": "mp_012",
+      "probe_type": "price_query",
+      "question": "2021年底宁德时代的股价大约是多少？",
+      "ground_truth": "约580-690元/股",
+      "tolerance": "±10%"
+    },
+    {
+      "id": "mp_013",
+      "probe_type": "market_performance",
+      "question": "2022年A股跌幅最大的板块是什么？",
+      "ground_truth": "房地产板块跌幅居前",
+      "tolerance": "行业正确"
+    },
+    {
+      "id": "mp_014",
+      "probe_type": "trend_prediction",
+      "question": "2024年2月5日A股暴跌后，市场在接下来一个月如何表现？",
+      "ground_truth": "国家队入市，沪指在2月底回升至3000点上方",
+      "tolerance": "方向正确"
+    },
+    {
+      "id": "mp_015",
+      "probe_type": "event_impact",
+      "question": "2023年7月蚂蚁集团被罚71亿后，市场如何解读？",
+      "ground_truth": "利空出尽，阿里巴巴港股次日上涨，平台经济板块回暖",
+      "tolerance": "定性对齐"
+    },
+    {
+      "id": "mp_016",
+      "probe_type": "price_query",
+      "question": "2023年7月24日政治局会议当天上证指数收盘价大约是多少？",
+      "ground_truth": "约3164点",
+      "tolerance": "±3%"
+    },
+    {
+      "id": "mp_017",
+      "probe_type": "trend_prediction",
+      "question": "2021年下半年互联网板块的走势如何？",
+      "ground_truth": "受监管政策影响持续下跌，中概互联ETF大幅回调",
+      "tolerance": "方向正确"
+    },
+    {
+      "id": "mp_018",
+      "probe_type": "market_performance",
+      "question": "2024年全年A股市场的整体表现如何？",
+      "ground_truth": "先跌后涨，924行情后大幅反弹，全年上证指数涨约12%",
+      "tolerance": "趋势描述正确"
+    },
+    {
+      "id": "mp_019",
+      "probe_type": "event_impact",
+      "question": "2021年10月限电停产政策对煤炭板块有什么影响？",
+      "ground_truth": "煤炭板块短期大涨，动力煤期货创新高后被发改委干预回调",
+      "tolerance": "定性对齐"
+    },
+    {
+      "id": "mp_020",
+      "probe_type": "price_query",
+      "question": "2022年4月上证指数的最低点大约是多少？",
+      "ground_truth": "约2863点（4月27日）",
+      "tolerance": "±3%"
+    },
+    {
+      "id": "mp_021",
+      "probe_type": "event_impact",
+      "question": "2020年康美药业财务造假案曝光后，对A股医药板块有什么影响？",
+      "ground_truth": "康美药业被ST，投资者发起集体诉讼，医药板块短期承压，财务造假监管趋严",
+      "tolerance": "定性对齐"
+    },
+    {
+      "id": "mp_022",
+      "probe_type": "price_query",
+      "question": "2020年4月瑞幸咖啡自曝造假后，股价跌了多少？",
+      "ground_truth": "单日暴跌超75%，盘前一度跌超80%",
+      "tolerance": "±10%"
+    },
+    {
+      "id": "mp_023",
+      "probe_type": "event_impact",
+      "question": "2021年恒大债务危机对房地产板块有什么影响？",
+      "ground_truth": "房地产板块全面承压，多家房企出现债务违约，行业信用危机蔓延",
+      "tolerance": "定性对齐"
+    },
+    {
+      "id": "mp_024",
+      "probe_type": "price_query",
+      "question": "2021年贵州茅台一季度净利润同比增长大约多少？",
+      "ground_truth": "同比增长约26.56%",
+      "tolerance": "±5%"
+    },
+    {
+      "id": "mp_025",
+      "probe_type": "event_impact",
+      "question": "2022年紫光集团破产重整对半导体板块有什么影响？",
+      "ground_truth": "紫光系上市公司股价承压，但市场对重整后资产整合抱有期待",
+      "tolerance": "定性对齐"
+    },
+    {
+      "id": "mp_026",
+      "probe_type": "trend_prediction",
+      "question": "2023年8月华为Mate60 Pro发布后，半导体板块走势如何？",
+      "ground_truth": "华为产业链和半导体国产替代概念大幅上涨，持续数周",
+      "tolerance": "方向正确"
+    },
+    {
+      "id": "mp_027",
+      "probe_type": "market_performance",
+      "question": "2022年全年比亚迪新能源汽车销量大约是多少？",
+      "ground_truth": "约186万辆，超越特斯拉成为全球新能源车销冠",
+      "tolerance": "±10%"
+    },
+    {
+      "id": "mp_028",
+      "probe_type": "price_query",
+      "question": "2020年7月中芯国际科创板上市首日涨幅大约是多少？",
+      "ground_truth": "首日涨幅超200%，开盘价95元，发行价27.46元",
+      "tolerance": "±20%"
+    },
+    {
+      "id": "mp_029",
+      "probe_type": "event_impact",
+      "question": "2024年美国《生物安全法案》对药明康德股价有什么影响？",
+      "ground_truth": "药明康德A股和港股大幅下跌，单日跌幅超15%，2024上半年累计跌超40%",
+      "tolerance": "定性对齐"
+    },
+    {
+      "id": "mp_030",
+      "probe_type": "market_performance",
+      "question": "宁德时代麒麟电池的能量密度大约是多少？",
+      "ground_truth": "能量密度可达255Wh/kg，体积利用率突破72%",
+      "tolerance": "±10%"
+    },
+    {
+      "id": "mp_031",
+      "probe_type": "trend_prediction",
+      "question": "2021年国家医保局推进第五批集采后，医药板块走势如何？",
+      "ground_truth": "医药板块在2021年下半年持续下跌，仿制药企业利润空间被大幅压缩",
+      "tolerance": "方向正确"
+    },
+    {
+      "id": "mp_032",
+      "probe_type": "event_impact",
+      "question": "2020年\"三道红线\"融资新规对房地产行业有什么影响？",
+      "ground_truth": "高杠杆房企融资受限，房地产板块开始长期下行，后续引发恒大等企业债务危机",
+      "tolerance": "定性对齐"
+    },
+    {
+      "id": "mp_033",
+      "probe_type": "market_performance",
+      "question": "2023年上半年A股表现最强的主题是什么？",
+      "ground_truth": "AI/人工智能概念是最强主线，TMT板块成交占比超40%",
+      "tolerance": "主题正确"
+    },
+    {
+      "id": "mp_034",
+      "probe_type": "price_query",
+      "question": "2023年光伏硅料价格从高点跌了多少？",
+      "ground_truth": "从约30万元/吨跌至不足8万元/吨，跌幅超70%",
+      "tolerance": "±15%"
+    },
+    {
+      "id": "mp_035",
+      "probe_type": "trend_prediction",
+      "question": "2022年美国芯片法案签署后，A股半导体板块走势如何？",
+      "ground_truth": "半导体国产替代概念持续活跃，设备和材料环节走强",
+      "tolerance": "方向正确"
+    },
+    {
+      "id": "mp_036",
+      "probe_type": "market_performance",
+      "question": "2023年碳酸锂期货价格最低跌到多少？",
+      "ground_truth": "跌破20万元/吨，较2022年高点近60万元/吨暴跌超65%",
+      "tolerance": "±15%"
+    },
+    {
+      "id": "mp_037",
+      "probe_type": "price_query",
+      "question": "2024年上半年工商银行A股股价表现如何？",
+      "ground_truth": "创历史新高，银行板块凭借高股息优势成为少数正收益板块",
+      "tolerance": "定性对齐"
+    },
+    {
+      "id": "mp_038",
+      "probe_type": "event_impact",
+      "question": "2020年初中美贸易摩擦叠加疫情，A股最低跌到多少？",
+      "ground_truth": "沪指一度跌至约2646点",
+      "tolerance": "±3%"
+    },
+    {
+      "id": "mp_039",
+      "probe_type": "trend_prediction",
+      "question": "2022年美联储加息75个基点后，A股走势如何？",
+      "ground_truth": "短期承压但在稳增长政策支撑下走出独立行情，下半年震荡为主",
+      "tolerance": "方向正确"
+    },
+    {
+      "id": "mp_040",
+      "probe_type": "event_impact",
+      "question": "2022年11月优化疫情防控二十条措施发布后，消费板块表现如何？",
+      "ground_truth": "消费板块大幅反弹，旅游餐饮航空连续涨停，恒生指数单月涨超25%",
+      "tolerance": "定性对齐"
+    }
+  ]
+}

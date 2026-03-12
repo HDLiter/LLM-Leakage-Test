@@ -1,0 +1,24 @@
+# Environment
+.env
+
+# API cache and experiment results (regenerable)
+data/cache/
+data/results/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+
+# Claude Code
+.claude/
+
+# Misc
+deepseek_speed_test.py

@@ -1,0 +1,31 @@
+# LLM Leakage Test Bench Configuration
+# API keys are read from environment variables, NOT stored here.
+
+llm:
+  provider: deepseek
+  model: deepseek-chat
+  base_url: https://api.deepseek.com/v1
+  temperature: 0.0
+  max_tokens: 2048
+  # env var: DEEPSEEK_API_KEY
+
+experiment:
+  n_repeats: 3                # 每个探针重复次数
+  cache_results: true         # 缓存 API 结果到 data/cache/
+  output_format: "5-bin"      # 默认输出格式: binary | scalar | 5-bin | free-text
+
+metrics:
+  # FactFin 目标函数权重: L = alpha*PC + beta*CI - gamma*IDS
+  alpha: 0.4
+  beta: 0.3
+  gamma: 0.3
+
+paths:
+  samples_dir: data/samples
+  seed_dir: data/seed
+  generated_dir: data/generated
+  cache_dir: data/cache
+  results_dir: data/results
+  test_cases: data/seed/test_cases.json
+  memorization_probes: data/seed/memorization_probes.json
+  counterfactual_variants: data/generated/counterfactual_variants.json

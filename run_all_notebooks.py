@@ -13,7 +13,7 @@ import sys
 import time
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).parent
+PROJECT_ROOT = Path(__file__).resolve().parent
 
 NOTEBOOKS = [
     "notebooks/00_data_prep.ipynb",

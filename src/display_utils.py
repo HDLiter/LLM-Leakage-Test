@@ -97,16 +97,16 @@ def show_counterfactual_result(
             <th style="width:50%; padding:6px 10px; border:1px solid #ddd; text-align:left;">反事实新闻</th>
         </tr>
         <tr>
-            <td style="padding:8px 10px; border:1px solid #ddd; vertical-align:top; white-space:pre-wrap; max-height:200px; overflow-y:auto;">{original_text}</td>
-            <td style="padding:8px 10px; border:1px solid #ddd; vertical-align:top; white-space:pre-wrap; max-height:200px; overflow-y:auto;">{cf_text}</td>
+            <td style="padding:8px 10px; border:1px solid #ddd; vertical-align:top;"><div style="max-height:200px; overflow-y:auto; white-space:pre-wrap;">{original_text}</div></td>
+            <td style="padding:8px 10px; border:1px solid #ddd; vertical-align:top;"><div style="max-height:200px; overflow-y:auto; white-space:pre-wrap;">{cf_text}</div></td>
         </tr>
         <tr style="background:#f5f5f5;">
             <th style="padding:6px 10px; border:1px solid #ddd; text-align:left;">原始预测</th>
             <th style="padding:6px 10px; border:1px solid #ddd; text-align:left;">反事实预测</th>
         </tr>
         <tr>
-            <td style="padding:8px 10px; border:1px solid #ddd; vertical-align:top;">{orig_pred}</td>
-            <td style="padding:8px 10px; border:1px solid #ddd; vertical-align:top;">{cf_pred}</td>
+            <td style="padding:8px 10px; border:1px solid #ddd; vertical-align:top;"><div style="max-height:150px; overflow-y:auto; white-space:pre-wrap;">{orig_pred}</div></td>
+            <td style="padding:8px 10px; border:1px solid #ddd; vertical-align:top;"><div style="max-height:150px; overflow-y:auto; white-space:pre-wrap;">{cf_pred}</div></td>
         </tr>
         </table>
     </div>

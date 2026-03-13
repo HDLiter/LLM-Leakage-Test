@@ -55,24 +55,21 @@ def show_parsed_prediction(raw: str) -> str:
             arrow, direction = "\u2192", "中性"
         conf = max(bull, bear, (dist[2] / total) if total > 0 else 0.2)
         reasoning = data.get("reasoning", "")
-        summary = reasoning[:80] + "..." if len(reasoning) > 80 else reasoning
-        return f"{arrow} {direction} | 置信度: {conf:.0%} | {summary}"
+        return f"{arrow} {direction} | 置信度: {conf:.0%} | {reasoning}"
 
     # binary format
     if "direction" in data:
         d = data["direction"]
         arrow = "\u2191" if d == "up" else ("\u2193" if d == "down" else "\u2192")
         reasoning = data.get("reasoning", "")
-        summary = reasoning[:80] + "..." if len(reasoning) > 80 else reasoning
-        return f"{arrow} {d} | {summary}"
+        return f"{arrow} {d} | {reasoning}"
 
     # scalar format
     if "score" in data:
         s = float(data["score"])
         arrow = "\u2191" if s > 0.1 else ("\u2193" if s < -0.1 else "\u2192")
         reasoning = data.get("reasoning", "")
-        summary = reasoning[:80] + "..." if len(reasoning) > 80 else reasoning
-        return f"{arrow} score={s:.2f} | {summary}"
+        return f"{arrow} score={s:.2f} | {reasoning}"
 
     return text[:300]
 
@@ -100,8 +97,8 @@ def show_counterfactual_result(
             <th style="width:50%; padding:6px 10px; border:1px solid #ddd; text-align:left;">反事实新闻</th>
         </tr>
         <tr>
-            <td style="padding:8px 10px; border:1px solid #ddd; vertical-align:top; white-space:pre-wrap; max-height:150px; overflow-y:auto;">{original_text[:300]}</td>
-            <td style="padding:8px 10px; border:1px solid #ddd; vertical-align:top; white-space:pre-wrap; max-height:150px; overflow-y:auto;">{cf_text[:300]}</td>
+            <td style="padding:8px 10px; border:1px solid #ddd; vertical-align:top; white-space:pre-wrap; max-height:200px; overflow-y:auto;">{original_text}</td>
+            <td style="padding:8px 10px; border:1px solid #ddd; vertical-align:top; white-space:pre-wrap; max-height:200px; overflow-y:auto;">{cf_text}</td>
         </tr>
         <tr style="background:#f5f5f5;">
             <th style="padding:6px 10px; border:1px solid #ddd; text-align:left;">原始预测</th>

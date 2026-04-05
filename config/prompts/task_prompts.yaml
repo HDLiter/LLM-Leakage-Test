@@ -1,25 +1,32 @@
 schema_version: prompt_schema_v1
-frozen_on: "2026-04-05"
+frozen_on: "2026-04-05-v2"
 
 defaults:
   temperature: 0
   instruction_language: en
   article_language: zh
-  input_unit: single_article
+  input_unit: article_target_pair
   article_placeholder: "{article}"
+  target_placeholder: "{target}"
+  target_type_placeholder: "{target_type}"
   target_resolution_rule: >
-    For direct prediction and sentiment classification, if the article is company- or
-    sector-specific, judge the most directly affected Chinese listed stock or sector;
-    if the article is macro or policy-wide, judge the broad A-share market.
+    Each annotation is conditioned on the provided target and target_type. Judge only
+    the provided target. Do not substitute another company, sector, or broad market
+    proxy even if the article also mentions them.
   evidence_rule: >
-    Copy 1-2 short verbatim Chinese quotes from the article. Do not fabricate evidence.
+    Copy 1-2 short verbatim Chinese quotes from the article. Do not fabricate
+    evidence. Each quote must stay within 120 characters.
 
 common_schemas:
   matched_slots_v1:
     type: object
-    required: [slot_1, slot_2, slot_3, evidence, confidence]
+    required: [target_echo, slot_1, slot_2, slot_3, evidence, confidence]
     additionalProperties: false
     properties:
+      target_echo:
+        type: string
+        minLength: 1
+        maxLength: 120
       slot_1:
         type: string
       slot_2:
@@ -56,32 +63,39 @@ prompts:
     task_family: direct_prediction
     variant: base
     experiments: [E1, E2, E3]
-    approx_max_output_tokens: 96
+    approx_max_output_tokens: 120
     system_prompt: >
       You are an annotation model in a leakage audit of Chinese financial news. Use
-      only the provided article. Do not use outside knowledge, hindsight, prices, or
-      events after publication. If the text does not support a directional call,
-      choose neutral. Return valid JSON only with no markdown or extra text.
+      only the provided Chinese article and the provided target. Do not use outside
+      knowledge, hindsight, later market outcomes, realized returns, or any events
+      after publication. Judge only what the article implies for the named target. If
+      the article does not support a directional call for that target, choose neutral.
+      Return valid JSON only with no markdown or extra text.
     user_prompt_template: |
       Article (Chinese):
       {article}
 
-      Task: predict the immediate price direction implied by this article.
-      Use the most directly affected Chinese listed stock or sector; if the article
-      is macro or policy-wide, use the broad A-share market.
-      Use only the article text, not what actually happened later.
+      Target: {target} ({target_type})
+
+      Task: predict the immediate price direction implied by this article FOR {target}.
 
       Return exactly:
-      {"direction":"up|down|neutral","confidence":0-100,"evidence":["quote_1","quote_2"]}
+      {"target_echo":"{target}","direction":"up|down|neutral","confidence":0-100,"evidence":["quote_1","quote_2"]}
 
       Rules:
+      - Judge only the provided target, not another entity or a broader market proxy.
+      - `target_echo` must exactly repeat the target name.
       - Evidence must be 1-2 short verbatim Chinese quotes from the article.
-      - If the article is mixed or insufficient, use "neutral".
+      - If the article is mixed, hedged, or insufficient for {target}, use "neutral".
     output_schema:
       type: object
-      required: [direction, confidence, evidence]
+      required: [target_echo, direction, confidence, evidence]
       additionalProperties: false
       properties:
+        target_echo:
+          type: string
+          minLength: 1
+          maxLength: 120
         direction:
           type: string
           enum: [up, down, neutral]
@@ -96,33 +110,39 @@ prompts:
           items:
             type: string
             minLength: 1
-            maxLength: 80
+            maxLength: 120
 
   "direct_prediction.matched":
     task_family: direct_prediction
     variant: matched
     experiments: [E3]
-    approx_max_output_tokens: 150
+    approx_max_output_tokens: 180
     system_prompt: >
       You are an annotation model in a leakage audit of Chinese financial news. Use
-      only the provided article. Do not use outside knowledge, hindsight, prices, or
-      events after publication. Ground every slot in short verbatim evidence from the
+      only the provided Chinese article and the provided target. Do not use outside
+      knowledge, hindsight, later market outcomes, realized returns, or any events
+      after publication. Ground every slot in short verbatim evidence from the
       article. If the text is insufficient, use the neutral or unclear option. Return
       valid JSON only with no markdown or extra text.
     user_prompt_template: |
       Article (Chinese):
       {article}
 
-      Task: use the common matched schema and fill all three slots from the article only.
+      Target: {target} ({target_type})
+
+      Task: use the common matched schema and fill all three slots FOR {target} from the article only.
       Slot meanings for this prompt:
       - slot_1 = direction: up | down | neutral
-      - slot_2 = scope: company | sector | broad_market | unclear
+      - slot_2 = framing_certainty: definitive | qualified | speculative | mixed | unclear
       - slot_3 = strength: strong | moderate | weak | unclear
 
       Return exactly:
-      {"slot_1":"...","slot_2":"...","slot_3":"...","evidence":[{"quote":"...","supports":["slot_1"]},{"quote":"...","supports":["slot_2","slot_3"]}],"confidence":0-100}
+      {"target_echo":"{target}","slot_1":"...","slot_2":"...","slot_3":"...","evidence":[{"quote":"...","supports":["slot_1"]},{"quote":"...","supports":["slot_2","slot_3"]}],"confidence":0-100}
 
       Rules:
+      - Judge only the provided target, not another entity or a broader market proxy.
+      - `target_echo` must exactly repeat the target name.
+      - `framing_certainty` captures how firmly the article speaks about {target}: definitive = direct confirmed claim, qualified = hedged but leaning, speculative = rumor or possibility language, mixed = both firm and hedged cues, unclear = not supported.
       - Use 1-2 short verbatim Chinese quotes.
       - If only one quote is needed, keep one evidence item.
     output_schema_ref: matched_slots_v1
@@ -131,8 +151,8 @@ prompts:
         meaning: direction
         allowed_values: [up, down, neutral]
       slot_2:
-        meaning: scope
-        allowed_values: [company, sector, broad_market, unclear]
+        meaning: framing_certainty
+        allowed_values: [definitive, qualified, speculative, mixed, unclear]
       slot_3:
         meaning: strength
         allowed_values: [strong, moderate, weak, unclear]
@@ -141,32 +161,40 @@ prompts:
     task_family: sentiment_classification
     variant: base
     experiments: [E1, E2, E3]
-    approx_max_output_tokens: 96
+    approx_max_output_tokens: 120
     system_prompt: >
       You are an annotation model in a leakage audit of Chinese financial news. Use
-      only the provided article. Do not use outside knowledge, hindsight, prices, or
-      events after publication. If the text does not support a clear sentiment label,
+      only the provided Chinese article and the provided target. Do not use outside
+      knowledge, hindsight, later market outcomes, realized returns, or any events
+      after publication. Judge only the article's market-facing tone toward the named
+      target. If the article does not support a clear sentiment label for that target,
       choose neutral. Return valid JSON only with no markdown or extra text.
     user_prompt_template: |
       Article (Chinese):
       {article}
 
-      Task: classify the market-facing sentiment conveyed by this article.
-      Use the most directly affected Chinese listed stock or sector; if the article
-      is macro or policy-wide, use the broad A-share market.
-      This is a sentiment label, not a claim about what really happened later.
+      Target: {target} ({target_type})
+
+      Task: classify the market-facing sentiment conveyed by this article FOR {target}.
 
       Return exactly:
-      {"sentiment":"positive|negative|neutral","confidence":0-100,"evidence":["quote_1","quote_2"]}
+      {"target_echo":"{target}","sentiment":"positive|negative|neutral","confidence":0-100,"evidence":["quote_1","quote_2"]}
 
       Rules:
+      - Judge only the provided target, not another entity or a broader market proxy.
+      - `target_echo` must exactly repeat the target name.
+      - This is the article's tone toward {target}, not a claim about what happened later.
       - Evidence must be 1-2 short verbatim Chinese quotes from the article.
-      - If the article is mixed or insufficient, use "neutral".
+      - If the article is mixed or insufficient for {target}, use "neutral".
     output_schema:
       type: object
-      required: [sentiment, confidence, evidence]
+      required: [target_echo, sentiment, confidence, evidence]
       additionalProperties: false
       properties:
+        target_echo:
+          type: string
+          minLength: 1
+          maxLength: 120
         sentiment:
           type: string
           enum: [positive, negative, neutral]
@@ -181,33 +209,39 @@ prompts:
           items:
             type: string
             minLength: 1
-            maxLength: 80
+            maxLength: 120
 
   "sentiment_classification.matched":
     task_family: sentiment_classification
     variant: matched
     experiments: [E3]
-    approx_max_output_tokens: 150
+    approx_max_output_tokens: 180
     system_prompt: >
       You are an annotation model in a leakage audit of Chinese financial news. Use
-      only the provided article. Do not use outside knowledge, hindsight, prices, or
-      events after publication. Ground every slot in short verbatim evidence from the
+      only the provided Chinese article and the provided target. Do not use outside
+      knowledge, hindsight, later market outcomes, realized returns, or any events
+      after publication. Ground every slot in short verbatim evidence from the
       article. If the text is insufficient, use the neutral or unclear option. Return
       valid JSON only with no markdown or extra text.
     user_prompt_template: |
       Article (Chinese):
       {article}
 
-      Task: use the common matched schema and fill all three slots from the article only.
+      Target: {target} ({target_type})
+
+      Task: use the common matched schema and fill all three slots FOR {target} from the article only.
       Slot meanings for this prompt:
       - slot_1 = sentiment: positive | negative | neutral
-      - slot_2 = scope: company | sector | broad_market | unclear
+      - slot_2 = framing_certainty: definitive | qualified | speculative | mixed | unclear
       - slot_3 = tone_strength: strong | moderate | weak | mixed | unclear
 
       Return exactly:
-      {"slot_1":"...","slot_2":"...","slot_3":"...","evidence":[{"quote":"...","supports":["slot_1"]},{"quote":"...","supports":["slot_2","slot_3"]}],"confidence":0-100}
+      {"target_echo":"{target}","slot_1":"...","slot_2":"...","slot_3":"...","evidence":[{"quote":"...","supports":["slot_1"]},{"quote":"...","supports":["slot_2","slot_3"]}],"confidence":0-100}
 
       Rules:
+      - Judge only the provided target, not another entity or a broader market proxy.
+      - `target_echo` must exactly repeat the target name.
+      - `framing_certainty` captures how firmly the article speaks about {target}: definitive = direct confirmed claim, qualified = hedged but leaning, speculative = rumor or possibility language, mixed = both firm and hedged cues, unclear = not supported.
       - Use 1-2 short verbatim Chinese quotes.
       - If only one quote is needed, keep one evidence item.
     output_schema_ref: matched_slots_v1
@@ -216,8 +250,8 @@ prompts:
         meaning: sentiment
         allowed_values: [positive, negative, neutral]
       slot_2:
-        meaning: scope
-        allowed_values: [company, sector, broad_market, unclear]
+        meaning: framing_certainty
+        allowed_values: [definitive, qualified, speculative, mixed, unclear]
       slot_3:
         meaning: tone_strength
         allowed_values: [strong, moderate, weak, mixed, unclear]
@@ -226,30 +260,39 @@ prompts:
     task_family: decomposed_authority
     variant: base
     experiments: [E1, E2, E3]
-    approx_max_output_tokens: 150
+    approx_max_output_tokens: 180
     system_prompt: >
       You are an annotation model in a leakage audit of Chinese financial news. Use
-      only the provided article. Do not use outside knowledge, hindsight, prices, or
-      events after publication. Extract authority signals only. Do not predict prices
-      or sentiment. Return valid JSON only with no markdown or extra text.
+      only the provided Chinese article and the provided target. Do not use outside
+      knowledge, hindsight, later market outcomes, realized returns, or any events
+      after publication. Extract authority signals only. Do not predict prices,
+      sentiment, or impact. Return valid JSON only with no markdown or extra text.
     user_prompt_template: |
       Article (Chinese):
       {article}
 
-      Task: extract authority signals only.
+      Target: {target} ({target_type})
+
+      Task: extract authority signals about the claims relevant to {target} only.
 
       Return exactly:
-      {"source_credibility":"high|medium|low|unclear","regulatory_vs_rumor":"regulatory_or_official_notice|rumor_or_chatter|neither_or_mixed|unclear","official_vs_unattributed":"official_named|named_but_not_official|unattributed|mixed|unclear","evidence":[{"quote":"...","supports":["source_credibility","regulatory_vs_rumor"]},{"quote":"...","supports":["official_vs_unattributed"]}],"confidence":0-100}
+      {"target_echo":"{target}","source_credibility":"high|medium|low|unclear","regulatory_vs_rumor":"regulatory_or_official_notice|rumor_or_chatter|neither_or_mixed|unclear","official_vs_unattributed":"official_named|named_but_not_official|unattributed|mixed|unclear","evidence":[{"quote":"...","supports":["source_credibility","regulatory_vs_rumor"]},{"quote":"...","supports":["official_vs_unattributed"]}],"confidence":0-100}
 
       Rules:
-      - Judge only provenance and attribution cues stated in the article.
+      - Judge only provenance and attribution cues stated in the article for claims about {target}.
+      - `target_echo` must exactly repeat the target name.
+      - Do not infer credibility from outside knowledge, hindsight, or later market outcomes.
       - Use 1-2 short verbatim Chinese quotes.
       - Use "unclear" if the article does not support a field.
     output_schema:
       type: object
-      required: [source_credibility, regulatory_vs_rumor, official_vs_unattributed, evidence, confidence]
+      required: [target_echo, source_credibility, regulatory_vs_rumor, official_vs_unattributed, evidence, confidence]
       additionalProperties: false
       properties:
+        target_echo:
+          type: string
+          minLength: 1
+          maxLength: 120
         source_credibility:
           type: string
           enum: [high, medium, low, unclear]
@@ -288,27 +331,32 @@ prompts:
     task_family: decomposed_authority
     variant: matched
     experiments: [E3]
-    approx_max_output_tokens: 150
+    approx_max_output_tokens: 180
     system_prompt: >
       You are an annotation model in a leakage audit of Chinese financial news. Use
-      only the provided article. Do not use outside knowledge, hindsight, prices, or
-      events after publication. Extract authority signals only. Ground every slot in
-      short verbatim evidence from the article. Return valid JSON only with no
-      markdown or extra text.
+      only the provided Chinese article and the provided target. Do not use outside
+      knowledge, hindsight, later market outcomes, realized returns, or any events
+      after publication. Extract authority signals only. Ground every slot in short
+      verbatim evidence from the article. Return valid JSON only with no markdown or
+      extra text.
     user_prompt_template: |
       Article (Chinese):
       {article}
 
-      Task: use the common matched schema and fill all three slots from the article only.
+      Target: {target} ({target_type})
+
+      Task: use the common matched schema and fill all three slots FOR {target} from the article only.
       Slot meanings for this prompt:
       - slot_1 = source_credibility: high | medium | low | unclear
       - slot_2 = regulatory_vs_rumor: regulatory_or_official_notice | rumor_or_chatter | neither_or_mixed | unclear
       - slot_3 = official_vs_unattributed: official_named | named_but_not_official | unattributed | mixed | unclear
 
       Return exactly:
-      {"slot_1":"...","slot_2":"...","slot_3":"...","evidence":[{"quote":"...","supports":["slot_1"]},{"quote":"...","supports":["slot_2","slot_3"]}],"confidence":0-100}
+      {"target_echo":"{target}","slot_1":"...","slot_2":"...","slot_3":"...","evidence":[{"quote":"...","supports":["slot_1"]},{"quote":"...","supports":["slot_2","slot_3"]}],"confidence":0-100}
 
       Rules:
+      - Judge only provenance and attribution cues stated in the article for claims about {target}.
+      - `target_echo` must exactly repeat the target name.
       - Use 1-2 short verbatim Chinese quotes.
       - Use "unclear" when the article does not support a slot.
     output_schema_ref: matched_slots_v1
@@ -327,36 +375,46 @@ prompts:
     task_family: decomposed_novelty
     variant: base
     experiments: [E1, E2, E3]
-    approx_max_output_tokens: 150
+    approx_max_output_tokens: 180
     system_prompt: >
       You are an annotation model in a leakage audit of Chinese financial news. Use
-      only the provided article. Do not use outside knowledge, hindsight, prices, or
-      events after publication. Extract novelty signals only. Do not predict prices
-      or sentiment. Return valid JSON only with no markdown or extra text.
+      only the provided Chinese article and the provided target. Do not use outside
+      knowledge, hindsight, later market outcomes, realized returns, or any events
+      after publication. Extract disclosure-framing and freshness signals only. Do not
+      predict prices, sentiment, or impact. Return valid JSON only with no markdown or
+      extra text.
     user_prompt_template: |
       Article (Chinese):
       {article}
 
-      Task: extract novelty signals only.
+      Target: {target} ({target_type})
+
+      Task: extract disclosure-framing and freshness signals for {target} only.
 
       Return exactly:
-      {"first_disclosure_vs_follow_up":"first_disclosure|routine_follow_up|unclear","information_freshness":"fresh_new_information|mostly_recap_or_context|mixed|unclear","novelty_strength":"high|medium|low|unclear","evidence":[{"quote":"...","supports":["first_disclosure_vs_follow_up","information_freshness"]},{"quote":"...","supports":["novelty_strength"]}],"confidence":0-100}
+      {"target_echo":"{target}","disclosure_frame":"new_announcement|update_or_follow_up|unclear","information_freshness":"mostly_new_information|mostly_recap_or_context|mixed|unclear","novelty_strength":"high|medium|low|unclear","evidence":[{"quote":"...","supports":["disclosure_frame","information_freshness"]},{"quote":"...","supports":["novelty_strength"]}],"confidence":0-100}
 
       Rules:
-      - Judge whether the text presents new disclosure or routine follow-up.
+      - Judge only how the article FRAMES the disclosure — whether it presents itself as a new announcement or an update/follow-up. Do NOT judge whether the event truly appeared before elsewhere.
+      - `target_echo` must exactly repeat the target name.
+      - `information_freshness` judges whether the text mainly contains newly introduced substance versus recap or context.
       - Use 1-2 short verbatim Chinese quotes.
       - Use "unclear" if the article does not support a field.
     output_schema:
       type: object
-      required: [first_disclosure_vs_follow_up, information_freshness, novelty_strength, evidence, confidence]
+      required: [target_echo, disclosure_frame, information_freshness, novelty_strength, evidence, confidence]
       additionalProperties: false
       properties:
-        first_disclosure_vs_follow_up:
+        target_echo:
           type: string
-          enum: [first_disclosure, routine_follow_up, unclear]
+          minLength: 1
+          maxLength: 120
+        disclosure_frame:
+          type: string
+          enum: [new_announcement, update_or_follow_up, unclear]
         information_freshness:
           type: string
-          enum: [fresh_new_information, mostly_recap_or_context, mixed, unclear]
+          enum: [mostly_new_information, mostly_recap_or_context, mixed, unclear]
         novelty_strength:
           type: string
           enum: [high, medium, low, unclear]
@@ -379,7 +437,7 @@ prompts:
                 maxItems: 3
                 items:
                   type: string
-                  enum: [first_disclosure_vs_follow_up, information_freshness, novelty_strength]
+                  enum: [disclosure_frame, information_freshness, novelty_strength]
         confidence:
           type: integer
           minimum: 0
@@ -389,71 +447,201 @@ prompts:
     task_family: decomposed_novelty
     variant: matched
     experiments: [E3]
-    approx_max_output_tokens: 150
+    approx_max_output_tokens: 180
     system_prompt: >
       You are an annotation model in a leakage audit of Chinese financial news. Use
-      only the provided article. Do not use outside knowledge, hindsight, prices, or
-      events after publication. Extract novelty signals only. Ground every slot in
-      short verbatim evidence from the article. Return valid JSON only with no
-      markdown or extra text.
+      only the provided Chinese article and the provided target. Do not use outside
+      knowledge, hindsight, later market outcomes, realized returns, or any events
+      after publication. Extract disclosure-framing and freshness signals only. Ground
+      every slot in short verbatim evidence from the article. Return valid JSON only
+      with no markdown or extra text.
     user_prompt_template: |
       Article (Chinese):
       {article}
 
-      Task: use the common matched schema and fill all three slots from the article only.
+      Target: {target} ({target_type})
+
+      Task: use the common matched schema and fill all three slots FOR {target} from the article only.
       Slot meanings for this prompt:
-      - slot_1 = first_disclosure_vs_follow_up: first_disclosure | routine_follow_up | unclear
-      - slot_2 = information_freshness: fresh_new_information | mostly_recap_or_context | mixed | unclear
+      - slot_1 = disclosure_frame: new_announcement | update_or_follow_up | unclear
+      - slot_2 = information_freshness: mostly_new_information | mostly_recap_or_context | mixed | unclear
       - slot_3 = novelty_strength: high | medium | low | unclear
 
       Return exactly:
-      {"slot_1":"...","slot_2":"...","slot_3":"...","evidence":[{"quote":"...","supports":["slot_1"]},{"quote":"...","supports":["slot_2","slot_3"]}],"confidence":0-100}
+      {"target_echo":"{target}","slot_1":"...","slot_2":"...","slot_3":"...","evidence":[{"quote":"...","supports":["slot_1"]},{"quote":"...","supports":["slot_2","slot_3"]}],"confidence":0-100}
 
       Rules:
+      - Judge only how the article FRAMES the disclosure — whether it presents itself as a new announcement or an update/follow-up. Do NOT judge whether the event truly appeared before elsewhere.
+      - `target_echo` must exactly repeat the target name.
+      - `information_freshness` judges whether the text mainly contains newly introduced substance versus recap or context.
       - Use 1-2 short verbatim Chinese quotes.
       - Use "unclear" when the article does not support a slot.
     output_schema_ref: matched_slots_v1
     slot_semantics:
       slot_1:
-        meaning: first_disclosure_vs_follow_up
-        allowed_values: [first_disclosure, routine_follow_up, unclear]
+        meaning: disclosure_frame
+        allowed_values: [new_announcement, update_or_follow_up, unclear]
       slot_2:
         meaning: information_freshness
-        allowed_values: [fresh_new_information, mostly_recap_or_context, mixed, unclear]
+        allowed_values: [mostly_new_information, mostly_recap_or_context, mixed, unclear]
       slot_3:
         meaning: novelty_strength
         allowed_values: [high, medium, low, unclear]
+
+  "decomposed_impact.base":
+    task_family: decomposed_impact
+    variant: base
+    experiments: [E6]
+    approx_max_output_tokens: 180
+    system_prompt: >
+      You are an annotation model in a leakage audit of Chinese financial news. Use
+      only the provided Chinese article and the provided target. Do not use outside
+      knowledge, hindsight, later market outcomes, realized returns, or any events
+      after publication. Extract target-specific impact channels only. Do not predict
+      realized price movement or return. Return valid JSON only with no markdown or
+      extra text.
+    user_prompt_template: |
+      Article (Chinese):
+      {article}
+
+      Target: {target} ({target_type})
+
+      Task: extract target-specific impact signals for {target} only.
+
+      Return exactly:
+      {"target_echo":"{target}","fund_impact":"strong_negative|negative|neutral|positive|strong_positive","shock_impact":"strong_negative|negative|neutral|positive|strong_positive","evidence":[{"quote":"...","supports":["fund_impact"]},{"quote":"...","supports":["shock_impact"]}],"confidence":0-100}
+
+      Rules:
+      - Judge the fundamental and sentiment impact CHANNELS on {target}, not the realized price movement or return.
+      - `target_echo` must exactly repeat the target name.
+      - `fund_impact` is the fundamental or structural impact on {target}, such as competitive position, regulation, demand, supply, margins, or cost structure.
+      - `shock_impact` is the short-run sentiment or reaction pressure on {target}, such as panic, relief, excitement, or headline shock.
+      - Use 1-2 short verbatim Chinese quotes.
+      - Use "neutral" if the article gives no clear impact signal for a channel.
+    output_schema:
+      type: object
+      required: [target_echo, fund_impact, shock_impact, evidence, confidence]
+      additionalProperties: false
+      properties:
+        target_echo:
+          type: string
+          minLength: 1
+          maxLength: 120
+        fund_impact:
+          type: string
+          enum: [strong_negative, negative, neutral, positive, strong_positive]
+        shock_impact:
+          type: string
+          enum: [strong_negative, negative, neutral, positive, strong_positive]
+        evidence:
+          type: array
+          minItems: 1
+          maxItems: 2
+          items:
+            type: object
+            required: [quote, supports]
+            additionalProperties: false
+            properties:
+              quote:
+                type: string
+                minLength: 1
+                maxLength: 120
+              supports:
+                type: array
+                minItems: 1
+                maxItems: 2
+                items:
+                  type: string
+                  enum: [fund_impact, shock_impact]
+        confidence:
+          type: integer
+          minimum: 0
+          maximum: 100
+
+  "decomposed_impact.matched":
+    task_family: decomposed_impact
+    variant: matched
+    experiments: [E6]
+    approx_max_output_tokens: 180
+    system_prompt: >
+      You are an annotation model in a leakage audit of Chinese financial news. Use
+      only the provided Chinese article and the provided target. Do not use outside
+      knowledge, hindsight, later market outcomes, realized returns, or any events
+      after publication. Extract target-specific impact channels only. Ground every
+      slot in short verbatim evidence from the article. Do not predict realized price
+      movement or return. Return valid JSON only with no markdown or extra text.
+    user_prompt_template: |
+      Article (Chinese):
+      {article}
+
+      Target: {target} ({target_type})
+
+      Task: use the common matched schema and fill all three slots FOR {target} from the article only.
+      Slot meanings for this prompt:
+      - slot_1 = fund_impact: strong_negative | negative | neutral | positive | strong_positive
+      - slot_2 = shock_impact: strong_negative | negative | neutral | positive | strong_positive
+      - slot_3 = effect_persistence: transient | mixed | persistent | unclear
+
+      Return exactly:
+      {"target_echo":"{target}","slot_1":"...","slot_2":"...","slot_3":"...","evidence":[{"quote":"...","supports":["slot_1"]},{"quote":"...","supports":["slot_2","slot_3"]}],"confidence":0-100}
+
+      Rules:
+      - Judge the fundamental and sentiment impact CHANNELS on {target}, not the realized price movement or return.
+      - `target_echo` must exactly repeat the target name.
+      - `slot_3` judges how long the article frames the effect on {target} as lasting: transient = short-lived, persistent = durable or structural, mixed = both short- and longer-run cues, unclear = not supported.
+      - Use 1-2 short verbatim Chinese quotes.
+      - Use "unclear" when the article does not support effect persistence.
+    output_schema_ref: matched_slots_v1
+    slot_semantics:
+      slot_1:
+        meaning: fund_impact
+        allowed_values: [strong_negative, negative, neutral, positive, strong_positive]
+      slot_2:
+        meaning: shock_impact
+        allowed_values: [strong_negative, negative, neutral, positive, strong_positive]
+      slot_3:
+        meaning: effect_persistence
+        allowed_values: [transient, mixed, persistent, unclear]
 
   "sham_decomposition.control":
     task_family: sham_decomposition
     variant: control
     experiments: [E4]
-    approx_max_output_tokens: 150
+    approx_max_output_tokens: 180
     system_prompt: >
       You are an annotation model in a leakage audit of Chinese financial news. Use
-      only the provided article. Do not use outside knowledge, hindsight, prices, or
-      events after publication. Extract sham surface-form indicators only. Do not
-      predict prices, sentiment, authority, or novelty. Return valid JSON only with
+      only the provided Chinese article and the provided target. Do not use outside
+      knowledge, hindsight, later market outcomes, realized returns, or any events
+      after publication. Extract sham surface-form indicators only. Do not predict
+      prices, sentiment, authority, novelty, or impact. Return valid JSON only with
       no markdown or extra text.
     user_prompt_template: |
       Article (Chinese):
       {article}
 
-      Task: extract sham surface-form indicators only.
+      Target: {target} ({target_type})
+
+      Task: extract sham surface-form indicators from the passages about {target} only.
 
       Return exactly:
-      {"formality_level":"formal|mixed|informal","numeric_density":"none|some|many","sentence_complexity":"simple|moderate|dense","evidence":[{"quote":"...","supports":["formality_level","numeric_density"]},{"quote":"...","supports":["sentence_complexity"]}],"confidence":0-100}
+      {"target_echo":"{target}","formality_level":"formal|mixed|informal","numeric_density":"none|some|many","sentence_complexity":"simple|moderate|dense","evidence":[{"quote":"...","supports":["formality_level","numeric_density"]},{"quote":"...","supports":["sentence_complexity"]}],"confidence":0-100}
 
       Rules:
-      - formality_level judges register only, not credibility.
-      - numeric_density judges the surface presence of digits or quantities only.
-      - sentence_complexity judges syntax only, not economics.
+      - If the article is mostly about {target}, judge the article overall; otherwise focus on the lines that discuss {target}.
+      - `target_echo` must exactly repeat the target name.
+      - `formality_level` judges register only, not credibility.
+      - `numeric_density` judges the surface presence of digits or quantity wording only.
+      - `sentence_complexity` judges syntax only, not economics.
       - Use 1-2 short verbatim Chinese quotes.
     output_schema:
       type: object
-      required: [formality_level, numeric_density, sentence_complexity, evidence, confidence]
+      required: [target_echo, formality_level, numeric_density, sentence_complexity, evidence, confidence]
       additionalProperties: false
       properties:
+        target_echo:
+          type: string
+          minLength: 1
+          maxLength: 120
         formality_level:
           type: string
           enum: [formal, mixed, informal]

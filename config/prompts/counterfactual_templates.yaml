@@ -1,23 +1,34 @@
 schema_version: counterfactual_template_v1
-frozen_on: "2026-04-05"
+frozen_on: "2026-04-05-v2"
 
 defaults:
   temperature: 0
   instruction_language: en
   rewrite_language: zh
+  input_unit: article_target_pair
   article_placeholder: "{article}"
+  target_placeholder: "{target}"
+  target_type_placeholder: "{target_type}"
   rewrite_style_rule: >
     Preserve Chinese CLS-telegraph style, approximate length, and internal coherence.
     Keep the rewrite concise and natural.
+  target_preservation_rule: >
+    Preserve the provided target as the same entity or market object. Do not swap the
+    target for another company, sector, or market aggregate, and keep the rewrite
+    interpretable with respect to that target.
   output_rule: >
     Return valid JSON only with no markdown or extra text.
 
 common_schemas:
   counterfactual_rewrite_v1:
     type: object
-    required: [rewritten_article, edit_type, expected_effect, changed_spans]
+    required: [target_echo, rewritten_article, edit_type, expected_effect, changed_spans]
     additionalProperties: false
     properties:
+      target_echo:
+        type: string
+        minLength: 1
+        maxLength: 120
       rewritten_article:
         type: string
         minLength: 1
@@ -63,30 +74,31 @@ templates:
       - "sentiment_classification.base"
       - "sentiment_classification.matched"
     experiments: [E1, E2, E3]
-    approx_max_output_tokens: 220
+    approx_max_output_tokens: 240
     system_prompt: >
       You rewrite Chinese financial news articles for a leakage study. Edit only the
-      article text. Preserve Chinese language, telegraph style, approximate length,
-      and internal coherence. Do not explain the rewrite. Return valid JSON only with
-      no markdown or extra text.
+      article text for the provided target. Preserve Chinese language, telegraph
+      style, approximate length, and internal coherence. Keep the target as the same
+      referent. Do not explain the rewrite. Return valid JSON only with no markdown
+      or extra text.
     user_prompt_template: |
       Original article (Chinese):
       {article}
 
-      Task: perform a semantic reversal for a decision task.
-      Reverse the economically relevant meaning so a text-grounded annotator would
-      change the primary label from {original_label} to {target_label}.
+      Target: {target} ({target_type})
+
+      Task: perform a semantic reversal FOR {target}.
+      Flip the economic meaning FOR {target} so a text-grounded annotator would change the primary label from {original_label} to {target_label}.
       Use {target_field} as the flipped field.
 
       Rules:
-      - Do not merely flip adjectives. Change the underlying event, policy, disclosure,
-        earnings, or regulatory meaning.
-      - Keep named entities, dates, and overall topic unless a minimal local change is
-        required for coherence.
+      - Preserve {target} as the same entity or market object named in the original.
+      - Do not merely flip adjectives. Change the underlying event, policy, disclosure, earnings, or regulatory meaning as it applies to {target}.
+      - Keep named entities, dates, and overall topic unless a minimal local change is required for coherence.
       - Keep the rewrite internally consistent.
 
       Return exactly:
-      {"rewritten_article":"...","edit_type":"semantic_reversal","expected_effect":{"task_signal":"flip_primary_label","target_field":"{target_field}","target_label_after_edit":"{target_label}"},"changed_spans":[{"from":"...","to":"..."}]}
+      {"target_echo":"{target}","rewritten_article":"...","edit_type":"semantic_reversal","expected_effect":{"task_signal":"flip_primary_label","target_field":"{target_field}","target_label_after_edit":"{target_label}"},"changed_spans":[{"from":"...","to":"..."}]}
     output_schema_ref: counterfactual_rewrite_v1
 
   provenance_swap:
@@ -94,28 +106,30 @@ templates:
       - "decomposed_authority.base"
       - "decomposed_authority.matched"
     experiments: [E1, E2, E3]
-    approx_max_output_tokens: 220
+    approx_max_output_tokens: 240
     system_prompt: >
       You rewrite Chinese financial news articles for a leakage study. Edit only the
-      article text. Preserve Chinese language, telegraph style, approximate length,
-      and internal coherence. Do not explain the rewrite. Return valid JSON only with
-      no markdown or extra text.
+      article text for the provided target. Preserve Chinese language, telegraph
+      style, approximate length, and internal coherence. Keep the target as the same
+      referent. Do not explain the rewrite. Return valid JSON only with no markdown
+      or extra text.
     user_prompt_template: |
       Original article (Chinese):
       {article}
 
-      Task: swap authority cues while keeping the substantive economics unchanged.
+      Target: {target} ({target_type})
+
+      Task: swap authority cues for claims about {target} while keeping the substantive economics for {target} unchanged.
       Move the article toward the target authority pole {target_label}.
 
       Rules:
-      - If the target is regulatory_or_official_notice, rewrite the text so the news
-        reads like an official or regulator-linked notice with named attribution.
-      - If the target is rumor_or_chatter, rewrite the text so the same economics are
-        presented as unattributed market talk or rumor.
-      - Do not change the core economic event, direction, or novelty.
+      - Preserve {target} as the same entity or market object named in the original.
+      - If the target is regulatory_or_official_notice, rewrite the text so the news about {target} reads like an official or regulator-linked notice with named attribution.
+      - If the target is rumor_or_chatter, rewrite the text so the same economics for {target} are presented as unattributed market talk or rumor.
+      - Do not change the core economic event, polarity, or disclosure framing for {target}.
 
       Return exactly:
-      {"rewritten_article":"...","edit_type":"provenance_swap","expected_effect":{"task_signal":"change_authority_only","target_field":"regulatory_vs_rumor","target_label_after_edit":"{target_label}"},"changed_spans":[{"from":"...","to":"..."}]}
+      {"target_echo":"{target}","rewritten_article":"...","edit_type":"provenance_swap","expected_effect":{"task_signal":"change_authority_only","target_field":"regulatory_vs_rumor","target_label_after_edit":"{target_label}"},"changed_spans":[{"from":"...","to":"..."}]}
     output_schema_ref: counterfactual_rewrite_v1
 
   novelty_toggle:
@@ -123,28 +137,31 @@ templates:
       - "decomposed_novelty.base"
       - "decomposed_novelty.matched"
     experiments: [E1, E2, E3]
-    approx_max_output_tokens: 220
+    approx_max_output_tokens: 240
     system_prompt: >
       You rewrite Chinese financial news articles for a leakage study. Edit only the
-      article text. Preserve Chinese language, telegraph style, approximate length,
-      and internal coherence. Do not explain the rewrite. Return valid JSON only with
-      no markdown or extra text.
+      article text for the provided target. Preserve Chinese language, telegraph
+      style, approximate length, and internal coherence. Keep the target as the same
+      referent. Do not explain the rewrite. Return valid JSON only with no markdown
+      or extra text.
     user_prompt_template: |
       Original article (Chinese):
       {article}
 
-      Task: toggle the novelty cue while keeping the substantive economics unchanged.
-      Move the article toward the target novelty pole {target_label}.
+      Target: {target} ({target_type})
+
+      Task: toggle the disclosure framing for {target} while keeping the substantive economics for {target} unchanged.
+      Move the article toward the target disclosure frame {target_label}.
 
       Rules:
-      - If the target is first_disclosure, make the text read like a new announcement
-        or first release.
-      - If the target is routine_follow_up, make the text read like a scheduled update,
-        implementation follow-up, recap, or previously announced development.
-      - Do not change the core economic event, sentiment, or authority.
+      - Preserve {target} as the same entity or market object named in the original.
+      - Rewrite framing cues only. Judge only how the article frames the disclosure for {target}, not whether the event truly appeared before elsewhere.
+      - If the target is new_announcement, make the text read like a new announcement, first release, or newly disclosed development for {target}.
+      - If the target is update_or_follow_up, make the text read like an update, implementation follow-up, recap, or previously announced development for {target}.
+      - Do not change the core economic event, authority cues, or polarity for {target}.
 
       Return exactly:
-      {"rewritten_article":"...","edit_type":"novelty_toggle","expected_effect":{"task_signal":"change_novelty_only","target_field":"first_disclosure_vs_follow_up","target_label_after_edit":"{target_label}"},"changed_spans":[{"from":"...","to":"..."}]}
+      {"target_echo":"{target}","rewritten_article":"...","edit_type":"novelty_toggle","expected_effect":{"task_signal":"change_novelty_only","target_field":"disclosure_frame","target_label_after_edit":"{target_label}"},"changed_spans":[{"from":"...","to":"..."}]}
     output_schema_ref: counterfactual_rewrite_v1
 
   neutral_paraphrase:
@@ -159,43 +176,50 @@ templates:
       - "decomposed_novelty.matched"
       - "sham_decomposition.control"
     experiments: [E1, E2, E3, E4]
-    approx_max_output_tokens: 220
+    approx_max_output_tokens: 240
     system_prompt: >
       You rewrite Chinese financial news articles for a leakage study. Edit only the
-      article text. Preserve Chinese language, telegraph style, approximate length,
-      and internal coherence. Do not explain the rewrite. Return valid JSON only with
-      no markdown or extra text.
+      article text for the provided target. Preserve Chinese language, telegraph
+      style, approximate length, and internal coherence. Keep the target as the same
+      referent. Do not explain the rewrite. Return valid JSON only with no markdown
+      or extra text.
     user_prompt_template: |
       Original article (Chinese):
       {article}
 
-      Task: produce a neutral paraphrase.
+      Target: {target} ({target_type})
+
+      Task: produce a neutral paraphrase that preserves the task-relevant meaning FOR {target}.
 
       Rules:
-      - Preserve the relevant task label(s): direct direction, sentiment, authority,
-        novelty, and sham indicators should stay unchanged.
-      - Change wording, syntax, and local phrasing, but keep the same event meaning.
+      - Preserve {target} as the same entity or market object named in the original.
+      - Preserve the relevant task label(s) for {target}: direct direction, sentiment, authority, novelty, and sham indicators should stay unchanged for the applicable task.
+      - Change wording, syntax, and local phrasing, but keep the same event meaning for {target}.
       - Keep named entities, dates, and numbers unless a small stylistic rewrite is needed.
+      - Before finalizing, check that the rewrite still supports the same target-specific label(s).
 
       Return exactly:
-      {"rewritten_article":"...","edit_type":"neutral_paraphrase","expected_effect":{"task_signal":"preserve_relevant_labels","target_field":"all_relevant_labels","target_label_after_edit":"unchanged"},"changed_spans":[{"from":"...","to":"..."}]}
+      {"target_echo":"{target}","rewritten_article":"...","edit_type":"neutral_paraphrase","expected_effect":{"task_signal":"preserve_relevant_labels","target_field":"all_relevant_labels","target_label_after_edit":"unchanged"},"changed_spans":[{"from":"...","to":"..."}]}
     output_schema_ref: counterfactual_rewrite_v1
 
   sham_edits:
     applicable_to:
       - "sham_decomposition.control"
     experiments: [E4]
-    approx_max_output_tokens: 220
+    approx_max_output_tokens: 240
     system_prompt: >
       You rewrite Chinese financial news articles for a leakage study. Edit only the
-      article text. Preserve Chinese language, telegraph style, approximate length,
-      and internal coherence. Do not explain the rewrite. Return valid JSON only with
-      no markdown or extra text.
+      article text for the provided target. Preserve Chinese language, telegraph
+      style, approximate length, and internal coherence. Keep the target as the same
+      referent. Do not explain the rewrite. Return valid JSON only with no markdown
+      or extra text.
     user_prompt_template: |
       Original article (Chinese):
       {article}
 
-      Task: change sham surface indicators only.
+      Target: {target} ({target_type})
+
+      Task: change sham surface indicators for {target} only.
       Move the article toward the target sham label {target_label} for {target_field}.
 
       Allowed edits:
@@ -204,9 +228,11 @@ templates:
       - split, merge, or simplify sentences to change sentence_complexity
 
       Forbidden edits:
-      - do not change the core economic event, polarity, authority, or novelty
+      - preserve {target} as the same entity or market object named in the original
+      - if the article is mixed-topic, edit the sentences most relevant to {target} first
+      - do not change the core economic event, polarity, authority, novelty, or impact channels for {target}
       - do not add new economically relevant facts
 
       Return exactly:
-      {"rewritten_article":"...","edit_type":"sham_edits","expected_effect":{"task_signal":"change_sham_only","target_field":"{target_field}","target_label_after_edit":"{target_label}"},"changed_spans":[{"from":"...","to":"..."}]}
+      {"target_echo":"{target}","rewritten_article":"...","edit_type":"sham_edits","expected_effect":{"task_signal":"change_sham_only","target_field":"{target_field}","target_label_after_edit":"{target_label}"},"changed_spans":[{"from":"...","to":"..."}]}
     output_schema_ref: counterfactual_rewrite_v1

@@ -1,0 +1,15 @@
+{
+  "round": 3,
+  "threadIds": {
+    "quant": "019d5d58-108a-72c0-9ad9-03c0e84e6fc0",
+    "nlp": "019d5d5a-aa83-7c81-8092-d2a7569348c3",
+    "econometrics": "019d5d61-a42f-7d10-a0a5-35138718f7f6",
+    "editor": "019d5d64-6e0b-7961-8c28-420c1ea05d75"
+  },
+  "status": "completed",
+  "difficulty": "medium",
+  "last_score": 8.0,
+  "last_verdict": "ready",
+  "pending_experiments": [],
+  "timestamp": "2026-04-05T13:00:00"
+}

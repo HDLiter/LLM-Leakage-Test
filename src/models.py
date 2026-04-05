@@ -23,8 +23,34 @@ class NewsCategory(str, Enum):
 
 
 class VariantType(str, Enum):
-    REVERSE_OUTCOME = "reverse_outcome"
-    ALTER_NUMBERS = "alter_numbers"
+    REVERSE_OUTCOME = "reverse_outcome"  # deprecated; use SEMANTIC_REVERSAL
+    ALTER_NUMBERS = "alter_numbers"  # deprecated; retained for backward compatibility
+    SEMANTIC_REVERSAL = "semantic_reversal"
+    PROVENANCE_SWAP = "provenance_swap"
+    NOVELTY_TOGGLE = "novelty_toggle"
+    NEUTRAL_PARAPHRASE = "neutral_paraphrase"
+    SHAM_EDITS = "sham_edits"
+
+    @classmethod
+    def active_counterfactuals(cls) -> tuple["VariantType", ...]:
+        """Counterfactual variants backed by frozen YAML templates."""
+        return (
+            cls.SEMANTIC_REVERSAL,
+            cls.PROVENANCE_SWAP,
+            cls.NOVELTY_TOGGLE,
+            cls.NEUTRAL_PARAPHRASE,
+            cls.SHAM_EDITS,
+        )
+
+    @classmethod
+    def deprecated_counterfactuals(cls) -> tuple["VariantType", ...]:
+        """Legacy counterfactual variants kept only for compatibility."""
+        return (cls.REVERSE_OUTCOME, cls.ALTER_NUMBERS)
+
+    @property
+    def is_deprecated(self) -> bool:
+        """Whether this enum value is a legacy counterfactual type."""
+        return self in self.deprecated_counterfactuals()
 
 
 class MaskDimension(str, Enum):

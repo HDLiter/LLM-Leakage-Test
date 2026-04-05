@@ -8,13 +8,42 @@ from __future__ import annotations
 
 import json
 import re
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from .models import CounterfactualVariant, MaskingConfig, VariantType
 from .prompts import counterfactual_generator_prompt, llm_masking_prompt, counterfactual_validation_prompt
 
 if TYPE_CHECKING:
     from .llm_client import LLMClient
+
+
+COUNTERFACTUAL_TEMPLATE_ID_BY_VARIANT: dict[VariantType, str] = {
+    VariantType.SEMANTIC_REVERSAL: "semantic_reversal",
+    VariantType.PROVENANCE_SWAP: "provenance_swap",
+    VariantType.NOVELTY_TOGGLE: "novelty_toggle",
+    VariantType.NEUTRAL_PARAPHRASE: "neutral_paraphrase",
+    VariantType.SHAM_EDITS: "sham_edits",
+}
+
+
+def _coerce_variant_type(variant_type: VariantType | str) -> VariantType | None:
+    """Normalise a variant type to the enum when possible."""
+    if isinstance(variant_type, VariantType):
+        return variant_type
+    try:
+        return VariantType(variant_type)
+    except ValueError:
+        return None
+
+
+def resolve_counterfactual_template_id(
+    variant_type: VariantType | str,
+) -> str | None:
+    """Return the YAML template id for a template-backed variant type."""
+    variant = _coerce_variant_type(variant_type)
+    if variant is None:
+        return None
+    return COUNTERFACTUAL_TEMPLATE_ID_BY_VARIANT.get(variant)
 
 
 # ── Rule-based masking ──────────────────────────────────────────
@@ -184,6 +213,78 @@ def validate_counterfactual(
 
 # ── LLM-assisted counterfactual generation ──────────────────────
 
+def _parse_json_object(text: str, context: str) -> dict[str, Any]:
+    """Parse a JSON object, tolerating wrapped prose around the JSON."""
+    raw = text.strip()
+    try:
+        parsed = json.loads(raw)
+    except json.JSONDecodeError:
+        parsed = extract_json_robust(raw)
+
+    if parsed is None:
+        snippet = raw[:200].replace("\n", " ")
+        raise ValueError(f"Could not parse JSON object from {context}: {snippet!r}")
+    if not isinstance(parsed, dict):
+        raise ValueError(
+            f"Expected {context} to return a JSON object, got {type(parsed).__name__}"
+        )
+    return parsed
+
+
+def _counterfactual_variant_from_template_result(
+    original_case_id: str,
+    variant_type: VariantType,
+    parsed: dict[str, Any],
+    modification_description: str = "",
+) -> CounterfactualVariant:
+    """Convert structured template output into the legacy variant model."""
+    rewritten = str(parsed["rewritten_article"]).strip()
+    lines = rewritten.split("\n", 1)
+
+    return CounterfactualVariant(
+        original_case_id=original_case_id,
+        variant_type=variant_type,
+        modified_title=lines[0].strip(),
+        modified_content=lines[1].strip() if len(lines) > 1 else lines[0].strip(),
+        modification_description=modification_description or f"template {variant_type.value}",
+    )
+
+
+def generate_counterfactual_from_template(
+    article: str,
+    template_id: str,
+    client: "LLMClient",
+    prompts_dir: str = "config/prompts",
+    **kwargs,
+) -> dict[str, Any]:
+    """Generate a structured counterfactual rewrite from a frozen YAML template."""
+    from .prompt_loader import PromptLoader
+
+    bypass_cache = bool(kwargs.pop("bypass_cache", False))
+
+    loader = PromptLoader(prompts_dir=prompts_dir)
+    template = loader.get_counterfactual_template(template_id)
+    user_prompt = loader.render_cf_prompt(template_id, article, **kwargs)
+
+    response = client.chat(
+        template.system_prompt,
+        user_prompt,
+        bypass_cache=bypass_cache,
+    )
+    parsed = _parse_json_object(
+        response.raw_response,
+        context=f"counterfactual template {template_id!r}",
+    )
+
+    errors = list(loader._validator.validate_schema(template.output_schema, parsed))
+    if errors:
+        raise ValueError(
+            f"LLM output failed validation for counterfactual template {template_id!r}: "
+            + "; ".join(errors)
+        )
+    return parsed
+
+
 def _generate_single(
     client: "LLMClient",
     news_text: str,
@@ -214,13 +315,45 @@ def generate_counterfactual(
     variant_type: VariantType | str,
     validate: bool = True,
     max_retries: int = 2,
+    prompts_dir: str = "config/prompts",
+    **template_kwargs: Any,
 ) -> CounterfactualVariant:
     """Generate a counterfactual variant with optional validation + retry.
 
-    When validate=True, uses LLM-as-judge to check quality. If the variant
-    fails validation, regenerates (bypass_cache) up to max_retries times.
+    Legacy variants use LLM-as-judge validation. Template-backed variants use
+    the frozen YAML prompt plus schema validation, retrying on parse/schema
+    failures up to max_retries times.
     """
-    vt = variant_type.value if isinstance(variant_type, VariantType) else variant_type
+    variant_enum = _coerce_variant_type(variant_type)
+    vt = variant_enum.value if variant_enum is not None else variant_type
+    template_id = resolve_counterfactual_template_id(variant_type)
+
+    if template_id is not None:
+        if variant_enum is None:
+            raise ValueError(f"Unknown template-backed variant type: {variant_type!r}")
+
+        last_error: ValueError | None = None
+        for attempt in range(max_retries + 1):
+            try:
+                parsed = generate_counterfactual_from_template(
+                    article=news_text,
+                    template_id=template_id,
+                    client=client,
+                    prompts_dir=prompts_dir,
+                    bypass_cache=attempt > 0,
+                    **template_kwargs,
+                )
+                return _counterfactual_variant_from_template_result(
+                    original_case_id=original_case_id,
+                    variant_type=variant_enum,
+                    parsed=parsed,
+                    modification_description=f"template {template_id} (attempt {attempt + 1})",
+                )
+            except ValueError as exc:
+                last_error = exc
+
+        if last_error is not None:
+            raise last_error
 
     cf = _generate_single(client, news_text, original_case_id, vt)
 
@@ -256,11 +389,44 @@ def generate_all_counterfactuals(
     news_text: str,
     case_id: str,
     validate: bool = True,
+    variant_types: list[VariantType | str] | None = None,
+    prompts_dir: str = "config/prompts",
+    template_kwargs_by_variant: dict[VariantType | str, dict[str, Any]] | None = None,
 ) -> list[CounterfactualVariant]:
-    """Generate all three types of counterfactual variants."""
+    """Generate configured counterfactual variants.
+
+    Defaults to the legacy pair for backward compatibility. Template-backed
+    variants can be supplied via variant_types plus template_kwargs_by_variant.
+    """
+    def _kwargs_for_variant(vt: VariantType | str) -> dict[str, Any]:
+        if not template_kwargs_by_variant:
+            return {}
+
+        candidates: list[VariantType | str] = [vt]
+        enum_value = _coerce_variant_type(vt)
+        if enum_value is not None:
+            candidates.extend([enum_value, enum_value.value])
+
+        for key in candidates:
+            if key in template_kwargs_by_variant:
+                return dict(template_kwargs_by_variant[key])
+        return {}
+
+    if variant_types is None:
+        active_variants = list(VariantType.deprecated_counterfactuals())
+    else:
+        active_variants = list(variant_types)
     variants = []
-    for vt in VariantType:
-        cf = generate_counterfactual(client, news_text, case_id, vt, validate=validate)
+    for vt in active_variants:
+        cf = generate_counterfactual(
+            client,
+            news_text,
+            case_id,
+            vt,
+            validate=validate,
+            prompts_dir=prompts_dir,
+            **_kwargs_for_variant(vt),
+        )
         variants.append(cf)
     return variants
 
@@ -270,6 +436,9 @@ def generate_counterfactuals_batch(
     test_cases: list,
     validate: bool = True,
     max_workers: int | None = None,
+    variant_types: list[VariantType | str] | None = None,
+    prompts_dir: str = "config/prompts",
+    template_kwargs_by_case: dict[str, dict[VariantType | str, dict[str, Any]]] | None = None,
 ) -> list[CounterfactualVariant]:
     """Generate counterfactual variants for multiple test cases concurrently.
 
@@ -282,10 +451,33 @@ def generate_counterfactuals_batch(
     if max_workers is None:
         max_workers = DEFAULT_CONCURRENCY
 
+    if variant_types is None:
+        active_variants = list(VariantType.deprecated_counterfactuals())
+    else:
+        active_variants = list(variant_types)
+
+    def _kwargs_for_case(case_id: str, vt: VariantType | str) -> dict[str, Any]:
+        if not template_kwargs_by_case:
+            return {}
+
+        per_case = template_kwargs_by_case.get(case_id)
+        if not per_case:
+            return {}
+
+        candidates: list[VariantType | str] = [vt]
+        enum_value = _coerce_variant_type(vt)
+        if enum_value is not None:
+            candidates.extend([enum_value, enum_value.value])
+
+        for key in candidates:
+            if key in per_case:
+                return dict(per_case[key])
+        return {}
+
     tasks = [
-        (tc, vt)
+        (tc, vt, _kwargs_for_case(tc.id, vt))
         for tc in test_cases
-        for vt in VariantType
+        for vt in active_variants
     ]
 
     results: list[tuple[int, CounterfactualVariant]] = []
@@ -294,9 +486,15 @@ def generate_counterfactuals_batch(
         futures = {
             pool.submit(
                 generate_counterfactual,
-                client, tc.news.content, tc.id, vt, validate,
+                client,
+                tc.news.content,
+                tc.id,
+                vt,
+                validate=validate,
+                prompts_dir=prompts_dir,
+                **template_kwargs,
             ): idx
-            for idx, (tc, vt) in enumerate(tasks)
+            for idx, (tc, vt, template_kwargs) in enumerate(tasks)
         }
         for future in as_completed(futures):
             idx = futures[future]

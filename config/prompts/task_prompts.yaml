@@ -1,0 +1,489 @@
+schema_version: prompt_schema_v1
+frozen_on: "2026-04-05"
+
+defaults:
+  temperature: 0
+  instruction_language: en
+  article_language: zh
+  input_unit: single_article
+  article_placeholder: "{article}"
+  target_resolution_rule: >
+    For direct prediction and sentiment classification, if the article is company- or
+    sector-specific, judge the most directly affected Chinese listed stock or sector;
+    if the article is macro or policy-wide, judge the broad A-share market.
+  evidence_rule: >
+    Copy 1-2 short verbatim Chinese quotes from the article. Do not fabricate evidence.
+
+common_schemas:
+  matched_slots_v1:
+    type: object
+    required: [slot_1, slot_2, slot_3, evidence, confidence]
+    additionalProperties: false
+    properties:
+      slot_1:
+        type: string
+      slot_2:
+        type: string
+      slot_3:
+        type: string
+      evidence:
+        type: array
+        minItems: 1
+        maxItems: 2
+        items:
+          type: object
+          required: [quote, supports]
+          additionalProperties: false
+          properties:
+            quote:
+              type: string
+              minLength: 1
+              maxLength: 120
+            supports:
+              type: array
+              minItems: 1
+              maxItems: 3
+              items:
+                type: string
+                enum: [slot_1, slot_2, slot_3]
+      confidence:
+        type: integer
+        minimum: 0
+        maximum: 100
+
+prompts:
+  "direct_prediction.base":
+    task_family: direct_prediction
+    variant: base
+    experiments: [E1, E2, E3]
+    approx_max_output_tokens: 96
+    system_prompt: >
+      You are an annotation model in a leakage audit of Chinese financial news. Use
+      only the provided article. Do not use outside knowledge, hindsight, prices, or
+      events after publication. If the text does not support a directional call,
+      choose neutral. Return valid JSON only with no markdown or extra text.
+    user_prompt_template: |
+      Article (Chinese):
+      {article}
+
+      Task: predict the immediate price direction implied by this article.
+      Use the most directly affected Chinese listed stock or sector; if the article
+      is macro or policy-wide, use the broad A-share market.
+      Use only the article text, not what actually happened later.
+
+      Return exactly:
+      {"direction":"up|down|neutral","confidence":0-100,"evidence":["quote_1","quote_2"]}
+
+      Rules:
+      - Evidence must be 1-2 short verbatim Chinese quotes from the article.
+      - If the article is mixed or insufficient, use "neutral".
+    output_schema:
+      type: object
+      required: [direction, confidence, evidence]
+      additionalProperties: false
+      properties:
+        direction:
+          type: string
+          enum: [up, down, neutral]
+        confidence:
+          type: integer
+          minimum: 0
+          maximum: 100
+        evidence:
+          type: array
+          minItems: 1
+          maxItems: 2
+          items:
+            type: string
+            minLength: 1
+            maxLength: 80
+
+  "direct_prediction.matched":
+    task_family: direct_prediction
+    variant: matched
+    experiments: [E3]
+    approx_max_output_tokens: 150
+    system_prompt: >
+      You are an annotation model in a leakage audit of Chinese financial news. Use
+      only the provided article. Do not use outside knowledge, hindsight, prices, or
+      events after publication. Ground every slot in short verbatim evidence from the
+      article. If the text is insufficient, use the neutral or unclear option. Return
+      valid JSON only with no markdown or extra text.
+    user_prompt_template: |
+      Article (Chinese):
+      {article}
+
+      Task: use the common matched schema and fill all three slots from the article only.
+      Slot meanings for this prompt:
+      - slot_1 = direction: up | down | neutral
+      - slot_2 = scope: company | sector | broad_market | unclear
+      - slot_3 = strength: strong | moderate | weak | unclear
+
+      Return exactly:
+      {"slot_1":"...","slot_2":"...","slot_3":"...","evidence":[{"quote":"...","supports":["slot_1"]},{"quote":"...","supports":["slot_2","slot_3"]}],"confidence":0-100}
+
+      Rules:
+      - Use 1-2 short verbatim Chinese quotes.
+      - If only one quote is needed, keep one evidence item.
+    output_schema_ref: matched_slots_v1
+    slot_semantics:
+      slot_1:
+        meaning: direction
+        allowed_values: [up, down, neutral]
+      slot_2:
+        meaning: scope
+        allowed_values: [company, sector, broad_market, unclear]
+      slot_3:
+        meaning: strength
+        allowed_values: [strong, moderate, weak, unclear]
+
+  "sentiment_classification.base":
+    task_family: sentiment_classification
+    variant: base
+    experiments: [E1, E2, E3]
+    approx_max_output_tokens: 96
+    system_prompt: >
+      You are an annotation model in a leakage audit of Chinese financial news. Use
+      only the provided article. Do not use outside knowledge, hindsight, prices, or
+      events after publication. If the text does not support a clear sentiment label,
+      choose neutral. Return valid JSON only with no markdown or extra text.
+    user_prompt_template: |
+      Article (Chinese):
+      {article}
+
+      Task: classify the market-facing sentiment conveyed by this article.
+      Use the most directly affected Chinese listed stock or sector; if the article
+      is macro or policy-wide, use the broad A-share market.
+      This is a sentiment label, not a claim about what really happened later.
+
+      Return exactly:
+      {"sentiment":"positive|negative|neutral","confidence":0-100,"evidence":["quote_1","quote_2"]}
+
+      Rules:
+      - Evidence must be 1-2 short verbatim Chinese quotes from the article.
+      - If the article is mixed or insufficient, use "neutral".
+    output_schema:
+      type: object
+      required: [sentiment, confidence, evidence]
+      additionalProperties: false
+      properties:
+        sentiment:
+          type: string
+          enum: [positive, negative, neutral]
+        confidence:
+          type: integer
+          minimum: 0
+          maximum: 100
+        evidence:
+          type: array
+          minItems: 1
+          maxItems: 2
+          items:
+            type: string
+            minLength: 1
+            maxLength: 80
+
+  "sentiment_classification.matched":
+    task_family: sentiment_classification
+    variant: matched
+    experiments: [E3]
+    approx_max_output_tokens: 150
+    system_prompt: >
+      You are an annotation model in a leakage audit of Chinese financial news. Use
+      only the provided article. Do not use outside knowledge, hindsight, prices, or
+      events after publication. Ground every slot in short verbatim evidence from the
+      article. If the text is insufficient, use the neutral or unclear option. Return
+      valid JSON only with no markdown or extra text.
+    user_prompt_template: |
+      Article (Chinese):
+      {article}
+
+      Task: use the common matched schema and fill all three slots from the article only.
+      Slot meanings for this prompt:
+      - slot_1 = sentiment: positive | negative | neutral
+      - slot_2 = scope: company | sector | broad_market | unclear
+      - slot_3 = tone_strength: strong | moderate | weak | mixed | unclear
+
+      Return exactly:
+      {"slot_1":"...","slot_2":"...","slot_3":"...","evidence":[{"quote":"...","supports":["slot_1"]},{"quote":"...","supports":["slot_2","slot_3"]}],"confidence":0-100}
+
+      Rules:
+      - Use 1-2 short verbatim Chinese quotes.
+      - If only one quote is needed, keep one evidence item.
+    output_schema_ref: matched_slots_v1
+    slot_semantics:
+      slot_1:
+        meaning: sentiment
+        allowed_values: [positive, negative, neutral]
+      slot_2:
+        meaning: scope
+        allowed_values: [company, sector, broad_market, unclear]
+      slot_3:
+        meaning: tone_strength
+        allowed_values: [strong, moderate, weak, mixed, unclear]
+
+  "decomposed_authority.base":
+    task_family: decomposed_authority
+    variant: base
+    experiments: [E1, E2, E3]
+    approx_max_output_tokens: 150
+    system_prompt: >
+      You are an annotation model in a leakage audit of Chinese financial news. Use
+      only the provided article. Do not use outside knowledge, hindsight, prices, or
+      events after publication. Extract authority signals only. Do not predict prices
+      or sentiment. Return valid JSON only with no markdown or extra text.
+    user_prompt_template: |
+      Article (Chinese):
+      {article}
+
+      Task: extract authority signals only.
+
+      Return exactly:
+      {"source_credibility":"high|medium|low|unclear","regulatory_vs_rumor":"regulatory_or_official_notice|rumor_or_chatter|neither_or_mixed|unclear","official_vs_unattributed":"official_named|named_but_not_official|unattributed|mixed|unclear","evidence":[{"quote":"...","supports":["source_credibility","regulatory_vs_rumor"]},{"quote":"...","supports":["official_vs_unattributed"]}],"confidence":0-100}
+
+      Rules:
+      - Judge only provenance and attribution cues stated in the article.
+      - Use 1-2 short verbatim Chinese quotes.
+      - Use "unclear" if the article does not support a field.
+    output_schema:
+      type: object
+      required: [source_credibility, regulatory_vs_rumor, official_vs_unattributed, evidence, confidence]
+      additionalProperties: false
+      properties:
+        source_credibility:
+          type: string
+          enum: [high, medium, low, unclear]
+        regulatory_vs_rumor:
+          type: string
+          enum: [regulatory_or_official_notice, rumor_or_chatter, neither_or_mixed, unclear]
+        official_vs_unattributed:
+          type: string
+          enum: [official_named, named_but_not_official, unattributed, mixed, unclear]
+        evidence:
+          type: array
+          minItems: 1
+          maxItems: 2
+          items:
+            type: object
+            required: [quote, supports]
+            additionalProperties: false
+            properties:
+              quote:
+                type: string
+                minLength: 1
+                maxLength: 120
+              supports:
+                type: array
+                minItems: 1
+                maxItems: 3
+                items:
+                  type: string
+                  enum: [source_credibility, regulatory_vs_rumor, official_vs_unattributed]
+        confidence:
+          type: integer
+          minimum: 0
+          maximum: 100
+
+  "decomposed_authority.matched":
+    task_family: decomposed_authority
+    variant: matched
+    experiments: [E3]
+    approx_max_output_tokens: 150
+    system_prompt: >
+      You are an annotation model in a leakage audit of Chinese financial news. Use
+      only the provided article. Do not use outside knowledge, hindsight, prices, or
+      events after publication. Extract authority signals only. Ground every slot in
+      short verbatim evidence from the article. Return valid JSON only with no
+      markdown or extra text.
+    user_prompt_template: |
+      Article (Chinese):
+      {article}
+
+      Task: use the common matched schema and fill all three slots from the article only.
+      Slot meanings for this prompt:
+      - slot_1 = source_credibility: high | medium | low | unclear
+      - slot_2 = regulatory_vs_rumor: regulatory_or_official_notice | rumor_or_chatter | neither_or_mixed | unclear
+      - slot_3 = official_vs_unattributed: official_named | named_but_not_official | unattributed | mixed | unclear
+
+      Return exactly:
+      {"slot_1":"...","slot_2":"...","slot_3":"...","evidence":[{"quote":"...","supports":["slot_1"]},{"quote":"...","supports":["slot_2","slot_3"]}],"confidence":0-100}
+
+      Rules:
+      - Use 1-2 short verbatim Chinese quotes.
+      - Use "unclear" when the article does not support a slot.
+    output_schema_ref: matched_slots_v1
+    slot_semantics:
+      slot_1:
+        meaning: source_credibility
+        allowed_values: [high, medium, low, unclear]
+      slot_2:
+        meaning: regulatory_vs_rumor
+        allowed_values: [regulatory_or_official_notice, rumor_or_chatter, neither_or_mixed, unclear]
+      slot_3:
+        meaning: official_vs_unattributed
+        allowed_values: [official_named, named_but_not_official, unattributed, mixed, unclear]
+
+  "decomposed_novelty.base":
+    task_family: decomposed_novelty
+    variant: base
+    experiments: [E1, E2, E3]
+    approx_max_output_tokens: 150
+    system_prompt: >
+      You are an annotation model in a leakage audit of Chinese financial news. Use
+      only the provided article. Do not use outside knowledge, hindsight, prices, or
+      events after publication. Extract novelty signals only. Do not predict prices
+      or sentiment. Return valid JSON only with no markdown or extra text.
+    user_prompt_template: |
+      Article (Chinese):
+      {article}
+
+      Task: extract novelty signals only.
+
+      Return exactly:
+      {"first_disclosure_vs_follow_up":"first_disclosure|routine_follow_up|unclear","information_freshness":"fresh_new_information|mostly_recap_or_context|mixed|unclear","novelty_strength":"high|medium|low|unclear","evidence":[{"quote":"...","supports":["first_disclosure_vs_follow_up","information_freshness"]},{"quote":"...","supports":["novelty_strength"]}],"confidence":0-100}
+
+      Rules:
+      - Judge whether the text presents new disclosure or routine follow-up.
+      - Use 1-2 short verbatim Chinese quotes.
+      - Use "unclear" if the article does not support a field.
+    output_schema:
+      type: object
+      required: [first_disclosure_vs_follow_up, information_freshness, novelty_strength, evidence, confidence]
+      additionalProperties: false
+      properties:
+        first_disclosure_vs_follow_up:
+          type: string
+          enum: [first_disclosure, routine_follow_up, unclear]
+        information_freshness:
+          type: string
+          enum: [fresh_new_information, mostly_recap_or_context, mixed, unclear]
+        novelty_strength:
+          type: string
+          enum: [high, medium, low, unclear]
+        evidence:
+          type: array
+          minItems: 1
+          maxItems: 2
+          items:
+            type: object
+            required: [quote, supports]
+            additionalProperties: false
+            properties:
+              quote:
+                type: string
+                minLength: 1
+                maxLength: 120
+              supports:
+                type: array
+                minItems: 1
+                maxItems: 3
+                items:
+                  type: string
+                  enum: [first_disclosure_vs_follow_up, information_freshness, novelty_strength]
+        confidence:
+          type: integer
+          minimum: 0
+          maximum: 100
+
+  "decomposed_novelty.matched":
+    task_family: decomposed_novelty
+    variant: matched
+    experiments: [E3]
+    approx_max_output_tokens: 150
+    system_prompt: >
+      You are an annotation model in a leakage audit of Chinese financial news. Use
+      only the provided article. Do not use outside knowledge, hindsight, prices, or
+      events after publication. Extract novelty signals only. Ground every slot in
+      short verbatim evidence from the article. Return valid JSON only with no
+      markdown or extra text.
+    user_prompt_template: |
+      Article (Chinese):
+      {article}
+
+      Task: use the common matched schema and fill all three slots from the article only.
+      Slot meanings for this prompt:
+      - slot_1 = first_disclosure_vs_follow_up: first_disclosure | routine_follow_up | unclear
+      - slot_2 = information_freshness: fresh_new_information | mostly_recap_or_context | mixed | unclear
+      - slot_3 = novelty_strength: high | medium | low | unclear
+
+      Return exactly:
+      {"slot_1":"...","slot_2":"...","slot_3":"...","evidence":[{"quote":"...","supports":["slot_1"]},{"quote":"...","supports":["slot_2","slot_3"]}],"confidence":0-100}
+
+      Rules:
+      - Use 1-2 short verbatim Chinese quotes.
+      - Use "unclear" when the article does not support a slot.
+    output_schema_ref: matched_slots_v1
+    slot_semantics:
+      slot_1:
+        meaning: first_disclosure_vs_follow_up
+        allowed_values: [first_disclosure, routine_follow_up, unclear]
+      slot_2:
+        meaning: information_freshness
+        allowed_values: [fresh_new_information, mostly_recap_or_context, mixed, unclear]
+      slot_3:
+        meaning: novelty_strength
+        allowed_values: [high, medium, low, unclear]
+
+  "sham_decomposition.control":
+    task_family: sham_decomposition
+    variant: control
+    experiments: [E4]
+    approx_max_output_tokens: 150
+    system_prompt: >
+      You are an annotation model in a leakage audit of Chinese financial news. Use
+      only the provided article. Do not use outside knowledge, hindsight, prices, or
+      events after publication. Extract sham surface-form indicators only. Do not
+      predict prices, sentiment, authority, or novelty. Return valid JSON only with
+      no markdown or extra text.
+    user_prompt_template: |
+      Article (Chinese):
+      {article}
+
+      Task: extract sham surface-form indicators only.
+
+      Return exactly:
+      {"formality_level":"formal|mixed|informal","numeric_density":"none|some|many","sentence_complexity":"simple|moderate|dense","evidence":[{"quote":"...","supports":["formality_level","numeric_density"]},{"quote":"...","supports":["sentence_complexity"]}],"confidence":0-100}
+
+      Rules:
+      - formality_level judges register only, not credibility.
+      - numeric_density judges the surface presence of digits or quantities only.
+      - sentence_complexity judges syntax only, not economics.
+      - Use 1-2 short verbatim Chinese quotes.
+    output_schema:
+      type: object
+      required: [formality_level, numeric_density, sentence_complexity, evidence, confidence]
+      additionalProperties: false
+      properties:
+        formality_level:
+          type: string
+          enum: [formal, mixed, informal]
+        numeric_density:
+          type: string
+          enum: [none, some, many]
+        sentence_complexity:
+          type: string
+          enum: [simple, moderate, dense]
+        evidence:
+          type: array
+          minItems: 1
+          maxItems: 2
+          items:
+            type: object
+            required: [quote, supports]
+            additionalProperties: false
+            properties:
+              quote:
+                type: string
+                minLength: 1
+                maxLength: 120
+              supports:
+                type: array
+                minItems: 1
+                maxItems: 3
+                items:
+                  type: string
+                  enum: [formality_level, numeric_density, sentence_complexity]
+        confidence:
+          type: integer
+          minimum: 0
+          maximum: 100

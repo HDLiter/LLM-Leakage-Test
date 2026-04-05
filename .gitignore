@@ -19,7 +19,7 @@ __pycache__/
 .idea/
 
 # Claude Code
-.claude/
+.claude/skills/
 
 # Misc
 deepseek_speed_test.py

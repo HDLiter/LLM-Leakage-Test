@@ -21,5 +21,11 @@ __pycache__/
 # Claude Code
 .claude/skills/
 
+# Large datasets
+data/cls_telegraph_raw/
+
+# Related papers (PDFs are large and re-downloadable; INDEX.md is tracked)
+related papers/*.pdf
+
 # Misc
 deepseek_speed_test.py

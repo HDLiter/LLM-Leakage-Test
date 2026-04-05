@@ -21,6 +21,18 @@
 - API key 在 .env 中，不要提交到 git
 - 所有文档、代码注释、notebook markdown 均使用英文（用户对话可用中文）
 
+## Network / Proxy
+- 本机使用代理，连接 DeepSeek API 和 vLLM (Docker) 时需设置 NO_PROXY
+- 在代码中发起请求前确保环境变量正确，或在 httpx/requests 中显式设置 proxy=None
+
+## 可用模型
+- DeepSeek-chat: 通过 API（灰/黑盒）
+- Qwen 2.5 7B: Docker vLLM 本地部署（白盒，可获取 logprobs）
+
+## 数据资源
+- 84 条 A 股新闻测试集（data/seed/）
+- 财联社电报语料 ~100万+ 条（源：D:\GitRepos\Thales\datasets\cls_telegraph_raw）
+
 ## Rate limit handling
 如果 Codex MCP 调用因 rate limit 失败：
 1. 等待 30 秒后重试，最多 3 次（排除网络抖动）

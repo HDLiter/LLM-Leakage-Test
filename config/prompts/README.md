@@ -39,7 +39,7 @@ Task: ...
 | `decomposed_impact.matched` | Impact decomposition | Matched-format ablation | `slot_1=fund_impact`, `slot_2=shock_impact`, `slot_3=effect_persistence` | `E6` |
 | `sham_decomposition.control` | Sham decomposition | Falsification control | `formality_level`, `numeric_density`, `sentence_complexity` | `E4` |
 
-`E1` and `E2` reuse the same frozen task prompts used in `E3`; they do not introduce separate task wording. `decomposed_impact.*` is reserved for `E6` and is intentionally excluded from the counterfactual rewrite catalog.
+`E1` and `E2` reuse the same frozen task prompts used in `E3`; they do not introduce separate task wording. `decomposed_impact.*` was originally reserved for `E6` but is now also included in `E_pilot` for same-template bridge validation (Round 3 decision: use `semantic_reversal` on both `direct_prediction` and `decomposed_impact` to enable fair cross-task CFLS comparison).
 
 ## Matched-Format Contract
 
@@ -110,7 +110,7 @@ These are answerable from the text around the target but are not intended to enc
 - `neutral_paraphrase`: preserves the original target-specific label(s) while changing wording.
 - `sham_edits`: changes sham surface indicators only while holding target-relevant economics fixed.
 
-There is intentionally no impact-specific counterfactual template.
+There is no impact-specific counterfactual template. Instead, `semantic_reversal` and `neutral_paraphrase` are extended to cover `decomposed_impact.*` for `E_pilot`, providing the same-template bridge needed for cross-task CFLS comparability.
 
 ## Files
 

@@ -62,7 +62,7 @@ prompts:
   "direct_prediction.base":
     task_family: direct_prediction
     variant: base
-    experiments: [E1, E2, E3]
+    experiments: [E1, E2, E3, E_pilot]
     approx_max_output_tokens: 120
     system_prompt: >
       You are an annotation model in a leakage audit of Chinese financial news. Use
@@ -115,7 +115,7 @@ prompts:
   "direct_prediction.matched":
     task_family: direct_prediction
     variant: matched
-    experiments: [E3]
+    experiments: [E3, E_pilot]
     approx_max_output_tokens: 180
     system_prompt: >
       You are an annotation model in a leakage audit of Chinese financial news. Use
@@ -491,7 +491,7 @@ prompts:
   "decomposed_impact.base":
     task_family: decomposed_impact
     variant: base
-    experiments: [E6]
+    experiments: [E6, E_pilot]
     approx_max_output_tokens: 180
     system_prompt: >
       You are an annotation model in a leakage audit of Chinese financial news. Use
@@ -561,7 +561,7 @@ prompts:
   "decomposed_impact.matched":
     task_family: decomposed_impact
     variant: matched
-    experiments: [E6]
+    experiments: [E6, E_pilot]
     approx_max_output_tokens: 180
     system_prompt: >
       You are an annotation model in a leakage audit of Chinese financial news. Use

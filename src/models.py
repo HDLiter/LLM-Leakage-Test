@@ -30,6 +30,7 @@ class VariantType(str, Enum):
     NOVELTY_TOGGLE = "novelty_toggle"
     NEUTRAL_PARAPHRASE = "neutral_paraphrase"
     SHAM_EDITS = "sham_edits"
+    FALSE_OUTCOME_CPT = "false_outcome_cpt"
 
     @classmethod
     def active_counterfactuals(cls) -> tuple["VariantType", ...]:
@@ -96,6 +97,8 @@ class TestCase(BaseModel):
     expected_direction: Direction
     subcategory: str = Field(default="", description="细分类别")
     memorization_likelihood: str = Field(default="medium", description="high|medium|low")
+    target: str = Field(default="", description="Primary entity/ticker/index being predicted about")
+    target_type: str = Field(default="", description="company|sector|index")
 
 
 class MaskingConfig(BaseModel):

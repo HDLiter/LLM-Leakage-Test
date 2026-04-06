@@ -28,7 +28,9 @@
       ],
       "expected_direction": "up",
       "subcategory": "货币政策",
-      "memorization_likelihood": "high"
+      "memorization_likelihood": "high",
+      "target": "A股大盘",
+      "target_type": "index"
     },
     {
       "id": "tc_002",
@@ -57,7 +59,9 @@
       ],
       "expected_direction": "down",
       "subcategory": "市场危机",
-      "memorization_likelihood": "high"
+      "memorization_likelihood": "high",
+      "target": "上证指数",
+      "target_type": "index"
     },
     {
       "id": "tc_003",
@@ -78,7 +82,9 @@
       "key_numbers": [],
       "expected_direction": "up",
       "subcategory": "经济会议",
-      "memorization_likelihood": "high"
+      "memorization_likelihood": "high",
+      "target": "A股大盘",
+      "target_type": "index"
     },
     {
       "id": "tc_004",
@@ -100,7 +106,9 @@
       "key_numbers": [],
       "expected_direction": "down",
       "subcategory": "教育监管",
-      "memorization_likelihood": "high"
+      "memorization_likelihood": "high",
+      "target": "教育板块",
+      "target_type": "sector"
     },
     {
       "id": "tc_005",
@@ -122,7 +130,9 @@
       "key_numbers": [],
       "expected_direction": "neutral",
       "subcategory": "监管人事",
-      "memorization_likelihood": "medium"
+      "memorization_likelihood": "medium",
+      "target": "A股大盘",
+      "target_type": "index"
     },
     {
       "id": "tc_006",
@@ -147,7 +157,9 @@
       ],
       "expected_direction": "down",
       "subcategory": "能耗双控",
-      "memorization_likelihood": "medium"
+      "memorization_likelihood": "medium",
+      "target": "煤炭板块",
+      "target_type": "sector"
     },
     {
       "id": "tc_007",
@@ -168,7 +180,9 @@
       "key_numbers": [],
       "expected_direction": "up",
       "subcategory": "金融维稳",
-      "memorization_likelihood": "high"
+      "memorization_likelihood": "high",
+      "target": "科技板块",
+      "target_type": "sector"
     },
     {
       "id": "tc_008",
@@ -191,7 +205,9 @@
       "key_numbers": [],
       "expected_direction": "up",
       "subcategory": "交易制度",
-      "memorization_likelihood": "high"
+      "memorization_likelihood": "high",
+      "target": "A股大盘",
+      "target_type": "index"
     },
     {
       "id": "tc_009",
@@ -217,7 +233,9 @@
       ],
       "expected_direction": "neutral",
       "subcategory": "数据要素",
-      "memorization_likelihood": "low"
+      "memorization_likelihood": "low",
+      "target": "数据要素板块",
+      "target_type": "sector"
     },
     {
       "id": "tc_010",
@@ -241,7 +259,9 @@
       ],
       "expected_direction": "down",
       "subcategory": "互联网整治",
-      "memorization_likelihood": "medium"
+      "memorization_likelihood": "medium",
+      "target": "互联网板块",
+      "target_type": "sector"
     },
     {
       "id": "tc_011",
@@ -265,7 +285,9 @@
       ],
       "expected_direction": "down",
       "subcategory": "资本市场改革",
-      "memorization_likelihood": "high"
+      "memorization_likelihood": "high",
+      "target": "A股大盘",
+      "target_type": "index"
     },
     {
       "id": "tc_012",
@@ -289,7 +311,9 @@
       ],
       "expected_direction": "neutral",
       "subcategory": "货币政策",
-      "memorization_likelihood": "medium"
+      "memorization_likelihood": "medium",
+      "target": "A股大盘",
+      "target_type": "index"
     },
     {
       "id": "tc_013",
@@ -313,7 +337,9 @@
       ],
       "expected_direction": "up",
       "subcategory": "平台经济",
-      "memorization_likelihood": "high"
+      "memorization_likelihood": "high",
+      "target": "蚂蚁集团",
+      "target_type": "company"
     },
     {
       "id": "tc_014",
@@ -334,7 +360,9 @@
       "key_numbers": [],
       "expected_direction": "up",
       "subcategory": "市值管理",
-      "memorization_likelihood": "medium"
+      "memorization_likelihood": "medium",
+      "target": "A股大盘",
+      "target_type": "index"
     },
     {
       "id": "tc_015",
@@ -359,7 +387,9 @@
       ],
       "expected_direction": "up",
       "subcategory": "碳中和",
-      "memorization_likelihood": "high"
+      "memorization_likelihood": "high",
+      "target": "宁德时代",
+      "target_type": "company"
     },
     {
       "id": "tc_016",
@@ -384,7 +414,9 @@
       ],
       "expected_direction": "down",
       "subcategory": "财务造假",
-      "memorization_likelihood": "high"
+      "memorization_likelihood": "high",
+      "target": "康美药业",
+      "target_type": "company"
     },
     {
       "id": "tc_017",
@@ -410,7 +442,9 @@
       ],
       "expected_direction": "down",
       "subcategory": "财务造假",
-      "memorization_likelihood": "high"
+      "memorization_likelihood": "high",
+      "target": "瑞幸咖啡",
+      "target_type": "company"
     },
     {
       "id": "tc_018",
@@ -434,7 +468,9 @@
       ],
       "expected_direction": "down",
       "subcategory": "债务危机",
-      "memorization_likelihood": "high"
+      "memorization_likelihood": "high",
+      "target": "中国恒大",
+      "target_type": "company"
     },
     {
       "id": "tc_019",
@@ -458,7 +494,9 @@
       ],
       "expected_direction": "down",
       "subcategory": "业绩亏损",
-      "memorization_likelihood": "medium"
+      "memorization_likelihood": "medium",
+      "target": "牧原股份",
+      "target_type": "company"
     },
     {
       "id": "tc_020",
@@ -483,7 +521,9 @@
       ],
       "expected_direction": "up",
       "subcategory": "业绩超预期",
-      "memorization_likelihood": "high"
+      "memorization_likelihood": "high",
+      "target": "贵州茅台",
+      "target_type": "company"
     },
     {
       "id": "tc_021",
@@ -508,7 +548,9 @@
       ],
       "expected_direction": "up",
       "subcategory": "并购重组",
-      "memorization_likelihood": "medium"
+      "memorization_likelihood": "medium",
+      "target": "国电电力",
+      "target_type": "company"
     },
     {
       "id": "tc_022",
@@ -530,7 +572,9 @@
       "key_numbers": [],
       "expected_direction": "neutral",
       "subcategory": "品牌整合",
-      "memorization_likelihood": "medium"
+      "memorization_likelihood": "medium",
+      "target": "美团",
+      "target_type": "company"
     },
     {
       "id": "tc_023",
@@ -555,7 +599,9 @@
       ],
       "expected_direction": "up",
       "subcategory": "借壳上市",
-      "memorization_likelihood": "high"
+      "memorization_likelihood": "high",
+      "target": "中国中免",
+      "target_type": "company"
     },
     {
       "id": "tc_024",
@@ -581,7 +627,9 @@
       ],
       "expected_direction": "down",
       "subcategory": "破产重整",
-      "memorization_likelihood": "high"
+      "memorization_likelihood": "high",
+      "target": "紫光集团",
+      "target_type": "company"
     },
     {
       "id": "tc_025",
@@ -606,7 +654,9 @@
       ],
       "expected_direction": "neutral",
       "subcategory": "合并回顾",
-      "memorization_likelihood": "medium"
+      "memorization_likelihood": "medium",
+      "target": "中国中车",
+      "target_type": "company"
     },
     {
       "id": "tc_026",
@@ -630,7 +680,9 @@
       ],
       "expected_direction": "up",
       "subcategory": "技术突破",
-      "memorization_likelihood": "high"
+      "memorization_likelihood": "high",
+      "target": "华为",
+      "target_type": "company"
     },
     {
       "id": "tc_027",
@@ -656,7 +708,9 @@
       ],
       "expected_direction": "up",
       "subcategory": "销量突破",
-      "memorization_likelihood": "high"
+      "memorization_likelihood": "high",
+      "target": "比亚迪",
+      "target_type": "company"
     },
     {
       "id": "tc_028",
@@ -683,7 +737,9 @@
       ],
       "expected_direction": "up",
       "subcategory": "科创板上市",
-      "memorization_likelihood": "high"
+      "memorization_likelihood": "high",
+      "target": "中芯国际",
+      "target_type": "company"
     },
     {
       "id": "tc_029",
@@ -708,7 +764,9 @@
       ],
       "expected_direction": "down",
       "subcategory": "制裁风险",
-      "memorization_likelihood": "high"
+      "memorization_likelihood": "high",
+      "target": "药明康德",
+      "target_type": "company"
     },
     {
       "id": "tc_030",
@@ -733,7 +791,9 @@
       ],
       "expected_direction": "up",
       "subcategory": "技术突破",
-      "memorization_likelihood": "high"
+      "memorization_likelihood": "high",
+      "target": "宁德时代",
+      "target_type": "company"
     },
     {
       "id": "tc_031",
@@ -757,7 +817,9 @@
       ],
       "expected_direction": "down",
       "subcategory": "集采政策",
-      "memorization_likelihood": "high"
+      "memorization_likelihood": "high",
+      "target": "医药板块",
+      "target_type": "sector"
     },
     {
       "id": "tc_032",
@@ -783,7 +845,9 @@
       ],
       "expected_direction": "down",
       "subcategory": "融资监管",
-      "memorization_likelihood": "high"
+      "memorization_likelihood": "high",
+      "target": "房地产板块",
+      "target_type": "sector"
     },
     {
       "id": "tc_033",
@@ -811,7 +875,9 @@
       ],
       "expected_direction": "up",
       "subcategory": "AI概念",
-      "memorization_likelihood": "high"
+      "memorization_likelihood": "high",
+      "target": "AI概念板块",
+      "target_type": "sector"
     },
     {
       "id": "tc_034",
@@ -837,7 +903,9 @@
       ],
       "expected_direction": "down",
       "subcategory": "产能过剩",
-      "memorization_likelihood": "high"
+      "memorization_likelihood": "high",
+      "target": "光伏板块",
+      "target_type": "sector"
     },
     {
       "id": "tc_035",
@@ -862,7 +930,9 @@
       ],
       "expected_direction": "neutral",
       "subcategory": "消费复苏",
-      "memorization_likelihood": "medium"
+      "memorization_likelihood": "medium",
+      "target": "白酒板块",
+      "target_type": "sector"
     },
     {
       "id": "tc_036",
@@ -884,7 +954,9 @@
       "key_numbers": [],
       "expected_direction": "up",
       "subcategory": "国产替代",
-      "memorization_likelihood": "high"
+      "memorization_likelihood": "high",
+      "target": "半导体板块",
+      "target_type": "sector"
     },
     {
       "id": "tc_037",
@@ -909,7 +981,9 @@
       ],
       "expected_direction": "up",
       "subcategory": "十四五规划",
-      "memorization_likelihood": "medium"
+      "memorization_likelihood": "medium",
+      "target": "军工板块",
+      "target_type": "sector"
     },
     {
       "id": "tc_038",
@@ -935,7 +1009,9 @@
       ],
       "expected_direction": "down",
       "subcategory": "价格崩塌",
-      "memorization_likelihood": "high"
+      "memorization_likelihood": "high",
+      "target": "锂电板块",
+      "target_type": "sector"
     },
     {
       "id": "tc_039",
@@ -958,7 +1034,9 @@
       ],
       "expected_direction": "up",
       "subcategory": "高股息",
-      "memorization_likelihood": "medium"
+      "memorization_likelihood": "medium",
+      "target": "工商银行",
+      "target_type": "company"
     },
     {
       "id": "tc_040",
@@ -981,7 +1059,9 @@
       ],
       "expected_direction": "down",
       "subcategory": "贸易摩擦",
-      "memorization_likelihood": "high"
+      "memorization_likelihood": "high",
+      "target": "A股大盘",
+      "target_type": "index"
     },
     {
       "id": "tc_041",
@@ -1007,7 +1087,9 @@
       ],
       "expected_direction": "down",
       "subcategory": "美联储加息",
-      "memorization_likelihood": "high"
+      "memorization_likelihood": "high",
+      "target": "A股大盘",
+      "target_type": "index"
     },
     {
       "id": "tc_042",
@@ -1031,7 +1113,9 @@
       ],
       "expected_direction": "up",
       "subcategory": "防控优化",
-      "memorization_likelihood": "high"
+      "memorization_likelihood": "high",
+      "target": "消费板块",
+      "target_type": "sector"
     }
   ]
 }

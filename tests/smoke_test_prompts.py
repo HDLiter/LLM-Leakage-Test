@@ -32,6 +32,8 @@ TASK_IDS = [
     "decomposed_authority.matched",
     "decomposed_novelty.base",
     "decomposed_novelty.matched",
+    "decomposed_impact.base",
+    "decomposed_impact.matched",
     "sham_decomposition.control",
 ]
 
@@ -225,6 +227,8 @@ def run_task_safe(
     task_id: str,
     article: str,
     article_id: str,
+    target: str = "",
+    target_type: str = "",
 ) -> dict[str, Any]:
     prompt = loader.get_task_prompt(task_id)
     result: dict[str, Any] = {
@@ -245,7 +249,12 @@ def run_task_safe(
     }
 
     try:
-        user_prompt = loader.render_user_prompt(task_id, article)
+        render_kwargs: dict[str, str] = {}
+        if target:
+            render_kwargs["target"] = target
+        if target_type:
+            render_kwargs["target_type"] = target_type
+        user_prompt = loader.render_user_prompt(task_id, article, **render_kwargs)
         response = client.chat(prompt.system_prompt, user_prompt)
         result["raw_response"] = response.raw_response
         result["prompt_hash"] = response.prompt_hash
@@ -471,6 +480,9 @@ def run_counterfactual_check(
         f"{original_label} -> {target_label}"
     )
 
+    target = getattr(test_case, "target", "")
+    target_type = getattr(test_case, "target_type", "")
+
     semantic_reversal, semantic_errors, semantic_repaired = generate_counterfactual_template_safe(
         client=client,
         loader=loader,
@@ -479,12 +491,16 @@ def run_counterfactual_check(
         original_label=original_label,
         target_label=target_label,
         target_field="direction",
+        target=target,
+        target_type=target_type,
     )
     neutral_paraphrase, paraphrase_errors, paraphrase_repaired = generate_counterfactual_template_safe(
         client=client,
         loader=loader,
         template_id="neutral_paraphrase",
         article=original_article,
+        target=target,
+        target_type=target_type,
     )
 
     if semantic_reversal is None or neutral_paraphrase is None:
@@ -513,6 +529,8 @@ def run_counterfactual_check(
         task_id=task_id,
         article=original_article,
         article_id=test_case.id,
+        target=target,
+        target_type=target_type,
     )
     reversed_result = run_task_safe(
         client=client,
@@ -520,6 +538,8 @@ def run_counterfactual_check(
         task_id=task_id,
         article=str(semantic_reversal["rewritten_article"]),
         article_id=f"{test_case.id}:semantic_reversal",
+        target=target,
+        target_type=target_type,
     )
     paraphrase_result = run_task_safe(
         client=client,
@@ -527,6 +547,8 @@ def run_counterfactual_check(
         task_id=task_id,
         article=str(neutral_paraphrase["rewritten_article"]),
         article_id=f"{test_case.id}:neutral_paraphrase",
+        target=target,
+        target_type=target_type,
     )
 
     original_payload = original_result["resolved_output"] or original_result["parsed_output"]
@@ -631,6 +653,8 @@ def main() -> int:
                     task_id=task_id,
                     article=current_article,
                     article_id=test_case.id,
+                    target=getattr(test_case, "target", ""),
+                    target_type=getattr(test_case, "target_type", ""),
                 )
                 task_result.update(
                     {

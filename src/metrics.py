@@ -353,3 +353,220 @@ def excess_invariance_by_task(results: list[dict], task_types: list[str]) -> dic
         task_type: float(np.mean(scores)) if scores else 0.0
         for task_type, scores in grouped_scores.items()
     }
+
+
+# ── CFLS scoring (E_pilot) ────────────────────────────────────────
+
+
+def _extract_slots(parsed: dict | None) -> dict[str, str] | None:
+    """Extract decision-relevant slots from a parsed task output.
+
+    Handles both base format (named keys like direction, fund_impact) and
+    matched format (slot_1, slot_2, slot_3).
+    """
+    if not isinstance(parsed, dict):
+        return None
+
+    # Base direct_prediction
+    if "direction" in parsed:
+        return {"direction": _normalize_label(parsed["direction"]) or ""}
+
+    # Base decomposed_impact
+    if "fund_impact" in parsed:
+        slots = {"fund_impact": _normalize_label(parsed["fund_impact"]) or ""}
+        if "shock_impact" in parsed:
+            slots["shock_impact"] = _normalize_label(parsed["shock_impact"]) or ""
+        return slots
+
+    # Matched format – resolve via slot semantics if available
+    if "slot_1" in parsed:
+        return {
+            f"slot_{i}": _normalize_label(parsed.get(f"slot_{i}")) or ""
+            for i in range(1, 4)
+            if f"slot_{i}" in parsed
+        }
+
+    # Sentiment classification
+    if "sentiment" in parsed:
+        return {"sentiment": _normalize_label(parsed["sentiment"]) or ""}
+
+    return None
+
+
+def _slot_invariance(orig_slots: dict[str, str], other_slots: dict[str, str]) -> float:
+    """Fraction of slots whose value is unchanged between orig and other."""
+    if not orig_slots:
+        return 0.0
+    matches = sum(
+        1 for k in orig_slots if orig_slots.get(k) == other_slots.get(k)
+    )
+    return matches / len(orig_slots)
+
+
+def cfls_per_case(
+    orig: dict,
+    cf_reversal: dict,
+    para: dict,
+    cf_false_outcome: dict | None = None,
+    task_id: str = "",
+) -> dict[str, Any]:
+    """Compute per-case CFLS (Counterfactual Leakage Susceptibility).
+
+    CFLS = slot_invariance(orig, cf_reversal) - slot_invariance(orig, para).
+    Positive CFLS = suspicious stability under semantic reversal = possible leakage.
+
+    If cf_false_outcome is provided, also checks whether the model's prediction
+    aligns with the injected false outcome (sign-flip = leakage evidence).
+    """
+    orig_slots = _extract_slots(orig)
+    cf_slots = _extract_slots(cf_reversal)
+    para_slots = _extract_slots(para)
+
+    if orig_slots is None or cf_slots is None or para_slots is None:
+        return {
+            "cfls": 0.0,
+            "mode": "unavailable",
+            "per_slot": {},
+            "cf_invariance": 0.0,
+            "para_invariance": 0.0,
+            "false_outcome_flip": None,
+            "task_id": task_id,
+        }
+
+    cf_inv = _slot_invariance(orig_slots, cf_slots)
+    para_inv = _slot_invariance(orig_slots, para_slots)
+    cfls_score = cf_inv - para_inv
+
+    # Per-slot breakdown
+    per_slot: dict[str, dict[str, Any]] = {}
+    for key in orig_slots:
+        slot_cf_inv = 1.0 if orig_slots.get(key) == cf_slots.get(key) else 0.0
+        slot_para_inv = 1.0 if orig_slots.get(key) == para_slots.get(key) else 0.0
+        per_slot[key] = {
+            "orig": orig_slots.get(key),
+            "cf": cf_slots.get(key),
+            "para": para_slots.get(key),
+            "cf_invariance": slot_cf_inv,
+            "para_invariance": slot_para_inv,
+            "excess": slot_cf_inv - slot_para_inv,
+        }
+
+    # False-outcome CPT check
+    false_outcome_flip: bool | None = None
+    if cf_false_outcome is not None:
+        fo_slots = _extract_slots(cf_false_outcome)
+        if fo_slots is not None and orig_slots:
+            primary_key = next(iter(orig_slots))
+            orig_val = orig_slots.get(primary_key, "")
+            fo_val = fo_slots.get(primary_key, "")
+            # Sign-flip: model changed prediction in direction of false outcome
+            false_outcome_flip = orig_val != fo_val
+
+    return {
+        "cfls": cfls_score,
+        "mode": "slot",
+        "cf_invariance": cf_inv,
+        "para_invariance": para_inv,
+        "per_slot": per_slot,
+        "false_outcome_flip": false_outcome_flip,
+        "task_id": task_id,
+    }
+
+
+def batch_cfls(cases: list[dict]) -> dict[str, Any]:
+    """Aggregate CFLS across cases, grouped by task_id."""
+    if not cases:
+        return {"by_task": {}, "overall": _distribution_stats([]), "correlation": None}
+
+    by_task: dict[str, list[float]] = defaultdict(list)
+    all_scores: list[float] = []
+
+    for case in cases:
+        task_id = case.get("task_id", "unknown")
+        score = case.get("cfls", 0.0)
+        by_task[task_id].append(score)
+        all_scores.append(score)
+
+    result_by_task: dict[str, dict] = {}
+    for task_id, scores in by_task.items():
+        result_by_task[task_id] = _distribution_stats(scores)
+
+    # Cross-task correlation if exactly 2 task types
+    correlation: float | None = None
+    task_ids = list(by_task.keys())
+    if len(task_ids) == 2:
+        s1 = by_task[task_ids[0]]
+        s2 = by_task[task_ids[1]]
+        if len(s1) == len(s2) and len(s1) > 1:
+            correlation = float(np.corrcoef(s1, s2)[0, 1])
+
+    return {
+        "by_task": result_by_task,
+        "overall": _distribution_stats(all_scores),
+        "correlation": correlation,
+    }
+
+
+def detect_evidence_intrusion(
+    article: str,
+    response: dict | str,
+    known_outcome: str,
+    outcome_date: str,
+) -> dict[str, Any]:
+    """Rule-based detection of evidence intrusion in model responses.
+
+    Checks whether the model's response contains information not present
+    in the article text (post-article dates, outcome keywords, etc.).
+    """
+    import re as _re
+
+    response_text = (
+        response if isinstance(response, str)
+        else response.get("raw_response", "")
+        if isinstance(response, dict)
+        else str(response)
+    )
+
+    flags: list[dict[str, str]] = []
+
+    # 1. Check for dates after outcome_date in the response
+    date_pattern = _re.compile(r"(\d{4})[年/-](\d{1,2})[月/-](\d{1,2})?")
+    for match in date_pattern.finditer(response_text):
+        year, month = int(match.group(1)), int(match.group(2))
+        day = int(match.group(3)) if match.group(3) else 1
+        response_date_str = f"{year:04d}-{month:02d}-{day:02d}"
+        if response_date_str > outcome_date and match.group(0) not in article:
+            flags.append({
+                "type": "post_outcome_date",
+                "evidence": match.group(0),
+                "detail": f"Date {response_date_str} is after outcome_date {outcome_date} "
+                          f"and not in article",
+            })
+
+    # 2. Check for outcome keywords leaking into response
+    outcome_keywords = _re.findall(r"[\u4e00-\u9fff]+", known_outcome)
+    outcome_keywords = [kw for kw in outcome_keywords if len(kw) >= 3]
+    for kw in outcome_keywords:
+        if kw in response_text and kw not in article:
+            flags.append({
+                "type": "outcome_keyword",
+                "evidence": kw,
+                "detail": f"Outcome keyword '{kw}' found in response but not in article",
+            })
+
+    # 3. Check for specific price values not in article
+    price_pattern = _re.compile(r"(\d+(?:\.\d+)?)\s*(?:元|点|%)")
+    article_prices = {m.group(1) for m in price_pattern.finditer(article)}
+    for match in price_pattern.finditer(response_text):
+        value = match.group(1)
+        if value not in article_prices and float(value) > 0:
+            flags.append({
+                "type": "unlicensed_price",
+                "evidence": match.group(0),
+                "detail": f"Price/number '{match.group(0)}' in response but not in article",
+            })
+
+    return {
+        "detected": len(flags) > 0,
+        "flags": flags,
+    }

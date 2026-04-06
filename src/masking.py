@@ -502,3 +502,52 @@ def generate_counterfactuals_batch(
 
     results.sort(key=lambda x: x[0])
     return [cf for _, cf in results]
+
+
+# ── False-outcome CPT ─────────────────────────────────────────────
+
+_FALSE_OUTCOME_PHRASES_NEGATIVE = [
+    "后续{target}表现低迷，市场反应冷淡",
+    "此后{target}持续走弱，投资者信心不足",
+    "随后{target}出现明显回调，未能延续涨势",
+    "{target}后续承压下行，相关板块全面走弱",
+    "市场对{target}反应偏负面，短期内持续承压",
+]
+
+_FALSE_OUTCOME_PHRASES_POSITIVE = [
+    "后续{target}表现强劲，市场热情高涨",
+    "此后{target}持续走强，投资者积极加仓",
+    "随后{target}企稳回升，超出市场预期",
+    "{target}后续获得资金追捧，涨势显著",
+    "市场对{target}反应积极，短期内持续上行",
+]
+
+
+def generate_false_outcome_cpt(
+    article: str,
+    known_outcome: str,
+    expected_direction: str,
+    target: str,
+) -> str:
+    """Inject a plausible false-outcome hint into the article.
+
+    Flips the expected direction: if expected_direction is 'up', injects
+    a negative outcome hint, and vice versa. This tests whether the model
+    short-circuits through outcome memorization vs reading article text.
+
+    Returns the modified article with the false outcome hint appended.
+    """
+    import random as _random
+
+    direction = expected_direction.strip().lower()
+    if direction in ("up", "positive", "strong_positive"):
+        phrases = _FALSE_OUTCOME_PHRASES_NEGATIVE
+    elif direction in ("down", "negative", "strong_negative"):
+        phrases = _FALSE_OUTCOME_PHRASES_POSITIVE
+    else:
+        # Neutral: inject a negative hint as default
+        phrases = _FALSE_OUTCOME_PHRASES_NEGATIVE
+
+    phrase = _random.choice(phrases).format(target=target)
+    hint = f"（注：据了解，{phrase}。）"
+    return f"{article}\n{hint}"

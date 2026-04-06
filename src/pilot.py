@@ -81,51 +81,6 @@ def _safe_json_parse(raw: str) -> dict | None:
         return extract_json_robust(raw)
 
 
-def _run_task(
-    client: "LLMClient",
-    loader: PromptLoader,
-    task_id: str,
-    article: str,
-    target: str,
-    target_type: str,
-) -> dict[str, Any]:
-    """Run a single task prompt and return parsed output."""
-    prompt = loader.get_task_prompt(task_id)
-    user_prompt = loader.render_user_prompt(
-        task_id, article, target=target, target_type=target_type,
-    )
-    try:
-        response = client.chat(prompt.system_prompt, user_prompt)
-    except Exception as exc:
-        return {
-            "raw_response": None,
-            "parsed_output": None,
-            "valid": False,
-            "validation_errors": [f"API error: {type(exc).__name__}: {exc}"],
-            "input_tokens": 0,
-            "output_tokens": 0,
-        }
-    parsed = _safe_json_parse(response.raw_response)
-    validation_errors: list[str] = []
-    if parsed is not None:
-        validation_errors = loader.validate_output(task_id, parsed)
-        # Validate target_echo matches the requested target
-        if target and isinstance(parsed, dict):
-            echo = parsed.get("target_echo", "")
-            if echo and echo.strip() != target.strip():
-                validation_errors.append(
-                    f"target_echo mismatch: expected '{target}', got '{echo}'"
-                )
-    return {
-        "raw_response": response.raw_response,
-        "parsed_output": parsed,
-        "valid": parsed is not None and not validation_errors,
-        "validation_errors": validation_errors,
-        "input_tokens": response.input_tokens,
-        "output_tokens": response.output_tokens,
-    }
-
-
 def _generate_cf_safe(
     client: "LLMClient",
     _loader: PromptLoader,
@@ -262,16 +217,120 @@ def prepare_conditions(
     return conditions
 
 
+def _batch_run_tasks(
+    client: "LLMClient",
+    loader: PromptLoader,
+    jobs: list[tuple[str, str, str, str]],
+    max_concurrency: int = 20,
+) -> list[dict[str, Any]]:
+    """Run multiple task prompts concurrently.
+
+    Each job is (task_id, article, target, target_type).
+    Returns list of result dicts in the same order as jobs.
+    """
+    # Build prompts
+    prompt_pairs: list[tuple[str, str]] = []
+    task_ids: list[str] = []
+    targets: list[str] = []
+    for task_id, article, target, target_type in jobs:
+        prompt = loader.get_task_prompt(task_id)
+        user_prompt = loader.render_user_prompt(
+            task_id, article, target=target, target_type=target_type,
+        )
+        prompt_pairs.append((prompt.system_prompt, user_prompt))
+        task_ids.append(task_id)
+        targets.append(target)
+
+    # Batch call
+    try:
+        responses = client.batch_chat_concurrent(
+            prompt_pairs, max_concurrency=max_concurrency,
+        )
+    except Exception as exc:
+        # If batch fails entirely, return error for all
+        return [{
+            "raw_response": None,
+            "parsed_output": None,
+            "valid": False,
+            "validation_errors": [f"Batch API error: {type(exc).__name__}: {exc}"],
+            "input_tokens": 0,
+            "output_tokens": 0,
+        }] * len(jobs)
+
+    # Parse and validate each response
+    results: list[dict[str, Any]] = []
+    for resp, task_id, target in zip(responses, task_ids, targets):
+        parsed = _safe_json_parse(resp.raw_response)
+        validation_errors: list[str] = []
+        if parsed is not None:
+            validation_errors = loader.validate_output(task_id, parsed)
+            if target and isinstance(parsed, dict):
+                echo = parsed.get("target_echo", "")
+                if echo and echo.strip() != target.strip():
+                    validation_errors.append(
+                        f"target_echo mismatch: expected '{target}', got '{echo}'"
+                    )
+        results.append({
+            "raw_response": resp.raw_response,
+            "parsed_output": parsed,
+            "valid": parsed is not None and not validation_errors,
+            "validation_errors": validation_errors,
+            "input_tokens": resp.input_tokens,
+            "output_tokens": resp.output_tokens,
+        })
+    return results
+
+
 def run_single_case(
     client: "LLMClient",
     loader: PromptLoader,
     tc: "TestCase",
     conditions: dict[str, dict[str, Any]],
+    max_concurrency: int = 20,
 ) -> dict[str, Any]:
-    """Run both pilot tasks on all conditions for one test case."""
+    """Run both pilot tasks on all conditions for one test case (concurrent)."""
     target = tc.target
     target_type = tc.target_type
     article = _article_text(tc)
+
+    # Build all jobs across tasks and conditions
+    job_keys: list[tuple[str, str]] = []  # (task_id, cond_name)
+    jobs: list[tuple[str, str, str, str]] = []  # (task_id, article, target, target_type)
+    skipped: dict[tuple[str, str], bool] = {}
+
+    for task_id in PILOT_TASKS:
+        family = task_id.split(".")[0]
+        reversal_key = "sr_direction" if family == "direct_prediction" else "sr_fund_impact"
+        condition_map = {
+            "original": conditions["original"],
+            "semantic_reversal": conditions[reversal_key],
+            "neutral_paraphrase": conditions["neutral_paraphrase"],
+            "false_outcome_cpt": conditions["false_outcome_cpt"],
+        }
+        for cond_name, cond in condition_map.items():
+            key = (task_id, cond_name)
+            if cond.get("failed") and cond_name != "original":
+                skipped[key] = True
+                continue
+            job_keys.append(key)
+            jobs.append((task_id, cond["article"], target, target_type))
+
+    # Run all non-skipped jobs concurrently
+    batch_results = _batch_run_tasks(client, loader, jobs, max_concurrency)
+
+    # Reassemble responses by (task_id, cond_name)
+    result_iter = iter(batch_results)
+    all_responses: dict[tuple[str, str], dict[str, Any]] = {}
+    for key in job_keys:
+        all_responses[key] = next(result_iter)
+    for key in skipped:
+        all_responses[key] = {
+            "raw_response": None,
+            "parsed_output": None,
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "skipped": True,
+        }
 
     task_results: dict[str, dict[str, Any]] = {}
 
@@ -279,34 +338,13 @@ def run_single_case(
         family = task_id.split(".")[0]
         reversal_key = "sr_direction" if family == "direct_prediction" else "sr_fund_impact"
 
-        # Run task on each relevant condition
-        condition_map = {
-            "original": conditions["original"],
-            "semantic_reversal": conditions[reversal_key],
-            "neutral_paraphrase": conditions["neutral_paraphrase"],
-            "false_outcome_cpt": conditions["false_outcome_cpt"],
+        sr_failed = conditions[reversal_key].get("failed", False)
+        np_failed = conditions["neutral_paraphrase"].get("failed", False)
+
+        responses = {
+            cond_name: all_responses[(task_id, cond_name)]
+            for cond_name in ("original", "semantic_reversal", "neutral_paraphrase", "false_outcome_cpt")
         }
-
-        # Check if required CFs are available (not failed)
-        sr_failed = condition_map["semantic_reversal"].get("failed", False)
-        np_failed = condition_map["neutral_paraphrase"].get("failed", False)
-
-        responses: dict[str, dict[str, Any]] = {}
-        for cond_name, cond in condition_map.items():
-            if cond.get("failed") and cond_name != "original":
-                responses[cond_name] = {
-                    "raw_response": None,
-                    "parsed_output": None,
-                    "input_tokens": 0,
-                    "output_tokens": 0,
-                    "skipped": True,
-                }
-                continue
-            result = _run_task(
-                client, loader, task_id,
-                cond["article"], target, target_type,
-            )
-            responses[cond_name] = result
 
         # Compute CFLS only if SR, NP succeeded AND all 3 core responses are valid
         core_valid = all(

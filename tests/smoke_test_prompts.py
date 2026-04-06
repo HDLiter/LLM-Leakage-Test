@@ -477,8 +477,8 @@ def run_counterfactual_check(
         f"{original_label} -> {target_label}"
     )
 
-    target = getattr(test_case, "target", "")
-    target_type = getattr(test_case, "target_type", "")
+    target = getattr(test_case, "target", "") or test_case.news.title[:20]
+    target_type = getattr(test_case, "target_type", "") or "index"
 
     semantic_reversal, semantic_errors, semantic_repaired = generate_counterfactual_template_safe(
         client=client,

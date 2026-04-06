@@ -94,7 +94,17 @@ def _run_task(
     user_prompt = loader.render_user_prompt(
         task_id, article, target=target, target_type=target_type,
     )
-    response = client.chat(prompt.system_prompt, user_prompt)
+    try:
+        response = client.chat(prompt.system_prompt, user_prompt)
+    except Exception as exc:
+        return {
+            "raw_response": None,
+            "parsed_output": None,
+            "valid": False,
+            "validation_errors": [f"API error: {type(exc).__name__}: {exc}"],
+            "input_tokens": 0,
+            "output_tokens": 0,
+        }
     parsed = _safe_json_parse(response.raw_response)
     validation_errors: list[str] = []
     if parsed is not None:
@@ -283,11 +293,17 @@ def run_single_case(
             )
             responses[cond_name] = result
 
-        # Compute CFLS only if both SR and NP succeeded
-        if sr_failed or np_failed:
+        # Compute CFLS only if SR, NP succeeded AND all 3 core responses are valid
+        core_valid = all(
+            responses[k].get("valid", False)
+            for k in ("original", "semantic_reversal", "neutral_paraphrase")
+            if not responses[k].get("skipped")
+        )
+        if sr_failed or np_failed or not core_valid:
+            fail_reason = "cf_generation_failed" if (sr_failed or np_failed) else "task_output_invalid"
             cfls_result = {
                 "cfls": None,
-                "mode": "cf_generation_failed",
+                "mode": fail_reason,
                 "cf_invariance": None,
                 "para_invariance": None,
                 "per_slot": {},
@@ -346,6 +362,28 @@ def run_single_case(
     }
 
 
+def _incremental_save(
+    output_path: Path,
+    case_results: list[dict[str, Any]],
+    n_total: int,
+    seed: int,
+) -> None:
+    """Save partial results so progress isn't lost on crash."""
+    partial = {
+        "meta": {
+            "experiment": "E_pilot",
+            "n_cases_completed": len(case_results),
+            "n_cases_total": n_total,
+            "timestamp": datetime.now(UTC).isoformat(),
+            "seed": seed,
+            "partial": True,
+        },
+        "cases": case_results,
+    }
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(json.dumps(partial, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
 def run_pilot(
     client: "LLMClient",
     loader: PromptLoader,
@@ -364,28 +402,36 @@ def run_pilot(
         direction = getattr(tc.expected_direction, "value", tc.expected_direction)
         print(f"\n[{i}/{n}] {tc.id} | {tc.target} ({tc.target_type}) | {direction}")
 
-        # Phase A: generate conditions
-        print("  Generating counterfactual conditions...")
-        conditions = prepare_conditions(client, loader, tc)
-        for cond_name, cond in conditions.items():
-            if cond_name == "original" or cond_name == "false_outcome_cpt":
-                status = "OK"
-            elif cond.get("failed"):
-                status = "FAILED"
-            else:
-                status = "OK"
-            print(f"    {cond_name}: {status}")
+        try:
+            # Phase A: generate conditions
+            print("  Generating counterfactual conditions...")
+            conditions = prepare_conditions(client, loader, tc)
+            for cond_name, cond in conditions.items():
+                if cond_name in ("original", "false_outcome_cpt"):
+                    status = "OK"
+                elif cond.get("failed"):
+                    status = "FAILED"
+                else:
+                    status = "OK"
+                print(f"    {cond_name}: {status}")
 
-        # Phase B: run tasks
-        print("  Running tasks...")
-        case_result = run_single_case(client, loader, tc, conditions)
-        all_case_results.append(case_result)
+            # Phase B: run tasks
+            print("  Running tasks...")
+            case_result = run_single_case(client, loader, tc, conditions)
+            all_case_results.append(case_result)
 
-        cfls_d = case_result["metrics"]["cfls_direct"]
-        cfls_i = case_result["metrics"]["cfls_impact"]
-        d_str = f"{cfls_d:.2f}" if cfls_d is not None else "N/A"
-        i_str = f"{cfls_i:.2f}" if cfls_i is not None else "N/A"
-        print(f"  CFLS: direct={d_str}, impact={i_str}")
+            cfls_d = case_result["metrics"]["cfls_direct"]
+            cfls_i = case_result["metrics"]["cfls_impact"]
+            d_str = f"{cfls_d:.2f}" if cfls_d is not None else "N/A"
+            i_str = f"{cfls_i:.2f}" if cfls_i is not None else "N/A"
+            print(f"  CFLS: direct={d_str}, impact={i_str}")
+        except Exception as exc:
+            print(f"  [ERROR] Case {tc.id} failed: {type(exc).__name__}: {exc}")
+            continue
+
+        # Incremental save after each case
+        if all_case_results and i % 5 == 0:
+            _incremental_save(output_path, all_case_results, n, seed)
 
     # Phase C: aggregate (filter out cases with failed CF generation)
     print("\nAggregating results...")
@@ -400,7 +446,10 @@ def run_pilot(
 
     aggregated = batch_cfls(all_cfls_entries)
 
-    # Compute case-id-paired cross-task correlation (overrides batch_cfls positional one)
+    # Always clear positional correlation — we recompute by case_id pairing below
+    aggregated["correlation"] = None
+
+    # Compute case-id-paired cross-task correlation
     if len(PILOT_TASKS) == 2:
         paired: dict[str, dict[str, float]] = {}
         for cr in all_case_results:

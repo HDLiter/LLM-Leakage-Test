@@ -301,6 +301,8 @@ def run_single_case(
             fo_parsed = responses["false_outcome_cpt"]["parsed_output"] or {}
 
             direction_val = getattr(tc.expected_direction, "value", tc.expected_direction)
+            # Only score the slot that was actually targeted by the reversal
+            target_field = "direction" if family == "direct_prediction" else "fund_impact"
             cfls_result = cfls_per_case(
                 orig=orig_parsed,
                 cf_reversal=sr_parsed,
@@ -308,6 +310,7 @@ def run_single_case(
                 cf_false_outcome=fo_parsed,
                 task_id=task_id,
                 expected_direction=direction_val,
+                reversal_target_field=target_field,
             )
 
         # Evidence intrusion on original response
@@ -391,9 +394,31 @@ def run_pilot(
         for task_id in PILOT_TASKS:
             cfls_data = cr["tasks"][task_id]["cfls"]
             if cfls_data.get("cfls") is not None:
+                # Tag with case_id for paired correlation
+                cfls_data["case_id"] = cr["case_id"]
                 all_cfls_entries.append(cfls_data)
 
     aggregated = batch_cfls(all_cfls_entries)
+
+    # Compute case-id-paired cross-task correlation (overrides batch_cfls positional one)
+    if len(PILOT_TASKS) == 2:
+        paired: dict[str, dict[str, float]] = {}
+        for cr in all_case_results:
+            cid = cr["case_id"]
+            scores = {}
+            for tid in PILOT_TASKS:
+                s = cr["tasks"][tid]["cfls"].get("cfls")
+                if s is not None:
+                    scores[tid] = s
+            if len(scores) == 2:
+                paired[cid] = scores
+        if len(paired) > 1:
+            import numpy as _np
+            s1 = [v[PILOT_TASKS[0]] for v in paired.values()]
+            s2 = [v[PILOT_TASKS[1]] for v in paired.values()]
+            corr = _np.corrcoef(s1, s2)[0, 1]
+            aggregated["correlation"] = None if _np.isnan(corr) else float(corr)
+            aggregated["correlation_n_paired"] = len(paired)
 
     # Build output
     output = {

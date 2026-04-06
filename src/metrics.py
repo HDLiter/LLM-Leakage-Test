@@ -410,11 +410,15 @@ def cfls_per_case(
     cf_false_outcome: dict | None = None,
     task_id: str = "",
     expected_direction: str = "",
+    reversal_target_field: str = "",
 ) -> dict[str, Any]:
     """Compute per-case CFLS (Counterfactual Leakage Susceptibility).
 
     CFLS = slot_invariance(orig, cf_reversal) - slot_invariance(orig, para).
     Positive CFLS = suspicious stability under semantic reversal = possible leakage.
+
+    If reversal_target_field is set, only that slot is used for invariance
+    comparison (avoids penalizing untargeted slots that weren't edited).
 
     If cf_false_outcome is provided, also checks whether the model's prediction
     aligns with the injected false outcome (sign-flip = leakage evidence).
@@ -425,20 +429,30 @@ def cfls_per_case(
 
     if orig_slots is None or cf_slots is None or para_slots is None:
         return {
-            "cfls": 0.0,
+            "cfls": None,
             "mode": "unavailable",
             "per_slot": {},
-            "cf_invariance": 0.0,
-            "para_invariance": 0.0,
+            "cf_invariance": None,
+            "para_invariance": None,
             "false_outcome_flip": None,
             "task_id": task_id,
         }
 
-    cf_inv = _slot_invariance(orig_slots, cf_slots)
-    para_inv = _slot_invariance(orig_slots, para_slots)
+    # If reversal only targeted one field, restrict invariance to that field
+    if reversal_target_field and reversal_target_field in orig_slots:
+        scored_keys = {reversal_target_field}
+    else:
+        scored_keys = set(orig_slots.keys())
+
+    scored_orig = {k: v for k, v in orig_slots.items() if k in scored_keys}
+    scored_cf = {k: v for k, v in cf_slots.items() if k in scored_keys}
+    scored_para = {k: v for k, v in para_slots.items() if k in scored_keys}
+
+    cf_inv = _slot_invariance(scored_orig, scored_cf)
+    para_inv = _slot_invariance(scored_orig, scored_para)
     cfls_score = cf_inv - para_inv
 
-    # Per-slot breakdown
+    # Per-slot breakdown (all slots, not just scored)
     per_slot: dict[str, dict[str, Any]] = {}
     for key in orig_slots:
         slot_cf_inv = 1.0 if orig_slots.get(key) == cf_slots.get(key) else 0.0
@@ -452,33 +466,35 @@ def cfls_per_case(
             "excess": slot_cf_inv - slot_para_inv,
         }
 
-    # False-outcome CPT check: did the model flip toward the injected false outcome?
-    # The false outcome is opposite to expected_direction, so if the model moves
-    # away from expected_direction, it was influenced by the false hint.
+    # False-outcome CPT check: did the model flip ANY slot toward the injected
+    # false outcome? The false outcome is opposite to expected_direction, so if
+    # the model moves away from expected_direction on any slot, it was influenced.
     false_outcome_flip: bool | None = None
     if cf_false_outcome is not None:
         fo_slots = _extract_slots(cf_false_outcome)
         if fo_slots is not None and orig_slots:
-            primary_key = next(iter(orig_slots))
-            orig_val = orig_slots.get(primary_key, "")
-            fo_val = fo_slots.get(primary_key, "")
-            if orig_val == fo_val:
-                false_outcome_flip = False  # No change, model ignored the hint
-            elif expected_direction:
-                # Check if the change is AWAY from expected direction
-                # (i.e., toward the false outcome)
-                _POS = {"up", "positive", "strong_positive"}
-                _NEG = {"down", "negative", "strong_negative"}
-                expected_polarity = "pos" if expected_direction in _POS | {"up"} else "neg"
-                fo_polarity = "pos" if fo_val in _POS else ("neg" if fo_val in _NEG else "neutral")
-                # False outcome flip = model moved to opposite polarity of expected
-                false_outcome_flip = (
-                    (expected_polarity == "pos" and fo_polarity == "neg")
-                    or (expected_polarity == "neg" and fo_polarity == "pos")
-                )
-            else:
-                # No expected_direction, fall back to "any change"
-                false_outcome_flip = True
+            _POS = {"up", "positive", "strong_positive"}
+            _NEG = {"down", "negative", "strong_negative"}
+
+            any_flip = False
+            for key in orig_slots:
+                orig_val = orig_slots.get(key, "")
+                fo_val = fo_slots.get(key, "")
+                if orig_val == fo_val:
+                    continue
+                if expected_direction:
+                    expected_polarity = "pos" if expected_direction in _POS | {"up"} else "neg"
+                    fo_polarity = "pos" if fo_val in _POS else ("neg" if fo_val in _NEG else "neutral")
+                    if (
+                        (expected_polarity == "pos" and fo_polarity == "neg")
+                        or (expected_polarity == "neg" and fo_polarity == "pos")
+                    ):
+                        any_flip = True
+                        break
+                else:
+                    any_flip = True
+                    break
+            false_outcome_flip = any_flip
 
     return {
         "cfls": cfls_score,

@@ -329,7 +329,9 @@ def run_single_case(
             orig_parsed = responses["original"]["parsed_output"] or {}
             sr_parsed = responses["semantic_reversal"]["parsed_output"] or {}
             np_parsed = responses["neutral_paraphrase"]["parsed_output"] or {}
-            fo_parsed = responses["false_outcome_cpt"]["parsed_output"] or {}
+            # Only use FO result if it passed validation
+            fo_response = responses["false_outcome_cpt"]
+            fo_parsed = fo_response["parsed_output"] if fo_response.get("valid") else None
 
             direction_val = getattr(tc.expected_direction, "value", tc.expected_direction)
             # Only score the slot that was actually targeted by the reversal
@@ -449,10 +451,9 @@ def run_pilot(
             print(f"  CFLS: direct={d_str}, impact={i_str}")
         except Exception as exc:
             print(f"  [ERROR] Case {tc.id} failed: {type(exc).__name__}: {exc}")
-            continue
 
-        # Incremental save after each case
-        if all_case_results and i % 5 == 0:
+        # Incremental save every 5 completed cases
+        if len(all_case_results) > 0 and len(all_case_results) % 5 == 0:
             _incremental_save(output_path, all_case_results, n, seed)
 
     # Phase C: aggregate (filter out cases with failed CF generation)

@@ -109,6 +109,13 @@ def _run_task(
     validation_errors: list[str] = []
     if parsed is not None:
         validation_errors = loader.validate_output(task_id, parsed)
+        # Validate target_echo matches the requested target
+        if target and isinstance(parsed, dict):
+            echo = parsed.get("target_echo", "")
+            if echo and echo.strip() != target.strip():
+                validation_errors.append(
+                    f"target_echo mismatch: expected '{target}', got '{echo}'"
+                )
     return {
         "raw_response": response.raw_response,
         "parsed_output": parsed,
@@ -130,6 +137,7 @@ def _generate_cf_safe(
     """Generate a counterfactual with retry, return parsed payload or None."""
     from .masking import generate_counterfactual_from_template
 
+    target = kwargs.get("target", "")
     for attempt in range(1, max_attempts + 1):
         try:
             payload = generate_counterfactual_from_template(
@@ -140,6 +148,13 @@ def _generate_cf_safe(
                 bypass_cache=attempt > 1,
                 **kwargs,
             )
+            # Validate target_echo on CF rewrite
+            if target and isinstance(payload, dict):
+                echo = payload.get("target_echo", "")
+                if echo and echo.strip() != target.strip():
+                    raise ValueError(
+                        f"CF target_echo mismatch: expected '{target}', got '{echo}'"
+                    )
             return payload
         except Exception as exc:
             print(f"  [WARN] CF {template_id} attempt {attempt}: {exc}")
@@ -362,6 +377,14 @@ def run_single_case(
     }
 
 
+def _atomic_write(path: Path, data: dict[str, Any]) -> None:
+    """Write JSON atomically via temp file + rename to prevent corruption."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = path.with_suffix(".tmp")
+    tmp_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    tmp_path.replace(path)
+
+
 def _incremental_save(
     output_path: Path,
     case_results: list[dict[str, Any]],
@@ -380,8 +403,7 @@ def _incremental_save(
         },
         "cases": case_results,
     }
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(json.dumps(partial, ensure_ascii=False, indent=2), encoding="utf-8")
+    _atomic_write(output_path, partial)
 
 
 def run_pilot(
@@ -483,8 +505,7 @@ def run_pilot(
     }
 
     # Save
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(json.dumps(output, ensure_ascii=False, indent=2), encoding="utf-8")
+    _atomic_write(output_path, output)
     print(f"\nResults saved to {output_path}")
 
     # Summary

@@ -249,12 +249,9 @@ def run_task_safe(
     }
 
     try:
-        render_kwargs: dict[str, str] = {}
-        if target:
-            render_kwargs["target"] = target
-        if target_type:
-            render_kwargs["target_type"] = target_type
-        user_prompt = loader.render_user_prompt(task_id, article, **render_kwargs)
+        user_prompt = loader.render_user_prompt(
+            task_id, article, target=target, target_type=target_type,
+        )
         response = client.chat(prompt.system_prompt, user_prompt)
         result["raw_response"] = response.raw_response
         result["prompt_hash"] = response.prompt_hash

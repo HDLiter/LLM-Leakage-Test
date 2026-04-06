@@ -196,7 +196,7 @@ templates:
 
       Rules:
       - Preserve {target} as the same entity or market object named in the original.
-      - Preserve the relevant task label(s) for {target}: direct direction, sentiment, authority, novelty, and sham indicators should stay unchanged for the applicable task.
+      - Preserve the relevant task label(s) for {target}: direct direction, sentiment, authority, novelty, impact channels (fund_impact, shock_impact), and sham indicators should stay unchanged for the applicable task.
       - Change wording, syntax, and local phrasing, but keep the same event meaning for {target}.
       - Keep named entities, dates, and numbers unless a small stylistic rewrite is needed.
       - Before finalizing, check that the rewrite still supports the same target-specific label(s).

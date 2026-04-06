@@ -409,6 +409,7 @@ def cfls_per_case(
     para: dict,
     cf_false_outcome: dict | None = None,
     task_id: str = "",
+    expected_direction: str = "",
 ) -> dict[str, Any]:
     """Compute per-case CFLS (Counterfactual Leakage Susceptibility).
 
@@ -451,7 +452,9 @@ def cfls_per_case(
             "excess": slot_cf_inv - slot_para_inv,
         }
 
-    # False-outcome CPT check
+    # False-outcome CPT check: did the model flip toward the injected false outcome?
+    # The false outcome is opposite to expected_direction, so if the model moves
+    # away from expected_direction, it was influenced by the false hint.
     false_outcome_flip: bool | None = None
     if cf_false_outcome is not None:
         fo_slots = _extract_slots(cf_false_outcome)
@@ -459,8 +462,23 @@ def cfls_per_case(
             primary_key = next(iter(orig_slots))
             orig_val = orig_slots.get(primary_key, "")
             fo_val = fo_slots.get(primary_key, "")
-            # Sign-flip: model changed prediction in direction of false outcome
-            false_outcome_flip = orig_val != fo_val
+            if orig_val == fo_val:
+                false_outcome_flip = False  # No change, model ignored the hint
+            elif expected_direction:
+                # Check if the change is AWAY from expected direction
+                # (i.e., toward the false outcome)
+                _POS = {"up", "positive", "strong_positive"}
+                _NEG = {"down", "negative", "strong_negative"}
+                expected_polarity = "pos" if expected_direction in _POS | {"up"} else "neg"
+                fo_polarity = "pos" if fo_val in _POS else ("neg" if fo_val in _NEG else "neutral")
+                # False outcome flip = model moved to opposite polarity of expected
+                false_outcome_flip = (
+                    (expected_polarity == "pos" and fo_polarity == "neg")
+                    or (expected_polarity == "neg" and fo_polarity == "pos")
+                )
+            else:
+                # No expected_direction, fall back to "any change"
+                false_outcome_flip = True
 
     return {
         "cfls": cfls_score,
@@ -498,7 +516,8 @@ def batch_cfls(cases: list[dict]) -> dict[str, Any]:
         s1 = by_task[task_ids[0]]
         s2 = by_task[task_ids[1]]
         if len(s1) == len(s2) and len(s1) > 1:
-            correlation = float(np.corrcoef(s1, s2)[0, 1])
+            corr_val = np.corrcoef(s1, s2)[0, 1]
+            correlation = None if np.isnan(corr_val) else float(corr_val)
 
     return {
         "by_task": result_by_task,

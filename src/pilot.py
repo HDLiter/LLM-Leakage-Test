@@ -96,9 +96,14 @@ def _run_task(
     )
     response = client.chat(prompt.system_prompt, user_prompt)
     parsed = _safe_json_parse(response.raw_response)
+    validation_errors: list[str] = []
+    if parsed is not None:
+        validation_errors = loader.validate_output(task_id, parsed)
     return {
         "raw_response": response.raw_response,
         "parsed_output": parsed,
+        "valid": parsed is not None and not validation_errors,
+        "validation_errors": validation_errors,
         "input_tokens": response.input_tokens,
         "output_tokens": response.output_tokens,
     }
@@ -164,15 +169,17 @@ def prepare_conditions(
             target_type=target_type,
         )
         conditions["sr_direction"] = {
-            "article": sr_dir["rewritten_article"] if sr_dir else article,
+            "article": sr_dir["rewritten_article"] if sr_dir else None,
             "cf_payload": sr_dir,
             "source": "semantic_reversal:direction",
+            "failed": sr_dir is None,
         }
     else:
         conditions["sr_direction"] = {
-            "article": article,
+            "article": None,
             "cf_payload": None,
             "source": "semantic_reversal:direction:skipped_neutral",
+            "failed": True,
         }
 
     # Semantic reversal for fund_impact (decomposed_impact)
@@ -188,15 +195,17 @@ def prepare_conditions(
             target_type=target_type,
         )
         conditions["sr_fund_impact"] = {
-            "article": sr_impact["rewritten_article"] if sr_impact else article,
+            "article": sr_impact["rewritten_article"] if sr_impact else None,
             "cf_payload": sr_impact,
             "source": "semantic_reversal:fund_impact",
+            "failed": sr_impact is None,
         }
     else:
         conditions["sr_fund_impact"] = {
-            "article": article,
+            "article": None,
             "cf_payload": None,
             "source": "semantic_reversal:fund_impact:skipped_neutral",
+            "failed": True,
         }
 
     # Neutral paraphrase (shared across tasks)
@@ -206,9 +215,10 @@ def prepare_conditions(
         target_type=target_type,
     )
     conditions["neutral_paraphrase"] = {
-        "article": np_payload["rewritten_article"] if np_payload else article,
+        "article": np_payload["rewritten_article"] if np_payload else None,
         "cf_payload": np_payload,
         "source": "neutral_paraphrase",
+        "failed": np_payload is None,
     }
 
     # False-outcome CPT (code-level, no API call)
@@ -252,27 +262,53 @@ def run_single_case(
             "false_outcome_cpt": conditions["false_outcome_cpt"],
         }
 
+        # Check if required CFs are available (not failed)
+        sr_failed = condition_map["semantic_reversal"].get("failed", False)
+        np_failed = condition_map["neutral_paraphrase"].get("failed", False)
+
         responses: dict[str, dict[str, Any]] = {}
         for cond_name, cond in condition_map.items():
+            if cond.get("failed") and cond_name != "original":
+                responses[cond_name] = {
+                    "raw_response": None,
+                    "parsed_output": None,
+                    "input_tokens": 0,
+                    "output_tokens": 0,
+                    "skipped": True,
+                }
+                continue
             result = _run_task(
                 client, loader, task_id,
                 cond["article"], target, target_type,
             )
             responses[cond_name] = result
 
-        # Compute CFLS
-        orig_parsed = responses["original"]["parsed_output"] or {}
-        sr_parsed = responses["semantic_reversal"]["parsed_output"] or {}
-        np_parsed = responses["neutral_paraphrase"]["parsed_output"] or {}
-        fo_parsed = responses["false_outcome_cpt"]["parsed_output"] or {}
+        # Compute CFLS only if both SR and NP succeeded
+        if sr_failed or np_failed:
+            cfls_result = {
+                "cfls": None,
+                "mode": "cf_generation_failed",
+                "cf_invariance": None,
+                "para_invariance": None,
+                "per_slot": {},
+                "false_outcome_flip": None,
+                "task_id": task_id,
+            }
+        else:
+            orig_parsed = responses["original"]["parsed_output"] or {}
+            sr_parsed = responses["semantic_reversal"]["parsed_output"] or {}
+            np_parsed = responses["neutral_paraphrase"]["parsed_output"] or {}
+            fo_parsed = responses["false_outcome_cpt"]["parsed_output"] or {}
 
-        cfls_result = cfls_per_case(
-            orig=orig_parsed,
-            cf_reversal=sr_parsed,
-            para=np_parsed,
-            cf_false_outcome=fo_parsed,
-            task_id=task_id,
-        )
+            direction_val = getattr(tc.expected_direction, "value", tc.expected_direction)
+            cfls_result = cfls_per_case(
+                orig=orig_parsed,
+                cf_reversal=sr_parsed,
+                para=np_parsed,
+                cf_false_outcome=fo_parsed,
+                task_id=task_id,
+                expected_direction=direction_val,
+            )
 
         # Evidence intrusion on original response
         intrusion = detect_evidence_intrusion(
@@ -329,7 +365,12 @@ def run_pilot(
         print("  Generating counterfactual conditions...")
         conditions = prepare_conditions(client, loader, tc)
         for cond_name, cond in conditions.items():
-            status = "OK" if cond["cf_payload"] is not None or cond_name in ("original", "false_outcome_cpt") else "FALLBACK"
+            if cond_name == "original" or cond_name == "false_outcome_cpt":
+                status = "OK"
+            elif cond.get("failed"):
+                status = "FAILED"
+            else:
+                status = "OK"
             print(f"    {cond_name}: {status}")
 
         # Phase B: run tasks
@@ -339,15 +380,18 @@ def run_pilot(
 
         cfls_d = case_result["metrics"]["cfls_direct"]
         cfls_i = case_result["metrics"]["cfls_impact"]
-        print(f"  CFLS: direct={cfls_d:.2f}, impact={cfls_i:.2f}")
+        d_str = f"{cfls_d:.2f}" if cfls_d is not None else "N/A"
+        i_str = f"{cfls_i:.2f}" if cfls_i is not None else "N/A"
+        print(f"  CFLS: direct={d_str}, impact={i_str}")
 
-    # Phase C: aggregate
+    # Phase C: aggregate (filter out cases with failed CF generation)
     print("\nAggregating results...")
     all_cfls_entries = []
     for cr in all_case_results:
         for task_id in PILOT_TASKS:
             cfls_data = cr["tasks"][task_id]["cfls"]
-            all_cfls_entries.append(cfls_data)
+            if cfls_data.get("cfls") is not None:
+                all_cfls_entries.append(cfls_data)
 
     aggregated = batch_cfls(all_cfls_entries)
 

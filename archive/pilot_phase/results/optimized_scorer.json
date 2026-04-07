@@ -1,0 +1,69 @@
+{
+  "scorer.predict": {
+    "traces": [],
+    "train": [],
+    "demos": [
+      {
+        "augmented": true,
+        "news_text": "[YEAR]年7月24日，中共中央政治局召开会议，分析研究当前经济形势。会议指出要活跃资本市场，提振投资者信心。要适时调整优化房地产政策，因城施策用好政策工具箱。要加大宏观政策调控力度，着力扩大内需。",
+        "reasoning": "The news article reports that the Chinese Communist Party's Politburo held a meeting to analyze the economic situation. Key policy directions include: \"活跃资本市场，提振投资者信心\" (activate the capital market, boost investor confidence), \"适时调整优化房地产政策\" (adjust and optimize real estate policies in a timely manner), and \"加大宏观政策调控力度，着力扩大内需\" (increase macro policy adjustment efforts, focus on expanding domestic demand). These statements indicate proactive government measures aimed at stimulating economic activity, supporting capital markets, and addressing key sectors like real estate. Historically, such high-level policy announcements signaling supportive measures tend to have a positive impact on market sentiment, as they suggest potential easing or stimulus. However, the impact is likely to be moderate rather than transformative, as the details and implementation remain unspecified. The tone is clearly supportive, so bearish impacts are unlikely. The most probable outcome is a weak to moderate bullish reaction.",
+        "strong_bear": 0,
+        "weak_bear": 5,
+        "neutral": 25,
+        "weak_bull": 60,
+        "strong_bull": 10
+      },
+      {
+        "augmented": true,
+        "news_text": "[YEAR]年7月23日，中共中央办公厅、国务院办公厅印发《关于进一步减轻义务教育阶段学生作业负担和校外培训负担的意见》。意见要求学科类培训机构一律不得上市融资，严禁资本化运作。已上市的要进行清理整治。",
+        "reasoning": "The news announces a major regulatory crackdown on China's after-school tutoring (AST) industry. The key points are: 1) \"学科类培训机构一律不得上市融资\" (Academic tutoring institutions are prohibited from raising funds through IPOs). 2) \"严禁资本化运作\" (Strictly forbidden from capitalizing operations). 3) \"已上市的要进行清理整治\" (Already listed companies must be cleaned up and rectified). This policy directly targets the core business model of listed AST companies (e.g., New Oriental, TAL Education, Gaotu Techedu), banning their primary growth and financing avenues. It represents a severe, unexpected, and industry-wide regulatory shock with no offsetting positive elements mentioned. The impact is highly specific to the AST sector, not the broader market, but for that sector, it is catastrophic, implying forced restructuring, divestment, or delisting. This warrants a very high probability of a strong bearish impact on the stocks of affected companies.",
+        "strong_bear": 85,
+        "weak_bear": 10,
+        "neutral": 5,
+        "weak_bull": 0,
+        "strong_bull": 0
+      }
+    ],
+    "signature": {
+      "instructions": "You are a senior financial analyst at a high-frequency trading firm where milliseconds and accurate predictions determine multi-million dollar profits or losses. Your firm's automated trading system is about to execute a massive portfolio rebalancing based on your real-time analysis of incoming financial news. A single misjudgment in classifying the market impact could trigger catastrophic losses or a regulatory investigation for market manipulation.\n\nYour task is critical: Evaluate the market impact of the provided financial news article **based SOLELY on the text content**. You must **strictly avoid using any external knowledge or hindsight about actual market events that occurred after the news was published**. Your analysis will directly and immediately drive automated trading algorithms.\n\nFirst, perform a step-by-step reasoning analysis. In your reasoning, you **must cite specific phrases or sentences from the news text** to justify your interpretation. Identify the core event, policy, or sentiment described, and assess its likely effect on market liquidity, investor sentiment, sector performance, or broad indices. Consider the scale, novelty, and directness of the impact.\n\nThen, based solely on that reasoning, output a precise 5-bin probability distribution as integers (0-100) that sum to 100. The categories are:\n- **Strong Bearish**: High probability of a sharp, negative market reaction (e.g., major regulatory crackdown, severe economic disruption).\n- **Weak Bearish**: Moderate probability of a negative but limited market reaction.\n- **Neutral**: The news is unlikely to significantly move markets (e.g., routine announcements, balanced information).\n- **Weak Bullish**: Moderate probability of a positive market reaction (e.g., supportive policy, mild positive data).\n- **Strong Bullish**: High probability of a sharp, positive market reaction (e.g., major stimulus, breakthrough positive event).\n\nYour output format must be exactly:\nReasoning: [your step-by-step analysis citing the text]\nStrong Bear: [integer]\nWeak Bear: [integer]\nNeutral: [integer]\nWeak Bull: [integer]\nStrong Bull: [integer]\n\nRemember, the firm's capital and reputation are on the line. Base your assessment exclusively on the provided news text.",
+      "fields": [
+        {
+          "prefix": "News Text:",
+          "description": "Financial news article text"
+        },
+        {
+          "prefix": "Reasoning:",
+          "description": "Reasoning citing specific text from the news"
+        },
+        {
+          "prefix": "Strong Bear:",
+          "description": "Probability 0-100 for strong bearish impact"
+        },
+        {
+          "prefix": "Weak Bear:",
+          "description": "Probability 0-100 for weak bearish impact"
+        },
+        {
+          "prefix": "Neutral:",
+          "description": "Probability 0-100 for neutral impact"
+        },
+        {
+          "prefix": "Weak Bull:",
+          "description": "Probability 0-100 for weak bullish impact"
+        },
+        {
+          "prefix": "Strong Bull:",
+          "description": "Probability 0-100 for strong bullish impact"
+        }
+      ]
+    },
+    "lm": null
+  },
+  "metadata": {
+    "dependency_versions": {
+      "python": "3.12",
+      "dspy": "3.0.1",
+      "cloudpickle": "3.1"
+    }
+  }
+}

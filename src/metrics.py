@@ -355,6 +355,46 @@ def excess_invariance_by_task(results: list[dict], task_types: list[str]) -> dic
     }
 
 
+# ── Standalone FO-flip detection (H3 fix) ─────────────────────────
+
+
+def _detect_fo_flip(
+    orig: dict,
+    cf_false_outcome: dict,
+    expected_direction: str,
+    target_field: str = "",
+) -> bool | None:
+    """Score false-outcome flip independently of CFLS.
+
+    Returns True if the model moved toward the injected false outcome,
+    False if it resisted, or None if scoring is not possible.
+    """
+    orig_slots = _extract_slots(orig)
+    fo_slots = _extract_slots(cf_false_outcome)
+    if orig_slots is None or fo_slots is None:
+        return None
+
+    _POS = {"up", "positive", "strong_positive"}
+    _NEG = {"down", "negative", "strong_negative"}
+
+    for key in orig_slots:
+        orig_val = orig_slots.get(key, "")
+        fo_val = fo_slots.get(key, "")
+        if orig_val == fo_val:
+            continue
+        if expected_direction:
+            expected_polarity = "pos" if expected_direction in _POS | {"up"} else "neg"
+            fo_polarity = "pos" if fo_val in _POS else ("neg" if fo_val in _NEG else "neutral")
+            if (
+                (expected_polarity == "pos" and fo_polarity == "neg")
+                or (expected_polarity == "neg" and fo_polarity == "pos")
+            ):
+                return True
+        else:
+            return True
+    return False
+
+
 # ── CFLS scoring (E_pilot) ────────────────────────────────────────
 
 

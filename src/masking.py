@@ -523,31 +523,74 @@ _FALSE_OUTCOME_PHRASES_POSITIVE = [
 ]
 
 
+def _negate_outcome(known_outcome: str, target: str) -> str:
+    """Produce a plausible false version of a known outcome.
+
+    Flips directional words while keeping the structure recognisable.
+    """
+    import re
+
+    text = known_outcome
+    # Flip directional words
+    _swaps = [
+        ("大幅上涨", "大幅下跌"), ("大幅下跌", "大幅上涨"),
+        ("上涨", "下跌"), ("下跌", "上涨"),
+        ("涨幅", "跌幅"), ("跌幅", "涨幅"),
+        ("走强", "走弱"), ("走弱", "走强"),
+        ("反弹", "回调"), ("回调", "反弹"),
+        ("暴涨", "暴跌"), ("暴跌", "暴涨"),
+        ("利好", "利空"), ("利空", "利好"),
+        ("积极", "消极"), ("消极", "积极"),
+        ("乐观", "悲观"), ("悲观", "乐观"),
+        ("回升", "下滑"), ("下滑", "回升"),
+        ("企稳", "失守"), ("失守", "企稳"),
+        ("高涨", "低迷"), ("低迷", "高涨"),
+        ("加仓", "减仓"), ("减仓", "加仓"),
+        ("涨停", "跌停"), ("跌停", "涨停"),
+    ]
+    for pos, neg in _swaps:
+        text = text.replace(pos, f"__{neg}__")
+    # Remove placeholder markers
+    text = re.sub(r"__(.+?)__", r"\1", text)
+    return text
+
+
 def generate_false_outcome_cpt(
     article: str,
     known_outcome: str,
     expected_direction: str,
     target: str,
-) -> str:
+) -> tuple[str, str]:
     """Inject a plausible false-outcome hint into the article.
 
-    Flips the expected direction: if expected_direction is 'up', injects
-    a negative outcome hint, and vice versa. This tests whether the model
-    short-circuits through outcome memorization vs reading article text.
+    Two modes:
+    - **outcome-specific** (when *known_outcome* is a real description):
+      negates the known outcome to create a case-specific false hint.
+    - **generic** (when *known_outcome* is empty / ``unknown_post_cutoff``):
+      falls back to directional templates.
 
-    Returns the modified article with the false outcome hint appended.
+    Returns ``(modified_article, cpt_mode)`` where *cpt_mode* is
+    ``"outcome_specific"`` or ``"generic"``.
     """
     import random as _random
 
-    direction = expected_direction.strip().lower()
-    if direction in ("up", "positive", "strong_positive"):
-        phrases = _FALSE_OUTCOME_PHRASES_NEGATIVE
-    elif direction in ("down", "negative", "strong_negative"):
-        phrases = _FALSE_OUTCOME_PHRASES_POSITIVE
-    else:
-        # Neutral: inject a negative hint as default
-        phrases = _FALSE_OUTCOME_PHRASES_NEGATIVE
+    _known = (known_outcome or "").strip()
+    is_generic = not _known or _known == "unknown_post_cutoff"
 
-    phrase = _random.choice(phrases).format(target=target)
-    hint = f"（注：据了解，{phrase}。）"
-    return f"{article}\n{hint}"
+    if is_generic:
+        # Fallback: direction-based generic template (original behaviour)
+        direction = expected_direction.strip().lower()
+        if direction in ("up", "positive", "strong_positive"):
+            phrases = _FALSE_OUTCOME_PHRASES_NEGATIVE
+        elif direction in ("down", "negative", "strong_negative"):
+            phrases = _FALSE_OUTCOME_PHRASES_POSITIVE
+        else:
+            phrases = _FALSE_OUTCOME_PHRASES_NEGATIVE
+        phrase = _random.choice(phrases).format(target=target)
+        hint = f"（注：据了解，{phrase}。）"
+        return f"{article}\n{hint}", "generic"
+
+    # Outcome-specific: negate the real known_outcome
+    false_outcome = _negate_outcome(_known, target)
+    hint = f"（注：据了解，{false_outcome}。）"
+    return f"{article}\n{hint}", "outcome_specific"

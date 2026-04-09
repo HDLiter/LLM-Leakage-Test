@@ -202,7 +202,7 @@ def prepare_conditions(
     }
 
     # False-outcome CPT (code-level, no API call)
-    fo_article = generate_false_outcome_cpt(
+    fo_article, cpt_mode = generate_false_outcome_cpt(
         article=article,
         known_outcome=tc.known_outcome,
         expected_direction=direction,
@@ -212,6 +212,7 @@ def prepare_conditions(
         "article": fo_article,
         "cf_payload": None,
         "source": "false_outcome_cpt",
+        "cpt_mode": cpt_mode,
     }
 
     return conditions
@@ -346,7 +347,25 @@ def run_single_case(
             for cond_name in ("original", "semantic_reversal", "neutral_paraphrase", "false_outcome_cpt")
         }
 
-        # Compute CFLS only if SR, NP succeeded AND all 3 core responses are valid
+        # ── FO flip: score independently of SR/NP success (H3 fix) ──
+        fo_response = responses["false_outcome_cpt"]
+        fo_parsed = fo_response["parsed_output"] if fo_response.get("valid") else None
+        orig_parsed_for_fo = (responses["original"].get("parsed_output") or {}) if responses["original"].get("valid") else None
+        direction_val = getattr(tc.expected_direction, "value", tc.expected_direction)
+        target_field = "direction" if family == "direct_prediction" else "fund_impact"
+
+        # Compute fo_flip whenever original + CPT are both valid
+        fo_flip = None
+        if orig_parsed_for_fo and fo_parsed:
+            from .metrics import _detect_fo_flip
+            fo_flip = _detect_fo_flip(
+                orig=orig_parsed_for_fo,
+                cf_false_outcome=fo_parsed,
+                expected_direction=direction_val,
+                target_field=target_field,
+            )
+
+        # ── CFLS: requires SR + NP + original all valid ──
         core_valid = all(
             responses[k].get("valid", False)
             for k in ("original", "semantic_reversal", "neutral_paraphrase")
@@ -360,20 +379,14 @@ def run_single_case(
                 "cf_invariance": None,
                 "para_invariance": None,
                 "per_slot": {},
-                "false_outcome_flip": None,
+                "false_outcome_flip": fo_flip,  # H3: scored independently
                 "task_id": task_id,
             }
         else:
             orig_parsed = responses["original"]["parsed_output"] or {}
             sr_parsed = responses["semantic_reversal"]["parsed_output"] or {}
             np_parsed = responses["neutral_paraphrase"]["parsed_output"] or {}
-            # Only use FO result if it passed validation
-            fo_response = responses["false_outcome_cpt"]
-            fo_parsed = fo_response["parsed_output"] if fo_response.get("valid") else None
 
-            direction_val = getattr(tc.expected_direction, "value", tc.expected_direction)
-            # Only score the slot that was actually targeted by the reversal
-            target_field = "direction" if family == "direct_prediction" else "fund_impact"
             cfls_result = cfls_per_case(
                 orig=orig_parsed,
                 cf_reversal=sr_parsed,
@@ -383,6 +396,8 @@ def run_single_case(
                 expected_direction=direction_val,
                 reversal_target_field=target_field,
             )
+            # Override fo_flip with independently computed value
+            cfls_result["false_outcome_flip"] = fo_flip
 
         # Evidence intrusion on original response
         intrusion = detect_evidence_intrusion(

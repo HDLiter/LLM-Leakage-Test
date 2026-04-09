@@ -32,6 +32,8 @@ DEFAULT_CASES_PATH = ROOT / "data" / "seed" / "test_cases_expanded.json"
 DEFAULT_OUTPUT_PATH = ROOT / "data" / "results" / "diagnostic_2_results.json"
 DEFAULT_MAX_CONCURRENCY = 20
 SAVE_EVERY = 10
+# Bump this whenever H2/H3 or scoring logic changes to invalidate stale checkpoints
+PIPELINE_VERSION = 2  # v1=original, v2=H2+H3 fixes
 UNKNOWN_OUTCOME_DATE = "9999-12-31"
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
@@ -388,7 +390,8 @@ def build_output_payload(
     payload = {
         "meta": {
             "experiment": "diagnostic_2",
-            "description": "CFLS pipeline on expanded non-neutral cases using pilot tasks",
+            "pipeline_version": PIPELINE_VERSION,
+            "description": "CFLS pipeline on expanded cases with outcome-specific CPT (H2) and independent fo_flip (H3)",
             "tasks": PILOT_TASKS,
             "source_cases_path": str(cases_path),
             "output_path": str(output_path),
@@ -515,6 +518,17 @@ def main() -> int:
 
     if args.resume and args.output.exists():
         completed_results, errors = load_resume_state(args.output)
+        # Check pipeline version to avoid mixing old/new scoring logic
+        with open(args.output, "r", encoding="utf-8") as _f:
+            _saved_meta = json.load(_f).get("meta", {})
+        saved_version = _saved_meta.get("pipeline_version", 1)
+        if saved_version != PIPELINE_VERSION:
+            print(
+                f"WARNING: checkpoint pipeline_version={saved_version} != current {PIPELINE_VERSION}. "
+                f"Discarding stale checkpoint and starting fresh."
+            )
+            completed_results = []
+            errors = []
         resumed = True
         completed_ids = {case_result["case_id"] for case_result in completed_results}
         eligible_cases = [

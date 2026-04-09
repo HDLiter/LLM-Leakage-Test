@@ -523,36 +523,39 @@ _FALSE_OUTCOME_PHRASES_POSITIVE = [
 ]
 
 
-def _negate_outcome(known_outcome: str, target: str) -> str:
+_NEGATE_SWAP_MAP: dict[str, str] = {}
+for _a, _b in [
+    ("大幅上涨", "大幅下跌"), ("上涨", "下跌"), ("涨幅", "跌幅"),
+    ("走强", "走弱"), ("反弹", "回调"), ("暴涨", "暴跌"),
+    ("利好", "利空"), ("积极", "消极"), ("乐观", "悲观"),
+    ("回升", "下滑"), ("企稳", "失守"), ("高涨", "低迷"),
+    ("加仓", "减仓"), ("涨停", "跌停"),
+]:
+    _NEGATE_SWAP_MAP[_a] = _b
+    _NEGATE_SWAP_MAP[_b] = _a
+
+# Build regex once — match longest first to avoid partial matches
+import re as _re
+_NEGATE_PATTERN = _re.compile(
+    "|".join(_re.escape(k) for k in sorted(_NEGATE_SWAP_MAP, key=len, reverse=True))
+)
+
+
+def _negate_outcome(known_outcome: str, target: str) -> tuple[str, bool]:
     """Produce a plausible false version of a known outcome.
 
-    Flips directional words while keeping the structure recognisable.
+    Uses single-pass regex replacement to avoid double-swap bugs.
+    Returns ``(negated_text, any_swap_made)``.
     """
-    import re
+    swaps_made = 0
 
-    text = known_outcome
-    # Flip directional words
-    _swaps = [
-        ("大幅上涨", "大幅下跌"), ("大幅下跌", "大幅上涨"),
-        ("上涨", "下跌"), ("下跌", "上涨"),
-        ("涨幅", "跌幅"), ("跌幅", "涨幅"),
-        ("走强", "走弱"), ("走弱", "走强"),
-        ("反弹", "回调"), ("回调", "反弹"),
-        ("暴涨", "暴跌"), ("暴跌", "暴涨"),
-        ("利好", "利空"), ("利空", "利好"),
-        ("积极", "消极"), ("消极", "积极"),
-        ("乐观", "悲观"), ("悲观", "乐观"),
-        ("回升", "下滑"), ("下滑", "回升"),
-        ("企稳", "失守"), ("失守", "企稳"),
-        ("高涨", "低迷"), ("低迷", "高涨"),
-        ("加仓", "减仓"), ("减仓", "加仓"),
-        ("涨停", "跌停"), ("跌停", "涨停"),
-    ]
-    for pos, neg in _swaps:
-        text = text.replace(pos, f"__{neg}__")
-    # Remove placeholder markers
-    text = re.sub(r"__(.+?)__", r"\1", text)
-    return text
+    def _replacer(m: _re.Match) -> str:
+        nonlocal swaps_made
+        swaps_made += 1
+        return _NEGATE_SWAP_MAP[m.group(0)]
+
+    negated = _NEGATE_PATTERN.sub(_replacer, known_outcome)
+    return negated, swaps_made > 0
 
 
 def generate_false_outcome_cpt(
@@ -591,6 +594,20 @@ def generate_false_outcome_cpt(
         return f"{article}\n{hint}", "generic"
 
     # Outcome-specific: negate the real known_outcome
-    false_outcome = _negate_outcome(_known, target)
+    false_outcome, any_swap = _negate_outcome(_known, target)
+    if not any_swap:
+        # No directional words found — fall back to generic to avoid
+        # injecting the true outcome as a "false" hint
+        direction = expected_direction.strip().lower()
+        if direction in ("up", "positive", "strong_positive"):
+            phrases = _FALSE_OUTCOME_PHRASES_NEGATIVE
+        elif direction in ("down", "negative", "strong_negative"):
+            phrases = _FALSE_OUTCOME_PHRASES_POSITIVE
+        else:
+            phrases = _FALSE_OUTCOME_PHRASES_NEGATIVE
+        phrase = _random.choice(phrases).format(target=target)
+        hint = f"（注：据了解，{phrase}。）"
+        return f"{article}\n{hint}", "generic_fallback"
+
     hint = f"（注：据了解，{false_outcome}。）"
     return f"{article}\n{hint}", "outcome_specific"

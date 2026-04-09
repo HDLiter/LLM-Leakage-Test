@@ -366,6 +366,10 @@ def _detect_fo_flip(
 ) -> bool | None:
     """Score false-outcome flip independently of CFLS.
 
+    When *target_field* is set (e.g. ``"direction"`` or ``"fund_impact"``),
+    only that slot is checked — preventing a shock_impact change from
+    counting as a fund_impact flip.
+
     Returns True if the model moved toward the injected false outcome,
     False if it resisted, or None if scoring is not possible.
     """
@@ -374,10 +378,13 @@ def _detect_fo_flip(
     if orig_slots is None or fo_slots is None:
         return None
 
+    # Restrict to target_field if specified
+    check_keys = [target_field] if target_field and target_field in orig_slots else list(orig_slots)
+
     _POS = {"up", "positive", "strong_positive"}
     _NEG = {"down", "negative", "strong_negative"}
 
-    for key in orig_slots:
+    for key in check_keys:
         orig_val = orig_slots.get(key, "")
         fo_val = fo_slots.get(key, "")
         if orig_val == fo_val:

@@ -32,6 +32,9 @@ for task_key in ["direct_prediction.base", "decomposed_impact.base"]:
         })
 
     print(f"Total scored: {len(records)}")
+    if not records:
+        print("  (no scored records, skipping)\n")
+        continue
 
     # 4-cell analysis
     red_flag = [r for r in records if r["cf_inv"] == 1.0 and r["para_inv"] < 1.0]

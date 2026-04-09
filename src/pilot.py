@@ -201,12 +201,13 @@ def prepare_conditions(
         "failed": np_payload is None,
     }
 
-    # False-outcome CPT (code-level, no API call)
+    # False-outcome CPT (LLM-based negation for pre-cutoff, generic for post-cutoff)
     fo_article, cpt_mode = generate_false_outcome_cpt(
         article=article,
         known_outcome=tc.known_outcome,
         expected_direction=direction,
         target=target,
+        client=client,
     )
     conditions["false_outcome_cpt"] = {
         "article": fo_article,

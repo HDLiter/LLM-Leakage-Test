@@ -558,22 +558,42 @@ def _negate_outcome(known_outcome: str, target: str) -> tuple[str, bool]:
     return negated, swaps_made > 0
 
 
+_NEGATE_OUTCOME_PROMPT_SYSTEM = (
+    "你是一个金融新闻改写专家。你的任务是将一段已知的市场结局改写为"
+    "方向完全相反的虚假结局，用于测试语言模型是否依赖记忆而非阅读。"
+    "仅输出改写后的结局文本，不要添加任何解释、引号或前缀。"
+)
+
+_NEGATE_OUTCOME_PROMPT_USER = (
+    "请将以下真实市场结局改写为方向完全相反的虚假结局：\n\n"
+    "真实结局：{known_outcome}\n\n"
+    "要求：\n"
+    "1. 反转核心方向（涨→跌、跌→涨、利好→利空等）\n"
+    "2. 同时调整数字使之与反转后的方向一致（如涨25%→跌15%）\n"
+    "3. 保持相似的篇幅和语言风格\n"
+    "4. 结果必须读起来是一段合理的（但虚假的）市场结局描述\n"
+    "5. 仅输出改写后的文本"
+)
+
+
 def generate_false_outcome_cpt(
     article: str,
     known_outcome: str,
     expected_direction: str,
     target: str,
+    client: "LLMClient | None" = None,
 ) -> tuple[str, str]:
     """Inject a plausible false-outcome hint into the article.
 
-    Two modes:
-    - **outcome-specific** (when *known_outcome* is a real description):
-      negates the known outcome to create a case-specific false hint.
+    Three modes (in priority order):
+    - **llm_negated** (when *client* is provided and *known_outcome* is real):
+      uses LLM to generate a natural, context-aware false outcome.
+    - **regex_negated** (fallback if LLM unavailable or fails):
+      uses single-pass regex swap of directional words.
     - **generic** (when *known_outcome* is empty / ``unknown_post_cutoff``):
       falls back to directional templates.
 
-    Returns ``(modified_article, cpt_mode)`` where *cpt_mode* is
-    ``"outcome_specific"`` or ``"generic"``.
+    Returns ``(modified_article, cpt_mode)``.
     """
     import random as _random
 
@@ -581,7 +601,6 @@ def generate_false_outcome_cpt(
     is_generic = not _known or _known == "unknown_post_cutoff"
 
     if is_generic:
-        # Fallback: direction-based generic template (original behaviour)
         direction = expected_direction.strip().lower()
         if direction in ("up", "positive", "strong_positive"):
             phrases = _FALSE_OUTCOME_PHRASES_NEGATIVE
@@ -593,21 +612,41 @@ def generate_false_outcome_cpt(
         hint = f"（注：据了解，{phrase}。）"
         return f"{article}\n{hint}", "generic"
 
-    # Outcome-specific: negate the real known_outcome
-    false_outcome, any_swap = _negate_outcome(_known, target)
-    if not any_swap:
-        # No directional words found — fall back to generic to avoid
-        # injecting the true outcome as a "false" hint
-        direction = expected_direction.strip().lower()
-        if direction in ("up", "positive", "strong_positive"):
-            phrases = _FALSE_OUTCOME_PHRASES_NEGATIVE
-        elif direction in ("down", "negative", "strong_negative"):
-            phrases = _FALSE_OUTCOME_PHRASES_POSITIVE
+    # ── Outcome-specific: try LLM first, regex fallback ──
+
+    false_outcome: str | None = None
+    mode = "regex_negated"
+
+    if client is not None:
+        try:
+            system = _NEGATE_OUTCOME_PROMPT_SYSTEM
+            user = _NEGATE_OUTCOME_PROMPT_USER.format(known_outcome=_known)
+            resp = client.chat(system, user)
+            text = resp.raw_response.strip()
+            # Basic sanity: not empty, not identical to original, reasonable length
+            if text and text != _known and len(text) < len(_known) * 3:
+                false_outcome = text
+                mode = "llm_negated"
+        except Exception:
+            pass  # fall through to regex
+
+    if false_outcome is None:
+        negated, any_swap = _negate_outcome(_known, target)
+        if any_swap:
+            false_outcome = negated
+            mode = "regex_negated"
         else:
-            phrases = _FALSE_OUTCOME_PHRASES_NEGATIVE
-        phrase = _random.choice(phrases).format(target=target)
-        hint = f"（注：据了解，{phrase}。）"
-        return f"{article}\n{hint}", "generic_fallback"
+            # No swap possible — generic fallback
+            direction = expected_direction.strip().lower()
+            if direction in ("up", "positive", "strong_positive"):
+                phrases = _FALSE_OUTCOME_PHRASES_NEGATIVE
+            elif direction in ("down", "negative", "strong_negative"):
+                phrases = _FALSE_OUTCOME_PHRASES_POSITIVE
+            else:
+                phrases = _FALSE_OUTCOME_PHRASES_NEGATIVE
+            phrase = _random.choice(phrases).format(target=target)
+            false_outcome = phrase
+            mode = "generic_fallback"
 
     hint = f"（注：据了解，{false_outcome}。）"
-    return f"{article}\n{hint}", "outcome_specific"
+    return f"{article}\n{hint}", mode

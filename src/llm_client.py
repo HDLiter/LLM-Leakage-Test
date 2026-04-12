@@ -36,6 +36,8 @@ class LLMClient:
         cache_dir: Path | None = None,
         enable_cache: bool = True,
         request_logprobs: bool = False,
+        top_p: float | None = None,
+        repetition_penalty: float | None = None,
     ):
         self.base_url = base_url.rstrip("/")
         self.model = model
@@ -46,11 +48,19 @@ class LLMClient:
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self.enable_cache = enable_cache
         self.request_logprobs = request_logprobs
+        self.top_p = top_p
+        self.repetition_penalty = repetition_penalty
         self._client = httpx.Client(timeout=120.0)
 
-    def _cache_key(self, messages: list[dict]) -> str:
+    def _cache_key(self, messages: list[dict], max_tokens: int | None = None) -> str:
         raw = json.dumps(
-            {"model": self.model, "temperature": self.temperature, "messages": messages},
+            {
+                "model": self.model,
+                "temperature": self.temperature,
+                "max_tokens": max_tokens or self.max_tokens,
+                "request_logprobs": self.request_logprobs,
+                "messages": messages,
+            },
             sort_keys=True, ensure_ascii=False,
         )
         return hashlib.sha256(raw.encode()).hexdigest()[:16]
@@ -68,21 +78,29 @@ class LLMClient:
             path = self.cache_dir / f"{key}.json"
             path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
+    def _apply_extra_params(self, body: dict[str, Any]) -> None:
+        """Add optional sampling parameters to a request body."""
+        if self.request_logprobs:
+            body["logprobs"] = True
+            body["top_logprobs"] = 5
+        if self.top_p is not None:
+            body["top_p"] = self.top_p
+        if self.repetition_penalty is not None:
+            body["repetition_penalty"] = self.repetition_penalty
+
     @retry(
         stop=stop_after_attempt(5),
         wait=wait_exponential(multiplier=2, min=4, max=60),
         retry=retry_if_exception_type((httpx.HTTPStatusError, httpx.ConnectError)),
     )
-    def _raw_chat(self, messages: list[dict]) -> dict:
+    def _raw_chat(self, messages: list[dict], max_tokens: int | None = None) -> dict:
         body: dict[str, Any] = {
             "model": self.model,
             "messages": messages,
             "temperature": self.temperature,
-            "max_tokens": self.max_tokens,
+            "max_tokens": max_tokens or self.max_tokens,
         }
-        if self.request_logprobs:
-            body["logprobs"] = True
-            body["top_logprobs"] = 5
+        self._apply_extra_params(body)
         resp = self._client.post(
             f"{self.base_url}/chat/completions",
             headers={"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"},
@@ -96,20 +114,21 @@ class LLMClient:
         system: str,
         user: str,
         bypass_cache: bool = False,
+        max_tokens: int | None = None,
     ) -> LLMResponse:
         """Send a chat request and return a parsed LLMResponse."""
         messages = [
             {"role": "system", "content": system},
             {"role": "user", "content": user},
         ]
-        cache_key = self._cache_key(messages)
+        cache_key = self._cache_key(messages, max_tokens=max_tokens)
 
         if not bypass_cache:
             cached = self._load_cache(cache_key)
             if cached:
                 return LLMResponse(**cached["parsed"])
 
-        raw = self._raw_chat(messages)
+        raw = self._raw_chat(messages, max_tokens=max_tokens)
         choice = raw["choices"][0]
         content = choice["message"]["content"]
         usage = raw.get("usage", {})
@@ -145,16 +164,14 @@ class LLMClient:
 
     # ── 异步并发接口 ──────────────────────────────────────────────
 
-    def _build_body(self, messages: list[dict]) -> dict:
+    def _build_body(self, messages: list[dict], max_tokens: int | None = None) -> dict:
         body: dict[str, Any] = {
             "model": self.model,
             "messages": messages,
             "temperature": self.temperature,
-            "max_tokens": self.max_tokens,
+            "max_tokens": max_tokens or self.max_tokens,
         }
-        if self.request_logprobs:
-            body["logprobs"] = True
-            body["top_logprobs"] = 5
+        self._apply_extra_params(body)
         return body
 
     def _parse_raw(self, raw: dict, cache_key: str) -> LLMResponse:

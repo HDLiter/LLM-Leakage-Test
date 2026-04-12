@@ -35,7 +35,7 @@ DEFAULT_MAX_CONCURRENCY = 20
 DEFAULT_CHUNK_SIZE = 50
 SAVE_EVERY = 10
 # Bump this whenever H2/H3 or scoring logic changes to invalidate stale checkpoints
-PIPELINE_VERSION = 3  # v1=original, v2=H2+H3 fixes, v3=anchor/frequency strata + 3-phase batching
+PIPELINE_VERSION = 4  # v1=original, v2=H2+H3 fixes, v3=anchor/frequency strata + 3-phase batching, v4=authority task + multi-model
 UNKNOWN_OUTCOME_DATE = "9999-12-31"
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
@@ -151,7 +151,14 @@ def normalize_outcome_fields(
     return known_outcome_text, normalized_outcome_date, True
 
 
-def adapt_case(raw_case: dict[str, Any]) -> CaseBundle:
+def _period_from_cutoff(publish_time_str: str, cutoff_date: str) -> str:
+    """Classify a case as pre/post cutoff by comparing publish_time to a date string."""
+    # Compare date portions only (YYYY-MM-DD)
+    pub_date = publish_time_str[:10]
+    return "pre_cutoff" if pub_date <= cutoff_date else "post_cutoff"
+
+
+def adapt_case(raw_case: dict[str, Any], cutoff_date: str | None = None) -> CaseBundle:
     """Map a raw expanded-case record onto the canonical TestCase schema."""
     raw_news = raw_case.get("news")
     news = raw_news if isinstance(raw_news, dict) else {}
@@ -243,8 +250,18 @@ def adapt_case(raw_case: dict[str, Any]) -> CaseBundle:
     frequency_class = ensure_string(raw_case.get("frequency_class"), default="") or None
     reversibility = ensure_string(raw_case.get("reversibility"), default="") or None
 
+    # Period: use --cutoff-date override if provided, else fall back to source field
+    if cutoff_date:
+        pub_time = normalize_publish_time(
+            pick_value(news.get("publish_time"), raw_case.get("publish_time"),
+                       news.get("ctime"), raw_case.get("ctime")),
+        )
+        period = _period_from_cutoff(pub_time, cutoff_date)
+    else:
+        period = ensure_string(raw_case.get("period"), default="unknown")
+
     metadata = {
-        "period": ensure_string(raw_case.get("period"), default="unknown"),
+        "period": period,
         "rarity_estimate": ensure_string(
             pick_value(raw_case.get("rarity_estimate"), raw_case.get("rarity"), default="unknown"),
             default="unknown",
@@ -265,10 +282,14 @@ def adapt_case(raw_case: dict[str, Any]) -> CaseBundle:
     return CaseBundle(test_case=test_case, metadata=metadata)
 
 
-def load_eligible_cases(path: Path, limit: int = 0) -> tuple[list[CaseBundle], dict[str, Any]]:
+def load_eligible_cases(
+    path: Path,
+    limit: int = 0,
+    cutoff_date: str | None = None,
+) -> tuple[list[CaseBundle], dict[str, Any]]:
     """Load, adapt, and filter the expanded dataset for Diagnostic 2."""
     raw_cases = load_raw_cases(path)
-    bundles = [adapt_case(raw_case) for raw_case in raw_cases]
+    bundles = [adapt_case(raw_case, cutoff_date=cutoff_date) for raw_case in raw_cases]
 
     counts = Counter()
     eligible: list[CaseBundle] = []
@@ -359,14 +380,20 @@ def compute_cf_failure_summary(
         tasks = case_result.get("tasks", {})
         direct = tasks.get("direct_prediction.base", {})
         impact = tasks.get("decomposed_impact.base", {})
+        authority = tasks.get("decomposed_authority.matched", {})
         direct_resp = direct.get("responses", {}) if isinstance(direct, dict) else {}
         impact_resp = impact.get("responses", {}) if isinstance(impact, dict) else {}
+        authority_resp = authority.get("responses", {}) if isinstance(authority, dict) else {}
 
-        sr_dir_skipped = bool(direct_resp.get("semantic_reversal", {}).get("skipped"))
+        sr_dir_skipped = bool(
+            direct_resp.get("semantic_reversal", {}).get("skipped")
+            or authority_resp.get("semantic_reversal", {}).get("skipped")
+        )
         sr_imp_skipped = bool(impact_resp.get("semantic_reversal", {}).get("skipped"))
         np_skipped = bool(
             direct_resp.get("neutral_paraphrase", {}).get("skipped")
             or impact_resp.get("neutral_paraphrase", {}).get("skipped")
+            or authority_resp.get("neutral_paraphrase", {}).get("skipped")
         )
 
         if sr_dir_skipped:
@@ -427,11 +454,19 @@ def aggregate_case_results(case_results: list[dict[str, Any]]) -> dict[str, Any]
 
     if len(paired) > 1:
         import numpy as np
+        from itertools import combinations
 
-        first = [scores[PILOT_TASKS[0]] for scores in paired.values()]
-        second = [scores[PILOT_TASKS[1]] for scores in paired.values()]
-        corr = np.corrcoef(first, second)[0, 1]
-        aggregated["correlation"] = None if np.isnan(corr) else float(corr)
+        # Pairwise correlations for all task pairs
+        pairwise: dict[str, float | None] = {}
+        for ta, tb in combinations(PILOT_TASKS, 2):
+            a_vals = [scores[ta] for scores in paired.values()]
+            b_vals = [scores[tb] for scores in paired.values()]
+            corr = np.corrcoef(a_vals, b_vals)[0, 1]
+            pairwise[f"{ta}_vs_{tb}"] = None if np.isnan(corr) else float(corr)
+        aggregated["correlation_pairwise"] = pairwise
+        # Legacy scalar: first pair
+        first_pair = list(pairwise.values())[0] if pairwise else None
+        aggregated["correlation"] = first_pair
         aggregated["correlation_n_paired"] = len(paired)
     else:
         aggregated["correlation_n_paired"] = len(paired)
@@ -530,6 +565,7 @@ def build_output_payload(
             "save_every": SAVE_EVERY,
             "resumed": resumed,
             "partial": partial,
+            "cutoff_date": stats.get("cutoff_date"),
             "n_source_cases": stats["n_source_cases"],
             "n_eligible_cases": stats["n_eligible_cases"],
             "n_cases_completed": len(case_results),
@@ -651,6 +687,46 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Resume from an existing output file by skipping already completed cases",
     )
+    # B0.1: Multi-model support
+    parser.add_argument(
+        "--settings",
+        type=Path,
+        default=None,
+        help="Path to settings YAML (default: config/settings.yaml)",
+    )
+    parser.add_argument(
+        "--model",
+        type=str,
+        default=None,
+        help="Override model name from settings",
+    )
+    parser.add_argument(
+        "--base-url",
+        type=str,
+        default=None,
+        help="Override base URL from settings",
+    )
+    parser.add_argument(
+        "--api-key-env",
+        type=str,
+        default=None,
+        help="Env var name for the API key (default: from settings or DEEPSEEK_API_KEY)",
+    )
+    parser.add_argument(
+        "--cutoff-date",
+        type=str,
+        default=None,
+        help="Override pre/post cutoff date (YYYY-MM-DD). Cases with publish_time <= this date "
+             "are pre_cutoff; after are post_cutoff. When omitted, uses the period field from "
+             "the source dataset.",
+    )
+    # B0.5: False-outcome override for Arm 3
+    parser.add_argument(
+        "--fo-override",
+        type=Path,
+        default=None,
+        help="JSON file mapping case_id → false_outcome_text (skip on-the-fly FO generation)",
+    )
     return parser.parse_args()
 
 
@@ -660,7 +736,12 @@ def main() -> int:
     max_concurrency = max(1, min(args.max_concurrency, DEFAULT_MAX_CONCURRENCY))
     random.seed(args.seed)
 
-    eligible_cases, stats = load_eligible_cases(args.cases, limit=args.n_cases)
+    eligible_cases, stats = load_eligible_cases(
+        args.cases, limit=args.n_cases, cutoff_date=args.cutoff_date,
+    )
+    if args.cutoff_date:
+        print(f"Cutoff date override: {args.cutoff_date}")
+        stats["cutoff_date"] = args.cutoff_date
     ordered_case_ids = [bundle.test_case.id for bundle in eligible_cases]
     case_positions = {case_id: index for index, case_id in enumerate(ordered_case_ids, start=1)}
 
@@ -699,8 +780,20 @@ def main() -> int:
         resumed = True
         print(f"Resume requested but no existing output found at {args.output}; starting fresh")
 
-    client = _build_client()
+    client = _build_client(
+        settings_path=args.settings,
+        model=args.model,
+        base_url=args.base_url,
+        api_key_env=args.api_key_env,
+    )
     loader = PromptLoader(prompts_dir=str(PROMPTS_DIR))
+
+    # B0.5: Load false-outcome overrides if provided
+    fo_override_map: dict[str, str] | None = None
+    if args.fo_override:
+        loaded = json.loads(args.fo_override.read_text(encoding="utf-8"))
+        fo_override_map = loaded
+        print(f"Loaded {len(loaded)} FO overrides from {args.fo_override}")
 
     def _attach_metadata(case_result: dict[str, Any], bundle: CaseBundle) -> None:
         case_result["period"] = bundle.metadata["period"]
@@ -746,9 +839,11 @@ def main() -> int:
 
                     cfls_direct = case_result["metrics"]["cfls_direct"]
                     cfls_impact = case_result["metrics"]["cfls_impact"]
+                    cfls_authority = case_result["metrics"]["cfls_authority"]
                     direct_text = f"{cfls_direct:.2f}" if cfls_direct is not None else "N/A"
                     impact_text = f"{cfls_impact:.2f}" if cfls_impact is not None else "N/A"
-                    print(f"  CFLS: direct={direct_text}, impact={impact_text}")
+                    authority_text = f"{cfls_authority:.2f}" if cfls_authority is not None else "N/A"
+                    print(f"  CFLS: direct={direct_text}, impact={impact_text}, authority={authority_text}")
                 except Exception as exc:
                     errors = drop_errors_for_case(errors, tc.id)
                     errors.append({
@@ -800,6 +895,7 @@ def main() -> int:
                         loader=loader,
                         test_cases=chunk_tcs,
                         max_concurrency=max_concurrency,
+                        fo_override=fo_override_map,
                     )
                 except Exception as exc:
                     # Catastrophic failure of an entire chunk -- record one error

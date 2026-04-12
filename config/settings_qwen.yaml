@@ -1,0 +1,33 @@
+# Qwen 2.5 7B Instruct — local vLLM serving
+# Used for Phase 5 (Qwen positive control + cross-model replication)
+
+llm:
+  provider: qwen
+  model: Qwen/Qwen2.5-7B-Instruct-AWQ
+  base_url: http://localhost:8000/v1
+  api_key_env: VLLM_API_KEY          # vLLM default: "EMPTY" or any string
+  temperature: 0.0
+  max_tokens: 2048
+  top_p: 0.8                          # Qwen recommended default
+  repetition_penalty: 1.05            # Qwen recommended default
+  request_logprobs: true
+
+experiment:
+  n_repeats: 3
+  cache_results: true
+  output_format: "5-bin"
+
+metrics:
+  alpha: 0.4
+  beta: 0.3
+  gamma: 0.3
+
+paths:
+  samples_dir: data/samples
+  seed_dir: data/seed
+  generated_dir: data/generated
+  cache_dir: data/cache
+  results_dir: data/results
+  test_cases: data/seed/test_cases.json
+  memorization_probes: data/seed/memorization_probes.json
+  counterfactual_variants: data/generated/counterfactual_variants.json

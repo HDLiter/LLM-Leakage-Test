@@ -36,7 +36,7 @@ SETTINGS_PATH = ROOT / "config" / "settings.yaml"
 ENV_PATH = ROOT / ".env"
 
 # Tasks used in the pilot comparison
-PILOT_TASKS = ["direct_prediction.base", "decomposed_impact.base"]
+PILOT_TASKS = ["direct_prediction.base", "decomposed_impact.base", "decomposed_authority.matched"]
 
 # Map expected_direction -> label for direct_prediction
 _DIRECTION_LABELS = {"up": "up", "down": "down", "neutral": "neutral"}
@@ -57,6 +57,24 @@ _FLIP_IMPACT = {
     "strong_negative": "strong_positive",
     "neutral": "neutral",
 }
+
+
+def _task_reversal_key(family: str) -> str:
+    """Map a task family to its semantic-reversal condition key."""
+    if family == "decomposed_impact":
+        return "sr_fund_impact"
+    # direct_prediction + decomposed_authority both use direction reversal
+    return "sr_direction"
+
+
+def _task_target_field(family: str) -> str:
+    """Map a task family to the slot checked by _detect_fo_flip."""
+    if family == "direct_prediction":
+        return "direction"
+    if family == "decomposed_impact":
+        return "fund_impact"
+    # authority + others: check all slots (empty = check all)
+    return ""
 
 
 def _flip_label(label: str, field: str) -> str:
@@ -283,11 +301,14 @@ def prepare_fo_cpt_batch(
     client: "LLMClient",
     test_cases: list["TestCase"],
     max_concurrency: int = 20,
+    fo_override: dict[str, str] | None = None,
 ) -> dict[str, tuple[str | None, str]]:
     """Compute false-outcome CPT articles for all cases.
 
     Pre-cutoff (with real ``known_outcome``): LLM-only negation, batched + retry.
     Post-cutoff / unknown: directional generic template (no API call).
+    When ``fo_override`` is provided (``{case_id: false_outcome_text}``),
+    those cases use the override text instead of on-the-fly generation.
     Returns ``{case_id: (modified_article_or_None, cpt_mode)}``.
     """
     from .masking import (
@@ -304,6 +325,14 @@ def prepare_fo_cpt_batch(
     llm_prompts: list[tuple[str, str]] = []
 
     for tc in test_cases:
+        # B0.5: Use override text if provided for this case
+        if fo_override and tc.id in fo_override:
+            article = _article_text(tc)
+            fo_text = fo_override[tc.id]
+            hint = f"（注：据了解，{fo_text}。）"
+            out[tc.id] = (f"{article}\n{hint}", "fo_override")
+            continue
+
         known = (tc.known_outcome or "").strip()
         is_generic = not known or known == "unknown_post_cutoff"
         article = _article_text(tc)
@@ -473,7 +502,7 @@ def run_tasks_batch(
 
         for task_id in PILOT_TASKS:
             family = task_id.split(".")[0]
-            reversal_key = "sr_direction" if family == "direct_prediction" else "sr_fund_impact"
+            reversal_key = _task_reversal_key(family)
             condition_map = {
                 "original": conds["original"],
                 "semantic_reversal": conds[reversal_key],
@@ -530,7 +559,7 @@ def run_tasks_batch(
         # Pre-fill skipped slots so downstream can iterate uniformly
         for task_id in PILOT_TASKS:
             family = task_id.split(".")[0]
-            reversal_key = "sr_direction" if family == "direct_prediction" else "sr_fund_impact"
+            reversal_key = _task_reversal_key(family)
             cond_failed = {
                 "semantic_reversal": conditions_per_case[tc.id][reversal_key].get("failed", False),
                 "neutral_paraphrase": conditions_per_case[tc.id]["neutral_paraphrase"].get("failed", False),
@@ -618,7 +647,7 @@ def score_case_from_batches(
 
     for task_id in PILOT_TASKS:
         family = task_id.split(".")[0]
-        reversal_key = "sr_direction" if family == "direct_prediction" else "sr_fund_impact"
+        reversal_key = _task_reversal_key(family)
         sr_failed = conditions[reversal_key].get("failed", False)
         np_failed = conditions["neutral_paraphrase"].get("failed", False)
 
@@ -630,16 +659,21 @@ def score_case_from_batches(
             if responses["original"].get("valid") else None
         )
         direction_val = getattr(tc.expected_direction, "value", tc.expected_direction)
-        target_field = "direction" if family == "direct_prediction" else "fund_impact"
+        target_field = _task_target_field(family)
 
         fo_flip_label: str | None = None
+        fo_any_change: bool | None = None
         if orig_parsed_for_fo and fo_parsed:
-            from .metrics import _detect_fo_flip
+            from .metrics import _detect_fo_flip, _detect_fo_any_change
             fo_flip_label = _detect_fo_flip(
                 orig=orig_parsed_for_fo,
                 cf_false_outcome=fo_parsed,
                 expected_direction=direction_val,
                 target_field=target_field,
+            )
+            fo_any_change = _detect_fo_any_change(
+                orig=orig_parsed_for_fo,
+                cf_false_outcome=fo_parsed,
             )
         from .metrics import fo_flip_label_to_strict, fo_flip_label_to_hedged
         fo_flip_strict = fo_flip_label_to_strict(fo_flip_label)
@@ -662,6 +696,7 @@ def score_case_from_batches(
                 "false_outcome_flip_strict": fo_flip_strict,
                 "false_outcome_flip_hedged": fo_flip_hedged,
                 "false_outcome_flip_label": fo_flip_label,
+                "fo_any_change": fo_any_change,
                 "task_id": task_id,
             }
         else:
@@ -683,6 +718,7 @@ def score_case_from_batches(
             cfls_result["false_outcome_flip_strict"] = fo_flip_strict
             cfls_result["false_outcome_flip_hedged"] = fo_flip_hedged
             cfls_result["false_outcome_flip_label"] = fo_flip_label
+            cfls_result["fo_any_change"] = fo_any_change
 
         intrusion = detect_evidence_intrusion(
             article=article,
@@ -699,6 +735,7 @@ def score_case_from_batches(
 
     direct_cfls = task_results["direct_prediction.base"]["cfls"]
     impact_cfls = task_results["decomposed_impact.base"]["cfls"]
+    authority_cfls = task_results["decomposed_authority.matched"]["cfls"]
     fo_condition = conditions.get("false_outcome_cpt", {})
     return {
         "case_id": tc.id,
@@ -712,6 +749,7 @@ def score_case_from_batches(
         "metrics": {
             "cfls_direct": direct_cfls["cfls"],
             "cfls_impact": impact_cfls["cfls"],
+            "cfls_authority": authority_cfls["cfls"],
             # Legacy aliases (strict semantics) — kept so older scripts that
             # read fo_flip_direct/impact continue to work without change.
             "fo_flip_direct": direct_cfls.get("false_outcome_flip_strict"),
@@ -723,8 +761,12 @@ def score_case_from_batches(
             "fo_flip_impact_strict": impact_cfls.get("false_outcome_flip_strict"),
             "fo_flip_impact_hedged": impact_cfls.get("false_outcome_flip_hedged"),
             "fo_flip_impact_label":  impact_cfls.get("false_outcome_flip_label"),
+            # Authority: non-directional task — fo_any_change is the primary metric
+            "fo_flip_authority_label": authority_cfls.get("false_outcome_flip_label"),
+            "fo_any_change_authority": authority_cfls.get("fo_any_change"),
             "intrusion_direct": task_results["direct_prediction.base"]["evidence_intrusion"]["detected"],
             "intrusion_impact": task_results["decomposed_impact.base"]["evidence_intrusion"]["detected"],
+            "intrusion_authority": task_results["decomposed_authority.matched"]["evidence_intrusion"]["detected"],
         },
     }
 
@@ -734,6 +776,7 @@ def run_chunk_batched(
     loader: PromptLoader,
     test_cases: list["TestCase"],
     max_concurrency: int = 20,
+    fo_override: dict[str, str] | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     """Run a chunk of cases through Phase 1-4 batching.
 
@@ -750,7 +793,7 @@ def run_chunk_batched(
 
     # Phase 2: FO CPT (LLM negation for pre-cutoff, generic for post-cutoff)
     print(f"[batch] Phase 2: FO CPT ({len(test_cases)} cases)")
-    fo_results = prepare_fo_cpt_batch(client, test_cases, max_concurrency)
+    fo_results = prepare_fo_cpt_batch(client, test_cases, max_concurrency, fo_override=fo_override)
 
     # Assemble per-case conditions from phase 1 + 2
     conditions_per_case = assemble_conditions(test_cases, cf_payloads, fo_results)
@@ -1006,7 +1049,7 @@ def run_single_case(
 
     for task_id in PILOT_TASKS:
         family = task_id.split(".")[0]
-        reversal_key = "sr_direction" if family == "direct_prediction" else "sr_fund_impact"
+        reversal_key = _task_reversal_key(family)
         condition_map = {
             "original": conditions["original"],
             "semantic_reversal": conditions[reversal_key],
@@ -1042,7 +1085,7 @@ def run_single_case(
 
     for task_id in PILOT_TASKS:
         family = task_id.split(".")[0]
-        reversal_key = "sr_direction" if family == "direct_prediction" else "sr_fund_impact"
+        reversal_key = _task_reversal_key(family)
 
         sr_failed = conditions[reversal_key].get("failed", False)
         np_failed = conditions["neutral_paraphrase"].get("failed", False)
@@ -1057,17 +1100,22 @@ def run_single_case(
         fo_parsed = fo_response["parsed_output"] if fo_response.get("valid") else None
         orig_parsed_for_fo = (responses["original"].get("parsed_output") or {}) if responses["original"].get("valid") else None
         direction_val = getattr(tc.expected_direction, "value", tc.expected_direction)
-        target_field = "direction" if family == "direct_prediction" else "fund_impact"
+        target_field = _task_target_field(family)
 
         # Compute fo_flip whenever original + CPT are both valid
         fo_flip_label: str | None = None
+        fo_any_change: bool | None = None
         if orig_parsed_for_fo and fo_parsed:
-            from .metrics import _detect_fo_flip
+            from .metrics import _detect_fo_flip, _detect_fo_any_change
             fo_flip_label = _detect_fo_flip(
                 orig=orig_parsed_for_fo,
                 cf_false_outcome=fo_parsed,
                 expected_direction=direction_val,
                 target_field=target_field,
+            )
+            fo_any_change = _detect_fo_any_change(
+                orig=orig_parsed_for_fo,
+                cf_false_outcome=fo_parsed,
             )
         from .metrics import fo_flip_label_to_strict, fo_flip_label_to_hedged
         fo_flip_strict = fo_flip_label_to_strict(fo_flip_label)
@@ -1091,6 +1139,7 @@ def run_single_case(
                 "false_outcome_flip_strict": fo_flip_strict,
                 "false_outcome_flip_hedged": fo_flip_hedged,
                 "false_outcome_flip_label": fo_flip_label,
+                "fo_any_change": fo_any_change,
                 "task_id": task_id,
             }
         else:
@@ -1112,6 +1161,7 @@ def run_single_case(
             cfls_result["false_outcome_flip_strict"] = fo_flip_strict
             cfls_result["false_outcome_flip_hedged"] = fo_flip_hedged
             cfls_result["false_outcome_flip_label"] = fo_flip_label
+            cfls_result["fo_any_change"] = fo_any_change
 
         # Evidence intrusion on original response
         intrusion = detect_evidence_intrusion(
@@ -1129,6 +1179,7 @@ def run_single_case(
 
     direct_cfls = task_results["direct_prediction.base"]["cfls"]
     impact_cfls = task_results["decomposed_impact.base"]["cfls"]
+    authority_cfls = task_results["decomposed_authority.matched"]["cfls"]
     fo_condition = conditions.get("false_outcome_cpt", {})
     return {
         "case_id": tc.id,
@@ -1142,6 +1193,7 @@ def run_single_case(
         "metrics": {
             "cfls_direct": direct_cfls["cfls"],
             "cfls_impact": impact_cfls["cfls"],
+            "cfls_authority": authority_cfls["cfls"],
             "fo_flip_direct": direct_cfls.get("false_outcome_flip_strict"),
             "fo_flip_impact": impact_cfls.get("false_outcome_flip_strict"),
             "fo_flip_direct_strict": direct_cfls.get("false_outcome_flip_strict"),
@@ -1150,8 +1202,11 @@ def run_single_case(
             "fo_flip_impact_strict": impact_cfls.get("false_outcome_flip_strict"),
             "fo_flip_impact_hedged": impact_cfls.get("false_outcome_flip_hedged"),
             "fo_flip_impact_label":  impact_cfls.get("false_outcome_flip_label"),
+            "fo_flip_authority_label": authority_cfls.get("false_outcome_flip_label"),
+            "fo_any_change_authority": authority_cfls.get("fo_any_change"),
             "intrusion_direct": task_results["direct_prediction.base"]["evidence_intrusion"]["detected"],
             "intrusion_impact": task_results["decomposed_impact.base"]["evidence_intrusion"]["detected"],
+            "intrusion_authority": task_results["decomposed_authority.matched"]["evidence_intrusion"]["detected"],
         },
     }
 
@@ -1298,13 +1353,22 @@ def run_pilot(
     return output
 
 
-def _build_client():
-    """Build LLMClient from settings, matching smoke_test_prompts.py pattern."""
+def _build_client(
+    settings_path: Path | None = None,
+    model: str | None = None,
+    base_url: str | None = None,
+    api_key_env: str | None = None,
+) -> "LLMClient":
+    """Build LLMClient from settings with optional CLI overrides.
+
+    Priority (highest first): explicit arguments > settings YAML > .env > env vars.
+    """
     import yaml
 
     from .llm_client import LLMClient
 
-    settings = yaml.safe_load(SETTINGS_PATH.read_text(encoding="utf-8"))
+    settings_file = settings_path or SETTINGS_PATH
+    settings = yaml.safe_load(settings_file.read_text(encoding="utf-8"))
     env_values = {}
     if ENV_PATH.exists():
         for line in ENV_PATH.read_text(encoding="utf-8").splitlines():
@@ -1314,31 +1378,52 @@ def _build_client():
                 env_values[k.strip()] = v.strip().strip("\"'")
 
     llm_config = settings.get("llm", {})
-    base_url = (
-        env_values.get("DEEPSEEK_BASE_URL")
+
+    # --- Resolve base_url ---
+    resolved_base_url = base_url or str(
+        llm_config.get("base_url")
+        or env_values.get("DEEPSEEK_BASE_URL")
         or env_values.get("DEEPSEEK_API_BASE")
-        or str(llm_config.get("base_url", "https://api.deepseek.com/v1"))
+        or "https://api.deepseek.com/v1"
     )
-    api_key = env_values.get("DEEPSEEK_API_KEY") or os.getenv("DEEPSEEK_API_KEY", "")
+
+    # --- Resolve API key ---
+    # api_key_env overrides the default env var name to look up
+    key_env_name = api_key_env or str(llm_config.get("api_key_env", "DEEPSEEK_API_KEY"))
+    api_key = env_values.get(key_env_name) or os.getenv(key_env_name, "")
+    # For local vLLM, any non-empty key works (convention: "EMPTY")
+    if not api_key and llm_config.get("provider") == "qwen":
+        api_key = "EMPTY"
     if not api_key:
-        print(f"ERROR: DEEPSEEK_API_KEY not found in {ENV_PATH} or environment")
+        print(f"ERROR: {key_env_name} not found in {ENV_PATH} or environment")
         sys.exit(1)
 
-    # Configure NO_PROXY
-    host = urlparse(base_url).hostname or ""
+    # --- Resolve model ---
+    resolved_model = model or str(llm_config.get("model", "deepseek-chat"))
+
+    # --- Configure NO_PROXY ---
+    host = urlparse(resolved_base_url).hostname or ""
     entries = ["localhost", "127.0.0.1"]
     if host:
         entries.append(host)
     os.environ["NO_PROXY"] = ",".join(dict.fromkeys(entries))
     os.environ["no_proxy"] = os.environ["NO_PROXY"]
 
+    # --- Optional sampling parameters ---
+    top_p = llm_config.get("top_p")  # None = not sent
+    repetition_penalty = llm_config.get("repetition_penalty")  # None = not sent
+    request_logprobs = bool(llm_config.get("request_logprobs", False))
+
     client = LLMClient(
-        base_url=base_url,
-        model=str(llm_config.get("model", "deepseek-chat")),
-        temperature=0.0,
+        base_url=resolved_base_url,
+        model=resolved_model,
+        temperature=float(llm_config.get("temperature", 0.0)),
         max_tokens=int(llm_config.get("max_tokens", 2048)),
         api_key=api_key,
         enable_cache=True,
+        request_logprobs=request_logprobs,
+        top_p=top_p,
+        repetition_penalty=repetition_penalty,
     )
     # Reset httpx client without proxy
     client._client.close()

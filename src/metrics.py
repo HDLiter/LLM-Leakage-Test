@@ -433,6 +433,29 @@ def _detect_fo_flip(
     return "hedged_flip" if saw_hedged else "no_flip"
 
 
+def _detect_fo_any_change(
+    orig: dict,
+    cf_false_outcome: dict,
+) -> bool | None:
+    """Check whether ANY slot value changed between orig and FO response.
+
+    Unlike ``_detect_fo_flip`` which looks for polarity-crossing changes,
+    this function detects any slot-level difference. Used for non-directional
+    tasks (e.g. authority) where polarity concepts don't apply.
+
+    Returns True if any slot differs, False if all slots match, None if
+    extraction fails.
+    """
+    orig_slots = _extract_slots(orig)
+    fo_slots = _extract_slots(cf_false_outcome)
+    if orig_slots is None or fo_slots is None:
+        return None
+    for key in orig_slots:
+        if orig_slots.get(key, "") != fo_slots.get(key, ""):
+            return True
+    return False
+
+
 def fo_flip_label_to_strict(label: str | None) -> bool | None:
     """Project the FO flip label down to the legacy strict bool.
 
@@ -476,6 +499,15 @@ def _extract_slots(parsed: dict | None) -> dict[str, str] | None:
         slots = {"fund_impact": _normalize_label(parsed["fund_impact"]) or ""}
         if "shock_impact" in parsed:
             slots["shock_impact"] = _normalize_label(parsed["shock_impact"]) or ""
+        return slots
+
+    # Base decomposed_authority
+    if "source_credibility" in parsed:
+        slots = {"source_credibility": _normalize_label(parsed["source_credibility"]) or ""}
+        if "regulatory_vs_rumor" in parsed:
+            slots["regulatory_vs_rumor"] = _normalize_label(parsed["regulatory_vs_rumor"]) or ""
+        if "official_vs_unattributed" in parsed:
+            slots["official_vs_unattributed"] = _normalize_label(parsed["official_vs_unattributed"]) or ""
         return slots
 
     # Matched format – resolve via slot semantics if available

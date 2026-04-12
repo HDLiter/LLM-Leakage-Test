@@ -161,6 +161,9 @@ This lowers the reproduction barrier from "re-implement our pipeline" to
 7. Skill design: what granularity? One monolithic skill or composable steps?
 8. Should the English portion also avoid full-text (for uniformity), or
    publish full-text as a feature?
+9. CLS licensing: approach CLS after benchmark is built with a concrete
+   proposal. Possible outcomes: full-text license, summary-only, or
+   fallback to metadata+fingerprint scheme.
 
 ---
 

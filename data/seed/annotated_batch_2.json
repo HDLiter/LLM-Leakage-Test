@@ -1,0 +1,326 @@
+{
+  "test_cases": [
+    {
+      "id": "exp_030",
+      "news": {
+        "id": "2274433",
+        "title": "天齐锂业：预计2025年净利润3.69亿元-5.53亿元 同比扭亏",
+        "content": "【天齐锂业：预计2025年净利润3.69亿元-5.53亿元 同比扭亏】财联社1月29日电，天齐锂业(002466.SZ)公告称，预计2025年归属于上市公司股东的净利润为盈利3.69亿元至5.53亿元，上年同期为亏损790,458.03万元，同比扭亏为盈。截至本业绩预告公告日，公司重要的联营公司SQM尚未公告其2025年第四季度业绩报告。公司全面考虑所能获取的可靠信息，沿用一贯方式，采用彭博社预测的SQM2025年第四季度每股收益等信息为基础来计算同期公司对SQM的投资收益。根据前述预测数据，SQM2025年业绩预计将同比增长，因此公司在本报告期确认的对该联营公司的投资收益较上年同期大幅增长。",
+        "publish_time": "2026-01-29 19:04:10",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "锂矿",
+      "key_entities": [
+        "天齐锂业",
+        "SQM"
+      ],
+      "key_numbers": [
+        "3.69亿元-5.53亿元",
+        "790,458.03万元"
+      ],
+      "expected_direction": "up",
+      "subcategory": "业绩预告扭亏",
+      "memorization_likelihood": "medium",
+      "target": "天齐锂业",
+      "target_type": "company",
+      "period": "post_cutoff",
+      "rarity_estimate": "common"
+    },
+    {
+      "id": "exp_031",
+      "news": {
+        "id": "2264312",
+        "title": "今年首期LPR出炉 两期限品种均“按兵不动”",
+        "content": "【今年首期LPR出炉 两期限品种均“按兵不动”】财联社1月21日电，中国人民银行授权全国银行间同业拆借中心公布2026年1月20日贷款市场报价利率（LPR），1年期LPR为3.0%，5年期以上LPR为3.5%，均较上期维持不变。这也是LPR连续第8个月维持不变。专家认为，今年第一期LPR继续“按兵不动”符合预期。从LPR报价机制看，作为LPR定价主要参考的7天期逆回购操作利率并未发生变化，因此LPR较难下降。",
+        "publish_time": "2026-01-21 06:37:44",
+        "category": "macro",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "房地产",
+      "key_entities": [
+        "中国人民银行",
+        "LPR",
+        "全国银行间同业拆借中心"
+      ],
+      "key_numbers": [
+        "1年期LPR 3.0%",
+        "5年期以上LPR 3.5%",
+        "连续第8个月"
+      ],
+      "expected_direction": "neutral",
+      "subcategory": "LPR按兵不动",
+      "memorization_likelihood": "high",
+      "target": "房地产板块",
+      "target_type": "sector",
+      "period": "post_cutoff",
+      "rarity_estimate": "common"
+    },
+    {
+      "id": "exp_032",
+      "news": {
+        "id": "1089677",
+        "title": "微芯生物：约1.5763亿股限售股将解禁",
+        "content": "【微芯生物：约1.5763亿股限售股将解禁】《科创板日报》3日讯，微芯生物公告，此次上市流通的首次公开发行限售股数量为157,627,678股，限售期为36个月；此次限售股上市流通日期为2022年8月12日。",
+        "publish_time": "2022-08-03 17:43:57",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "消息后首个交易日（2022-08-04）微芯生物收涨2.5%，随后5个交易日累计上涨约10.2%，市场并未按典型解禁利空交易。",
+      "outcome_date": "2022-08-04",
+      "sector": "创新药",
+      "key_entities": [
+        "微芯生物",
+        "首次公开发行限售股"
+      ],
+      "key_numbers": [
+        "157,627,678股",
+        "36个月",
+        "2022年8月12日"
+      ],
+      "expected_direction": "down",
+      "subcategory": "IPO限售股解禁",
+      "memorization_likelihood": "low",
+      "target": "微芯生物",
+      "target_type": "company",
+      "period": "pre_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_033",
+      "news": {
+        "id": "617440",
+        "title": "*ST银亿：最终确定由嘉兴梓禾瑾芯股权投资作为公司重整投资人",
+        "content": "【*ST银亿：最终确定由嘉兴梓禾瑾芯股权投资作为公司重整投资人】财联社11月11日讯，*ST银亿公告，2020年10月27日，在宁波中院的监督下，重整投资人评审委员会对意向重整投资人提交的重整投资方案进行现场评审，并对意向重整投资人提交的重整投资方案进行评分，根据评分结果最终确定由嘉兴梓禾瑾芯股权投资合伙企业(有限合伙)作为公司重整投资人，其投资总报价为人民币32亿元。同时，遴选出中泽控股集团股份有限公司与Punch Motive International NV(比利时邦志动力国际公司)组成的联合投资体、宁波合奔投资合伙企业(有限合伙)作为备选的公司重整投资人。公司管理人根据《关于公开招募和遴选重整投资人的公告》正在与确定的重整投资人推进签订重整投资协议的相关工作。",
+        "publish_time": "2020-11-11 19:50:20",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "消息后首个交易日（2020-11-12）*ST银亿收跌0.9%，随后5个交易日累计仅上涨约1.8%，重整投资人利好触发的持续反应较弱。",
+      "outcome_date": "2020-11-12",
+      "sector": "ST重整",
+      "key_entities": [
+        "*ST银亿",
+        "嘉兴梓禾瑾芯股权投资",
+        "宁波中院"
+      ],
+      "key_numbers": [
+        "32亿元"
+      ],
+      "expected_direction": "up",
+      "subcategory": "重整投资人确定",
+      "memorization_likelihood": "low",
+      "target": "*ST银亿",
+      "target_type": "company",
+      "period": "pre_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_034",
+      "news": {
+        "id": "1225002",
+        "title": "荣昌生物：向188名激励对象授予286.945万股A股限制性股票",
+        "content": "【荣昌生物：向188名激励对象授予286.945万股A股限制性股票】财联社12月28日电，荣昌生物公告，《荣昌生物制药(烟台)股份有限公司2022年A股限制性股票激励计划》规定的公司2022年A股限制性股票激励计划首次授予条件已经成就，根据公司2022年第二次临时股东大会、2022年第一次A股类别股东大会及2022年第一次H股类别股东大会授权，公司于2022年12月28日召开的第一届董事会第二十六次会议、第一届监事会第十三次会议，审议通过了《关于向2022年A股限制性股票激励计划激励对象首次授予限制性股票的议案》，确定2022年12月28日为首次授予日，以36.36元/股的授予价格向188名激励对象授予286.945万股限制性股票。",
+        "publish_time": "2022-12-28 19:29:37",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "消息后首个交易日（2022-12-29）荣昌生物收涨2.7%，随后5个交易日累计上涨约9.5%，市场将股权激励授予解读为偏正面。",
+      "outcome_date": "2022-12-29",
+      "sector": "创新药",
+      "key_entities": [
+        "荣昌生物",
+        "2022年A股限制性股票激励计划",
+        "激励对象"
+      ],
+      "key_numbers": [
+        "286.945万股",
+        "36.36元/股",
+        "188名"
+      ],
+      "expected_direction": "up",
+      "subcategory": "股权激励授予",
+      "memorization_likelihood": "low",
+      "target": "荣昌生物",
+      "target_type": "company",
+      "period": "pre_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_035",
+      "news": {
+        "id": "886310",
+        "title": "*ST长动：第二大股东承诺参与公司预重整",
+        "content": "【*ST长动：第二大股东承诺参与公司预重整】财联社12月1日电，*ST长动公告，临时管理人收到大洲娱乐股份有限公司（简称“大洲娱乐”）出具的《承诺函》，大洲娱乐承诺愿作为重整投资人参与公司（预）重整，并将根据实际情况择机引入第三方作为财务投资人以联合重整的方式参与公司重整。大洲娱乐截至2021年9月30日持有公司14.12%的股份，系公司第二大股东。",
+        "publish_time": "2021-12-01 20:38:58",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "消息后首个交易日（2021-12-02）*ST长动涨停收盘（+5.1%），3个交易日累计上涨约15.8%，预重整预期带来强烈正反馈。",
+      "outcome_date": "2021-12-02",
+      "sector": "ST重整",
+      "key_entities": [
+        "*ST长动",
+        "大洲娱乐",
+        "临时管理人"
+      ],
+      "key_numbers": [
+        "14.12%"
+      ],
+      "expected_direction": "up",
+      "subcategory": "预重整进展",
+      "memorization_likelihood": "low",
+      "target": "*ST长动",
+      "target_type": "company",
+      "period": "pre_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_036",
+      "news": {
+        "id": "947816",
+        "title": "佳力图：证监会恢复审查公司定增申请",
+        "content": "【佳力图：证监会恢复审查公司定增申请】财联社3月2日电，佳力图公告，目前，公司首次募集资金购买土地使用权事项已有进一步落实进展，公司已向中国证监会提交恢复此次非公开发行股票事项审查的申请，并于近日收到中国证监会出具的《中国证监会行政许可申请恢复审查通知书》(210704号)，根据《中国证券监督管理委员会行政许可实施程序规定》第二十三条的有关规定，决定恢复对公司此次非公开发行股票申请的审查。",
+        "publish_time": "2022-03-02 15:56:50",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "消息后首个交易日（2022-03-03）佳力图收涨2.3%，但随后快速转弱，5个交易日累计下跌约11.4%，利好未能持续。",
+      "outcome_date": "2022-03-03",
+      "sector": "IDC温控",
+      "key_entities": [
+        "佳力图",
+        "中国证监会",
+        "非公开发行股票"
+      ],
+      "key_numbers": [],
+      "expected_direction": "up",
+      "subcategory": "定增恢复审查",
+      "memorization_likelihood": "low",
+      "target": "佳力图",
+      "target_type": "company",
+      "period": "pre_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_037",
+      "news": {
+        "id": "1900283",
+        "title": "*ST卓朗：收到上交所拟终止公司股票上市事先告知书",
+        "content": "【*ST卓朗：收到上交所拟终止公司股票上市事先告知书】财联社12月25日电，*ST卓朗公告，公司于12月25日收到上海证券交易所下发的《关于拟终止天津卓朗信息科技股份有限公司股票上市的事先告知书》。告知书指出，公司2019年至2023年年度报告存在虚假记载，虚增营业收入和利润总额，触及《上海证券交易所股票上市规则（2024年4月修订）》第9.5.2条第一款第（六）（七）项规定的重大违法强制退市情形，将被实施重大违法强制退市。上海证券交易所将根据相关规定，对公司股票作出终止上市的决定。如公司申请听证，应当在收到本通知后5个交易日内，提交载明申请听证事项及申辩理由的书面听证申请。",
+        "publish_time": "2024-12-25 21:16:41",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "公司股票此后长时间停牌，恢复交易后的首个可观察交易日为2025-02-07，当日*ST卓朗大跌75.8%；随后5个交易日累计跌约80.7%，退市风险被极端定价。",
+      "outcome_date": "2025-02-07",
+      "sector": "退市风险/ST",
+      "key_entities": [
+        "*ST卓朗",
+        "上海证券交易所",
+        "事先告知书"
+      ],
+      "key_numbers": [
+        "2019年至2023年",
+        "5个交易日"
+      ],
+      "expected_direction": "down",
+      "subcategory": "重大违法退市风险",
+      "memorization_likelihood": "medium",
+      "target": "*ST卓朗",
+      "target_type": "company",
+      "period": "pre_cutoff",
+      "rarity_estimate": "rare"
+    }
+  ],
+  "skipped": [
+    {
+      "id": "cand_030",
+      "reason": "隔夜全球多事件摘要，且A股映射过于分散。"
+    },
+    {
+      "id": "cand_032",
+      "reason": "美股盘前多条海外资讯汇总，缺少单一A股交易事件。"
+    },
+    {
+      "id": "cand_033",
+      "reason": "指数涨势与ETF营销混合稿，属于盘面总结而非独立新闻事件。"
+    },
+    {
+      "id": "cand_035",
+      "reason": "投行宏观展望属于预测观点，不是可验证的单一事件。"
+    },
+    {
+      "id": "cand_037",
+      "reason": "政策表述过于宽泛，受益对象分散，难以定义单一交易目标。"
+    },
+    {
+      "id": "cand_038",
+      "reason": "《新闻联播》多条内容汇总，无法抽取单一测试事件。"
+    },
+    {
+      "id": "cand_039",
+      "reason": "常规ST业绩预亏公告，边际信息有限且市场反应偏弱。"
+    },
+    {
+      "id": "cand_040",
+      "reason": "海外药企产品落地博鳌，对A股缺少直接可交易标的。"
+    },
+    {
+      "id": "cand_042",
+      "reason": "民营生鲜平台破产重组，缺少直接A股上市公司目标。"
+    },
+    {
+      "id": "cand_044",
+      "reason": "监管表态偏原则性讲话，缺乏明确交易催化。"
+    },
+    {
+      "id": "cand_045",
+      "reason": "早间新闻精选为多事件打包摘要，无法对应单一测试目标。"
+    },
+    {
+      "id": "cand_046",
+      "reason": "行政执法规范文件偏法治框架，A股直接受益方向不清。"
+    },
+    {
+      "id": "cand_047",
+      "reason": "终止IPO对象为未上市公司，缺少直接可交易A股标的。"
+    },
+    {
+      "id": "cand_049",
+      "reason": "股东减持计划属于常见供给类公告，信号模板化且市场反应较弱。"
+    },
+    {
+      "id": "cand_050",
+      "reason": "指数突破高点和ETF成交属于盘面/资金流总结，不是原始事件。"
+    },
+    {
+      "id": "cand_051",
+      "reason": "蔚来手机发布主要对应港美股公司，对A股缺少直接映射。"
+    },
+    {
+      "id": "cand_052",
+      "reason": "业绩说明会口径偏展望性，缺少硬事件和明确兑现节点。"
+    },
+    {
+      "id": "cand_053",
+      "reason": "互动平台表述过于笼统，没有具体订单、金额或客户落地。"
+    },
+    {
+      "id": "cand_054",
+      "reason": "盘后热点点评属于评论稿，不是独立新闻事件。"
+    },
+    {
+      "id": "cand_055",
+      "reason": "蚂蚁发行股本细节本身对A股可交易目标映射过于间接。"
+    },
+    {
+      "id": "cand_056",
+      "reason": "券商医药策略观点稿，缺少单一事件催化。"
+    }
+  ]
+}

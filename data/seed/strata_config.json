@@ -1,0 +1,28 @@
+{
+  "analysis_anchor_field": "anchor_binary",
+  "rationale": "4-level had 4/8 short cells; binary still has 3 short cells but binary is the best available given the 700-case budget. Document as a power limitation in PILOT_RESULTS.md.",
+  "min_cell_size_target": 80,
+  "expected_flip_rate": 0.075,
+  "target_or": 2.5,
+  "sample_budget": 700,
+  "cells_4level": {
+    "post_cutoff/0": 51,
+    "post_cutoff/1": 83,
+    "post_cutoff/2": 39,
+    "post_cutoff/3": 101,
+    "pre_cutoff/0": 85,
+    "pre_cutoff/1": 60,
+    "pre_cutoff/2": 69,
+    "pre_cutoff/3": 118
+  },
+  "cells_2level": {
+    "post_cutoff/strongly_anchored": 140,
+    "post_cutoff/weakly_anchored": 134,
+    "pre_cutoff/strongly_anchored": 187,
+    "pre_cutoff/weakly_anchored": 145
+  },
+  "n_neutral_dropped": 76,
+  "n_missing_anchor_dropped": 0,
+  "decided_at": "2026-04-09T08:15:55.721409",
+  "source_cases_path": "D:\\GitRepos\\LLM-Leakage-Test\\data\\seed\\test_cases_v3.json"
+}

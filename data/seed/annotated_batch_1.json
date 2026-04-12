@@ -1,0 +1,381 @@
+{
+  "test_cases": [
+    {
+      "id": "exp_001",
+      "news": {
+        "id": "2280384",
+        "title": "广生堂：乙肝治疗一类创新药奈瑞可韦GST-HG141完成III期临床试验受试者入组",
+        "content": "【广生堂：乙肝治疗一类创新药奈瑞可韦GST-HG141完成III期临床试验受试者入组】财联社2月4日电，广生堂(300436.SZ)公告称，公司创新药控股子公司福建广生中霖生物科技有限公司的在研乙肝治疗一类创新药奈瑞可韦GST-HG141的III期临床试验，已于近日完成全部受试者入组，合计入组578例。奈瑞可韦GST-HG141是新型乙肝核心蛋白/核衣壳调节剂，属于全新机制的在研抗乙肝病毒的一类创新药。迄今为止，全球范围内尚无同类产品上市，属潜在FIC（First in class）项目。",
+        "publish_time": "2026-02-04 16:49:54",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "创新药",
+      "key_entities": [
+        "广生堂",
+        "福建广生中霖",
+        "奈瑞可韦GST-HG141"
+      ],
+      "key_numbers": [
+        "III期",
+        "578例"
+      ],
+      "expected_direction": "up",
+      "subcategory": "创新药临床进展",
+      "memorization_likelihood": "low",
+      "target": "广生堂",
+      "target_type": "company",
+      "period": "post_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_002",
+      "news": {
+        "id": "2185165",
+        "title": "昊志机电：第三季度净利润5819.43万元 同比增长124.55%",
+        "content": "【昊志机电：第三季度净利润5819.43万元 同比增长124.55%】财联社10月29日电，昊志机电(300503.SZ)发布2025年三季报，公司第三季度营业收入4.4亿元，同比增长24.89%；净利润5819.43万元，同比增长124.55%。2025年前三季度营业收入11.43亿元，同比增长18.10%；净利润1.22亿元，同比增长50.40%；基本每股收益0.4元。2025年1—9月，公司主要产品所服务的核心应用领域需求强劲。在AI算力基础设施（如服务器、高速交换机）需求快速增长，以及消费电子终端产品持续升级的双重驱动下，PCB产业迎来结构性增长，公司在该领域的专用加工设备销售显著提升。与此同时，国产化替代加速，以及消费电子产品技术与加工工艺、材料持续创新，也为公司产品拓展市场提供了有力支撑。",
+        "publish_time": "2025-10-29 19:40:14",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "PCB设备",
+      "key_entities": [
+        "昊志机电",
+        "AI算力基础设施",
+        "PCB"
+      ],
+      "key_numbers": [
+        "5819.43万元",
+        "124.55%",
+        "4.4亿元",
+        "24.89%",
+        "11.43亿元",
+        "1.22亿元"
+      ],
+      "expected_direction": "up",
+      "subcategory": "业绩增长",
+      "memorization_likelihood": "low",
+      "target": "昊志机电",
+      "target_type": "company",
+      "period": "post_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_003",
+      "news": {
+        "id": "2209461",
+        "title": "*ST炼石：预计《重整计划》实施后公司股价存在向下除权调整的风险",
+        "content": "【*ST炼石：预计《重整计划》实施后公司股价存在向下除权调整的风险】财联社11月24日电，*ST炼石(000697.SZ)公告称，四川省成都市中级人民法院于2025年11月12日裁定批准《炼石航空科技股份有限公司重整计划》（简称“《重整计划》”），公司进入重整计划执行阶段。根据《重整计划》，结合公司初步测算情况，预计《重整计划》实施后公司股价存在向下除权调整的风险。",
+        "publish_time": "2025-11-24 22:16:42",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "ST重整",
+      "key_entities": [
+        "*ST炼石",
+        "成都市中级人民法院",
+        "《重整计划》"
+      ],
+      "key_numbers": [
+        "2025年11月12日"
+      ],
+      "expected_direction": "down",
+      "subcategory": "司法重整风险",
+      "memorization_likelihood": "low",
+      "target": "*ST炼石",
+      "target_type": "company",
+      "period": "post_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_004",
+      "news": {
+        "id": "2189608",
+        "title": "四川黄金：取得梭罗沟金矿区挖金沟矿段采矿许可证",
+        "content": "【四川黄金：取得梭罗沟金矿区挖金沟矿段采矿许可证】财联社11月3日电，四川黄金(001337.SZ)公告称，公司近日取得了四川省自然资源厅颁发的梭罗沟金矿区挖金沟矿段《采矿许可证》，完成了四川省木里县梭罗－挖金沟金矿勘查延续登记，并取得了四川省木里县梭罗－挖金沟金矿勘查《矿产资源勘查许可证》《不动产权证书（探矿权）》。公司通过探矿权转采矿权程序取得梭罗沟金矿区挖金沟矿段采矿证的生产规模为中型，有利于增强公司资源保障能力和提升开采规模，但资源储量较小，且后续还将办理安全设施设计等手续，并需在具备生态环境保护、安全生产、水土保持等法定条件后方可实施开采作业，该事项不会对公司当期经营业绩产生重大影响。",
+        "publish_time": "2025-11-03 16:58:05",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "黄金采选",
+      "key_entities": [
+        "四川黄金",
+        "四川省自然资源厅",
+        "梭罗沟金矿区挖金沟矿段"
+      ],
+      "key_numbers": [],
+      "expected_direction": "up",
+      "subcategory": "采矿许可证获批",
+      "memorization_likelihood": "low",
+      "target": "四川黄金",
+      "target_type": "company",
+      "period": "post_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_005",
+      "news": {
+        "id": "2263037",
+        "title": "互联互通机制下首只A500ETF“出海”  今日新交所上市",
+        "content": "【互联互通机制下首只A500ETF“出海”  今日新交所上市】财联社1月20日电，南方东英南方中证A500指数ETF在新加坡交易所今日正式上市，成为首只在互联互通机制下“走出去”的中证A500ETF。此次于新加坡交易所上市的南方东英南方中证A500指数ETF将投资至少90%的净资产至A500ETF南方，有助于为中国资本市场结构优化和新质生产力发展注入资本活水。2022年，深交所与新交所ETF互联互通正式落地，为中国和新加坡的投资者打开了投资通道。首对ETF互通双向产品，南方基金南方东英富时亚太低碳精选ETF、南方东英南方中证科创创业50指数ETF分别在深新两所成功上市，通过投资对方市场特色ETF产品，有效引导各类资源要素向科技创新、绿色低碳等重点领域聚集，实现了中国ETF“走出去”和新加坡ETF“引进来”。（财联社记者 闫军）",
+        "publish_time": "2026-01-20 09:50:18",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "ETF与资本市场互联互通",
+      "key_entities": [
+        "南方东英",
+        "中证A500指数ETF",
+        "新加坡交易所"
+      ],
+      "key_numbers": [
+        "90%",
+        "2022年"
+      ],
+      "expected_direction": "up",
+      "subcategory": "跨境ETF上市",
+      "memorization_likelihood": "medium",
+      "target": "中证A500指数",
+      "target_type": "index",
+      "period": "post_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_006",
+      "news": {
+        "id": "2240961",
+        "title": "日本11月半导体设备销售额创历史同期新高",
+        "content": "【日本11月半导体设备销售额创历史同期新高】《科创板日报》26日讯，日本半导体制造设备协会(SEAJ)公布统计数据显示，2025年11月份日本制芯片设备销售额(3个月移动平均值、包含出口)为4,206.7亿日元，较去年同月增加3.7%，连续第23个月实现增长，月销售额连续第25个月突破3,000亿日元，并连续13个月高于4,000亿日元，创下历年同月历史新高纪录。",
+        "publish_time": "2025-12-26 15:40:55",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "半导体设备",
+      "key_entities": [
+        "SEAJ",
+        "日本半导体制造设备协会",
+        "半导体设备"
+      ],
+      "key_numbers": [
+        "4206.7亿日元",
+        "3.7%",
+        "23个月",
+        "25个月",
+        "13个月"
+      ],
+      "expected_direction": "up",
+      "subcategory": "半导体设备景气度",
+      "memorization_likelihood": "low",
+      "target": "半导体设备板块",
+      "target_type": "sector",
+      "period": "post_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_007",
+      "news": {
+        "id": "2214288",
+        "title": "澜起科技：新产品的逐步上量将对公司业绩产生积极影响",
+        "content": "【澜起科技：新产品的逐步上量将对公司业绩产生积极影响】《科创板日报》28日讯，澜起科技(688008.SH)发布投资者关系活动记录表公告称，公司互连类芯片相关产品未来将持续受益于AI产业趋势，特别是AI整体由训练端向推理端的迁移，将带动更多高速互连芯片的需求。展望明后年，从产业趋势来看，AI将持续推动存储需求的增长，DDR5持续渗透及子代迭代有助于维系和提升公司相关产品的平均销售价格及毛利率；此外，针对公司的互连类芯片新产品，包括PCIeRetimer、MRCD/MDB、CKD、MXC芯片等，行业生态在持续完善，其价值也在逐步获得终端客户的认可，新产品的逐步上量将对公司业绩产生积极影响。",
+        "publish_time": "2025-11-28 18:14:43",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "内存接口芯片",
+      "key_entities": [
+        "澜起科技",
+        "DDR5",
+        "PCIeRetimer"
+      ],
+      "key_numbers": [],
+      "expected_direction": "up",
+      "subcategory": "产品放量指引",
+      "memorization_likelihood": "low",
+      "target": "澜起科技",
+      "target_type": "company",
+      "period": "post_cutoff",
+      "rarity_estimate": "medium"
+    },
+    {
+      "id": "exp_008",
+      "news": {
+        "id": "2284870",
+        "title": "奥普特：拟募资不超13.8亿元用于AI智能视觉解决方案系统研发等项目",
+        "content": "【奥普特：拟募资不超13.8亿元用于AI智能视觉解决方案系统研发等项目】《科创板日报》9日讯，奥普特(688686.SH)公告称，公司计划向不特定对象发行可转债，拟募集资金总额不超过13.8亿元，用于工业3D视觉传感器及智能硬件扩产建设项目、AI智能视觉解决方案系统研发项目、工业级机器人核心零部件及视觉系统研发产业化项目以及补充流动资金项目。公司旨在通过此次募资深化工业自动化领域的既有优势，并深入布局机器人核心零部件及视觉系统解决方案领域。",
+        "publish_time": "2026-02-09 18:32:29",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "机器视觉",
+      "key_entities": [
+        "奥普特",
+        "AI智能视觉解决方案",
+        "工业级机器人"
+      ],
+      "key_numbers": [
+        "13.8亿元"
+      ],
+      "expected_direction": "neutral",
+      "subcategory": "可转债募资扩产",
+      "memorization_likelihood": "low",
+      "target": "奥普特",
+      "target_type": "company",
+      "period": "post_cutoff",
+      "rarity_estimate": "medium"
+    },
+    {
+      "id": "exp_009",
+      "news": {
+        "id": "2209584",
+        "title": "央行今日操作1万亿元MLF 维持市场流动性充裕",
+        "content": "【央行今日操作1万亿元MLF 维持市场流动性充裕】财联社11月25日电，中国人民银行11月24日发布的11月中期借贷便利（MLF）招标公告显示，11月25日将以固定数量、利率招标、多重价位中标方式开展10000亿元MLF操作，期限为1年期，以保持银行体系流动性充裕。业内专家表示，这是央行连续第9个月加量续作MLF。在冲刺全年经济社会发展目标的关键时点，央行通过多种货币政策工具维持流动性充裕，有利于引导金融机构加大信贷投放，有助于稳增长、稳预期。",
+        "publish_time": "2025-11-25 06:11:00",
+        "category": "macro",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "流动性敏感板块",
+      "key_entities": [
+        "中国人民银行",
+        "MLF",
+        "银行体系流动性"
+      ],
+      "key_numbers": [
+        "10000亿元",
+        "1年期",
+        "第9个月"
+      ],
+      "expected_direction": "up",
+      "subcategory": "货币政策操作",
+      "memorization_likelihood": "medium",
+      "target": "A股大盘",
+      "target_type": "index",
+      "period": "post_cutoff",
+      "rarity_estimate": "medium"
+    },
+    {
+      "id": "exp_010",
+      "news": {
+        "id": "2225308",
+        "title": "佩蒂股份：根据当前建设进度 预计越南工厂新增产能将在2026年贡献收入",
+        "content": "【佩蒂股份：根据当前建设进度 预计越南工厂新增产能将在2026年贡献收入】财联社12月10日电，佩蒂股份在互动平台表示，根据当前建设进度，预计越南工厂新增的产能将在2026年贡献收入，这将增加越南工厂的订单交付能力，以满足市场和新老客户持续增长的需求。",
+        "publish_time": "2025-12-10 15:49:25",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "宠物食品",
+      "key_entities": [
+        "佩蒂股份",
+        "越南工厂",
+        "互动平台"
+      ],
+      "key_numbers": [
+        "2026年"
+      ],
+      "expected_direction": "up",
+      "subcategory": "海外产能扩张",
+      "memorization_likelihood": "low",
+      "target": "佩蒂股份",
+      "target_type": "company",
+      "period": "post_cutoff",
+      "rarity_estimate": "medium"
+    }
+  ],
+  "skipped": [
+    {
+      "id": "cand_003",
+      "reason": "券商宏观观点稿，缺乏可验证的单一事件，且目标资产过于宽泛。"
+    },
+    {
+      "id": "cand_004",
+      "reason": "港美股阿里巴巴评级调整，缺少直接A股可交易标的。"
+    },
+    {
+      "id": "cand_006",
+      "reason": "拟IPO主体尚未上市，缺少直接可交易的A股目标。"
+    },
+    {
+      "id": "cand_008",
+      "reason": "公募指数产品规模统计，属于数据汇总，缺乏明确事件催化。"
+    },
+    {
+      "id": "cand_009",
+      "reason": "基金营销和行业展望混合稿，偏宣传性质，缺乏清晰交易事件。"
+    },
+    {
+      "id": "cand_011",
+      "reason": "日内连板和涨停复盘，属于盘后行情总结，不是独立新闻事件。"
+    },
+    {
+      "id": "cand_012",
+      "reason": "午间新闻精选为多条新闻汇总，无法对应单一测试事件。"
+    },
+    {
+      "id": "cand_014",
+      "reason": "限售股解禁例行日历数据，信息过于程序化且缺少独立催化。"
+    },
+    {
+      "id": "cand_015",
+      "reason": "黄金ETF规模里程碑主要是存量数据描述，缺少明确新增事件。"
+    },
+    {
+      "id": "cand_016",
+      "reason": "欧洲深科技基金设立主要影响海外创投生态，对A股映射较弱。"
+    },
+    {
+      "id": "cand_017",
+      "reason": "主力资金净流入属于盘中资金流监控数据，不是原始事件。"
+    },
+    {
+      "id": "cand_019",
+      "reason": "腾讯人才引进新闻对应港股公司，且对A股缺少直接、可度量影响。"
+    },
+    {
+      "id": "cand_020",
+      "reason": "市场主线快评属于盘中评论，缺乏单一、可标注的事件触发点。"
+    },
+    {
+      "id": "cand_021",
+      "reason": "日本数字金融平台赴美IPO，与A股关联度不足。"
+    },
+    {
+      "id": "cand_022",
+      "reason": "军工板块拉升稿以盘中涨跌和券商展望为主，缺少明确原始事件。"
+    },
+    {
+      "id": "cand_024",
+      "reason": "有色主题基金上报和申购额是资金配置数据汇总，缺少单点催化。"
+    },
+    {
+      "id": "cand_026",
+      "reason": "盘中快评和热点轮动描述过于短线化，难以形成稳定测试样本。"
+    },
+    {
+      "id": "cand_028",
+      "reason": "隔夜全球要闻为多事件打包摘要，无法抽取单一A股测试目标。"
+    },
+    {
+      "id": "cand_029",
+      "reason": "美联储官员表态偏海外宏观噪音，对A股缺少明确、直接的单一映射。"
+    }
+  ]
+}

@@ -1,0 +1,330 @@
+{
+  "batch_index": 13,
+  "n_items": 40,
+  "items": [
+    {
+      "candidate_id": "tc_031",
+      "title": "国家医保局推进第五批药品集采，涉及61个品种",
+      "content": "2021年6月23日，国家医保局组织开展第五批国家药品集中采购，共涉及61个品种。部分品种降价幅度超90%，创历史新高。集采常态化推进对医药行业盈利模式产生深远影响，仿制药企业利润空间被大幅压缩。",
+      "publish_time": "2021-06-23T16:00:00",
+      "period": "pre_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "tc_032",
+      "title": "央行住建部约谈房企，\"三道红线\"融资新规出台",
+      "content": "2020年8月20日，中国人民银行、住建部召开重点房地产企业座谈会，明确提出\"三道红线\"融资管理规则：剔除预收款后资产负债率不超70%、净负债率不超100%、现金短债比不低于1倍。不达标企业将被限制融资增速。",
+      "publish_time": "2020-08-20T18:00:00",
+      "period": "pre_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "tc_033",
+      "title": "ChatGPT用户破亿引爆全球AI热潮，A股AI概念全线涨停",
+      "content": "2023年2月1日，OpenAI旗下ChatGPT月活用户突破1亿，成为史上增长最快的消费级应用。A股市场AI概念股全线爆发，昆仑万维、三六零、科大讯飞等多只个股涨停。算力、数据、应用三大方向全面受益。",
+      "publish_time": "2023-02-01T09:30:00",
+      "period": "pre_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "tc_034",
+      "title": "光伏产业链价格全线崩塌，硅料价格较高点跌超70%",
+      "content": "2023年8月15日，光伏产业链价格持续下跌。多晶硅料价格从2022年高点的30万元/吨跌至不足8万元/吨，跌幅超70%。组件价格跌破1元/W心理关口。行业产能严重过剩，企业开工率大幅下降。",
+      "publish_time": "2023-08-15T10:00:00",
+      "period": "pre_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "tc_035",
+      "title": "白酒板块消费复苏不及预期，库存压力显现",
+      "content": "2023年7月10日，多家白酒企业中报预告显示消费复苏力度不及预期。批价方面，五粮液批价跌破900元，国窖1573批价回落至800元附近。渠道库存偏高，经销商信心不足，白酒板块估值承压。",
+      "publish_time": "2023-07-10T14:00:00",
+      "period": "pre_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "tc_036",
+      "title": "美国芯片法案签署，半导体国产替代加速推进",
+      "content": "2022年8月10日，美国总统拜登正式签署《芯片与科学法案》，对中国半导体产业实施更严格的出口管制。A股半导体板块逆势走强，市场认为国产替代逻辑进一步强化，设备和材料环节最为受益。",
+      "publish_time": "2022-08-10T09:00:00",
+      "period": "pre_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "tc_037",
+      "title": "十四五规划纲要发布，军工装备现代化目标明确",
+      "content": "2021年3月15日，《中华人民共和国国民经济和社会发展第十四个五年规划和2035年远景目标纲要》正式发布，明确提出加快武器装备现代化，确保2027年实现建军百年奋斗目标。军工行业景气度有望持续上行。",
+      "publish_time": "2021-03-15T10:00:00",
+      "period": "pre_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "tc_038",
+      "title": "碳酸锂期货价格跌破20万元/吨，较高点暴跌超65%",
+      "content": "2023年9月1日，碳酸锂期货主力合约价格跌破20万元/吨，较2022年11月高点的近60万元/吨暴跌超65%。下游需求增速放缓叠加上游产能集中释放，锂电产业链面临严峻的去库存压力。",
+      "publish_time": "2023-09-01T15:00:00",
+      "period": "pre_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "tc_039",
+      "title": "银行板块高股息策略持续受追捧，工商银行股价创历史新高",
+      "content": "2024年3月15日，银行板块延续强势表现，工商银行A股股价创历史新高。在市场风险偏好下降的背景下，银行股凭借5%以上的股息率和低估值优势，成为险资和被动基金的重点配置方向。",
+      "publish_time": "2024-03-15T15:00:00",
+      "period": "pre_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "tc_040",
+      "title": "中美签署第一阶段经贸协议，贸易摩擦暂时缓和",
+      "content": "2020年1月15日，中美在华盛顿签署第一阶段经贸协议。但随后新冠疫情爆发，叠加美国对华为等企业加大制裁力度，中美关系再度紧张。2020年全年贸易摩擦反复升级，市场避险情绪上升。",
+      "publish_time": "2020-01-15T22:00:00",
+      "period": "pre_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "tc_041",
+      "title": "美联储加息75个基点，创28年来最大单次加息幅度",
+      "content": "2022年6月16日，美联储宣布加息75个基点，将联邦基金利率目标区间上调至1.50%-1.75%，为1994年以来最大单次加息幅度。美联储主席鲍威尔表示不排除7月继续加息75个基点的可能性。全球资本市场剧烈波动。",
+      "publish_time": "2022-06-16T02:00:00",
+      "period": "pre_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "tc_042",
+      "title": "国务院发布优化疫情防控二十条措施",
+      "content": "2022年11月11日，国务院联防联控机制发布进一步优化疫情防控的二十条措施，包括取消次密接判定、缩短隔离时间、取消中风险区判定等。市场将此解读为防控政策转向的重要信号，消费复苏预期大幅升温。",
+      "publish_time": "2022-11-11T18:00:00",
+      "period": "pre_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "exp_101",
+      "title": "海尔生物：奇君投资累计减持5%股份",
+      "content": "【海尔生物：奇君投资累计减持5%股份】《科创板日报》22日讯，海尔生物公告，公司于2021年9月22日收到公司股东奇君投资发来的《青岛海尔生物医疗股份有限公司简式权益变动报告书》，2020年2月28日-2021年9月22日，奇君投资累计减持1585.72万股，占总股本比例5.00%。",
+      "publish_time": "2021-09-22 18:28:49",
+      "period": "pre_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "exp_102",
+      "title": "国家发改委肖渭明：全面实施“人工智能+”行动 完善低空经济产业生态",
+      "content": "【国家发改委肖渭明：全面实施“人工智能+”行动 完善低空经济产业生态】财联社12月13日电，2025-2026中国经济年会12月13日召开，主题为“贯彻落实中央经济工作会议精神，以高质量发展为‘十五五’开好局”。国家发展改革委副秘书长肖渭明在会上表示，要加紧培育壮大新动能，制定一体推进教育科技人才发展的方案，强化企业为主导的产学研用协同攻关。实施新一轮重点产业链高质量发展行动，继续推进重点产业提质升级，强化产业基础再造和重大技术装备攻关，发展先进制造业集群，全面实施“人工智能+”行动，完善低空经济产业生态，实施新技术、新产品、新场景、大规模应用示范系统。",
+      "publish_time": "2025-12-13 14:11:33",
+      "period": "post_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "exp_103",
+      "title": "联翔股份：财务总监彭小红因个人原因辞职 聘任周红芳为新任财务总监",
+      "content": "【联翔股份：财务总监彭小红因个人原因辞职 聘任周红芳为新任财务总监】财联社6月23日电，联翔股份(603272.SH)公告称，公司财务总监彭小红因个人原因辞职，其辞职申请自送达董事会之日起生效。彭小红将继续担任公司董事、副总经理职务。经公司第三届董事会提名委员会第四次会议、第三届董事会审计委员会第十次会议审议通过，同意聘任周红芳为公司新任财务总监，任期自本次董事会审议通过之日起至第三届董事会任期届满之日止。",
+      "publish_time": "2025-06-23 16:22:41",
+      "period": "pre_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "exp_104",
+      "title": "市场主线：科技股方向全线爆发 算力硬件、芯片股双双领涨",
+      "content": "【市场主线：科技股方向全线爆发 算力硬件、芯片股双双领涨】今日早盘市场放量走强，创业板指与科创50双双领涨，其中算力硬件股再度集体爆发，工业富联2连板再创历史新高。此外半导体芯片同样走强，海光信息20CM涨停，寒武纪再度涨超10%，并开始向科技股内部全线扩散。不过需要注意的是，此前几日活跃的黄金股今日陷入调整。整体而言，市场仍处于良性轮动结构，但在增量资金仍相对有限的背景下，应对上寻找低吸机会或更为稳妥。",
+      "publish_time": "2025-09-11 12:26:12",
+      "period": "pre_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "exp_105",
+      "title": "9天6板利欧股份：在内容治理环节引入广告素材审核智能体 已具备多模态内容的AI应用能力",
+      "content": "【9天6板利欧股份：在内容治理环节引入广告素材审核智能体 已具备多模态内容的AI应用能力】财联社1月14日电，利欧股份(002131.SZ)接受机构调研时表示，在技术和流程层面，公司确保广告素材符合监管要求，并在必要时增加相应的明示或技术标识。公司在内容治理环节引入了广告素材审核智能体，对文本、图片、视频等广告素材进行统一审核与合规管理，以支持相关内容在实际业务中的安全、合规使用。公司在相关业务中已具备多模态内容的AI应用能力，形式不仅限于文字，也包括图片、图表及视频等。相关能力主要用于提升内容表达和信息呈现效果，目前正结合不同业务场景和客户需求，逐步推进多模态形式的应用。",
+      "publish_time": "2026-01-14 21:08:29",
+      "period": "post_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "exp_106",
+      "title": "四连板*ST建艺：控股股东豁免公司14亿元债务本金及889.67万元利息 并捐赠4亿元现金资产",
+      "content": "【四连板*ST建艺：控股股东豁免公司14亿元债务本金及889.67万元利息 并捐赠4亿元现金资产】财联社12月25日电，*ST建艺(002789.SZ)公告称，公司控股股东珠海正方集团豁免公司14亿元债务本金及889.67万元利息，并捐赠4亿元现金资产。该交易为公司单方面获得利益且不支付对价、不附任何义务的交易，无需提交股东会审议。上述债务豁免后，其对应的抵押资产将申请解除抵押，预计在2025年12月31日前完成。截至公告披露日，赠与现金已支付至建艺集团指定的银行账户。",
+      "publish_time": "2025-12-25 19:41:12",
+      "period": "post_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "exp_107",
+      "title": "14点快评：DeepSeek等AI应用方向持续退潮 短线情绪跌至冰点",
+      "content": "【14点快评：DeepSeek等AI应用方向持续退潮 短线情绪跌至冰点】市场午后震荡回落，创业板指领跌。成交量方面，午后第一个小时两市缩量57亿。板块方面，午后市场热点较为匮乏，大跌个股数量明显增多。短线方面，情绪跌至冰点，杭钢股份等多只高位的DeepSeek概念股跌停，高度板将降至6板。此外，炸板个股数量逐步增多，财联社盯盘数据显示，两市炸板率近40%。",
+      "publish_time": "2025-02-18 14:08:45",
+      "period": "pre_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "exp_108",
+      "title": "长安汽车：控股子公司深蓝汽车拟增资扩股 募资规模约61.22亿元",
+      "content": "【长安汽车：控股子公司深蓝汽车拟增资扩股 募资规模约61.22亿元】财联社12月12日电，长安汽车(000625.SZ)公告称，其控股子公司深蓝汽车拟以公开挂牌方式增资扩股，预计募资规模约61.22亿元，包括重庆产交所公开挂牌增资和非公开协议增资两部分。其中，长安汽车拟以非公开协议方式通过无形资产加自有资金合计增资不超过31.22亿元。本次交易构成关联交易，尚需获得股东会批准。增资扩股涉及公开挂牌方式，目前尚未完成，最终增资方、增资金额及股份比例等均存在不确定性。",
+      "publish_time": "2025-12-12 21:20:56",
+      "period": "post_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "exp_109",
+      "title": "元利科技：拟500万元设立全资子公司山东抱一科技有限公司",
+      "content": "【元利科技：拟500万元设立全资子公司山东抱一科技有限公司】财联社2月3日电，元利科技(603217.SH)公告称，公司以自有资金500万元对外投资设立山东抱一科技有限公司，现已取得营业执照。此次投资旨在布局并培育具有成长潜力的科技创新项目，符合公司战略规划及经营发展的需要。该投资使用自有资金，不会对公司财务状况及生产经营产生重大不利影响。同时，公司提醒存在受宏观经济、行业环境、市场变化等因素导致经营业绩不达预期的风险。",
+      "publish_time": "2026-02-03 16:11:50",
+      "period": "post_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "exp_110",
+      "title": "腾景科技：签订8760.60万元YVO4产品销售订单",
+      "content": "【腾景科技：签订8760.60万元YVO4产品销售订单】财联社10月22日电，腾景科技(688195.SH)公告称，公司控股子公司合肥众波收到某客户关于YVO4产品的单笔采购订单，总金额为8760.60万元（不含税）。该订单为公司日常经营性订单，无需提交公司董事会、股东会审议。若订单顺利实施，预计将会对公司经营业绩有积极影响。",
+      "publish_time": "2025-10-22 16:05:31",
+      "period": "post_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "exp_111",
+      "title": "芯片板块短期调整不改周期上行，持续关注科创芯片设计ETF易方达（589030）等产品布局机会",
+      "content": "【芯片板块短期调整不改周期上行，持续关注科创芯片设计ETF易方达（589030）等产品布局机会】\n截至收盘，中证半导体材料设备主题指数下跌1.0%，上证科创板芯片设计主题指数下跌1.2%，中证芯片产业指数下跌1.3%，上证科创板芯片指数下跌1.5%。\n中国银河证券认为，当前时点是存储芯片赛道下一轮周期的新起点，在AI服务器需求高速增长叠加国产替代，看好国内存储产业链相关上市公司的投资机遇。",
+      "publish_time": "2026-02-11 18:32:18",
+      "period": "post_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "exp_112",
+      "title": "倍轻松：IPO拟公开发行1541万股 6月30日初步询价",
+      "content": "【倍轻松：IPO拟公开发行1541万股 6月30日初步询价】《科创板日报》24日讯，倍轻松披露首次公开发行股票并在科创板上市发行安排及初步询价公告，本次公开发行股份全部为新股，拟发行股份数量为1,541万股，占发行后总股本的25.00%，本次发行后公司总股本为6,164万股。本次发行的初步询价时间为2021年6月30日(T-3日)的9:30-15:00。",
+      "publish_time": "2021-06-24 19:23:35",
+      "period": "pre_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "exp_113",
+      "title": "中国联通携手中兴通讯和联发科技完成时频双聚合商用验证",
+      "content": "【中国联通携手中兴通讯和联发科技完成时频双聚合商用验证】财联社8月13日讯，近日，中国联通集团研究院和辽宁分公司携手中兴通讯和MediaTek联发科技，在大连成功完成了时频双聚合方案（FAST）的商用验证，网络性能提升效果显著。 该方案深化“3.5GHz+2.1GHz”双频战略，是3GPP R16上行载波聚合特性的首次验证，对促进R16产业链的成熟有重要的推进作用。",
+      "publish_time": "2021-08-13 09:57:05",
+      "period": "pre_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "exp_114",
+      "title": "40余家上市公司净利翻番 AI成业绩增长强大驱动力",
+      "content": "【40余家上市公司净利翻番 AI成业绩增长强大驱动力】财联社1月20日电，A股上市公司2025年年报业绩预告正进入加速披露期。Wind数据显示，截至1月19日18时，A股共有451家上市公司对外披露2025年业绩预告，其中156家预喜。42家上市公司预计2025年全年归属于上市公司股东的净利润同比增幅下限超过100%。值得注意的是，AI正成为上市公司业绩增长的强大驱动力，黄金、铜等矿产上市公司在涨价带动下业绩水涨船高，创新赛道上市公司亦进入业绩收获期。",
+      "publish_time": "2026-01-20 06:39:39",
+      "period": "post_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "exp_115",
+      "title": "多种因素仍有望支撑牛市行情延续，持续关注A500ETF易方达（159361）等产品投资机会",
+      "content": "【多种因素仍有望支撑牛市行情延续，持续关注A500ETF易方达（159361）等产品投资机会】\n截至收盘，中证A500指数、中证A100指数均下跌0.5%，中证A50指数下跌0.4%。\n华西证券认为，展望后市，A股整体估值尚处合理区间，投资者风险偏好仍处于高位，宏观政策支持、中长期资金入市、企业盈利温和复苏等因素有望支撑牛市行情延续。随着1月下旬进入年报业绩预告密集披露期，资金或再次聚焦业绩主线，关注科技产业扩散、涨价主线及年报高增方向。",
+      "publish_time": "2026-01-20 18:49:25",
+      "period": "post_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "exp_116",
+      "title": "光刻胶板块逆势活跃 晶瑞电材20CM涨停",
+      "content": "【光刻胶板块逆势活跃 晶瑞电材20CM涨停】财联社10月16日电，光刻胶板块逆势活跃，晶瑞电材、国风新材涨停，怡达股份、容大感光、宝丽迪、百川股份等跟涨。消息面上，武汉太紫微光电科技有限公司推出的T150 A光刻胶产品，已通过半导体工艺量产验证，实现配方全自主设计在光刻工艺中表现出的极限分辨率达到120nm。",
+      "publish_time": "2024-10-16 09:36:01",
+      "period": "pre_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "exp_117",
+      "title": "红利板块震荡上行，恒生红利低波ETF易方达（159545）最新规模突破80亿元，创历史新高",
+      "content": "【红利板块震荡上行，恒生红利低波ETF易方达（159545）最新规模突破80亿元，创历史新高】\n截至收盘，恒生港股通高股息低波动指数上涨0.8%，中证红利指数上涨0.7%，中证红利低波动指数上涨0.5%，中证红利价值指数上涨0.4%，恒生红利低波ETF易方达（159545）今日净申购约2000万份。Wind数据显示，截至上周五，恒生红利低波ETF易方达（159545）最新规模已突破80亿元，创历史新高。\n据悉，易方达基金是目前唯一一家红利类ETF全部实行低费率的基金公司，旗下恒生红利低波ETF易方达（159545）、红利ETF易方达（515180）、红利低波ETF易方达（563020）、红利价值ETF易方达（563700）、A500红利低波ETF易方达（563510）等产品的管理费率均为0.15%/年，可助力投资者低成本布局高股息资产。",
+      "publish_time": "2026-02-09 19:24:42",
+      "period": "post_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "exp_118",
+      "title": "收评：创业板指大跌3.82% 全市场超4700只个股下跌",
+      "content": "【收评：创业板指大跌3.82% 全市场超4700只个股下跌】财联社2月28日电，今日是本月最后一个交易日，本月各大主要指数月线均收红，其中沪指本月累计涨超2%，科创50指数大涨12.95%，北证50指数大涨23.53%。今日盘面上，指数全天低开低走，创业指数领跌。市场热点较为匮乏，个股普跌，全市场超4700只个股下跌，近200股跌超9%。沪深两市全天成交额1.87万亿，较上个交易日缩量1376亿。从板块来看，油气股逆势走强，准油股份涨停。大消费股局部活跃，海南椰岛等涨停。下跌方面，两大主线机器人和算力集体大跌，中大力德等多股跌停。板块方面，油气、白酒等少数板块上涨，机器人、CPO、铜缆高速连接、通信设备等板块跌幅居前。截至收盘，沪指跌1.98%，深成指跌2.89%，创业板指跌3.82%。",
+      "publish_time": "2025-02-28 15:03:39",
+      "period": "pre_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "exp_119",
+      "title": "卫信康：利多卡因丁卡因乳膏药物临床试验获批准",
+      "content": "【卫信康：利多卡因丁卡因乳膏药物临床试验获批准】财联社12月3日电，卫信康(603676.SH)公告称，公司全资子公司西藏中卫诚康药业有限公司近日收到国家药监局核准签发的利多卡因丁卡因乳膏《药物临床试验批准通知书》，同意该药品开展用于成人皮肤手术前对完整皮肤的局部麻醉的临床试验。",
+      "publish_time": "2025-12-03 15:45:19",
+      "period": "post_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "exp_120",
+      "title": "上交所召开“科创板八条”专题座谈会 医药企业家建言并购重组具体措施尽快落地",
+      "content": "【上交所召开“科创板八条”专题座谈会 医药企业家建言并购重组具体措施尽快落地】财联社7月13日电，近日，上海证券交易所召开“科创板八条”生物医药专题培训及座谈会，多家科创板生物医药公司董事长、总经理等高管参会。本次培训聚焦“科创板八条”政策方向、行业内并购重组政策和特点等主题，旨在推动深化科创板改革各项政策措施落实到位，加快示范性案例落地见效。其中，三友医疗公司负责人建议，对收购控股子公司少数股权的交易审核流程是否可以更简化。美迪西相关负责人表示，希望股份对价分期支付的具体措施能尽快落地。此外，与会公司代表还提出将持续深入实施“提质增效重回报”行动，推动公司的高质量发展和投资价值提升。",
+      "publish_time": "2024-07-13 22:27:59",
+      "period": "pre_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "exp_121",
+      "title": "深科达：拟推264.74万股限制性股票激励计划",
+      "content": "【深科达：拟推264.74万股限制性股票激励计划】《科创板日报》24日讯，深科达公布2023年限制性股票激励计划，该激励计划首次授予的激励对象共计105人，限制性股票的授予价格(含预留授予)为12.50元/股。本次激励计划拟授予的限制性股票数量为264.74万股，约占公告时公司股本总额的3.27%。",
+      "publish_time": "2023-02-24 21:27:43",
+      "period": "pre_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "exp_122",
+      "title": "资本关注企业加码 冰雪经济持续升温",
+      "content": "【资本关注企业加码 冰雪经济持续升温】财联社12月2日电，首届“冰超”开启赛程、多地“冰雪假”陆续敲定、冰雪经济板块最高涨幅近30%……伴随各地入冬，2025年至2026年冰雪旺季也拉开了大幕，冰雪经济这一“冷”赛道正激发出产业企业发展的“热”活力。入冬以来，哈尔滨乾卯雪龙体育用品有限公司生产车间越来越忙碌。流水线上一副副滑雪固定器、一双双滑雪鞋在经过多道工序后整齐装箱，准备发往全国各地。“目前我们的订单量已明显超过往年同期，生产线正满负荷运转。”哈尔滨乾卯雪龙体育用品有限公司总经理李智博说，冰雪经济热潮促进行业发展，企业也得到前所未有的机遇，2025年上半年企业营收同比实现较快增长，产品已覆盖全国80%的滑雪场。",
+      "publish_time": "2025-12-02 07:33:54",
+      "period": "post_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "exp_123",
+      "title": "AI智能体概念股开盘活跃 南兴股份一字涨停",
+      "content": "【AI智能体概念股开盘活跃 南兴股份一字涨停】财联社7月18日电，南兴股份一字涨停，酷特智能、掌阅科技、立方控股、鼎捷数智、延华智能涨超5%，万兴科技、值得买、汉得信息、通达海等跟涨。消息面上，今天凌晨，OpenAI进行了技术直播发布了重磅产品ChatGPT Agent。ChatGPT Agent具备自主思考和行动的能力，能够主动从其技能库中选择合适的工具，包括Operator、 Deep Research和ChatGPT来完成各种超复杂任务。",
+      "publish_time": "2025-07-18 09:30:13",
+      "period": "pre_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "exp_124",
+      "title": "科创板超260份业绩预告出炉订单增长彰显发展潜力",
+      "content": "【科创板超260份业绩预告出炉订单增长彰显发展潜力】财联社1月30日电，随着上市公司2025年业绩预告进入密集披露期，多家科创板企业年度业绩“答卷”也提前揭晓。Wind数据显示，截至1月29日19时30分，超260家科创板公司公布2025年业绩预告，从披露情况来看，报喜公司（包括预增、扭亏、略增）数量达105家，占比约四成，还有超50家公司预计同比减亏。业内人士认为，科创板紧密连接国家科技创新战略，聚焦人工智能、生物医药等前沿领域，其制度创新吸引优质企业上市，并不断吸引“耐心资本”入场。目前随着上市公司年报业绩预告进入密集披露阶段，市场驱动逻辑正转向对业绩增长与盈利改善的验证层面。",
+      "publish_time": "2026-01-30 06:53:27",
+      "period": "post_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "exp_125",
+      "title": "工程机械板块异动拉升 建设机械涨停",
+      "content": "【工程机械板块异动拉升 建设机械涨停】财联社10月16日电，建设机械直线拉升涨停，浙矿股份、达刚控股、建科智能、南方路机等快速跟涨。上海证券研报指出，随着政策端持续发力，下游地产和基建开工有望回暖，叠加设备更新政策稳步推进，工程机械行业需求有望持续回暖。",
+      "publish_time": "2024-10-16 10:36:27",
+      "period": "pre_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "exp_126",
+      "title": "千方科技：非独立董事吴司韵辞职",
+      "content": "【千方科技：非独立董事吴司韵辞职】财联社2月12日电，千方科技(002373.SZ)公告称，公司非独立董事吴司韵因工作安排原因辞去职务，辞职后不再担任公司及控股子公司任何职务。吴司韵的辞职报告自送达董事会之日起生效。同时，公司于2026年2月12日召开职工代表大会，选举孙大勇为公司第六届董事会职工代表董事，任期自选举通过之日起至公司第六届董事会任期届满之日止。孙大勇的任职资格符合相关法律、法规及《公司章程》有关董事任职的资格和条件。",
+      "publish_time": "2026-02-12 20:10:09",
+      "period": "post_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "exp_127",
+      "title": "奥士康：调整回购股份价格上限至53.35元/股",
+      "content": "【奥士康：调整回购股份价格上限至53.35元/股】财联社8月12日电，奥士康(002913.SZ)公告称，公司将回购股份价格上限由39.40元/股调整为53.35元/股。该调整基于对公司未来发展的信心。除价格上限调整外，回购方案其他内容不变，价格上限调整自2025年8月13日起生效。",
+      "publish_time": "2025-08-12 18:51:45",
+      "period": "pre_cutoff",
+      "funnel": "existing_192"
+    },
+    {
+      "candidate_id": "exp_128",
+      "title": "爱玛科技：拟推706万股的2021年限制性股票激励计划",
+      "content": "【爱玛科技：拟推706万股的2021年限制性股票激励计划】财联社11月16日电，爱玛科技发布2021年限制性股票激励计划(草案)，拟向激励对象授予706万股公司限制性股票，涉及的标的股票种类为人民币A股普通股，约占草案公告时公司股本总额的1.75%。首次及预留限制性股票的授予价格为每股20.23元，即满足授予条件后，激励对象可以每股20.23元的价格购买公司限制性股票。",
+      "publish_time": "2021-11-16 18:03:18",
+      "period": "pre_cutoff",
+      "funnel": "existing_192"
+    }
+  ],
+  "system_prompt": "You are an expert Chinese-financial-news annotator. Annotate each item according to the embedded rubric. The rubric is the SINGLE SOURCE OF TRUTH; do not infer beyond what is explicitly defined.\n\n==== EMBEDDED RUBRIC (verbatim, do not modify) ====\n# Anchor Level Rubric\nrubric_version: 1.0\n\nUse this rubric to score how strongly a news text could let a model link the text to one specific real-world A-share event, assuming the event was seen in training. Judge only the text shown to the annotator, not metadata, URLs, tags, or outside knowledge. Apply the tree top-down and stop at the first `YES`.\n\n## Operational Definitions\n\n- `Named specific entity`: full company, institution, person, or full document title. A stock code alone does not count.\n- `Concrete event`: a filing/headline-level action or outcome such as `拟回购`, `签订合同`, `发布年报`, `被立案`, `收购某公司`. Generic statements such as `业绩下滑`, `景气回升`, or `市场看好` are not concrete.\n- `Time anchor`: a time cue inside the text tied to the event, including full dates, relative dates, report periods, or phrases such as `昨日晚间公告`, `本周`, `年报发布日`. Publish-date metadata does not count.\n- `Unique locator`: a cue that can nearly hard-match one record, such as a full exact date, a full `《...》` document title, an announcement ID, or a named institution + concrete event + exact amount/count so distinctive that full-text search would return one dominant event.\n\n## Decision Tree\n\n```text\nQ1. Does the text contain both a named specific entity and a unique locator?\nYES -> Level 3\nNO  -> Q2\n\nQ2. Does the text contain all three: one named specific entity, one concrete event, and one time anchor tied to that event?\nYES -> Level 2\nNO  -> Q3\n\nQ3. Does the text contain some event-bearing clue, but only at class level rather than instance level:\n    - generalized/masked entity, or named entity with only vague wording; and\n    - vague event/result, with no usable time anchor?\nYES -> Level 1\nNO  -> Q4\n\nQ4. After rejecting Q1-Q3, is the text still non-identifying: market roundup, ETF/fund marketing,\n    recurring template content, broad trend summary, or named entity mention without a concrete event?\nYES -> Level 0\nNO  -> Level 0\n```\n\n## Examples\n\n### Level 3\n\n1. Typical: `2024年4月12日，国务院发布《关于加强监管防范风险推动资本市场高质量发展的若干意见》，资本市场新“国九条”落地。`\n   Rationale: Full date plus full document title uniquely pins one policy release, so it is not merely a strong anchor.\n2. Edge: `《关于进一步减轻义务教育阶段学生作业负担和校外培训负担的意见》印发，教育股集体下挫。`\n   Rationale: Even without an explicit date, the full titled document is a unique searchable identifier, so it stays at Level 3.\n\n### Level 2\n\n1. Typical: `宁德时代昨日晚间公告，拟使用不超过50亿元回购股份。`\n   Rationale: It names the company, the event, and a time anchor, but lacks a unique locator such as a full date or announcement ID.\n2. Edge: `招商银行在年报发布日披露，拟发行二级资本债补充资本。`\n   Rationale: `年报发布日` is a valid time anchor tied to a concrete event, but it is not unique enough for Level 3.\n\n### Level 1\n\n1. Typical: `某头部券商业绩下滑，投行业务承压。`\n   Rationale: The entity and event are both generic classes, so the text suggests an event type but not one identifiable case.\n2. Edge: `隆基绿能业绩承压，光伏价格战拖累盈利。`\n   Rationale: A named company alone does not lift the case above Level 1 when the event wording is still vague and untimed.\n\n### Level 0\n\n1. Typical: `今日两市成交额放量，AI与半导体板块轮动走强。`\n   Rationale: This is a daily market roundup with no case-level anchor to one real-world event.\n2. Edge: `某ETF紧跟红利主线，低费率布局央国企高股息机会。`\n   Rationale: Marketing copy names an investment theme, not a discrete historical event, so it remains Level 0.\n\n## Prohibited Shortcuts\n\n- Do not use `publish_time`; only time cues written inside the text count.\n- Do not treat a stock code as Level 3; a code identifies an entity, not a unique event.\n- Do not treat numbers alone as anchors; percentages, price moves, and generic amounts do not identify one event by themselves.\n- Do not upgrade for an institution name alone; Level 2/3 requires institution + concrete event, and Level 2 also needs a time anchor.\n- Do not apply a bias such as \"prefer lower\" or \"prefer higher\"; follow the tree mechanically.\n\n==== END RUBRIC ====\n\nOutput a JSON array. Each element MUST have these keys:\n  candidate_id (string), anchor_level (int 0-3), anchor_cues (list[string]),\n  anchor_rationale (one short sentence in English),\n  key_entities (list[string]), key_numbers (list[string]),\n  expected_direction ('up'|'down'|'neutral'),\n  subcategory (string), target (string),\n  target_type ('company'|'sector'|'index'),\n  category ('macro'|'corporate'|'policy'|'industry'),\n  rubric_version ('1.0')\n\nApply the decision tree mechanically. Return ONLY the JSON array, no surrounding prose.",
+  "user_prompt": "Annotate the following candidates. Return a JSON array of length N=40.\n\n--- candidate_id: tc_031 ---\nperiod: pre_cutoff  funnel: existing_192  publish_time: 2021-06-23T16:00:00\ntitle: 国家医保局推进第五批药品集采，涉及61个品种\ncontent: 2021年6月23日，国家医保局组织开展第五批国家药品集中采购，共涉及61个品种。部分品种降价幅度超90%，创历史新高。集采常态化推进对医药行业盈利模式产生深远影响，仿制药企业利润空间被大幅压缩。\n\n--- candidate_id: tc_032 ---\nperiod: pre_cutoff  funnel: existing_192  publish_time: 2020-08-20T18:00:00\ntitle: 央行住建部约谈房企，\"三道红线\"融资新规出台\ncontent: 2020年8月20日，中国人民银行、住建部召开重点房地产企业座谈会，明确提出\"三道红线\"融资管理规则：剔除预收款后资产负债率不超70%、净负债率不超100%、现金短债比不低于1倍。不达标企业将被限制融资增速。\n\n--- candidate_id: tc_033 ---\nperiod: pre_cutoff  funnel: existing_192  publish_time: 2023-02-01T09:30:00\ntitle: ChatGPT用户破亿引爆全球AI热潮，A股AI概念全线涨停\ncontent: 2023年2月1日，OpenAI旗下ChatGPT月活用户突破1亿，成为史上增长最快的消费级应用。A股市场AI概念股全线爆发，昆仑万维、三六零、科大讯飞等多只个股涨停。算力、数据、应用三大方向全面受益。\n\n--- candidate_id: tc_034 ---\nperiod: pre_cutoff  funnel: existing_192  publish_time: 2023-08-15T10:00:00\ntitle: 光伏产业链价格全线崩塌，硅料价格较高点跌超70%\ncontent: 2023年8月15日，光伏产业链价格持续下跌。多晶硅料价格从2022年高点的30万元/吨跌至不足8万元/吨，跌幅超70%。组件价格跌破1元/W心理关口。行业产能严重过剩，企业开工率大幅下降。\n\n--- candidate_id: tc_035 ---\nperiod: pre_cutoff  funnel: existing_192  publish_time: 2023-07-10T14:00:00\ntitle: 白酒板块消费复苏不及预期，库存压力显现\ncontent: 2023年7月10日，多家白酒企业中报预告显示消费复苏力度不及预期。批价方面，五粮液批价跌破900元，国窖1573批价回落至800元附近。渠道库存偏高，经销商信心不足，白酒板块估值承压。\n\n--- candidate_id: tc_036 ---\nperiod: pre_cutoff  funnel: existing_192  publish_time: 2022-08-10T09:00:00\ntitle: 美国芯片法案签署，半导体国产替代加速推进\ncontent: 2022年8月10日，美国总统拜登正式签署《芯片与科学法案》，对中国半导体产业实施更严格的出口管制。A股半导体板块逆势走强，市场认为国产替代逻辑进一步强化，设备和材料环节最为受益。\n\n--- candidate_id: tc_037 ---\nperiod: pre_cutoff  funnel: existing_192  publish_time: 2021-03-15T10:00:00\ntitle: 十四五规划纲要发布，军工装备现代化目标明确\ncontent: 2021年3月15日，《中华人民共和国国民经济和社会发展第十四个五年规划和2035年远景目标纲要》正式发布，明确提出加快武器装备现代化，确保2027年实现建军百年奋斗目标。军工行业景气度有望持续上行。\n\n--- candidate_id: tc_038 ---\nperiod: pre_cutoff  funnel: existing_192  publish_time: 2023-09-01T15:00:00\ntitle: 碳酸锂期货价格跌破20万元/吨，较高点暴跌超65%\ncontent: 2023年9月1日，碳酸锂期货主力合约价格跌破20万元/吨，较2022年11月高点的近60万元/吨暴跌超65%。下游需求增速放缓叠加上游产能集中释放，锂电产业链面临严峻的去库存压力。\n\n--- candidate_id: tc_039 ---\nperiod: pre_cutoff  funnel: existing_192  publish_time: 2024-03-15T15:00:00\ntitle: 银行板块高股息策略持续受追捧，工商银行股价创历史新高\ncontent: 2024年3月15日，银行板块延续强势表现，工商银行A股股价创历史新高。在市场风险偏好下降的背景下，银行股凭借5%以上的股息率和低估值优势，成为险资和被动基金的重点配置方向。\n\n--- candidate_id: tc_040 ---\nperiod: pre_cutoff  funnel: existing_192  publish_time: 2020-01-15T22:00:00\ntitle: 中美签署第一阶段经贸协议，贸易摩擦暂时缓和\ncontent: 2020年1月15日，中美在华盛顿签署第一阶段经贸协议。但随后新冠疫情爆发，叠加美国对华为等企业加大制裁力度，中美关系再度紧张。2020年全年贸易摩擦反复升级，市场避险情绪上升。\n\n--- candidate_id: tc_041 ---\nperiod: pre_cutoff  funnel: existing_192  publish_time: 2022-06-16T02:00:00\ntitle: 美联储加息75个基点，创28年来最大单次加息幅度\ncontent: 2022年6月16日，美联储宣布加息75个基点，将联邦基金利率目标区间上调至1.50%-1.75%，为1994年以来最大单次加息幅度。美联储主席鲍威尔表示不排除7月继续加息75个基点的可能性。全球资本市场剧烈波动。\n\n--- candidate_id: tc_042 ---\nperiod: pre_cutoff  funnel: existing_192  publish_time: 2022-11-11T18:00:00\ntitle: 国务院发布优化疫情防控二十条措施\ncontent: 2022年11月11日，国务院联防联控机制发布进一步优化疫情防控的二十条措施，包括取消次密接判定、缩短隔离时间、取消中风险区判定等。市场将此解读为防控政策转向的重要信号，消费复苏预期大幅升温。\n\n--- candidate_id: exp_101 ---\nperiod: pre_cutoff  funnel: existing_192  publish_time: 2021-09-22 18:28:49\ntitle: 海尔生物：奇君投资累计减持5%股份\ncontent: 【海尔生物：奇君投资累计减持5%股份】《科创板日报》22日讯，海尔生物公告，公司于2021年9月22日收到公司股东奇君投资发来的《青岛海尔生物医疗股份有限公司简式权益变动报告书》，2020年2月28日-2021年9月22日，奇君投资累计减持1585.72万股，占总股本比例5.00%。\n\n--- candidate_id: exp_102 ---\nperiod: post_cutoff  funnel: existing_192  publish_time: 2025-12-13 14:11:33\ntitle: 国家发改委肖渭明：全面实施“人工智能+”行动 完善低空经济产业生态\ncontent: 【国家发改委肖渭明：全面实施“人工智能+”行动 完善低空经济产业生态】财联社12月13日电，2025-2026中国经济年会12月13日召开，主题为“贯彻落实中央经济工作会议精神，以高质量发展为‘十五五’开好局”。国家发展改革委副秘书长肖渭明在会上表示，要加紧培育壮大新动能，制定一体推进教育科技人才发展的方案，强化企业为主导的产学研用协同攻关。实施新一轮重点产业链高质量发展行动，继续推进重点产业提质升级，强化产业基础再造和重大技术装备攻关，发展先进制造业集群，全面实施“人工智能+”行动，完善低空经济产业生态，实施新技术、新产品、新场景、大规模应用示范系统。\n\n--- candidate_id: exp_103 ---\nperiod: pre_cutoff  funnel: existing_192  publish_time: 2025-06-23 16:22:41\ntitle: 联翔股份：财务总监彭小红因个人原因辞职 聘任周红芳为新任财务总监\ncontent: 【联翔股份：财务总监彭小红因个人原因辞职 聘任周红芳为新任财务总监】财联社6月23日电，联翔股份(603272.SH)公告称，公司财务总监彭小红因个人原因辞职，其辞职申请自送达董事会之日起生效。彭小红将继续担任公司董事、副总经理职务。经公司第三届董事会提名委员会第四次会议、第三届董事会审计委员会第十次会议审议通过，同意聘任周红芳为公司新任财务总监，任期自本次董事会审议通过之日起至第三届董事会任期届满之日止。\n\n--- candidate_id: exp_104 ---\nperiod: pre_cutoff  funnel: existing_192  publish_time: 2025-09-11 12:26:12\ntitle: 市场主线：科技股方向全线爆发 算力硬件、芯片股双双领涨\ncontent: 【市场主线：科技股方向全线爆发 算力硬件、芯片股双双领涨】今日早盘市场放量走强，创业板指与科创50双双领涨，其中算力硬件股再度集体爆发，工业富联2连板再创历史新高。此外半导体芯片同样走强，海光信息20CM涨停，寒武纪再度涨超10%，并开始向科技股内部全线扩散。不过需要注意的是，此前几日活跃的黄金股今日陷入调整。整体而言，市场仍处于良性轮动结构，但在增量资金仍相对有限的背景下，应对上寻找低吸机会或更为稳妥。\n\n--- candidate_id: exp_105 ---\nperiod: post_cutoff  funnel: existing_192  publish_time: 2026-01-14 21:08:29\ntitle: 9天6板利欧股份：在内容治理环节引入广告素材审核智能体 已具备多模态内容的AI应用能力\ncontent: 【9天6板利欧股份：在内容治理环节引入广告素材审核智能体 已具备多模态内容的AI应用能力】财联社1月14日电，利欧股份(002131.SZ)接受机构调研时表示，在技术和流程层面，公司确保广告素材符合监管要求，并在必要时增加相应的明示或技术标识。公司在内容治理环节引入了广告素材审核智能体，对文本、图片、视频等广告素材进行统一审核与合规管理，以支持相关内容在实际业务中的安全、合规使用。公司在相关业务中已具备多模态内容的AI应用能力，形式不仅限于文字，也包括图片、图表及视频等。相关能力主要用于提升内容表达和信息呈现效果，目前正结合不同业务场景和客户需求，逐步推进多模态形式的应用。\n\n--- candidate_id: exp_106 ---\nperiod: post_cutoff  funnel: existing_192  publish_time: 2025-12-25 19:41:12\ntitle: 四连板*ST建艺：控股股东豁免公司14亿元债务本金及889.67万元利息 并捐赠4亿元现金资产\ncontent: 【四连板*ST建艺：控股股东豁免公司14亿元债务本金及889.67万元利息 并捐赠4亿元现金资产】财联社12月25日电，*ST建艺(002789.SZ)公告称，公司控股股东珠海正方集团豁免公司14亿元债务本金及889.67万元利息，并捐赠4亿元现金资产。该交易为公司单方面获得利益且不支付对价、不附任何义务的交易，无需提交股东会审议。上述债务豁免后，其对应的抵押资产将申请解除抵押，预计在2025年12月31日前完成。截至公告披露日，赠与现金已支付至建艺集团指定的银行账户。\n\n--- candidate_id: exp_107 ---\nperiod: pre_cutoff  funnel: existing_192  publish_time: 2025-02-18 14:08:45\ntitle: 14点快评：DeepSeek等AI应用方向持续退潮 短线情绪跌至冰点\ncontent: 【14点快评：DeepSeek等AI应用方向持续退潮 短线情绪跌至冰点】市场午后震荡回落，创业板指领跌。成交量方面，午后第一个小时两市缩量57亿。板块方面，午后市场热点较为匮乏，大跌个股数量明显增多。短线方面，情绪跌至冰点，杭钢股份等多只高位的DeepSeek概念股跌停，高度板将降至6板。此外，炸板个股数量逐步增多，财联社盯盘数据显示，两市炸板率近40%。\n\n--- candidate_id: exp_108 ---\nperiod: post_cutoff  funnel: existing_192  publish_time: 2025-12-12 21:20:56\ntitle: 长安汽车：控股子公司深蓝汽车拟增资扩股 募资规模约61.22亿元\ncontent: 【长安汽车：控股子公司深蓝汽车拟增资扩股 募资规模约61.22亿元】财联社12月12日电，长安汽车(000625.SZ)公告称，其控股子公司深蓝汽车拟以公开挂牌方式增资扩股，预计募资规模约61.22亿元，包括重庆产交所公开挂牌增资和非公开协议增资两部分。其中，长安汽车拟以非公开协议方式通过无形资产加自有资金合计增资不超过31.22亿元。本次交易构成关联交易，尚需获得股东会批准。增资扩股涉及公开挂牌方式，目前尚未完成，最终增资方、增资金额及股份比例等均存在不确定性。\n\n--- candidate_id: exp_109 ---\nperiod: post_cutoff  funnel: existing_192  publish_time: 2026-02-03 16:11:50\ntitle: 元利科技：拟500万元设立全资子公司山东抱一科技有限公司\ncontent: 【元利科技：拟500万元设立全资子公司山东抱一科技有限公司】财联社2月3日电，元利科技(603217.SH)公告称，公司以自有资金500万元对外投资设立山东抱一科技有限公司，现已取得营业执照。此次投资旨在布局并培育具有成长潜力的科技创新项目，符合公司战略规划及经营发展的需要。该投资使用自有资金，不会对公司财务状况及生产经营产生重大不利影响。同时，公司提醒存在受宏观经济、行业环境、市场变化等因素导致经营业绩不达预期的风险。\n\n--- candidate_id: exp_110 ---\nperiod: post_cutoff  funnel: existing_192  publish_time: 2025-10-22 16:05:31\ntitle: 腾景科技：签订8760.60万元YVO4产品销售订单\ncontent: 【腾景科技：签订8760.60万元YVO4产品销售订单】财联社10月22日电，腾景科技(688195.SH)公告称，公司控股子公司合肥众波收到某客户关于YVO4产品的单笔采购订单，总金额为8760.60万元（不含税）。该订单为公司日常经营性订单，无需提交公司董事会、股东会审议。若订单顺利实施，预计将会对公司经营业绩有积极影响。\n\n--- candidate_id: exp_111 ---\nperiod: post_cutoff  funnel: existing_192  publish_time: 2026-02-11 18:32:18\ntitle: 芯片板块短期调整不改周期上行，持续关注科创芯片设计ETF易方达（589030）等产品布局机会\ncontent: 【芯片板块短期调整不改周期上行，持续关注科创芯片设计ETF易方达（589030）等产品布局机会】\n截至收盘，中证半导体材料设备主题指数下跌1.0%，上证科创板芯片设计主题指数下跌1.2%，中证芯片产业指数下跌1.3%，上证科创板芯片指数下跌1.5%。\n中国银河证券认为，当前时点是存储芯片赛道下一轮周期的新起点，在AI服务器需求高速增长叠加国产替代，看好国内存储产业链相关上市公司的投资机遇。\n\n--- candidate_id: exp_112 ---\nperiod: pre_cutoff  funnel: existing_192  publish_time: 2021-06-24 19:23:35\ntitle: 倍轻松：IPO拟公开发行1541万股 6月30日初步询价\ncontent: 【倍轻松：IPO拟公开发行1541万股 6月30日初步询价】《科创板日报》24日讯，倍轻松披露首次公开发行股票并在科创板上市发行安排及初步询价公告，本次公开发行股份全部为新股，拟发行股份数量为1,541万股，占发行后总股本的25.00%，本次发行后公司总股本为6,164万股。本次发行的初步询价时间为2021年6月30日(T-3日)的9:30-15:00。\n\n--- candidate_id: exp_113 ---\nperiod: pre_cutoff  funnel: existing_192  publish_time: 2021-08-13 09:57:05\ntitle: 中国联通携手中兴通讯和联发科技完成时频双聚合商用验证\ncontent: 【中国联通携手中兴通讯和联发科技完成时频双聚合商用验证】财联社8月13日讯，近日，中国联通集团研究院和辽宁分公司携手中兴通讯和MediaTek联发科技，在大连成功完成了时频双聚合方案（FAST）的商用验证，网络性能提升效果显著。 该方案深化“3.5GHz+2.1GHz”双频战略，是3GPP R16上行载波聚合特性的首次验证，对促进R16产业链的成熟有重要的推进作用。\n\n--- candidate_id: exp_114 ---\nperiod: post_cutoff  funnel: existing_192  publish_time: 2026-01-20 06:39:39\ntitle: 40余家上市公司净利翻番 AI成业绩增长强大驱动力\ncontent: 【40余家上市公司净利翻番 AI成业绩增长强大驱动力】财联社1月20日电，A股上市公司2025年年报业绩预告正进入加速披露期。Wind数据显示，截至1月19日18时，A股共有451家上市公司对外披露2025年业绩预告，其中156家预喜。42家上市公司预计2025年全年归属于上市公司股东的净利润同比增幅下限超过100%。值得注意的是，AI正成为上市公司业绩增长的强大驱动力，黄金、铜等矿产上市公司在涨价带动下业绩水涨船高，创新赛道上市公司亦进入业绩收获期。\n\n--- candidate_id: exp_115 ---\nperiod: post_cutoff  funnel: existing_192  publish_time: 2026-01-20 18:49:25\ntitle: 多种因素仍有望支撑牛市行情延续，持续关注A500ETF易方达（159361）等产品投资机会\ncontent: 【多种因素仍有望支撑牛市行情延续，持续关注A500ETF易方达（159361）等产品投资机会】\n截至收盘，中证A500指数、中证A100指数均下跌0.5%，中证A50指数下跌0.4%。\n华西证券认为，展望后市，A股整体估值尚处合理区间，投资者风险偏好仍处于高位，宏观政策支持、中长期资金入市、企业盈利温和复苏等因素有望支撑牛市行情延续。随着1月下旬进入年报业绩预告密集披露期，资金或再次聚焦业绩主线，关注科技产业扩散、涨价主线及年报高增方向。\n\n--- candidate_id: exp_116 ---\nperiod: pre_cutoff  funnel: existing_192  publish_time: 2024-10-16 09:36:01\ntitle: 光刻胶板块逆势活跃 晶瑞电材20CM涨停\ncontent: 【光刻胶板块逆势活跃 晶瑞电材20CM涨停】财联社10月16日电，光刻胶板块逆势活跃，晶瑞电材、国风新材涨停，怡达股份、容大感光、宝丽迪、百川股份等跟涨。消息面上，武汉太紫微光电科技有限公司推出的T150 A光刻胶产品，已通过半导体工艺量产验证，实现配方全自主设计在光刻工艺中表现出的极限分辨率达到120nm。\n\n--- candidate_id: exp_117 ---\nperiod: post_cutoff  funnel: existing_192  publish_time: 2026-02-09 19:24:42\ntitle: 红利板块震荡上行，恒生红利低波ETF易方达（159545）最新规模突破80亿元，创历史新高\ncontent: 【红利板块震荡上行，恒生红利低波ETF易方达（159545）最新规模突破80亿元，创历史新高】\n截至收盘，恒生港股通高股息低波动指数上涨0.8%，中证红利指数上涨0.7%，中证红利低波动指数上涨0.5%，中证红利价值指数上涨0.4%，恒生红利低波ETF易方达（159545）今日净申购约2000万份。Wind数据显示，截至上周五，恒生红利低波ETF易方达（159545）最新规模已突破80亿元，创历史新高。\n据悉，易方达基金是目前唯一一家红利类ETF全部实行低费率的基金公司，旗下恒生红利低波ETF易方达（159545）、红利ETF易方达（515180）、红利低波ETF易方达（563020）、红利价值ETF易方达（563700）、A500红利低波ETF易方达（563510）等产品的管理费率均为0.15%/年，可助力投资者低成本布局高股息资产。\n\n--- candidate_id: exp_118 ---\nperiod: pre_cutoff  funnel: existing_192  publish_time: 2025-02-28 15:03:39\ntitle: 收评：创业板指大跌3.82% 全市场超4700只个股下跌\ncontent: 【收评：创业板指大跌3.82% 全市场超4700只个股下跌】财联社2月28日电，今日是本月最后一个交易日，本月各大主要指数月线均收红，其中沪指本月累计涨超2%，科创50指数大涨12.95%，北证50指数大涨23.53%。今日盘面上，指数全天低开低走，创业指数领跌。市场热点较为匮乏，个股普跌，全市场超4700只个股下跌，近200股跌超9%。沪深两市全天成交额1.87万亿，较上个交易日缩量1376亿。从板块来看，油气股逆势走强，准油股份涨停。大消费股局部活跃，海南椰岛等涨停。下跌方面，两大主线机器人和算力集体大跌，中大力德等多股跌停。板块方面，油气、白酒等少数板块上涨，机器人、CPO、铜缆高速连接、通信设备等板块跌幅居前。截至收盘，沪指跌1.98%，深成指跌2.89%，创业板指跌3.82%。\n\n--- candidate_id: exp_119 ---\nperiod: post_cutoff  funnel: existing_192  publish_time: 2025-12-03 15:45:19\ntitle: 卫信康：利多卡因丁卡因乳膏药物临床试验获批准\ncontent: 【卫信康：利多卡因丁卡因乳膏药物临床试验获批准】财联社12月3日电，卫信康(603676.SH)公告称，公司全资子公司西藏中卫诚康药业有限公司近日收到国家药监局核准签发的利多卡因丁卡因乳膏《药物临床试验批准通知书》，同意该药品开展用于成人皮肤手术前对完整皮肤的局部麻醉的临床试验。\n\n--- candidate_id: exp_120 ---\nperiod: pre_cutoff  funnel: existing_192  publish_time: 2024-07-13 22:27:59\ntitle: 上交所召开“科创板八条”专题座谈会 医药企业家建言并购重组具体措施尽快落地\ncontent: 【上交所召开“科创板八条”专题座谈会 医药企业家建言并购重组具体措施尽快落地】财联社7月13日电，近日，上海证券交易所召开“科创板八条”生物医药专题培训及座谈会，多家科创板生物医药公司董事长、总经理等高管参会。本次培训聚焦“科创板八条”政策方向、行业内并购重组政策和特点等主题，旨在推动深化科创板改革各项政策措施落实到位，加快示范性案例落地见效。其中，三友医疗公司负责人建议，对收购控股子公司少数股权的交易审核流程是否可以更简化。美迪西相关负责人表示，希望股份对价分期支付的具体措施能尽快落地。此外，与会公司代表还提出将持续深入实施“提质增效重回报”行动，推动公司的高质量发展和投资价值提升。\n\n--- candidate_id: exp_121 ---\nperiod: pre_cutoff  funnel: existing_192  publish_time: 2023-02-24 21:27:43\ntitle: 深科达：拟推264.74万股限制性股票激励计划\ncontent: 【深科达：拟推264.74万股限制性股票激励计划】《科创板日报》24日讯，深科达公布2023年限制性股票激励计划，该激励计划首次授予的激励对象共计105人，限制性股票的授予价格(含预留授予)为12.50元/股。本次激励计划拟授予的限制性股票数量为264.74万股，约占公告时公司股本总额的3.27%。\n\n--- candidate_id: exp_122 ---\nperiod: post_cutoff  funnel: existing_192  publish_time: 2025-12-02 07:33:54\ntitle: 资本关注企业加码 冰雪经济持续升温\ncontent: 【资本关注企业加码 冰雪经济持续升温】财联社12月2日电，首届“冰超”开启赛程、多地“冰雪假”陆续敲定、冰雪经济板块最高涨幅近30%……伴随各地入冬，2025年至2026年冰雪旺季也拉开了大幕，冰雪经济这一“冷”赛道正激发出产业企业发展的“热”活力。入冬以来，哈尔滨乾卯雪龙体育用品有限公司生产车间越来越忙碌。流水线上一副副滑雪固定器、一双双滑雪鞋在经过多道工序后整齐装箱，准备发往全国各地。“目前我们的订单量已明显超过往年同期，生产线正满负荷运转。”哈尔滨乾卯雪龙体育用品有限公司总经理李智博说，冰雪经济热潮促进行业发展，企业也得到前所未有的机遇，2025年上半年企业营收同比实现较快增长，产品已覆盖全国80%的滑雪场。\n\n--- candidate_id: exp_123 ---\nperiod: pre_cutoff  funnel: existing_192  publish_time: 2025-07-18 09:30:13\ntitle: AI智能体概念股开盘活跃 南兴股份一字涨停\ncontent: 【AI智能体概念股开盘活跃 南兴股份一字涨停】财联社7月18日电，南兴股份一字涨停，酷特智能、掌阅科技、立方控股、鼎捷数智、延华智能涨超5%，万兴科技、值得买、汉得信息、通达海等跟涨。消息面上，今天凌晨，OpenAI进行了技术直播发布了重磅产品ChatGPT Agent。ChatGPT Agent具备自主思考和行动的能力，能够主动从其技能库中选择合适的工具，包括Operator、 Deep Research和ChatGPT来完成各种超复杂任务。\n\n--- candidate_id: exp_124 ---\nperiod: post_cutoff  funnel: existing_192  publish_time: 2026-01-30 06:53:27\ntitle: 科创板超260份业绩预告出炉订单增长彰显发展潜力\ncontent: 【科创板超260份业绩预告出炉订单增长彰显发展潜力】财联社1月30日电，随着上市公司2025年业绩预告进入密集披露期，多家科创板企业年度业绩“答卷”也提前揭晓。Wind数据显示，截至1月29日19时30分，超260家科创板公司公布2025年业绩预告，从披露情况来看，报喜公司（包括预增、扭亏、略增）数量达105家，占比约四成，还有超50家公司预计同比减亏。业内人士认为，科创板紧密连接国家科技创新战略，聚焦人工智能、生物医药等前沿领域，其制度创新吸引优质企业上市，并不断吸引“耐心资本”入场。目前随着上市公司年报业绩预告进入密集披露阶段，市场驱动逻辑正转向对业绩增长与盈利改善的验证层面。\n\n--- candidate_id: exp_125 ---\nperiod: pre_cutoff  funnel: existing_192  publish_time: 2024-10-16 10:36:27\ntitle: 工程机械板块异动拉升 建设机械涨停\ncontent: 【工程机械板块异动拉升 建设机械涨停】财联社10月16日电，建设机械直线拉升涨停，浙矿股份、达刚控股、建科智能、南方路机等快速跟涨。上海证券研报指出，随着政策端持续发力，下游地产和基建开工有望回暖，叠加设备更新政策稳步推进，工程机械行业需求有望持续回暖。\n\n--- candidate_id: exp_126 ---\nperiod: post_cutoff  funnel: existing_192  publish_time: 2026-02-12 20:10:09\ntitle: 千方科技：非独立董事吴司韵辞职\ncontent: 【千方科技：非独立董事吴司韵辞职】财联社2月12日电，千方科技(002373.SZ)公告称，公司非独立董事吴司韵因工作安排原因辞去职务，辞职后不再担任公司及控股子公司任何职务。吴司韵的辞职报告自送达董事会之日起生效。同时，公司于2026年2月12日召开职工代表大会，选举孙大勇为公司第六届董事会职工代表董事，任期自选举通过之日起至公司第六届董事会任期届满之日止。孙大勇的任职资格符合相关法律、法规及《公司章程》有关董事任职的资格和条件。\n\n--- candidate_id: exp_127 ---\nperiod: pre_cutoff  funnel: existing_192  publish_time: 2025-08-12 18:51:45\ntitle: 奥士康：调整回购股份价格上限至53.35元/股\ncontent: 【奥士康：调整回购股份价格上限至53.35元/股】财联社8月12日电，奥士康(002913.SZ)公告称，公司将回购股份价格上限由39.40元/股调整为53.35元/股。该调整基于对公司未来发展的信心。除价格上限调整外，回购方案其他内容不变，价格上限调整自2025年8月13日起生效。\n\n--- candidate_id: exp_128 ---\nperiod: pre_cutoff  funnel: existing_192  publish_time: 2021-11-16 18:03:18\ntitle: 爱玛科技：拟推706万股的2021年限制性股票激励计划\ncontent: 【爱玛科技：拟推706万股的2021年限制性股票激励计划】财联社11月16日电，爱玛科技发布2021年限制性股票激励计划(草案)，拟向激励对象授予706万股公司限制性股票，涉及的标的股票种类为人民币A股普通股，约占草案公告时公司股本总额的1.75%。首次及预留限制性股票的授予价格为每股20.23元，即满足授予条件后，激励对象可以每股20.23元的价格购买公司限制性股票。\n",
+  "built_at": "2026-04-09T03:40:23.469682",
+  "rubric_version": "1.0"
+}

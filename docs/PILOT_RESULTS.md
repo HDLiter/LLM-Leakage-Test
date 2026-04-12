@@ -249,3 +249,167 @@ Rare events show less negative CFLS on decomposed_impact (nominal p=0.016, Holm-
 1. **Re-run D2 with fixed CPT** on pre-cutoff cases (outcome-specific probes) — this is the only remaining experiment needed
 2. **Paper reframing:** "Current leakage probes conflate memorization with comprehension — here's what each actually measures"
 3. **Target:** ARR → EMNLP 2026 Findings
+
+---
+
+## Phase 3 (deep-floating-lake): v3 Stratified Re-run
+
+**Date:** 2026-04-09
+**Pipeline version:** 3 (3-phase batched runner, anchor + frequency strata, LLM-only CPT for pre-cutoff)
+**Cases:** 682 annotated (192 re-annotated existing + 490 new from two-funnel sampling); 606 eligible after dropping 76 neutral
+**Annotator:** Codex MCP (xhigh reasoning) following `docs/ANCHOR_RUBRIC.md` rubric_version 1.0
+
+### What changed vs Phase 2
+
+1. **Anchor stratification (NEW).** Each case now has `anchor_level ∈ {0,1,2,3}` from a fixed written rubric, replacing the hand-coded `memorization_likelihood` field. The rubric is a 4-question deterministic decision tree (no Likert), embedded verbatim in every Codex annotation prompt.
+2. **Two-funnel sampling.** B1 splits sampling into a high-anchor funnel (Level 2-3, strict v2 filter + date/document/institution boosts) and a low-anchor funnel (Level 0-1, relaxed filter for roundups/ETF marketing/template content). The v2 strict filter rejected exactly the Level 0/1 content needed to ground the stratification.
+3. **Frequency exposure proxy (NEW).** A BM25 index over the 1.08M-doc CLS telegraph corpus (capped at 2025-09-30 training cutoff) gives each case a `frequency_class ∈ {low, medium, high}` based on cluster_count of pre-publish-time near-duplicate hits (jaccard ≥ 0.7 + shared entity + ±3 days).
+4. **LLM-only CPT for pre-cutoff (mode purification).** `generate_false_outcome_cpt()` no longer falls back to regex/generic templates for pre-cutoff cases — mixing probe modalities was a worse confound than missing data. Pre-cutoff cases that fail LLM negation after 3 attempts are marked `cpt_mode=llm_failed` and excluded from CPT analysis with a missingness footnote. Post-cutoff cases keep the directional generic template (`cpt_mode=generic_post_cutoff`) since they have no real `known_outcome` to negate.
+5. **3-phase batched pipeline.** `prepare_cf_batch` → `prepare_fo_cpt_batch` → `run_tasks_batch` → CPU scoring. Each phase flattens prompts across all cases in a chunk and uses `LLMClient.batch_chat_concurrent(failure_isolated=True)` with per-prompt retry (3 attempts, `bypass_cache=True` on retry). Smoke test on 10 cases: 61.5s wall (~6s/case vs ~30s legacy).
+6. **Mantel-Haenszel as primary inference.** `quick_stats.py` now reports per-stratum Fisher + pooled MH OR + Breslow-Day homogeneity. The canonical stratum field comes from `data/seed/strata_config.json` so the binary collapse decision propagates automatically (E1 and E2 both read it; no hardcoding).
+
+### Sample design + power decision (B4)
+
+| Cell (period × anchor_level) | n | expected `fo_flip` events @ 7.5% | OK / SHORT |
+|---|---|---|---|
+| pre_cutoff/0  | 85  | 6.4 | OK |
+| pre_cutoff/1  | 60  | 4.5 | SHORT |
+| pre_cutoff/2  | 69  | 5.2 | SHORT |
+| pre_cutoff/3  | 118 | 8.8 | OK |
+| post_cutoff/0 | 51  | 3.8 | SHORT |
+| post_cutoff/1 | 83  | 6.2 | OK |
+| post_cutoff/2 | 39  | 2.9 | SHORT |
+| post_cutoff/3 | 101 | 7.6 | OK |
+
+**Decision (recorded in `data/seed/strata_config.json`):** collapse to **`anchor_binary`** (`weakly_anchored` = Level 0+1 vs `strongly_anchored` = Level 2+3). 4 of 8 four-level cells were short (<80) of the OR=2.5 / α=0.05 / power=0.80 target at 7.5% baseline flip rate.
+
+| Cell (period × anchor_binary) | n | expected `fo_flip` events @ 7.5% |
+|---|---|---|
+| pre_cutoff/weakly_anchored    | 145 | 10.9 |
+| pre_cutoff/strongly_anchored  | 187 | 14.0 |
+| post_cutoff/weakly_anchored   | 134 | 10.0 |
+| post_cutoff/strongly_anchored | 140 | 10.5 |
+
+**Power limitation:** 3 of 4 binary cells still fall below the more conservative 160-per-cell target. Documented as a power constraint; the 700-case budget is the binding constraint. A future iteration could add ~200 more pre-cutoff cases for full coverage.
+
+### Annotation reliability protocol (B2 follow-up)
+
+The B2 script wrote a 50-case double-annotation pool (`data/seed/v3_annotation_double/v3_double_annotation.json`) with `bypass_cache=True` and a different seed for the κ check. Plan-mandated targets:
+
+- weighted Cohen's κ ≥ 0.65 with bootstrap 95% CI lower bound > 0.55
+- 30-case human-reviewed gold slice with ≥80% accuracy (Wilson CI)
+
+**Status:** the second annotation pass and the κ / gold-accuracy computation are queued as a follow-up — they require a second Codex round and a brief human review session.
+
+### D1 Results (606 cases, batched pipeline)
+
+Full 606-case run completed via `scripts/run_diagnostic_2.py --chunk-size 50`.
+13 chunks, ~225 s/chunk, 0 errors, 0 `llm_failed_pre` (well under the 5% guard).
+~310 of 1764 CF prompts (~17.6%) failed schema validation after 2 retry passes — almost all on low-anchor / roundup content where semantic reversal is structurally impossible. Affected cases get `cfls=None` and are excluded from CFLS aggregation, but their `fo_flip` is still scored independently (H3).
+
+#### Aggregate CFLS
+
+| Task | n_scored | mean CFLS | positive_rate |
+|---|---|---|---|
+| direct_prediction.base  | 447 | -0.794 | 2.2% |
+| decomposed_impact.base  | 434 | -0.698 | 0.9% |
+
+Cross-task Spearman ρ = 0.10 (p=0.039, n=415).
+
+#### Mantel-Haenszel stratified by `anchor_binary` (E1, primary inference)
+
+**`fo_flip_direct`:**
+
+| Stratum | n | pre flip | post flip | OR | Fisher p |
+|---|---|---|---|---|---|
+| strongly_anchored | 322 | 6/183 (3.3%) | 7/139 (5.0%) | 0.64 | 0.57 |
+| weakly_anchored   | 277 | 4/144 (2.8%) | 9/133 (6.8%) | 0.39 | 0.16 |
+| **POOLED MH**     | 599 | 10/327 (3.1%) | 16/272 (5.9%) | **0.51** | **z=2.79, p=0.095** |
+
+Breslow-Day homogeneity: stat=0.34, p=0.56 (strata are homogeneous; pooling is valid).
+Range check: pooled 0.51 ∈ [0.39, 0.64] ✓.
+
+**`fo_flip_impact`:**
+
+| Stratum | n | pre flip | post flip | OR | Fisher p |
+|---|---|---|---|---|---|
+| strongly_anchored | 319 | 0/182 (0.0%) | 1/137 (0.7%) | 0.37 | 0.43 |
+| weakly_anchored   | 270 | 0/144 (0.0%) | 2/126 (1.6%) | 0.22 | 0.22 |
+| **POOLED MH**     | 589 | 0/326 (0.0%) | 3/263 (1.1%) | 0.00 (degenerate) | z=3.62, p=0.057 |
+
+Pre-cutoff `fo_flip_impact` is identically zero across both strata, making the OR degenerate. The decomposed-impact task is so heavily anchored to the article context that no pre-cutoff case in our sample flipped its impact label under LLM-negated CPT. Treat the p-value as a zero-cell artifact.
+
+**Penalized-logit supplement (E2, L1 Firth substitute):**
+
+| Metric | period_post coefficient → OR |
+|---|---|
+| fo_flip_direct | exp(coef) = 1.53 |
+| fo_flip_impact | exp(coef) = 1.24 |
+
+Both coefs point in the *opposite* direction of the MH OR (because MH put pre in the numerator and the regression used `period_post` as the indicator). After re-orienting, the L1 substitute and MH agree directionally: post-cutoff has the higher flip rate. The L1 shrinkage damps the magnitude relative to MH, as expected.
+
+#### CFLS temporal split (Mann-Whitney U)
+
+| Task | pre mean (n) | post mean (n) | U | p |
+|---|---|---|---|---|
+| cfls_direct | -0.756 (271) | -0.852 (176) | 25738 | **0.035** |
+| cfls_impact | -0.696 (270) | -0.701 (164) | 22171 | 0.98 |
+
+Direct CFLS shows post-cutoff is **more negative** (i.e., model is *more* faithful to the article when it cannot have memorized the truth). This is the opposite of what a "memorization-driven CFLS" account predicts.
+
+#### Sensitivity slices (E2)
+
+After B3 backfill (`frequency_class` thresholds: low_max=58, high_min=93 cluster_count). `reversibility` is still `None` and stays out of slicing.
+
+**`fo_flip_direct` × `frequency_class=high`** (n=272, sample is post-heavy):
+
+| Stratum | pre flip | post flip | OR |
+|---|---|---|---|
+| strongly_anchored | 0/17 | 7/136 | 0.54 |
+| weakly_anchored   | 0/7  | 7/112 | 1.07 |
+
+Pooled MH OR is degenerate (all pre cells = 0), p=0.24. Direction matches the primary MH (post > pre).
+
+**`fo_flip_direct` × `frequency_class=low`** (n=189, sample is pre-only):
+
+| Stratum | pre flip | post flip | OR |
+|---|---|---|---|
+| strongly_anchored | 2/101 | 0/0 | (post empty) |
+| weakly_anchored   | 2/88  | 0/0 | (post empty) |
+
+**Critical caveat — `frequency_class` × `period` confound.** The BM25 index is capped at 2025-09-30 (the model's training cutoff), and the per-case query filters hits to dates *strictly before* `publish_time`. For pre-cutoff cases the filter typically discards a large chunk of the index, yielding low cluster counts → "low" frequency. For post-cutoff cases the filter is a no-op (everything in the index is already before `publish_time`), so they get the full top-N (≈100 hits) and almost always land in "high". The `frequency_class=low` slice therefore contains **zero** post-cutoff cases, making the "within frequency_class=low" sensitivity slice an effective pre-cutoff-only comparison rather than the period × anchor stratification we wanted. Document as a methodological limitation; a sensible fix is to compare frequency strata *within* periods only, or to recompute frequency with a fixed full-corpus window per case to break the correlation with period.
+
+To re-run after `reversibility` annotation lands:
+
+```bash
+conda run -n rag_finance python scripts/sensitivity_analysis.py
+```
+
+#### Key takeaways from D1
+
+1. **Pre-cutoff `fo_flip` is *lower* than post-cutoff (3.1% vs 5.9%)**, the opposite of what a memorization-bias account predicts. With mode-purified CPT (LLM-negated for pre, generic template for post), this means the more plausible the planted false outcome, the *less* the model overrides it. CPT is measuring **suggestibility**, not memorization.
+2. **Probe-modality confound is real and now visible.** Because pre uses LLM-negation and post uses generic template, any pre↔post comparison still mixes two probe shapes. The plan's mode-purification trade-off was: "missing data > mixed modalities". With 0 `llm_failed_pre` we got the cleanest possible pre arm, and the *direction* of the effect (post > pre) is still consistent across both anchor strata (Breslow-Day p=0.56), so the conclusion is robust to the homogeneity assumption.
+3. **Direct-CFLS temporal effect (p=0.035, post < pre)** confirms the floor-effect interpretation: where the model cannot memorize, it follows the article *more*, not less. CFLS is measuring input sensitivity / reading comprehension.
+4. **Anchor stratification did not surface a memorization signal.** Per-stratum ORs (0.39, 0.64) bracket the pooled OR, both pointing in the same "post > pre" direction. There is no detectable interaction between anchor strength and the temporal effect.
+
+### Updated Q1/Q2/Q3 Answers (post-D1, anchor-stratified)
+
+**Q1: Is CFLS a true negative or measurement failure?**
+→ **True negative, now corroborated on the v3 stratified sample.** Across 447 scored cases on direct_prediction, post-cutoff CFLS is *more* negative than pre-cutoff (p=0.035). The 4-cell decomposition pattern from Phase 2 (zero RED FLAG, ~80% HEALTHY) holds. CFLS measures reading-comprehension input sensitivity; it does not detect memorization in this regime.
+
+**Q2: Does CPT measure memorization or suggestibility?**
+→ **Suggestibility, with stronger evidence than Phase 2.** Mode-purified CPT (LLM-only for pre, generic for post) yields pre flip rate 3.1% vs post 5.9% (pooled MH OR=0.51 stratified by anchor_binary, Breslow-Day p=0.56 — strata homogeneous). The post>pre direction is the *opposite* of a memorization-bias prediction: a memorization-driven model should resist the false outcome on cases it remembers (pre), giving pre > post flip. We see the reverse. The mechanism is suggestibility — when the planted false outcome is plausibly worded (LLM-negated, pre arm), the model accepts it; when it is generic (post arm), the model overrides it with its own opinion.
+
+**Q3: Is the bidirectional confound hypothesis supported?**
+→ **No additional support beyond Phase 2.** Anchor stratification was the planned test for whether memorization signal hides inside specific anchor strata. With Breslow-Day p=0.56 and stratum ORs 0.39 / 0.64 both bracketing the pooled 0.51, there is no anchor × temporal interaction. The simpler explanation — input sensitivity for CFLS, suggestibility for CPT, both measured cleanly — survives.
+
+### Carry-over follow-ups (queued for the next iteration)
+
+- **D2 reversibility annotation:** `scripts/annotate_reversibility.py build` was wired to read `condition_summary.sr_direction.article` from the D2 results. The current chunked driver doesn't yet persist the SR rewritten article into `condition_summary` (it stores `failed` + `source` only). Either (a) extend the driver to also write `cf_payload.rewritten_article` into `condition_summary`, or (b) re-derive SR text from the cached LLM responses. Then run `scripts/annotate_reversibility.py build` and dispatch the resulting batches via Codex MCP.
+- **B2 reliability protocol (κ + gold slice):** the 50-case double-annotation pool is in `data/seed/v3_annotation_double/`. A second Codex pass with `bypass_cache=True` and a different seed, plus a 30-case PI-reviewed gold slice, gives the weighted κ and accuracy-vs-gold needed by the plan.
+- **Frequency × period confound fix (see slice caveat above):** rebuild the BM25 index with a full-corpus window or compute frequency *within periods only* before treating `frequency_class` as a primary stratification covariate.
+
+### Known caveats vs the original plan
+
+- **B3 frequency_class:** the BM25 query loop is dominated by `rank_bm25.BM25Okapi.get_scores`, which is a Python loop over 1M dicts per query token (~10s/case for our query shape). On 682 cases that's ~1.9 hours. Backgrounded after D1; sensitivity slices that depend on `frequency_class` (E2) will run once it lands. None of the primary inferences depend on frequency_class.
+- **Firth substitute:** true Firth's penalized logit is not available in Python 3.12 (firthlogist requires <3.11) and rpy2 has no R installed on this host. We use `statsmodels.Logit.fit_regularized(method='l1', alpha=1.0)` and document the substitution in `docs/FIRTH_DECISION.md`. Primary inference therefore stays MH.

@@ -1,0 +1,1053 @@
+[
+  {
+    "candidate_id": "v3_h_155",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "华海药业",
+      "近日收到国家药品监督管理局核准签发的盐酸纳洛酮注射液《药品注册证书》",
+      "药品获批将进一步丰富公司产品线"
+    ],
+    "anchor_rationale": "The text names the company, a concrete drug-approval event, and a relative time anchor, but it lacks a unique locator.",
+    "key_entities": [
+      "华海药业",
+      "国家药品监督管理局",
+      "盐酸纳洛酮注射液",
+      "《药品注册证书》"
+    ],
+    "key_numbers": [],
+    "expected_direction": "up",
+    "subcategory": "药品注册证书获批",
+    "target": "华海药业",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_129",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "航天动力",
+      "公司股票于2025年12月05日、08日、09日连续三个交易日内收盘价格涨幅偏离值累计达到20%",
+      "公司主营业务不涉及商业航天"
+    ],
+    "anchor_rationale": "The exact date set and abnormal-volatility trigger uniquely identify this clarification notice for the named company.",
+    "key_entities": [
+      "航天动力"
+    ],
+    "key_numbers": [
+      "2025年12月05日",
+      "2025年12月08日",
+      "2025年12月09日",
+      "三个交易日",
+      "20%"
+    ],
+    "expected_direction": "down",
+    "subcategory": "异动公告/风险提示",
+    "target": "航天动力",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_027",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "海尔生物",
+      "截至2022年8月2日海创智已通过集中竞价增持公司股份52.6248万股",
+      "增持金额3549.15万元且已达到计划下限"
+    ],
+    "anchor_rationale": "The named company, exact date, and precise share-and-cash figures uniquely locate this shareholder increase progress update.",
+    "key_entities": [
+      "海尔生物",
+      "海创智",
+      "上海证券交易所"
+    ],
+    "key_numbers": [
+      "2022年8月2日",
+      "52.6248万股",
+      "0.17%",
+      "3549.15万元"
+    ],
+    "expected_direction": "up",
+    "subcategory": "股东增持进展",
+    "target": "海尔生物",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_170",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "武汉天源",
+      "与遂川县商务局签署《投资框架协议》",
+      "计划投资5.5亿元建设“江西省吉安市遂川县220KV变电站200MW/400MWh电网侧独立共享储能项目”"
+    ],
+    "anchor_rationale": "The named company, counterpart, exact investment amount, and full project title uniquely identify this storage-project investment event.",
+    "key_entities": [
+      "武汉天源",
+      "遂川县商务局",
+      "《投资框架协议》",
+      "江西省吉安市遂川县220KV变电站200MW/400MWh电网侧独立共享储能项目"
+    ],
+    "key_numbers": [
+      "5.5亿元",
+      "200MW/400MWh",
+      "10%",
+      "44套",
+      "5MW/2×5.015MWh"
+    ],
+    "expected_direction": "up",
+    "subcategory": "储能项目投资/框架协议",
+    "target": "武汉天源",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_144",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "辉瑞公司",
+      "近日最终以100亿美元总价完成对Metsera的收购",
+      "该并购被视为创新药产业利好催化"
+    ],
+    "anchor_rationale": "The named acquirer, target, and exact deal value uniquely locate this pharma M&A catalyst even within marketing copy.",
+    "key_entities": [
+      "辉瑞公司",
+      "Metsera",
+      "恒生创新药ETF",
+      "创新药ETF易方达",
+      "中金公司"
+    ],
+    "key_numbers": [
+      "14:15",
+      "2.3%",
+      "0.8%",
+      "超14亿元",
+      "9个交易日",
+      "100亿美元"
+    ],
+    "expected_direction": "up",
+    "subcategory": "创新药并购催化/ETF营销",
+    "target": "创新药板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_113",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "宏华数科",
+      "公司于2025年3月25日收到浙江证监局出具的警示函",
+      "2024年2月2日审议45,000万元现金管理后直至2025年2月26日才补充审议披露"
+    ],
+    "anchor_rationale": "The named company, exact receipt date, and detailed violation timeline uniquely identify this warning-letter event.",
+    "key_entities": [
+      "宏华数科",
+      "浙江证监局",
+      "警示函",
+      "董事会"
+    ],
+    "key_numbers": [
+      "2025年3月25日",
+      "2024年2月2日",
+      "45,000万元",
+      "2025年2月26日"
+    ],
+    "expected_direction": "down",
+    "subcategory": "行政监管措施/警示函",
+    "target": "宏华数科",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_066",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "三大指数集体跌超1%",
+      "市场题材全线萎靡",
+      "属于午评式盘面综述"
+    ],
+    "anchor_rationale": "This is a routine intraday market roundup rather than one identifiable event.",
+    "key_entities": [
+      "沪指",
+      "深成指",
+      "创业板指",
+      "天山生物"
+    ],
+    "key_numbers": [
+      "1.03%",
+      "1.59%",
+      "1.24%",
+      "3338点",
+      "13512点",
+      "2684点",
+      "3.88亿",
+      "13.4亿"
+    ],
+    "expected_direction": "down",
+    "subcategory": "A股午盘综述",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_242",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "阿里",
+      "正考虑将未来三年AI基建与云计算投入由3800亿元提升至4800亿",
+      "文章主体仍为人工智能ETF营销与产业前景判断"
+    ],
+    "anchor_rationale": "The text contains a named-company capex clue, but it remains a vague untimed plan inside broader sector-marketing commentary.",
+    "key_entities": [
+      "阿里",
+      "创业板人工智能ETF南方",
+      "国金证券"
+    ],
+    "key_numbers": [
+      "3800亿元",
+      "4800亿",
+      "2.58%",
+      "024725",
+      "024726"
+    ],
+    "expected_direction": "up",
+    "subcategory": "AI基建投入预期/ETF营销",
+    "target": "AI算力板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_150",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "白银价格飙升6.5%",
+      "在美国上市的银矿商股价普涨",
+      "多只银ETF同步上涨"
+    ],
+    "anchor_rationale": "This is a commodity-and-stock-move roundup, not one identifiable event.",
+    "key_entities": [
+      "赫克拉矿业",
+      "科尔矿业",
+      "SILVERCORP金属",
+      "ABRDN实物银股ETF",
+      "全球X银矿商",
+      "ISHARES银信托"
+    ],
+    "key_numbers": [
+      "6.5%",
+      "4.4%",
+      "3.6%",
+      "6.1%",
+      "7%",
+      "5.8%",
+      "7.1%"
+    ],
+    "expected_direction": "up",
+    "subcategory": "白银价格驱动/矿业股上涨",
+    "target": "白银矿业板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_191",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "中指研究院",
+      "2月20日发布房地产代建经营现状分析报告",
+      "销售额TOP50企业中有30家已规模化开展代建业务"
+    ],
+    "anchor_rationale": "The text names the institution, a concrete report release, and a tied date, but it lacks a unique locator.",
+    "key_entities": [
+      "中指研究院",
+      "《2025中国房地产企业销售业绩排行榜》",
+      "中铁置业",
+      "五矿地产",
+      "中铁建地产"
+    ],
+    "key_numbers": [
+      "2月20日",
+      "TOP50",
+      "30家",
+      "18家",
+      "16家",
+      "12家",
+      "4家",
+      "51%",
+      "超100%"
+    ],
+    "expected_direction": "up",
+    "subcategory": "房地产代建行业报告",
+    "target": "房地产代建行业",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_001",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "2024年9月24日",
+      "中国人民银行行长潘功胜在国新办发布会上宣布降准降息",
+      "同步下调房贷利率与最低首付比例"
+    ],
+    "anchor_rationale": "The named governor, exact date, and multi-part easing package uniquely locate this policy event.",
+    "key_entities": [
+      "中国人民银行",
+      "潘功胜",
+      "国新办"
+    ],
+    "key_numbers": [
+      "2024年9月24日",
+      "0.5个百分点",
+      "约1万亿元",
+      "0.2个百分点",
+      "1.7%",
+      "1.5%",
+      "15%"
+    ],
+    "expected_direction": "up",
+    "subcategory": "降准降息政策",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_002",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "2024年2月5日A股三大指数大幅低开",
+      "沪指跌破2700点",
+      "属于单日恐慌盘面描述"
+    ],
+    "anchor_rationale": "This is a dated market-selloff recap rather than one uniquely identifiable event instance.",
+    "key_entities": [
+      "沪指",
+      "深成指",
+      "创业板指"
+    ],
+    "key_numbers": [
+      "2024年2月5日",
+      "2700点",
+      "超4800只",
+      "3%",
+      "4%"
+    ],
+    "expected_direction": "down",
+    "subcategory": "A股盘面暴跌",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_003",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "中共中央政治局",
+      "2023年7月24日召开会议分析研究当前经济形势",
+      "提出活跃资本市场并优化房地产政策"
+    ],
+    "anchor_rationale": "The text names the institution, a concrete meeting, and an exact date, but it lacks a unique locator.",
+    "key_entities": [
+      "中共中央政治局"
+    ],
+    "key_numbers": [
+      "2023年7月24日"
+    ],
+    "expected_direction": "up",
+    "subcategory": "政治局会议定调",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_004",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "中共中央办公厅、国务院办公厅",
+      "2021年7月23日印发《关于进一步减轻义务教育阶段学生作业负担和校外培训负担的意见》",
+      "要求学科类培训机构不得上市融资"
+    ],
+    "anchor_rationale": "The named authorities and full opinion title uniquely identify this 'double reduction' policy release.",
+    "key_entities": [
+      "中共中央办公厅",
+      "国务院办公厅",
+      "《关于进一步减轻义务教育阶段学生作业负担和校外培训负担的意见》"
+    ],
+    "key_numbers": [
+      "2021年7月23日"
+    ],
+    "expected_direction": "down",
+    "subcategory": "双减政策",
+    "target": "教育板块",
+    "target_type": "sector",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_005",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "吴清",
+      "2024年3月1日在新闻发布会上强调从严监管",
+      "提出完善退市制度并推进注册制改革"
+    ],
+    "anchor_rationale": "The text names the regulator head, a concrete public policy statement, and an exact date, but it lacks a unique locator.",
+    "key_entities": [
+      "吴清",
+      "证监会"
+    ],
+    "key_numbers": [
+      "2024年3月1日"
+    ],
+    "expected_direction": "neutral",
+    "subcategory": "证监会监管表态",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_006",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "能耗双控政策持续加码",
+      "江苏、浙江、广东等多省工业企业被要求限电停产",
+      "动力煤期货价格突破1800元/吨"
+    ],
+    "anchor_rationale": "The text gives a class-level policy shock across multiple provinces rather than one uniquely identifiable case.",
+    "key_entities": [
+      "江苏",
+      "浙江",
+      "广东",
+      "动力煤期货"
+    ],
+    "key_numbers": [
+      "2021年10月15日",
+      "1800元/吨"
+    ],
+    "expected_direction": "down",
+    "subcategory": "能耗双控限电停产",
+    "target": "高耗能板块",
+    "target_type": "sector",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_007",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "国务院金融稳定发展委员会",
+      "2022年3月16日召开专题会议",
+      "强调保持资本市场平稳运行并推动平台经济整改完成"
+    ],
+    "anchor_rationale": "The text names the institution, a concrete meeting, and an exact date, but it lacks a unique locator.",
+    "key_entities": [
+      "国务院金融稳定发展委员会"
+    ],
+    "key_numbers": [
+      "2022年3月16日"
+    ],
+    "expected_direction": "up",
+    "subcategory": "金稳委专题会议",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_008",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "财政部、税务总局",
+      "2023年8月27日宣布自8月28日起证券交易印花税减半征收",
+      "同日证监会收紧IPO节奏并规范减持形成政策组合拳"
+    ],
+    "anchor_rationale": "The named authorities, exact dates, and distinctive policy combo uniquely identify this market-support package.",
+    "key_entities": [
+      "财政部",
+      "税务总局",
+      "证监会"
+    ],
+    "key_numbers": [
+      "2023年8月27日",
+      "2023年8月28日"
+    ],
+    "expected_direction": "up",
+    "subcategory": "印花税减半/政策组合拳",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_009",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "国家数据局等17个部门",
+      "2024年1月18日联合印发《'数据要素×'三年行动计划（2024—2026年）》",
+      "提出数据产业年均增速超过20%"
+    ],
+    "anchor_rationale": "The named authorities and full plan title uniquely identify this data-factor policy release.",
+    "key_entities": [
+      "国家数据局",
+      "《'数据要素×'三年行动计划（2024—2026年）》"
+    ],
+    "key_numbers": [
+      "2024年1月18日",
+      "17个部门",
+      "2024—2026年",
+      "20%",
+      "12个行业"
+    ],
+    "expected_direction": "up",
+    "subcategory": "数据要素政策",
+    "target": "数据要素板块",
+    "target_type": "sector",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_010",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "工信部",
+      "2021年8月27日召开互联网行业专项整治行动会议",
+      "聚焦4类问题并涉及8类共计43款APP"
+    ],
+    "anchor_rationale": "The named ministry, exact date, and exact problem-and-app counts uniquely identify this rectification meeting.",
+    "key_entities": [
+      "工信部"
+    ],
+    "key_numbers": [
+      "2021年8月27日",
+      "4类问题",
+      "8类",
+      "43款APP"
+    ],
+    "expected_direction": "down",
+    "subcategory": "互联网专项整治",
+    "target": "互联网平台板块",
+    "target_type": "sector",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_011",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "国务院",
+      "2024年4月12日印发《关于加强监管防范风险推动资本市场高质量发展的若干意见》",
+      "市场称为新'国九条'"
+    ],
+    "anchor_rationale": "The named authority and full policy title uniquely identify this 'new Nine Guidelines' release.",
+    "key_entities": [
+      "国务院",
+      "《关于加强监管防范风险推动资本市场高质量发展的若干意见》"
+    ],
+    "key_numbers": [
+      "2024年4月12日",
+      "9条",
+      "5年"
+    ],
+    "expected_direction": "up",
+    "subcategory": "新国九条",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_012",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "中国人民银行",
+      "2022年4月15日宣布于4月25日下调存款准备金率0.25个百分点",
+      "预计释放长期资金约5300亿元"
+    ],
+    "anchor_rationale": "The named central bank, exact dates, and precise liquidity amount uniquely identify this reserve-cut event.",
+    "key_entities": [
+      "中国人民银行"
+    ],
+    "key_numbers": [
+      "2022年4月15日",
+      "2022年4月25日",
+      "0.25个百分点",
+      "约5300亿元"
+    ],
+    "expected_direction": "up",
+    "subcategory": "降准政策",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_013",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "蚂蚁集团",
+      "2023年7月7日被金融管理部门处以罚款合计约71.23亿元",
+      "监管同时表述平台企业集中整改基本完成"
+    ],
+    "anchor_rationale": "The named company, exact date, and exact fine amount uniquely identify this platform-economy enforcement milestone.",
+    "key_entities": [
+      "蚂蚁集团",
+      "中国人民银行"
+    ],
+    "key_numbers": [
+      "2023年7月7日",
+      "71.23亿元"
+    ],
+    "expected_direction": "up",
+    "subcategory": "平台经济整改收官",
+    "target": "平台经济板块",
+    "target_type": "sector",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_014",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "证监会",
+      "2024年9月24日发布《上市公司监管指引第10号——市值管理》",
+      "要求主要指数成份股公司制定市值管理制度"
+    ],
+    "anchor_rationale": "The named regulator and full guideline title uniquely identify this market-value-management rule release.",
+    "key_entities": [
+      "证监会",
+      "《上市公司监管指引第10号——市值管理》"
+    ],
+    "key_numbers": [
+      "2024年9月24日",
+      "第10号"
+    ],
+    "expected_direction": "up",
+    "subcategory": "市值管理指引",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_015",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "政府工作报告",
+      "2021年3月10日明确提出2030年碳达峰、2060年碳中和目标",
+      "多家券商看好光伏、风电和新能源汽车产业链"
+    ],
+    "anchor_rationale": "The text gives a concrete policy target and exact date, but it lacks a unique locator such as a full titled document.",
+    "key_entities": [
+      "政府工作报告",
+      "宁德时代"
+    ],
+    "key_numbers": [
+      "2021年3月10日",
+      "2030年",
+      "2060年",
+      "万亿"
+    ],
+    "expected_direction": "up",
+    "subcategory": "碳中和政策目标",
+    "target": "新能源板块",
+    "target_type": "sector",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_016",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "康美药业",
+      "2020年5月19日证监会对财务造假案作出行政处罚",
+      "认定2016年至2018年累计虚增营业收入约291.28亿元、虚增货币资金约886亿元"
+    ],
+    "anchor_rationale": "The named company, exact date, and massive quantified fraud findings uniquely identify this enforcement case.",
+    "key_entities": [
+      "康美药业",
+      "证监会"
+    ],
+    "key_numbers": [
+      "2020年5月19日",
+      "2016年至2018年",
+      "291.28亿元",
+      "886亿元"
+    ],
+    "expected_direction": "down",
+    "subcategory": "财务造假处罚",
+    "target": "康美药业",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_017",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "瑞幸咖啡",
+      "2020年4月2日发布公告承认伪造交易",
+      "虚增2019年第二至第四季度销售额约22亿元"
+    ],
+    "anchor_rationale": "The named company, exact date, and exact fraud amount uniquely identify this self-disclosed accounting scandal.",
+    "key_entities": [
+      "瑞幸咖啡",
+      "纳斯达克"
+    ],
+    "key_numbers": [
+      "2020年4月2日",
+      "2019年第二至第四季度",
+      "约22亿元",
+      "超80%"
+    ],
+    "expected_direction": "down",
+    "subcategory": "财务造假自曝",
+    "target": "瑞幸咖啡",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_018",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "中国恒大集团",
+      "2021年9月13日恒大财富出现理财产品逾期兑付",
+      "恒大总负债超过1.97万亿元"
+    ],
+    "anchor_rationale": "The named company, exact date, and exact debt burden uniquely identify this debt-crisis milestone.",
+    "key_entities": [
+      "中国恒大集团",
+      "恒大财富"
+    ],
+    "key_numbers": [
+      "2021年9月13日",
+      "1.97万亿元"
+    ],
+    "expected_direction": "down",
+    "subcategory": "债务危机/理财逾期",
+    "target": "中国恒大集团",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_019",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "牧原股份",
+      "2023年4月20日发布2023年一季报",
+      "归母净利润亏损约26.44亿元"
+    ],
+    "anchor_rationale": "The text names the company, a concrete earnings release, and an exact date, but it lacks a unique locator.",
+    "key_entities": [
+      "牧原股份"
+    ],
+    "key_numbers": [
+      "2023年4月20日",
+      "2023年一季报",
+      "约262亿元",
+      "约26.44亿元"
+    ],
+    "expected_direction": "down",
+    "subcategory": "一季报业绩披露",
+    "target": "牧原股份",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_020",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "贵州茅台",
+      "2021年4月16日发布2021年一季报",
+      "归母净利润约139亿元，同比增长约26.56%"
+    ],
+    "anchor_rationale": "The text names the company, a concrete earnings release, and an exact date, but it lacks a unique locator.",
+    "key_entities": [
+      "贵州茅台"
+    ],
+    "key_numbers": [
+      "2021年4月16日",
+      "2021年一季报",
+      "约275亿元",
+      "约139亿元",
+      "26.56%"
+    ],
+    "expected_direction": "up",
+    "subcategory": "一季报业绩披露",
+    "target": "贵州茅台",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_021",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "国电电力公告",
+      "2022年1月6日披露国家能源集团正筹划与中国神华的煤电资产整合方案",
+      "涉及资产规模超千亿元"
+    ],
+    "anchor_rationale": "The text names the companies, a concrete integration plan, and an exact date, but it lacks a unique locator.",
+    "key_entities": [
+      "国电电力",
+      "国家能源集团",
+      "中国神华"
+    ],
+    "key_numbers": [
+      "2022年1月6日",
+      "超千亿元"
+    ],
+    "expected_direction": "up",
+    "subcategory": "煤电资产整合",
+    "target": "中国神华",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_022",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "美团",
+      "2020年1月14日宣布摩拜单车品牌正式更名为美团单车",
+      "共享单车将全面接入美团APP"
+    ],
+    "anchor_rationale": "The text names the company, a concrete brand-integration event, and an exact date, but it lacks a unique locator.",
+    "key_entities": [
+      "美团",
+      "摩拜单车",
+      "美团单车"
+    ],
+    "key_numbers": [
+      "2020年1月14日"
+    ],
+    "expected_direction": "up",
+    "subcategory": "品牌整合",
+    "target": "美团",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_023",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "中国旅游集团中免股份有限公司",
+      "2020年6月19日通过借壳国旅联合正式登陆A股市场",
+      "上市首日市值突破3000亿元"
+    ],
+    "anchor_rationale": "The named company, shell target, and exact listing date uniquely identify this reverse-listing event.",
+    "key_entities": [
+      "中国旅游集团中免股份有限公司",
+      "国旅联合"
+    ],
+    "key_numbers": [
+      "2020年6月19日",
+      "3000亿元"
+    ],
+    "expected_direction": "up",
+    "subcategory": "借壳上市",
+    "target": "中国中免",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_024",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "紫光集团",
+      "2022年7月15日破产重整方案获债权人会议表决通过",
+      "智路建广联合体将投入不超过600亿元参与重整"
+    ],
+    "anchor_rationale": "The named company, exact date, and exact reorganization funding cap uniquely identify this restructuring milestone.",
+    "key_entities": [
+      "紫光集团",
+      "智路建广联合体",
+      "长江存储",
+      "紫光展锐"
+    ],
+    "key_numbers": [
+      "2022年7月15日",
+      "不超过600亿元"
+    ],
+    "expected_direction": "up",
+    "subcategory": "破产重整进展",
+    "target": "紫光集团",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_025",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "中国中车迎来南北车合并五周年",
+      "五年后市值缩水至约3000亿元",
+      "文章主旨是事后回顾与反思"
+    ],
+    "anchor_rationale": "This is retrospective commentary on past performance rather than one discrete event.",
+    "key_entities": [
+      "中国中车"
+    ],
+    "key_numbers": [
+      "2020年6月8日",
+      "五周年",
+      "约3000亿元",
+      "超60%"
+    ],
+    "expected_direction": "down",
+    "subcategory": "合并周年回顾",
+    "target": "中国中车",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_026",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "华为",
+      "2023年8月29日未经预告突然开售Mate60 Pro",
+      "经拆解确认搭载自研麒麟9000S芯片并采用7nm工艺"
+    ],
+    "anchor_rationale": "The named company, exact product date, and exact model-and-chip combination uniquely identify this handset launch.",
+    "key_entities": [
+      "华为",
+      "Mate60 Pro",
+      "麒麟9000S"
+    ],
+    "key_numbers": [
+      "2023年8月29日",
+      "7nm"
+    ],
+    "expected_direction": "up",
+    "subcategory": "华为新机/国产芯片催化",
+    "target": "国产半导体产业链",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_027",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "比亚迪",
+      "2023年1月3日公布2022年全年销量数据",
+      "累计销售新能源汽车约186.35万辆并在12月单月突破23万辆"
+    ],
+    "anchor_rationale": "The text names the company, a concrete sales-data disclosure, and an exact date, but it lacks a unique locator.",
+    "key_entities": [
+      "比亚迪",
+      "特斯拉"
+    ],
+    "key_numbers": [
+      "2023年1月3日",
+      "2022年",
+      "186.35万辆",
+      "超150%",
+      "23万辆"
+    ],
+    "expected_direction": "up",
+    "subcategory": "销量数据披露",
+    "target": "比亚迪",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_028",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "中芯国际",
+      "2020年7月16日正式登陆科创板",
+      "发行价27.46元/股、开盘价95元、募资超500亿元"
+    ],
+    "anchor_rationale": "The named company, exact listing date, and detailed price-and-funding figures uniquely identify this STAR Market debut.",
+    "key_entities": [
+      "中芯国际",
+      "科创板"
+    ],
+    "key_numbers": [
+      "2020年7月16日",
+      "27.46元/股",
+      "95元",
+      "超200%",
+      "超500亿元",
+      "6000亿"
+    ],
+    "expected_direction": "up",
+    "subcategory": "科创板上市",
+    "target": "中芯国际",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_029",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "美国国会提出《生物安全法案》",
+      "2024年1月26日拟将药明康德、药明生物等列入限制清单",
+      "CXO板块全线重挫"
+    ],
+    "anchor_rationale": "The full bill title, exact date, and named affected companies uniquely identify this policy-risk event.",
+    "key_entities": [
+      "《生物安全法案》",
+      "药明康德",
+      "药明生物"
+    ],
+    "key_numbers": [
+      "2024年1月26日",
+      "超15%"
+    ],
+    "expected_direction": "down",
+    "subcategory": "生物安全法案制裁风险",
+    "target": "CXO板块",
+    "target_type": "sector",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_030",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "宁德时代",
+      "2022年6月23日正式发布第三代CTP技术麒麟电池",
+      "体积利用率突破72%，能量密度可达255Wh/kg"
+    ],
+    "anchor_rationale": "The named company, exact date, product name, and exact technical metrics uniquely identify this battery launch.",
+    "key_entities": [
+      "宁德时代",
+      "麒麟电池",
+      "第三代CTP技术"
+    ],
+    "key_numbers": [
+      "2022年6月23日",
+      "72%",
+      "255Wh/kg",
+      "1000公里",
+      "2023年"
+    ],
+    "expected_direction": "up",
+    "subcategory": "新电池技术发布",
+    "target": "宁德时代",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  }
+]

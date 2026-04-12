@@ -1,0 +1,1155 @@
+[
+  {
+    "candidate_id": "v3_h_008",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "刚果金战略矿产市场监管局(ARECOMS)",
+      "2025年6月21日起",
+      "将钴出口临时禁令再延长三个月"
+    ],
+    "anchor_rationale": "The named regulator, exact start date, and specific export-ban extension make this a near-unique policy event.",
+    "key_entities": [
+      "腾远钴业",
+      "寒锐钴业",
+      "华友钴业",
+      "刚果金",
+      "战略矿产市场监管局(ARECOMS)"
+    ],
+    "key_numbers": [
+      "2025年6月21日",
+      "三个月",
+      "15%",
+      "9%"
+    ],
+    "expected_direction": "up",
+    "subcategory": "海外资源出口管制",
+    "target": "钴板块",
+    "target_type": "sector",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_128",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "A股三大指数涨跌不一",
+      "今日大盘震荡",
+      "关注ETF布局机会"
+    ],
+    "anchor_rationale": "This is a daily market roundup and product-marketing blurb, not one identifiable event instance.",
+    "key_entities": [
+      "A500ETF易方达",
+      "沪深300ETF易方达",
+      "沪指",
+      "深成指",
+      "创业板指"
+    ],
+    "key_numbers": [
+      "-0.15%",
+      "0.6%",
+      "2.1%",
+      "1.0%",
+      "0.04%"
+    ],
+    "expected_direction": "neutral",
+    "subcategory": "市场行情综述",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_007",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "双创板块冲高回落",
+      "截至收盘",
+      "关注产品走势"
+    ],
+    "anchor_rationale": "This is routine board-index performance commentary without a discrete case-level event anchor.",
+    "key_entities": [
+      "创业板ETF",
+      "科创创业ETF",
+      "创业板指数",
+      "中证科创创业50指数",
+      "上证科创板50成份指数"
+    ],
+    "key_numbers": [
+      "0.3%",
+      "0.1%",
+      "-0.03%"
+    ],
+    "expected_direction": "neutral",
+    "subcategory": "双创板块走势/ETF营销",
+    "target": "双创板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_228",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "白银有色",
+      "甘肃省玉门市前红泉金矿详查探矿权",
+      "2026年1月20日竞拍结束",
+      "最终未竞得上述探矿权"
+    ],
+    "anchor_rationale": "The named company, exact mineral-right project, and dated auction result uniquely locate this event.",
+    "key_entities": [
+      "白银有色",
+      "甘肃省自然资源厅",
+      "甘肃省公共资源交易中心",
+      "甘肃省玉门市前红泉金矿详查探矿权"
+    ],
+    "key_numbers": [
+      "2026年1月20日"
+    ],
+    "expected_direction": "down",
+    "subcategory": "矿权竞拍结果",
+    "target": "白银有色",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_008",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "多只北证50成份指数基金密集宣布暂停大额申购",
+      "近期",
+      "北证50指数年内累计涨幅达到34.67%"
+    ],
+    "anchor_rationale": "This describes a class-level wave of fund purchase limits rather than one named identifiable event.",
+    "key_entities": [
+      "北证50成份指数基金",
+      "北证50指数",
+      "北交所"
+    ],
+    "key_numbers": [
+      "34.67%",
+      "3.54%",
+      "5月28日"
+    ],
+    "expected_direction": "up",
+    "subcategory": "北证50基金限购",
+    "target": "北证50指数",
+    "target_type": "index",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_190",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "半导体、新能源板块全线走强",
+      "今日早盘",
+      "科创板50ETF最新规模超700亿元"
+    ],
+    "anchor_rationale": "This is sector-performance and ETF-marketing commentary with weak event clues, not a discrete identifiable event.",
+    "key_entities": [
+      "佰维存储",
+      "天能股份",
+      "芯原股份",
+      "科创板50ETF"
+    ],
+    "key_numbers": [
+      "15%",
+      "7%",
+      "6%",
+      "2.2%",
+      "700亿元"
+    ],
+    "expected_direction": "up",
+    "subcategory": "科创板走势/ETF营销",
+    "target": "科创板50指数",
+    "target_type": "index",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_029",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "中小盘震荡",
+      "截至收盘",
+      "关注产品未来动向"
+    ],
+    "anchor_rationale": "This is plain index-performance coverage without a case-level event anchor.",
+    "key_entities": [
+      "中证1000指数ETF",
+      "创业板200ETF易方达",
+      "中证500指数",
+      "中证1000指数",
+      "创业板中盘200指数"
+    ],
+    "key_numbers": [
+      "0.5%",
+      "0.8%",
+      "-0.3%",
+      "1.1%"
+    ],
+    "expected_direction": "up",
+    "subcategory": "中小盘指数表现",
+    "target": "中证1000指数",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_129",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "AI应用板块集体爆发",
+      "软件ETF易方达连续5个交易日“吸金”",
+      "展望2026年，AI应用有望迎拐点机遇"
+    ],
+    "anchor_rationale": "This is thematic sector-and-ETF commentary with class-level catalysts rather than one concrete event instance.",
+    "key_entities": [
+      "软件ETF易方达",
+      "中信证券",
+      "科大讯飞",
+      "卫宁健康",
+      "三六零",
+      "用友网络"
+    ],
+    "key_numbers": [
+      "1月29日",
+      "10:16",
+      "3.6%",
+      "5个交易日",
+      "1.4亿元"
+    ],
+    "expected_direction": "up",
+    "subcategory": "AI应用ETF资金流入",
+    "target": "AI应用板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_187",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "*ST立方",
+      "1月20日至1月29日涨幅达188.06%",
+      "自1月30日开市起停牌核查",
+      "预计停牌时间不超过3个交易日"
+    ],
+    "anchor_rationale": "The named company, exact date range, precise price move, and dated trading halt make this a uniquely locatable event.",
+    "key_entities": [
+      "*ST立方",
+      "中国证券监督管理委员会安徽监管局",
+      "《行政处罚及市场禁入事先告知书》"
+    ],
+    "key_numbers": [
+      "1月20日至1月29日",
+      "188.06%",
+      "5个交易日",
+      "1月30日",
+      "3个交易日",
+      "2025年11月28日"
+    ],
+    "expected_direction": "down",
+    "subcategory": "停牌核查/异动公告",
+    "target": "*ST立方",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_233",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "宇树科技股份有限公司首次公开发行股票并上市辅导工作完成报告",
+      "宇树科技",
+      "IPO辅导完成"
+    ],
+    "anchor_rationale": "The named company and the exact report title act as a unique locator for this listing-preparation event.",
+    "key_entities": [
+      "宇树科技",
+      "中信证券",
+      "证监会"
+    ],
+    "key_numbers": [
+      "百分之五以上股份"
+    ],
+    "expected_direction": "up",
+    "subcategory": "IPO辅导完成",
+    "target": "宇树科技",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_168",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "Agent产业加速商业化",
+      "本周推出可基于用户本地PC的终端Agent",
+      "软件ETF易方达标的指数盘中反弹翻红"
+    ],
+    "anchor_rationale": "The text bundles several sector catalysts and product mentions, but it does not pin one single event instance.",
+    "key_entities": [
+      "Anthropic",
+      "Claude Cowork",
+      "MiniMax",
+      "阶跃星辰",
+      "豆包扣子",
+      "中信建投证券"
+    ],
+    "key_numbers": [
+      "1月27日",
+      "14:01",
+      "0.5%",
+      "去年3月",
+      "Agent 2.0"
+    ],
+    "expected_direction": "up",
+    "subcategory": "Agent产业催化/ETF营销",
+    "target": "AI应用板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_143",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "WSTS",
+      "上修2026年全球半导体销售额预测至9754亿美元",
+      "2026年/2025年"
+    ],
+    "anchor_rationale": "The text names the institution, a concrete forecast-revision event, and tied report periods, but it lacks a unique locator.",
+    "key_entities": [
+      "WSTS",
+      "芯片ETF易方达",
+      "半导体设备ETF易方达"
+    ],
+    "key_numbers": [
+      "9754亿美元",
+      "26.3%",
+      "7722亿美元",
+      "22.5%",
+      "2026年",
+      "2025年"
+    ],
+    "expected_direction": "up",
+    "subcategory": "行业机构上修预测",
+    "target": "半导体板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_229",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "红利板块本周延续震荡",
+      "红利低波动ETF本周前四个交易日连续获资金净流入",
+      "可助力投资者低成本布局高股息资产"
+    ],
+    "anchor_rationale": "This is recurring sector-and-ETF flow commentary rather than one concrete identifiable event.",
+    "key_entities": [
+      "红利ETF易方达",
+      "红利低波动ETF",
+      "易方达基金"
+    ],
+    "key_numbers": [
+      "0.6%",
+      "0.3%",
+      "-0.1%",
+      "-0.4%",
+      "1.8亿元",
+      "0.15%/年"
+    ],
+    "expected_direction": "up",
+    "subcategory": "红利ETF资金流向",
+    "target": "红利板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_159",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "中证A500相关ETF昨日获11.05亿元资金流入",
+      "A500ETF龙头以2.12亿元净流入额居首",
+      "成配置优选"
+    ],
+    "anchor_rationale": "This is broad ETF flow and product-positioning commentary rather than one identifiable event instance.",
+    "key_entities": [
+      "A500ETF龙头",
+      "中证A500指数",
+      "Wind",
+      "国泰海通证券"
+    ],
+    "key_numbers": [
+      "11.05亿元",
+      "2.12亿元",
+      "148亿元",
+      "16亿元",
+      "0.023%",
+      "5.2%"
+    ],
+    "expected_direction": "up",
+    "subcategory": "宽基ETF资金流入",
+    "target": "中证A500指数",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_028",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "6月26日工信部披露",
+      "到2025年将力争培育100万家创新型中小企业、10万家专精特新的中小企业、1万家专精特新“小巨人”企业",
+      "截至今年5月底"
+    ],
+    "anchor_rationale": "The named ministry, exact date, and highly specific target counts make this policy disclosure a near-unique event record.",
+    "key_entities": [
+      "工信部",
+      "专精特新“小巨人”企业",
+      "中证1000指数"
+    ],
+    "key_numbers": [
+      "6月26日",
+      "2025年",
+      "100万家",
+      "10万家",
+      "1万家",
+      "1400家",
+      "27%",
+      "56%"
+    ],
+    "expected_direction": "up",
+    "subcategory": "专精特新培育目标",
+    "target": "专精特新概念股",
+    "target_type": "sector",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_216",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "储能产业链盈利水平有望持续修复",
+      "工信部提出综合整治“内卷式”竞争",
+      "储能电池ETF全天净申购约2000万份"
+    ],
+    "anchor_rationale": "This is sector outlook and ETF-flow commentary with weak event clues rather than a single case-level event.",
+    "key_entities": [
+      "储能电池ETF",
+      "光大证券",
+      "工信部"
+    ],
+    "key_numbers": [
+      "1.5%",
+      "0.5%",
+      "0.2%",
+      "0.1%",
+      "2000万份",
+      "2026年"
+    ],
+    "expected_direction": "up",
+    "subcategory": "储能景气修复预期",
+    "target": "储能板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_079",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "中国证监会准予2只深港ETF互通产品注册",
+      "深港ETF互通产品",
+      "QDII模式"
+    ],
+    "anchor_rationale": "The text gives a concrete policy-market action, but without a usable in-text time anchor it does not reach case-level identification.",
+    "key_entities": [
+      "中国证监会",
+      "深港ETF互通产品",
+      "深圳证券交易所"
+    ],
+    "key_numbers": [
+      "2只",
+      "90%"
+    ],
+    "expected_direction": "up",
+    "subcategory": "ETF互通产品注册",
+    "target": "跨境ETF板块",
+    "target_type": "sector",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_153",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "恒生港股通高股息低波动指数周线“六连阳”",
+      "本周红利板块震荡分化",
+      "红利股仍然是险资权益配置中的重要方向"
+    ],
+    "anchor_rationale": "This is thematic dividend-style sector commentary and positioning logic rather than one identifiable event instance.",
+    "key_entities": [
+      "恒生红利低波ETF易方达",
+      "华泰证券",
+      "恒生港股通高股息低波动指数",
+      "中证红利指数"
+    ],
+    "key_numbers": [
+      "0.6%",
+      "-0.1%",
+      "-0.5%",
+      "-1.0%",
+      "1.0万亿",
+      "3.1万亿",
+      "0.9万亿"
+    ],
+    "expected_direction": "up",
+    "subcategory": "红利板块配置逻辑",
+    "target": "红利板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_117",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "第十四届全国人民代表大会第二次会议开幕",
+      "3月5日电",
+      "国务院总理李强作政府工作报告"
+    ],
+    "anchor_rationale": "The text names the meeting, the concrete report-delivery event, and a same-day time cue, but it lacks a unique locator.",
+    "key_entities": [
+      "第十四届全国人民代表大会第二次会议",
+      "李强",
+      "中金公司",
+      "彭文生",
+      "政府工作报告"
+    ],
+    "key_numbers": [
+      "3月5日",
+      "5%左右",
+      "2024年"
+    ],
+    "expected_direction": "up",
+    "subcategory": "政府工作报告解读",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_158",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "台积电昨日披露2026年资本支出",
+      "预计达520-560亿美元",
+      "昨日"
+    ],
+    "anchor_rationale": "The text names the company, a concrete capex disclosure, and a relative time anchor, but it lacks a unique locator.",
+    "key_entities": [
+      "台积电",
+      "半导体设备ETF易方达",
+      "中证半导体材料设备主题指数"
+    ],
+    "key_numbers": [
+      "1月16日",
+      "11:10",
+      "2.7%",
+      "3.5亿元",
+      "1.5亿份",
+      "13个交易日",
+      "520-560亿美元",
+      "2026年"
+    ],
+    "expected_direction": "up",
+    "subcategory": "海外资本开支催化",
+    "target": "半导体设备板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_017",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "国家能源局发布数据显示",
+      "截至6月底太阳能发电装机容量累计约7.1亿千瓦",
+      "1-6月新增太阳能发电装机10248万千瓦"
+    ],
+    "anchor_rationale": "The text names the institution, a concrete data-release event, and tied report periods, but it lacks a unique locator.",
+    "key_entities": [
+      "国家能源局",
+      "绿色电力ETF",
+      "新能源ETF易方达"
+    ],
+    "key_numbers": [
+      "6月底",
+      "7.1亿千瓦",
+      "51.6%",
+      "4.7亿千瓦",
+      "19.9%",
+      "1-6月",
+      "10248万千瓦",
+      "2584万千瓦"
+    ],
+    "expected_direction": "up",
+    "subcategory": "新能源装机数据发布",
+    "target": "绿色电力板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_033",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "中信证券数据显示",
+      "截至2021年6月末",
+      "个人投资者持仓占比首次超越机构"
+    ],
+    "anchor_rationale": "The text names the institution, a concrete statistics disclosure, and a tied period anchor, but it lacks a unique locator.",
+    "key_entities": [
+      "中信证券",
+      "股票型ETF",
+      "个人投资者",
+      "机构投资者"
+    ],
+    "key_numbers": [
+      "2021年6月末",
+      "51.48%",
+      "2009年末"
+    ],
+    "expected_direction": "neutral",
+    "subcategory": "ETF投资者结构数据",
+    "target": "A股ETF市场",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_116",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "宁波海运",
+      "2025年5月16日滚动市盈率为9.50",
+      "公司最新滚动市盈率为20,706.36",
+      "发布风险提示公告"
+    ],
+    "anchor_rationale": "The named company, dated peer metric, and highly specific valuation comparison make this risk notice nearly uniquely searchable.",
+    "key_entities": [
+      "宁波海运",
+      "中证指数网",
+      "水上运输业"
+    ],
+    "key_numbers": [
+      "5连板",
+      "2025年5月16日",
+      "9.50",
+      "20,706.36"
+    ],
+    "expected_direction": "down",
+    "subcategory": "风险提示公告",
+    "target": "宁波海运",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_022",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "权益类基金注册和成立节奏显著加快",
+      "股票ETF份额自9月以来持续增长",
+      "多家公募看好A股后市机遇"
+    ],
+    "anchor_rationale": "This is class-level fund-issuance and market-positioning commentary rather than one named identifiable event.",
+    "key_entities": [
+      "公募基金",
+      "股票ETF",
+      "A股市场"
+    ],
+    "key_numbers": [
+      "9月",
+      "四季度"
+    ],
+    "expected_direction": "up",
+    "subcategory": "权益基金发行提速",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_162",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "AI应用商业化加速",
+      "恒生科技ETF易方达月内净流入超20亿元",
+      "QuestMobile数据显示10月AI相关内容用户渗透率同比增长9.9个百分点"
+    ],
+    "anchor_rationale": "This is thematic technology-and-ETF commentary with supporting data points rather than one concrete event instance.",
+    "key_entities": [
+      "恒生科技ETF易方达",
+      "QuestMobile",
+      "中泰证券",
+      "美团",
+      "腾讯控股",
+      "阿里巴巴",
+      "中芯国际"
+    ],
+    "key_numbers": [
+      "10:45",
+      "0.1%",
+      "12月以来",
+      "80亿元",
+      "20亿元",
+      "10月",
+      "9.9个百分点",
+      "3000万"
+    ],
+    "expected_direction": "up",
+    "subcategory": "港股科技ETF资金流向",
+    "target": "恒生科技指数",
+    "target_type": "index",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_085",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "2月24日股市避雷针",
+      "多条风险事项并列",
+      "昨日A股拟减持规模较之前有所减少"
+    ],
+    "anchor_rationale": "This is a bundled risk bulletin covering many unrelated items rather than one identifiable event.",
+    "key_entities": [
+      "金沃股份",
+      "陇神戎发",
+      "良品铺子",
+      "华润微",
+      "奥联电子",
+      "越博动力",
+      "麦格纳"
+    ],
+    "key_numbers": [
+      "9.79%",
+      "7.11%",
+      "33%",
+      "6.7%"
+    ],
+    "expected_direction": "down",
+    "subcategory": "风险晨报",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_096",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "Airwallex宣布完成对UniCard的收购",
+      "已于2月23日获得香港金融管理局同意",
+      "收购"
+    ],
+    "anchor_rationale": "The text names the acquirer, the target, and a concrete acquisition event with a tied time cue, but it lacks a unique locator.",
+    "key_entities": [
+      "Airwallex",
+      "空中云汇",
+      "UniCard Solutions Limited",
+      "香港金融管理局",
+      "《支付系统及储值支付工具条例》"
+    ],
+    "key_numbers": [
+      "2月23日"
+    ],
+    "expected_direction": "up",
+    "subcategory": "收购完成",
+    "target": "Airwallex",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_168",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "新大洲A",
+      "收到税务局《责令限期改正通知书》",
+      "2017年1月至2025年8月期间",
+      "15个工作日内自查及整改"
+    ],
+    "anchor_rationale": "The named company, exact notice title, and specific tax period make this a uniquely locatable compliance event.",
+    "key_entities": [
+      "新大洲A",
+      "五九集团",
+      "国家税务总局牙克石市税务局第二税务分局",
+      "《责令限期改正通知书》"
+    ],
+    "key_numbers": [
+      "2017年1月至2025年8月",
+      "15个工作日"
+    ],
+    "expected_direction": "down",
+    "subcategory": "税务整改通知",
+    "target": "新大洲A",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_011",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "映翰通",
+      "2020年7月21日召开第三届董事会第六次会议",
+      "《关于对外投资设立境外全资子公司的议案》",
+      "投资金额100万加元"
+    ],
+    "anchor_rationale": "The named company, exact board date, proposal title, and amount uniquely identify this subsidiary-establishment event.",
+    "key_entities": [
+      "映翰通",
+      "映翰通北方公司",
+      "第三届董事会第六次会议",
+      "《关于对外投资设立境外全资子公司的议案》"
+    ],
+    "key_numbers": [
+      "2020年7月21日",
+      "100万加元"
+    ],
+    "expected_direction": "neutral",
+    "subcategory": "设立境外子公司",
+    "target": "映翰通",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_145",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "国盛金控",
+      "连续三个交易日内收盘价格涨幅偏离值累计达到20%",
+      "属于股票交易异常波动情形"
+    ],
+    "anchor_rationale": "The text names the company, an abnormal-volatility event, and a tied relative time window, but it lacks a unique locator.",
+    "key_entities": [
+      "国盛金控",
+      "深交所",
+      "董事会"
+    ],
+    "key_numbers": [
+      "三个交易日",
+      "20%"
+    ],
+    "expected_direction": "down",
+    "subcategory": "异动公告/风险提示",
+    "target": "国盛金控",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_148",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "财联社1月21日午间新闻精选",
+      "五条不同主题新闻并列",
+      "截至午间收盘"
+    ],
+    "anchor_rationale": "This is a midday digest of unrelated items rather than one discrete identifiable event.",
+    "key_entities": [
+      "工信部",
+      "张云明",
+      "广州市发改委",
+      "恒生科技指数",
+      "恒生指数"
+    ],
+    "key_numbers": [
+      "0.16%",
+      "0.76%",
+      "0.85%",
+      "0.15%",
+      "0.14%",
+      "3.5万吨",
+      "300项",
+      "10平方公里"
+    ],
+    "expected_direction": "neutral",
+    "subcategory": "午间新闻精选",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_217",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "老凤祥",
+      "拟2400万美元投资迈巴赫奢侈品亚太有限公司股权",
+      "认购2000股有投票权普通股，占20%",
+      "签署《品牌代理协议》"
+    ],
+    "anchor_rationale": "The named company, exact investment amount, share count, stake ratio, and agreement title make this a near-unique event record.",
+    "key_entities": [
+      "老凤祥",
+      "老凤祥香港有限公司",
+      "迈巴赫奢侈品亚太有限公司",
+      "上海老凤祥臻品商贸有限公司",
+      "《品牌代理协议》"
+    ],
+    "key_numbers": [
+      "2400万美元",
+      "2000股",
+      "20%"
+    ],
+    "expected_direction": "up",
+    "subcategory": "对外股权投资/品牌合作",
+    "target": "老凤祥",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_038",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "花旗维持对腾讯控股买入评级",
+      "下调目标价至468港元",
+      "腾讯二季度业绩喜忧参半"
+    ],
+    "anchor_rationale": "This is a named-company analyst note without a concrete event-time anchor, so it remains thesis-level.",
+    "key_entities": [
+      "花旗",
+      "腾讯控股"
+    ],
+    "key_numbers": [
+      "468港元",
+      "0.4%",
+      "1.2%",
+      "2.4%",
+      "6.1%",
+      "8%"
+    ],
+    "expected_direction": "up",
+    "subcategory": "券商评级/目标价调整",
+    "target": "腾讯控股",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_222",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "天际股份",
+      "控股股东汕头市天际有限公司质押3996.5万股",
+      "占其所持股份比例64.79%，占公司总股本比例7.97%",
+      "质押起始日为2025年11月10日，质押到期日为2028年11月9日"
+    ],
+    "anchor_rationale": "The named company, named shareholder, precise pledged shares, ratios, and dated pledge window uniquely identify this event.",
+    "key_entities": [
+      "天际股份",
+      "汕头市天际有限公司",
+      "信达证券股份有限公司"
+    ],
+    "key_numbers": [
+      "3996.5万股",
+      "64.79%",
+      "7.97%",
+      "2025年11月10日",
+      "2028年11月9日",
+      "12.30%",
+      "1475.11万股"
+    ],
+    "expected_direction": "down",
+    "subcategory": "控股股东股份质押",
+    "target": "天际股份",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_076",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "13只科创综指ETF发行第二日合计募集规模已超110亿元",
+      "建信科创综指ETF在昨日率先提前结募",
+      "多家公司有望提前结募"
+    ],
+    "anchor_rationale": "This is a class-level issuance wave for many ETFs rather than one single identifiable event.",
+    "key_entities": [
+      "建信科创综指ETF",
+      "易方达",
+      "工银",
+      "天弘",
+      "博时",
+      "鹏华"
+    ],
+    "key_numbers": [
+      "13只",
+      "110亿元",
+      "第二日",
+      "40%",
+      "5天",
+      "12天",
+      "200亿"
+    ],
+    "expected_direction": "up",
+    "subcategory": "科创综指ETF发行",
+    "target": "科创综指",
+    "target_type": "index",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_096",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "固态电池概念走强",
+      "截至收盘新能源电池相关指数普遍上涨",
+      "长期看好固态电池发展"
+    ],
+    "anchor_rationale": "This is sector-performance and long-term outlook commentary rather than a concrete identifiable event.",
+    "key_entities": [
+      "储能电池ETF",
+      "新能源ETF易方达",
+      "国泰海通证券",
+      "国证新能源电池指数"
+    ],
+    "key_numbers": [
+      "1.7%",
+      "1.1%",
+      "1.0%",
+      "0.2%"
+    ],
+    "expected_direction": "up",
+    "subcategory": "固态电池景气预期",
+    "target": "固态电池板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_160",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "港股通消费ETF易方达连续5个交易日获资金净申购",
+      "截至昨日累计超7亿元",
+      "消费板块震荡整理"
+    ],
+    "anchor_rationale": "This is recurring ETF-flow commentary around a sector theme rather than one concrete event instance.",
+    "key_entities": [
+      "港股通消费ETF易方达",
+      "中证港股通消费主题指数",
+      "中证消费50指数",
+      "Wind"
+    ],
+    "key_numbers": [
+      "-0.3%",
+      "-0.2%",
+      "5个交易日",
+      "7亿元"
+    ],
+    "expected_direction": "up",
+    "subcategory": "消费ETF资金流入",
+    "target": "港股消费板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_238",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "鲁银投资",
+      "控股股东山东发展计划增持公司股份",
+      "自本公告披露之日起6个月内",
+      "拟增持金额为4000万元-8000万元"
+    ],
+    "anchor_rationale": "The text names the company, a concrete share-increase plan, and a relative time anchor, but it lacks a unique locator.",
+    "key_entities": [
+      "鲁银投资",
+      "山东发展",
+      "上海证券交易所"
+    ],
+    "key_numbers": [
+      "6个月内",
+      "4000万元",
+      "8000万元"
+    ],
+    "expected_direction": "up",
+    "subcategory": "控股股东增持计划",
+    "target": "鲁银投资",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_115",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "深交所2025全球投资者大会",
+      "5月19日至20日在深圳举办",
+      "今明两天"
+    ],
+    "anchor_rationale": "The text names a specific conference, the concrete hosting event, and tied dates, but it lacks a unique locator.",
+    "key_entities": [
+      "深交所",
+      "2025全球投资者大会",
+      "罗文才",
+      "邢自强",
+      "伊恩·戈尔丁",
+      "郎子平",
+      "杰弗里·萨克斯"
+    ],
+    "key_numbers": [
+      "5月19日至20日",
+      "两天",
+      "2025"
+    ],
+    "expected_direction": "up",
+    "subcategory": "交易所投资者大会",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_036",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "双创板块冲高回落",
+      "截至收盘",
+      "产品受市场关注"
+    ],
+    "anchor_rationale": "This is routine board-index performance and ETF-marketing copy, not one identifiable event instance.",
+    "key_entities": [
+      "科创创业ETF",
+      "创业板ETF",
+      "上证科创板50成份指数",
+      "中证科创创业50指数",
+      "创业板指数"
+    ],
+    "key_numbers": [
+      "1.8%",
+      "0.8%",
+      "-0.2%"
+    ],
+    "expected_direction": "neutral",
+    "subcategory": "双创板块走势/ETF营销",
+    "target": "双创板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  }
+]

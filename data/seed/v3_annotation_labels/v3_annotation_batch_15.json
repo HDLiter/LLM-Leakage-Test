@@ -1,0 +1,1055 @@
+[
+  {
+    "candidate_id": "exp_182",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "郑晓曦在《南方半导体产业股票型发起式证券投资基金2025年第4季度报告》中集中阐述光刻机国产化",
+      "文中给出到2030年半导体设备国产化率由35%提升至60%的明确目标",
+      "光刻机国产化率优先提升至30%以上"
+    ],
+    "anchor_rationale": "The named fund report title and the highly specific localization targets uniquely identify this quarterly-report excerpt.",
+    "key_entities": [
+      "南方基金",
+      "郑晓曦",
+      "南方半导体产业股票型发起式证券投资基金",
+      "光刻机产业链"
+    ],
+    "key_numbers": [
+      "2025年第4季度",
+      "2030年",
+      "35%",
+      "60%",
+      "30%以上"
+    ],
+    "expected_direction": "up",
+    "subcategory": "基金季报观点/光刻机国产替代",
+    "target": "光刻机产业链",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_183",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "证监会同意北京铁科首钢轨道技术、西安瑞联新材料、成都苑东生物制药科创板IPO注册",
+      "近日",
+      "上述企业将陆续刊登招股文件"
+    ],
+    "anchor_rationale": "The text names the regulator and the three companies plus a concrete IPO-registration approval and a tied relative time anchor, but it lacks a unique locator.",
+    "key_entities": [
+      "证监会",
+      "北京铁科首钢轨道技术股份有限公司",
+      "西安瑞联新材料股份有限公司",
+      "成都苑东生物制药股份有限公司"
+    ],
+    "key_numbers": [
+      "3家"
+    ],
+    "expected_direction": "up",
+    "subcategory": "IPO注册获批",
+    "target": "北京铁科首钢轨道技术等3家企业",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_184",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "新锐股份",
+      "本次上市流通的网下配售限售股数量为112.7045万股",
+      "上市流通日期为2022年4月27日"
+    ],
+    "anchor_rationale": "The named company, exact unlock share count, and exact listing date uniquely identify this lockup-expiry event.",
+    "key_entities": [
+      "新锐股份"
+    ],
+    "key_numbers": [
+      "112.7045万股",
+      "2022年4月27日",
+      "6个月"
+    ],
+    "expected_direction": "down",
+    "subcategory": "限售股解禁",
+    "target": "新锐股份",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_185",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "创业板相关指数当日下跌",
+      "后半部分是华西证券的配置观点与ETF布局文案",
+      "属于指数表现与产品营销的组合内容"
+    ],
+    "anchor_rationale": "This is index-performance and ETF-marketing commentary rather than one identifiable event.",
+    "key_entities": [
+      "创业板中盘200指数",
+      "创业板指数",
+      "创业板成长指数",
+      "创业板ETF易方达"
+    ],
+    "key_numbers": [
+      "-0.5%",
+      "-0.7%",
+      "-0.9%",
+      "1月下旬"
+    ],
+    "expected_direction": "neutral",
+    "subcategory": "指数表现/ETF营销",
+    "target": "创业板指数",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_186",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "广东省集成电路行业协会",
+      "今日正式成立",
+      "在2020年第23届中国集成电路制造年会暨广东集成电路产业发展论坛开幕式上举行授牌仪式"
+    ],
+    "anchor_rationale": "The text names the association, a concrete establishment event, and a tied same-day time anchor, but it lacks a stronger unique locator.",
+    "key_entities": [
+      "广东省集成电路行业协会",
+      "罗小明",
+      "陈卫",
+      "广州粤芯半导体技术有限公司"
+    ],
+    "key_numbers": [
+      "2020年",
+      "第23届"
+    ],
+    "expected_direction": "up",
+    "subcategory": "行业协会成立",
+    "target": "半导体板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_187",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "宏达电子",
+      "参股公司江苏展芯创业板IPO申请获受理且该事项已于2025年12月18日披露",
+      "宏达电子间接持股13.79%"
+    ],
+    "anchor_rationale": "The named listed company, exact prior disclosure date, and precise shareholding detail uniquely identify this investee-IPO acceptance event.",
+    "key_entities": [
+      "宏达电子",
+      "江苏展芯半导体技术股份有限公司",
+      "深圳证券交易所"
+    ],
+    "key_numbers": [
+      "13.79%",
+      "2025年12月18日"
+    ],
+    "expected_direction": "neutral",
+    "subcategory": "参股公司IPO获受理",
+    "target": "宏达电子",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_188",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "天风证券",
+      "拟将向湖北宏泰集团借入的40亿元次级债务展期一年",
+      "年化利率由5%调整为4%"
+    ],
+    "anchor_rationale": "The named company, exact debt size, exact extension term, and exact rate reset uniquely identify this subordinated-debt rollover.",
+    "key_entities": [
+      "天风证券",
+      "湖北宏泰集团有限公司"
+    ],
+    "key_numbers": [
+      "40亿元",
+      "1年",
+      "5%",
+      "4%"
+    ],
+    "expected_direction": "up",
+    "subcategory": "次级债务展期",
+    "target": "天风证券",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_189",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "高盛投资研究部投资组合策略团队近期发表研究报告",
+      "持续建议高配中国A股和H股",
+      "继续看好互联网、汽车、半导体和耐用消费品板块"
+    ],
+    "anchor_rationale": "This is a named-house market strategy view with class-level clues but no concrete case-level time anchor or unique locator.",
+    "key_entities": [
+      "高盛",
+      "中国A股",
+      "中国H股"
+    ],
+    "key_numbers": [
+      "过去三个月"
+    ],
+    "expected_direction": "up",
+    "subcategory": "券商策略观点",
+    "target": "中国股市",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_190",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "多条新股申购、展会、指数调整、财报和宏观数据安排并列",
+      "属于每日资本市场大事提醒模板",
+      "无法锚定到单一事件"
+    ],
+    "anchor_rationale": "This is a recurring market calendar with multiple unrelated items rather than one identifiable event.",
+    "key_entities": [
+      "超颖电子",
+      "泰凯英",
+      "恒生指数公司",
+      "海光信息"
+    ],
+    "key_numbers": [
+      "2只",
+      "10月15日至17日",
+      "10月15日",
+      "9月"
+    ],
+    "expected_direction": "neutral",
+    "subcategory": "投资日历",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_191",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "按全年统计528只翻倍股、124只涨超2倍、6只涨超5倍",
+      "上纬新材和天普股份被概括为年内十倍股",
+      "属于年度牛股盘点而非单一事件"
+    ],
+    "anchor_rationale": "This is a year-end market statistics roundup rather than one identifiable event.",
+    "key_entities": [
+      "A股市场",
+      "上纬新材",
+      "天普股份"
+    ],
+    "key_numbers": [
+      "528只",
+      "124只",
+      "6只",
+      "2025年"
+    ],
+    "expected_direction": "up",
+    "subcategory": "年度牛股统计",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_192",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "数字经济概念股继续活跃",
+      "科创信息再度涨停3连板并带动多股冲高",
+      "属于盘中板块快评"
+    ],
+    "anchor_rationale": "This is routine intraday sector commentary rather than one identifiable event.",
+    "key_entities": [
+      "科创信息",
+      "英飞拓",
+      "国脉科技",
+      "数字经济概念股"
+    ],
+    "key_numbers": [
+      "3连板"
+    ],
+    "expected_direction": "up",
+    "subcategory": "数字经济板块盘中快评",
+    "target": "数字经济板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_193",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "今日市场放量普涨且创业板涨超4%",
+      "大金融与科技股被概括为盘面主线",
+      "属于市场复盘与风格判断"
+    ],
+    "anchor_rationale": "This is a broad market recap rather than one identifiable event.",
+    "key_entities": [
+      "创业板",
+      "东方财富",
+      "大金融",
+      "科技股"
+    ],
+    "key_numbers": [
+      "4%",
+      "10%"
+    ],
+    "expected_direction": "up",
+    "subcategory": "市场复盘",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_194",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "唯捷创芯",
+      "L-PAMiD产品已经实现量产出货且下半年将更大规模出货",
+      "公司预计下半年整体情况好于上半年"
+    ],
+    "anchor_rationale": "The text names the company, a concrete product-shipment event, and a tied half-year time anchor, but it lacks a unique locator.",
+    "key_entities": [
+      "唯捷创芯",
+      "L-PAMiD产品"
+    ],
+    "key_numbers": [
+      "第一季度",
+      "6月底",
+      "下半年"
+    ],
+    "expected_direction": "up",
+    "subcategory": "产品放量预期",
+    "target": "唯捷创芯",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_195",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "多条新股申购、发布会、指数发布、央行决议和宏观数据安排并列",
+      "属于每日资本市场大事提醒模板",
+      "无法锚定到单一事件"
+    ],
+    "anchor_rationale": "This is a recurring market calendar with multiple unrelated items rather than one identifiable event.",
+    "key_entities": [
+      "世盟股份",
+      "国新办",
+      "国证指数",
+      "日本央行"
+    ],
+    "key_numbers": [
+      "1月23日",
+      "867亿元",
+      "1只"
+    ],
+    "expected_direction": "neutral",
+    "subcategory": "投资日历",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_196",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "金安国纪",
+      "拟通过公开挂牌出售上海金板科技60%股权",
+      "交易完成后将不再持有该子公司股权并不再并表"
+    ],
+    "anchor_rationale": "The named company, named subsidiary, exact stake size, and explicit deconsolidation outcome uniquely identify this equity-sale plan.",
+    "key_entities": [
+      "金安国纪",
+      "上海金板科技",
+      "上海联合产权交易所"
+    ],
+    "key_numbers": [
+      "60%"
+    ],
+    "expected_direction": "neutral",
+    "subcategory": "股权出售",
+    "target": "金安国纪",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_197",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "怡达股份",
+      "控股子公司泰兴怡达将吸收合并全资子公司万淇生物科技",
+      "法人资格注销与业务资产承继已被说明"
+    ],
+    "anchor_rationale": "The text names the company and a concrete merger clue, but it provides no usable in-text time anchor or unique locator.",
+    "key_entities": [
+      "怡达股份",
+      "泰兴怡达化学有限公司",
+      "万淇生物科技（泰州）有限公司"
+    ],
+    "key_numbers": [],
+    "expected_direction": "up",
+    "subcategory": "吸收合并子公司",
+    "target": "怡达股份",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_198",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "A股百元股数量创历史新高的统计总结",
+      "横向比较2026年1月12日与2021年11月29日高点",
+      "属于市场结构盘点而非单一事件"
+    ],
+    "anchor_rationale": "This is a market statistics summary rather than one identifiable event.",
+    "key_entities": [
+      "A股市场",
+      "寒武纪-U",
+      "贵州茅台",
+      "北方华创"
+    ],
+    "key_numbers": [
+      "222只",
+      "2026年1月12日",
+      "219只",
+      "2021年11月29日",
+      "1400元",
+      "1376元"
+    ],
+    "expected_direction": "up",
+    "subcategory": "百元股数量创新高",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_199",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "顺博合金及相关责任人于2025年5月9日收到重庆证监局行政监管措施决定书",
+      "2024年关联交易累计金额1429.02万元未及时审议披露",
+      "2025年4月23日补充审议并于4月25日补充披露"
+    ],
+    "anchor_rationale": "The named company, exact receipt date, regulator document, and detailed violation timeline uniquely identify this sanction event.",
+    "key_entities": [
+      "顺博合金",
+      "重庆证监局",
+      "王真见",
+      "王增潮",
+      "李晓华"
+    ],
+    "key_numbers": [
+      "2025年5月9日",
+      "2024年",
+      "1429.02万元",
+      "2025年4月23日",
+      "2025年4月25日"
+    ],
+    "expected_direction": "down",
+    "subcategory": "行政监管措施/警示函",
+    "target": "顺博合金",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_200",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "今日早盘AI产业链题材股局部活跃",
+      "人工智能ETF半日成交额近8亿元",
+      "后半部分是东吴证券对AI产业趋势的延伸观点"
+    ],
+    "anchor_rationale": "This is recurring sector-and-ETF trading commentary with weak event clues rather than a discrete identifiable event.",
+    "key_entities": [
+      "人工智能ETF",
+      "中证人工智能主题指数",
+      "上证科创板人工智能指数",
+      "东吴证券"
+    ],
+    "key_numbers": [
+      "1.9%",
+      "-0.3%",
+      "8亿元"
+    ],
+    "expected_direction": "up",
+    "subcategory": "人工智能ETF成交活跃",
+    "target": "人工智能板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_201",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "12月31日上交所官网显示蓝箭航天科创板IPO获受理",
+      "蓝箭航天拟募集资金75亿元",
+      "募投项目为可重复使用火箭产能提升和技术提升项目"
+    ],
+    "anchor_rationale": "The exact date, named company, exact fundraising amount, and specific project names uniquely identify this commercial-space IPO filing event.",
+    "key_entities": [
+      "蓝箭航天",
+      "上交所",
+      "金风科技",
+      "商业航天概念股"
+    ],
+    "key_numbers": [
+      "12月31日",
+      "75亿元"
+    ],
+    "expected_direction": "up",
+    "subcategory": "商业火箭IPO获受理",
+    "target": "商业航天板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_202",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "趣睡科技",
+      "控股股东一致行动人及首发前员工持股平台完成减持计划",
+      "点名陈亚强、徐晓斌和宁波梅山保税港区趣同趣投资管理合伙企业"
+    ],
+    "anchor_rationale": "The text names the company and a concrete disposal-progress clue, but it lacks a usable in-text time anchor or unique locator.",
+    "key_entities": [
+      "趣睡科技",
+      "陈亚强",
+      "徐晓斌",
+      "宁波梅山保税港区趣同趣投资管理合伙企业（有限合伙）"
+    ],
+    "key_numbers": [],
+    "expected_direction": "down",
+    "subcategory": "股东减持进展",
+    "target": "趣睡科技",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_203",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "4月14日连板股分析覆盖全市场涨停与晋级率",
+      "103股涨停且连板股晋级率27.78%",
+      "属于涨停复盘与板块轮动总结"
+    ],
+    "anchor_rationale": "This is a broad trading recap rather than one identifiable event.",
+    "key_entities": [
+      "广宇集团",
+      "石英股份",
+      "海鸥住工",
+      "立讯精密",
+      "新赛股份"
+    ],
+    "key_numbers": [
+      "4月14日",
+      "103股",
+      "13只",
+      "5只",
+      "27.78%",
+      "超4500只"
+    ],
+    "expected_direction": "neutral",
+    "subcategory": "涨停复盘",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_204",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "*ST松发下属公司签订4艘VLCC超大型原油运输船建造合同",
+      "签约主体为恒力造船（大连）有限公司",
+      "合同金额合计约4至6亿美元"
+    ],
+    "anchor_rationale": "The named company group, exact vessel count, and exact contract value range uniquely identify this shipbuilding order.",
+    "key_entities": [
+      "*ST松发",
+      "恒力造船（大连）有限公司",
+      "欧洲知名船东"
+    ],
+    "key_numbers": [
+      "4艘",
+      "4-6亿美元"
+    ],
+    "expected_direction": "up",
+    "subcategory": "船舶建造合同",
+    "target": "*ST松发",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_205",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "德才股份近期接受机构调研",
+      "公司称将持续深化布局全建筑产业链",
+      "不排除通过收购兼并进行产业链延伸"
+    ],
+    "anchor_rationale": "The text names the company and a strategy statement, but it remains a vague business-layout view without a concrete case-level anchor.",
+    "key_entities": [
+      "德才股份",
+      "青岛虚拟现实研究院"
+    ],
+    "key_numbers": [],
+    "expected_direction": "up",
+    "subcategory": "机构调研/业务布局",
+    "target": "德才股份",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_206",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "奥赛康子公司江苏奥赛康药业于2025年10月18日在德国柏林召开的ESMO年会上公布ASKC202研究数据",
+      "ASKC202联合利厄替尼研究数据以壁报形式首次公布",
+      "点名EGFR-TKI治疗失败伴MET扩增/过表达的非小细胞肺癌适应症"
+    ],
+    "anchor_rationale": "The exact date, named conference, named drug, and detailed study setting uniquely identify this clinical-data presentation.",
+    "key_entities": [
+      "奥赛康",
+      "江苏奥赛康药业",
+      "欧洲肿瘤内科学会（ESMO）",
+      "ASKC202",
+      "利厄替尼"
+    ],
+    "key_numbers": [
+      "2025年10月18日"
+    ],
+    "expected_direction": "up",
+    "subcategory": "年会公布临床数据",
+    "target": "奥赛康",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_207",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "围绕春节后首周资金面进行前瞻分析",
+      "公开市场逆回购和MLF到期规模被汇总说明",
+      "属于宏观流动性展望而非单一事件"
+    ],
+    "anchor_rationale": "This is a recurring macro liquidity outlook rather than one identifiable event.",
+    "key_entities": [
+      "公开市场",
+      "财通证券",
+      "天风证券",
+      "MLF"
+    ],
+    "key_numbers": [
+      "2/24-2/28",
+      "22000亿元",
+      "8524亿元",
+      "14000亿元",
+      "3000亿元"
+    ],
+    "expected_direction": "down",
+    "subcategory": "资金面前瞻",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_208",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "阿里通义宣布开源Fun-CosyVoice3-0.5B",
+      "同时推出Fun-ASR-Nano轻量化版本",
+      "强调支持本地部署和定制化微调"
+    ],
+    "anchor_rationale": "The text names the company and a concrete model-release clue, but it lacks a usable in-text time anchor or unique locator.",
+    "key_entities": [
+      "阿里通义",
+      "Fun-CosyVoice3-0.5B",
+      "Fun-ASR-Nano"
+    ],
+    "key_numbers": [
+      "0.5B",
+      "3秒",
+      "0.8B"
+    ],
+    "expected_direction": "up",
+    "subcategory": "大模型发布",
+    "target": "人工智能板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_209",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "恒瑞医药子公司成都盛迪医药的HRS-5965胶囊被纳入拟突破性治疗品种公示名单",
+      "公示期7日",
+      "截至目前累计研发投入约1.42亿元"
+    ],
+    "anchor_rationale": "The text names the company and a concrete drug-designation clue, but it lacks a usable in-text time anchor or unique locator.",
+    "key_entities": [
+      "恒瑞医药",
+      "成都盛迪医药",
+      "国家药品监督管理局药品审评中心",
+      "HRS-5965胶囊"
+    ],
+    "key_numbers": [
+      "7日",
+      "1类",
+      "1.42亿元"
+    ],
+    "expected_direction": "up",
+    "subcategory": "拟突破性治疗品种公示名单",
+    "target": "恒瑞医药",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_210",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "对上市公司中期分红总体情况进行统计总结",
+      "截至11月11日已有1083家公司宣布中期分红",
+      "属于市场风格与制度趋势综述"
+    ],
+    "anchor_rationale": "This is a broad dividend-trend summary rather than one identifiable event.",
+    "key_entities": [
+      "上市公司",
+      "Wind"
+    ],
+    "key_numbers": [
+      "截至11月11日",
+      "1083家",
+      "7661.69亿元",
+      "超300家"
+    ],
+    "expected_direction": "up",
+    "subcategory": "中期分红统计",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_211",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "合富中国自2025年10月28日至2025年11月13日十三个交易日中有十二个交易日涨停",
+      "期间累计涨幅达230.84%",
+      "公司称如股价进一步异常上涨可能申请停牌核查"
+    ],
+    "anchor_rationale": "The named company, exact trading-date range, precise cumulative surge, and halt-check warning uniquely identify this abnormal-move notice.",
+    "key_entities": [
+      "合富中国"
+    ],
+    "key_numbers": [
+      "2025年10月28日至2025年11月13日",
+      "13个交易日",
+      "12个交易日",
+      "230.84%",
+      "22.10元/股"
+    ],
+    "expected_direction": "down",
+    "subcategory": "停牌核查/异动公告",
+    "target": "合富中国",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_212",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "对已披露三季报公司的盈利增长情况做统计总结",
+      "360家公司已披露且254家前三季度净利润同比增长或扭亏",
+      "属于财报季整体盘点而非单一事件"
+    ],
+    "anchor_rationale": "This is a broad earnings-season statistics summary rather than one identifiable event.",
+    "key_entities": [
+      "A股上市公司",
+      "电子行业"
+    ],
+    "key_numbers": [
+      "360家",
+      "254家",
+      "七成以上",
+      "32家"
+    ],
+    "expected_direction": "up",
+    "subcategory": "三季报统计",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_213",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "*ST文投",
+      "已向上海证券交易所申请撤销股票交易退市风险警示及其他风险警示",
+      "公司2024年度期末净资产为正且审计报告不再包含持续经营重大不确定性段"
+    ],
+    "anchor_rationale": "The text names the company, a concrete risk-warning-removal application, and a tied annual-report period anchor, but it lacks a unique locator.",
+    "key_entities": [
+      "*ST文投",
+      "上海证券交易所",
+      "中兴财光华会计师事务所"
+    ],
+    "key_numbers": [
+      "2024年度"
+    ],
+    "expected_direction": "up",
+    "subcategory": "申请撤销退市风险警示",
+    "target": "*ST文投",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_214",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "华民股份拟与鸿新新能源、晶澳无锡签订《债权重组暨投资协议》",
+      "晶澳无锡以20,000万元债权按投前估值10亿元对鸿新新能源债转股增资",
+      "增资完成后华民股份持股比例变更为73.74%"
+    ],
+    "anchor_rationale": "The named parties, agreement title, exact debt-for-equity amount, valuation, and post-deal ownership uniquely identify this subsidiary recapitalization.",
+    "key_entities": [
+      "华民股份",
+      "鸿新新能源",
+      "晶澳无锡",
+      "《债权重组暨投资协议》"
+    ],
+    "key_numbers": [
+      "10亿元",
+      "20,000万元",
+      "11,600万元",
+      "8,400万元",
+      "70,687.50万元",
+      "73.74%"
+    ],
+    "expected_direction": "up",
+    "subcategory": "控股子公司增资扩股",
+    "target": "华民股份",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_215",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "围绕2019年新三板企业转板与IPO辅导情况做年度统计",
+      "43家成功转板且111家IPO申请获证监会受理",
+      "属于IPO市场盘点而非单一事件"
+    ],
+    "anchor_rationale": "This is a broad transfer-and-IPO statistics summary rather than one identifiable event.",
+    "key_entities": [
+      "新三板企业",
+      "龙软科技",
+      "华特气体",
+      "证监会"
+    ],
+    "key_numbers": [
+      "2019年",
+      "43家",
+      "14家",
+      "49家",
+      "超过200家",
+      "111家"
+    ],
+    "expected_direction": "up",
+    "subcategory": "转板统计",
+    "target": "新三板转板市场",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_216",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "嘉必优于9月6日收到《湖北证监局关于对嘉必优生物技术(武汉)股份有限公司、易德伟、王华标、易华荣出具警示函措施的决定》",
+      "警示函点明2022年度业绩快报披露不准确",
+      "同时未及时审议并披露关联交易"
+    ],
+    "anchor_rationale": "The named company, exact receipt date, and full warning-letter title uniquely identify this regulatory warning event.",
+    "key_entities": [
+      "嘉必优",
+      "湖北证监局",
+      "易德伟",
+      "王华标",
+      "易华荣"
+    ],
+    "key_numbers": [
+      "9月6日",
+      "2022年度"
+    ],
+    "expected_direction": "down",
+    "subcategory": "行政监管措施/警示函",
+    "target": "嘉必优",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_217",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "上交所9月10日举办2024年半年度科创板消费类芯片企业集体业绩说明会",
+      "聚辰股份、南芯科技、格科微、艾为电子等集中亮相",
+      "会议聚焦消费类芯片行业回暖与终端市场布局"
+    ],
+    "anchor_rationale": "The named exchange, exact date, and full event title uniquely identify this collective performance-briefing event.",
+    "key_entities": [
+      "上交所",
+      "聚辰股份",
+      "南芯科技",
+      "格科微",
+      "艾为电子"
+    ],
+    "key_numbers": [
+      "9月10日",
+      "2024年半年度"
+    ],
+    "expected_direction": "up",
+    "subcategory": "科创板消费芯片业绩说明会",
+    "target": "消费类芯片板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_218",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "海南椰岛",
+      "将被实施退市风险警示及其他风险警示",
+      "触发原因为2024年度扣非后净利润为负且营业收入低于1.75亿元并被出具内部控制否定意见"
+    ],
+    "anchor_rationale": "The text names the company, a concrete risk-warning event, and a tied annual-report period anchor, but it lacks a unique locator.",
+    "key_entities": [
+      "海南椰岛",
+      "上海证券交易所",
+      "*ST椰岛"
+    ],
+    "key_numbers": [
+      "2024年度",
+      "1.75亿元"
+    ],
+    "expected_direction": "down",
+    "subcategory": "实施退市风险警示",
+    "target": "海南椰岛",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_219",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "多条新股申购、发布会、会议、指数纳入和宏观数据安排并列",
+      "属于每日资本市场大事提醒模板",
+      "无法锚定到单一事件"
+    ],
+    "anchor_rationale": "This is a recurring market calendar with multiple unrelated items rather than one identifiable event.",
+    "key_entities": [
+      "北芯生命",
+      "国新办",
+      "中国信息通信研究院",
+      "UiPath"
+    ],
+    "key_numbers": [
+      "1月26日",
+      "2000亿元",
+      "1583亿元"
+    ],
+    "expected_direction": "neutral",
+    "subcategory": "投资日历",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_220",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "多条新股申购、春运、地方会议、展会和宏观数据安排并列",
+      "属于每日资本市场大事提醒模板",
+      "无法锚定到单一事件"
+    ],
+    "anchor_rationale": "This is a recurring market calendar with multiple unrelated items rather than one identifiable event.",
+    "key_entities": [
+      "爱得科技",
+      "易思维",
+      "AWE Asia 2026"
+    ],
+    "key_numbers": [
+      "2月2日",
+      "3月13日",
+      "1505亿元"
+    ],
+    "expected_direction": "neutral",
+    "subcategory": "投资日历",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_221",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "深圳机场拟收购深圳市机场国际快件海关监管中心有限公司1%股权",
+      "交易价格为380.74万元",
+      "交易完成后持股比例由50%升至51%并将纳入合并报表范围"
+    ],
+    "anchor_rationale": "The named company, exact stake purchase, exact price, and exact post-deal control ratio uniquely identify this minority-stake acquisition.",
+    "key_entities": [
+      "深圳机场",
+      "深国际全程物流（深圳）有限公司",
+      "深圳市机场国际快件海关监管中心有限公司"
+    ],
+    "key_numbers": [
+      "1%",
+      "380.74万元",
+      "50%",
+      "51%"
+    ],
+    "expected_direction": "up",
+    "subcategory": "股权收购",
+    "target": "深圳机场",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  }
+]

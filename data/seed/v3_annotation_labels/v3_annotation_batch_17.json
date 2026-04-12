@@ -1,0 +1,58 @@
+[
+  {
+    "candidate_id": "exp_265",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "券商合计调研440家A股公司",
+      "电力设备、化工板块热度飙升",
+      "超1000家A股上市公司发布2025年业绩预告或业绩快报"
+    ],
+    "anchor_rationale": "This is a broad market and sector statistics roundup rather than one identifiable event.",
+    "key_entities": [
+      "券商",
+      "A股公司",
+      "电力设备板块",
+      "化工板块"
+    ],
+    "key_numbers": [
+      "1月26日",
+      "440家",
+      "超1000家",
+      "2025年"
+    ],
+    "expected_direction": "up",
+    "subcategory": "券商调研统计",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_266",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "ST天圣25日晚间在回复深交所重组问询函中表示",
+      "今年11月4日推出重组预案",
+      "拟向重药控股子公司重庆医药出售长圣医药51%股权"
+    ],
+    "anchor_rationale": "The named company, restructuring reply, named buyer and asset, and exact 51% stake uniquely identify this divestiture event.",
+    "key_entities": [
+      "ST天圣",
+      "深交所",
+      "重药控股",
+      "重庆医药",
+      "长圣医药"
+    ],
+    "key_numbers": [
+      "25日晚间",
+      "11月4日",
+      "51%"
+    ],
+    "expected_direction": "up",
+    "subcategory": "股权出售",
+    "target": "ST天圣",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  }
+]

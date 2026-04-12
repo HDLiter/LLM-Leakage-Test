@@ -1,0 +1,1243 @@
+{
+  "test_cases": [
+    {
+      "id": "exp_187",
+      "news": {
+        "id": "2239040",
+        "title": "宏达电子：参股公司江苏展芯IPO对当期财务报表不会构成重大影响",
+        "content": "【宏达电子：参股公司江苏展芯IPO对当期财务报表不会构成重大影响】财联社12月24日电，宏达电子(300726.SZ)发布股票交易异常波动公告称，近期公司间接持股13.79%的参股公司江苏展芯半导体技术股份有限公司（简称“江苏展芯”）向深圳证券交易所报送了首次公开发行股票并在创业板上市的申请文件并获受理，该事项已于2025年12月18日进行了披露，本次江苏展芯IPO申报受理前后，公司对其持股比例、表决权未出现重大变化，公司对其投资仍按权益法进行会计核算，该事项对公司当期财务报表不会构成重大影响，且江苏展芯本次提交IPO申请后续进展尚存在不确定性。",
+        "publish_time": "2025-12-24 17:51:59",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "军工电子/半导体参股",
+      "key_entities": [
+        "宏达电子",
+        "江苏展芯",
+        "创业板IPO"
+      ],
+      "key_numbers": [
+        "13.79%",
+        "2025年12月18日"
+      ],
+      "expected_direction": "down",
+      "subcategory": "参股公司IPO澄清",
+      "memorization_likelihood": "medium",
+      "target": "宏达电子",
+      "target_type": "company",
+      "period": "post_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_188",
+      "news": {
+        "id": "2233668",
+        "title": "天风证券：拟将40亿元次级债务展期一年并下调利率",
+        "content": "【天风证券：拟将40亿元次级债务展期一年并下调利率】财联社12月18日电，天风证券(601162.SH)公告称，公司拟将向控股股东湖北宏泰集团有限公司借入的40亿元次级债务进行展期及利率调整，债务期限展期一年，年化利率由5%调整为4%。此次交易构成关联交易，不构成重大资产重组，且无需提交股东会审议。",
+        "publish_time": "2025-12-18 17:42:44",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "券商",
+      "key_entities": [
+        "天风证券",
+        "湖北宏泰集团"
+      ],
+      "key_numbers": [
+        "40亿元",
+        "5%",
+        "4%",
+        "展期一年"
+      ],
+      "expected_direction": "up",
+      "subcategory": "关联债务展期降息",
+      "memorization_likelihood": "low",
+      "target": "天风证券",
+      "target_type": "company",
+      "period": "post_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_189",
+      "news": {
+        "id": "1071022",
+        "title": "高盛：建议高配中国A股和H股 继续看好互联网、汽车、半导体、耐用消费品",
+        "content": "【高盛：建议高配中国A股和H股 继续看好互联网、汽车、半导体、耐用消费品】财联社7月14日电，高盛投资研究部投资组合策略团队近期发表研究报告。高盛认为，中国股市受各类宏观经济、政策、周期性、持仓等因素支撑，仍将领跑全球其它市场，持续建议高配中国A股和H股。继过去三个月的强劲上涨后，叠加考虑估值和仓位因素，高盛继续看好互联网、汽车、半导体和耐用消费品板块，偏好财政受益、国有房地产、已回归香港市场且具有稳健盈利能力的科技企业、疫情复苏相关生产制造和消费概念。（记者 刘超凤）",
+        "publish_time": "2022-07-14 11:32:44",
+        "category": "macro",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "消息发布当日（2022-07-14）沪深300指数涨0.0%，随后5个交易日累计下跌约0.9%，市场初始按利好交易，但持续性不足。",
+      "outcome_date": "2022-07-14",
+      "sector": "A股宽基/科技制造",
+      "key_entities": [
+        "高盛",
+        "中国A股",
+        "中国H股",
+        "半导体"
+      ],
+      "key_numbers": [
+        "过去三个月",
+        "高配"
+      ],
+      "expected_direction": "up",
+      "subcategory": "外资机构看多中国资产",
+      "memorization_likelihood": "medium",
+      "target": "沪深300指数",
+      "target_type": "index",
+      "period": "pre_cutoff",
+      "rarity_estimate": "medium"
+    },
+    {
+      "id": "exp_190",
+      "news": {
+        "id": "2169567",
+        "title": "投资日历：周三资本市场大事提醒",
+        "content": "【投资日历：周三资本市场大事提醒】\n①今日共有2只新股申购，为沪主板的超颖电子（603175）、北交所的泰凯英（920020）。\n②2025湾区半导体产业生态博览会将于10月15日至17日在深圳举办。\n③新凯来旗下深圳市万里眼技术有限公司将发布多款新品，其中包括该公司自主研发的新一代超高速实时示波器。\n④第138届广交会将于10月15日至11月4日分三期在广州举办。\n⑤2025第二届上海无人机系统技术展览会、2025第二届上海国际低空经济产业大会将于10月15日至17日举办。\n⑥中国玩具展&潮玩展、中国授权展、中国婴童用品展、中国幼教展（简称中国玩协四展）将于10月15日至17日在上海举办。\n⑦恒生指数公司：紫金黄金国际将于10月15日收市后被纳入恒生综合指数。\n⑧十四届全国人大常委会第十六次会议表决通过新修订的反不正当竞争法，自2025年10月15日起施行。\n⑨海光信息、国光连锁、九洲药业等股将披露三季报。\n⑩今日将公布中国9月CPI、PPI等数据。",
+        "publish_time": "2025-10-15 07:45:20",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "低空经济/半导体会展",
+      "key_entities": [
+        "上海国际低空经济产业大会",
+        "湾区半导体产业生态博览会",
+        "海光信息"
+      ],
+      "key_numbers": [
+        "10月15日至17日",
+        "三季报"
+      ],
+      "expected_direction": "up",
+      "subcategory": "投资日历/产业大会催化",
+      "memorization_likelihood": "medium",
+      "target": "低空经济板块",
+      "target_type": "sector",
+      "period": "post_cutoff",
+      "rarity_estimate": "common"
+    },
+    {
+      "id": "exp_191",
+      "news": {
+        "id": "2242056",
+        "title": "年度“牛股”：528只翻倍股出炉 AI与并购“双主线”燃爆全场",
+        "content": "【年度“牛股”：528只翻倍股出炉 AI与并购“双主线”燃爆全场】财联社12月28日电，2025年的A股市场就将迎来收官，回首全年，A股市场产生了528只翻倍股，数量是2024年的4倍多。其中，124只个股涨幅超2倍，6只个股超5倍。区间涨幅最高的2只个股为上纬新材（688585.SH）和天普股份（605255.SH），是按收盘价计算年内唯二的十倍股。高居涨幅榜的“牛股”呈现出两大特点：或是AI概念股，或是并购概念股。",
+        "publish_time": "2025-12-28 13:54:57",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "AI/并购重组",
+      "key_entities": [
+        "上纬新材",
+        "天普股份",
+        "AI概念股",
+        "并购概念股"
+      ],
+      "key_numbers": [
+        "528只",
+        "124只",
+        "6只",
+        "4倍多"
+      ],
+      "expected_direction": "up",
+      "subcategory": "年度牛股复盘",
+      "memorization_likelihood": "medium",
+      "target": "AI与并购概念股",
+      "target_type": "sector",
+      "period": "post_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_192",
+      "news": {
+        "id": "1156522",
+        "title": "数字经济方向继续活跃 科创信息3连板",
+        "content": "【数字经济方向继续活跃 科创信息3连板】财联社10月17日电，数字经济概念股继续活跃，创业板科创信息再度涨停3连板，英飞拓、国脉科技、恒久科技、齐心集团、南天信息、拓维信息等多股涨停，中望软件、奇安信、安恒信息、金山办公、信安世纪、数字政通等继续冲高。",
+        "publish_time": "2022-10-17 10:11:06",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "消息发布当日（2022-10-17）科创信息收涨20.0%，随后5个交易日累计上涨约14.5%，市场按利好交易，正反馈得到延续。",
+      "outcome_date": "2022-10-17",
+      "sector": "数字经济/信创",
+      "key_entities": [
+        "科创信息",
+        "英飞拓",
+        "国脉科技",
+        "拓维信息"
+      ],
+      "key_numbers": [
+        "3连板"
+      ],
+      "expected_direction": "up",
+      "subcategory": "数字经济主线强化",
+      "memorization_likelihood": "low",
+      "target": "科创信息",
+      "target_type": "company",
+      "period": "pre_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_193",
+      "news": {
+        "id": "1848431",
+        "title": "市场主线：市场再现放量普涨 大金融、科技股成为盘面的领涨核心",
+        "content": "【市场主线：市场再现放量普涨 大金融、科技股成为盘面的领涨核心】今日市场呈现放量普涨态势，创业板涨超4%，其中大金融方向延续强势，多只个股涨停，东方财富同样涨近10%。此外，军工电子、消费电子、半导体等泛科技方向同样涨幅居前。整体而言，今日早盘指数呈现出放量突破之迹象，午后是否仍有足够买盘跟进加强依旧值得关注。此外，就本轮的领涨板块而言，大金融与科技股依旧是两大与指数形成较为明显共振的方向，因此仍可在后续市场震荡轮动中寻找一些低吸的机会。",
+        "publish_time": "2024-11-05 12:30:07",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "消息发布当日（2024-11-05）创业板指涨4.8%，随后5个交易日累计上涨约9.4%，市场按利好交易，正反馈得到延续。",
+      "outcome_date": "2024-11-05",
+      "sector": "大金融/科技成长",
+      "key_entities": [
+        "创业板指",
+        "东方财富",
+        "大金融",
+        "半导体"
+      ],
+      "key_numbers": [
+        "涨超4%",
+        "涨近10%"
+      ],
+      "expected_direction": "up",
+      "subcategory": "市场主线强化",
+      "memorization_likelihood": "medium",
+      "target": "创业板指",
+      "target_type": "index",
+      "period": "pre_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_194",
+      "news": {
+        "id": "1473803",
+        "title": "唯捷创芯：L-PAMiD产品将实现更大规模出货 预计下半年整体情况好于上半年",
+        "content": "【唯捷创芯：L-PAMiD产品将实现更大规模出货 预计下半年整体情况好于上半年】《科创板日报》27日讯，唯捷创芯近期调研纪要显示，目前公司自主研发的L-PAMiD产品已经实现量产出货，成为国内率先实现向头部品牌客户批量销售该产品的企业。下半年将实现更大规模出货，新一代L-PAMiD产品也正在研发和准备中。公司第一季度是去库存阶段，到6月底库存改善较明显，下半年得益于各项新产品的突破和用量提升，预计整体情况好于上半年。",
+        "publish_time": "2023-09-27 09:18:42",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "消息发布当日（2023-09-27）唯捷创芯收跌1.4%，随后5个交易日累计上涨约9.4%，资金先分歧后修复，利好在随后几个交易日发酵。",
+      "outcome_date": "2023-09-27",
+      "sector": "射频前端/半导体",
+      "key_entities": [
+        "唯捷创芯",
+        "L-PAMiD",
+        "头部品牌客户"
+      ],
+      "key_numbers": [
+        "量产出货",
+        "6月底库存改善",
+        "下半年整体情况好于上半年"
+      ],
+      "expected_direction": "up",
+      "subcategory": "新品放量预期",
+      "memorization_likelihood": "low",
+      "target": "唯捷创芯",
+      "target_type": "company",
+      "period": "pre_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_195",
+      "news": {
+        "id": "2267175",
+        "title": "投资日历：周五资本市场大事提醒",
+        "content": "【投资日历：周五资本市场大事提醒】\n①今日共有1只新股申购，为深主板的世盟股份（001220）。\n②国新办将于1月23日举行新闻发布会，介绍2025年知识产权工作进展情况。\n③2026北京商业航天展暨大会将于1月23日至25日举办。\n④第三届全国人工智能应用场景创新挑战赛总决赛暨全国人工智能+应用场景创新大会将于1月23日至25日在苏州举行。\n⑤2026智能机器人城市空间应用场景大会暨机器人交易中心建设启动仪式将于1月23日举办。\n⑥银发经济产业创新发展大会将于1月23日举办。\n⑦国证指数：定于1月23日发布国证创业板指股债恒定比例指数系列和国证创业板50股债恒定比例指数系列。\n⑧A123半固态浸没式储能产品全球线上发布会将于1月23日举办。\n⑨日本央行公布利率决议和经济前景展望报告。\n⑩今日有867亿元7天期逆回购到期。\n⑪今日将公布美国当周EIA原油库存、欧元区1月制造业PMI等数据。",
+        "publish_time": "2026-01-23 07:44:27",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "机器人/人工智能应用",
+      "key_entities": [
+        "全国人工智能+应用场景创新大会",
+        "机器人交易中心",
+        "智能机器人城市空间应用场景大会"
+      ],
+      "key_numbers": [
+        "1月23日至25日",
+        "1月23日"
+      ],
+      "expected_direction": "up",
+      "subcategory": "投资日历/产业大会催化",
+      "memorization_likelihood": "medium",
+      "target": "机器人板块",
+      "target_type": "sector",
+      "period": "post_cutoff",
+      "rarity_estimate": "common"
+    },
+    {
+      "id": "exp_196",
+      "news": {
+        "id": "1957569",
+        "title": "金安国纪：拟出售上海金板科技60%股权",
+        "content": "【金安国纪：拟出售上海金板科技60%股权】财联社2月28日电，金安国纪(002636.SZ)公告称，公司计划在上海联合产权交易所或同类型交易平台通过公开挂牌竞价的方式，出售所持控股子公司上海金板科技60%的股权。该交易完成后，公司将不再持有上海金板科技股权，且该子公司将不再纳入公司合并报表范围。交易预计会达到股东大会审议标准，因此尚需提交公司股东大会审议。本次交易不构成重大资产重组，且受让方通过公开挂牌方式确定，是否构成关联交易尚不确定。",
+        "publish_time": "2025-02-28 17:22:23",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "消息后首个交易日（2025-03-03）金安国纪收涨0.1%，随后5个交易日累计上涨约3.2%，事件本身偏中性，但股价仍随资金情绪走强。",
+      "outcome_date": "2025-03-03",
+      "sector": "PCB/覆铜板",
+      "key_entities": [
+        "金安国纪",
+        "上海金板科技",
+        "上海联合产权交易所"
+      ],
+      "key_numbers": [
+        "60%股权"
+      ],
+      "expected_direction": "neutral",
+      "subcategory": "出售控股子公司股权",
+      "memorization_likelihood": "low",
+      "target": "金安国纪",
+      "target_type": "company",
+      "period": "pre_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_197",
+      "news": {
+        "id": "2279000",
+        "title": "怡达股份：控股子公司泰兴怡达吸收合并其全资子公司万淇生物科技",
+        "content": "【怡达股份：控股子公司泰兴怡达吸收合并其全资子公司万淇生物科技】财联社2月3日电，怡达股份(300721.SZ)公告称，为优化管理架构，提高运营效率，其控股子公司泰兴怡达化学有限公司将吸收合并其全资子公司万淇生物科技（泰州）有限公司。吸收合并完成后，万淇的法人资格将注销，其业务、资产、负债等均由泰兴怡达承继。本次吸收合并不涉及泰兴怡达的名称、注册资本、股权结构变化，且不构成重大资产重组。该事项已通过泰兴怡达股东会决议，无需提交怡达股份董事会审议。",
+        "publish_time": "2026-02-03 15:44:59",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "精细化工",
+      "key_entities": [
+        "怡达股份",
+        "泰兴怡达",
+        "万淇生物科技"
+      ],
+      "key_numbers": [
+        "吸收合并",
+        "全资子公司"
+      ],
+      "expected_direction": "neutral",
+      "subcategory": "内部吸收合并",
+      "memorization_likelihood": "low",
+      "target": "怡达股份",
+      "target_type": "company",
+      "period": "post_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_198",
+      "news": {
+        "id": "2262089",
+        "title": "百元股数量创历史新高 科技新贵扎堆",
+        "content": "【百元股数量创历史新高 科技新贵扎堆】财联社1月19日电，A股市场共有222只个股收盘价达到百元以上。据此，A股百元股数量创下历史新高。往前看，2026年1月12日，A股市场共有219只百元股，数量逼平2021年11月29日的高点。从最新收盘价来看，寒武纪-U超过1400元居首，贵州茅台以1376元位居次席，源杰科技748.29元位居第三位。此外，摩尔线程-U、中际旭创、国盾量子、中际旭创、沐曦股份-U、北方华创等个股均超过500元。百元股中科技新贵扎堆，收盘价前十名只有贵州茅台不属于科技板块。",
+        "publish_time": "2026-01-19 15:14:13",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "高价股/科技成长",
+      "key_entities": [
+        "寒武纪-U",
+        "贵州茅台",
+        "源杰科技",
+        "北方华创"
+      ],
+      "key_numbers": [
+        "222只",
+        "219只",
+        "1400元",
+        "500元"
+      ],
+      "expected_direction": "up",
+      "subcategory": "高价股创历史新高",
+      "memorization_likelihood": "medium",
+      "target": "科技高价股板块",
+      "target_type": "sector",
+      "period": "post_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_199",
+      "news": {
+        "id": "2026907",
+        "title": "顺博合金：公司及相关责任人收到重庆证监局行政监管措施决定书",
+        "content": "【顺博合金：公司及相关责任人收到重庆证监局行政监管措施决定书】财联社5月9日电，顺博合金(002996.SZ)公告称，公司及相关责任人于2025年5月9日收到重庆证监局的行政监管措施决定书。公司在2024年与关联自然人杜嘉慧、俞璨、胡勇胜发生关联交易累计金额为1429.02万元，但未及时履行审议程序并披露，迟至2025年4月23日才召开董事会进行补充审议，并于4月25日进行补充披露。该行为违反了《上市公司信息披露管理办法》的规定。因此，重庆证监局决定对公司采取出具警示函的行政监管措施，并对公司董事长王真见、总裁王增潮、董事会秘书李晓华采取监管谈话的行政监管措施。",
+        "publish_time": "2025-05-09 16:48:10",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "消息后首个交易日（2025-05-12）顺博合金收跌0.1%，随后5个交易日累计上涨约1.2%，利空冲击较短，随后出现修复。",
+      "outcome_date": "2025-05-12",
+      "sector": "再生铝/监管风险",
+      "key_entities": [
+        "顺博合金",
+        "重庆证监局",
+        "王真见"
+      ],
+      "key_numbers": [
+        "1429.02万元"
+      ],
+      "expected_direction": "down",
+      "subcategory": "监管处罚/信披违规",
+      "memorization_likelihood": "low",
+      "target": "顺博合金",
+      "target_type": "company",
+      "period": "pre_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_200",
+      "news": {
+        "id": "2223748",
+        "title": "AI产业链题材股局部活跃，人工智能ETF（159819）半日成交额近8亿元",
+        "content": "【AI产业链题材股局部活跃，人工智能ETF（159819）半日成交额近8亿元】\n今日早盘，AI产业链题材股局部活跃，CPO、英伟达产业链等概念强势领涨。截至午间收盘，中证人工智能主题指数上涨1.9%，上证科创板人工智能指数下跌0.3%，相关ETF交投活跃，人工智能ETF（159819）半日成交额近8亿元。\n东吴证券表示，当前AI发展进程主要依赖大模型驱动全球加速演进，中美作为AI产业的头部集中区域，企业均在加码布局基础设施和硬件建设，全球AI产业规模将快速突破，AI有望引领全球创新产业共振。",
+        "publish_time": "2025-12-09 12:56:18",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "人工智能/算力",
+      "key_entities": [
+        "中证人工智能主题指数",
+        "人工智能ETF",
+        "东吴证券"
+      ],
+      "key_numbers": [
+        "1.9%",
+        "近8亿元"
+      ],
+      "expected_direction": "up",
+      "subcategory": "AI主题活跃",
+      "memorization_likelihood": "medium",
+      "target": "中证人工智能主题指数",
+      "target_type": "index",
+      "period": "post_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_201",
+      "news": {
+        "id": "2247479",
+        "title": "商业航天概念大面积高开 金风科技等多股涨停",
+        "content": "【商业航天概念大面积高开 金风科技等多股涨停】财联社1月5日电，早盘商业航天概念大面积高开，金风科技、雷科防务、联创光电等多股涨停，久之洋、北斗星通、中国卫星、顺灏股份等高开超5%。消息面上，12月31日，上交所官网显示，蓝箭航天科创板IPO获受理，正式冲刺“商业火箭第一股”。蓝箭航天本次发行募集资金投资项目包括“可重复使用火箭产能提升项目”和“可重复使用火箭技术提升项目”，拟募集资金75亿元。",
+        "publish_time": "2026-01-05 09:30:08",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "商业航天",
+      "key_entities": [
+        "蓝箭航天",
+        "金风科技",
+        "联创光电",
+        "中国卫星"
+      ],
+      "key_numbers": [
+        "75亿元"
+      ],
+      "expected_direction": "up",
+      "subcategory": "商业航天IPO催化",
+      "memorization_likelihood": "medium",
+      "target": "商业航天板块",
+      "target_type": "sector",
+      "period": "post_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_202",
+      "news": {
+        "id": "2259569",
+        "title": "趣睡科技：控股股东、实际控制人之一致行动人及首发前员工持股平台完成减持计划",
+        "content": "【趣睡科技：控股股东、实际控制人之一致行动人及首发前员工持股平台完成减持计划】财联社1月15日电，趣睡科技(301336.SZ)公告称，公司控股股东、实际控制人之一致行动人陈亚强、徐晓斌及首发前员工持股平台宁波梅山保税港区趣同趣投资管理合伙企业（有限合伙）已完成减持计划。",
+        "publish_time": "2026-01-16 00:33:37",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "家居电商",
+      "key_entities": [
+        "趣睡科技",
+        "陈亚强",
+        "徐晓斌",
+        "趣同趣"
+      ],
+      "key_numbers": [
+        "完成减持计划"
+      ],
+      "expected_direction": "neutral",
+      "subcategory": "减持计划完成",
+      "memorization_likelihood": "low",
+      "target": "趣睡科技",
+      "target_type": "company",
+      "period": "post_cutoff",
+      "rarity_estimate": "medium"
+    },
+    {
+      "id": "exp_203",
+      "news": {
+        "id": "2003018",
+        "title": "4月14日连板股分析：连板股晋级率不足三成 板块快速轮动",
+        "content": "【4月14日连板股分析：连板股晋级率不足三成 板块快速轮动】今日共103股涨停，连板股总数13只，其中三连板及以上个股5只，上一交易日共18只连板股，连板股晋级率27.78%（不含ST股、退市股）。个股方面，全市场超4500只个股上涨，连续5个交易日逾百股涨停或涨超10%，但市场追涨情绪并不积极，连板梯队断层，广宇集团、石英股份、海鸥住工等给出较大负反馈。另一方面，板块博弈氛围浓厚，消费电子板块高开低走，权重立讯精密盘中一度跌超2%，而集体低开的农业股却得到资金回流，新赛股份午后一度上演“地天板”。",
+        "publish_time": "2025-04-14 16:00:35",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "消息后首个交易日（2025-04-15）广宇集团收跌7.9%，随后5个交易日累计下跌约6.4%，利空被直接定价，弱势延续。",
+      "outcome_date": "2025-04-15",
+      "sector": "短线连板情绪/题材轮动",
+      "key_entities": [
+        "广宇集团",
+        "石英股份",
+        "新赛股份"
+      ],
+      "key_numbers": [
+        "103股涨停",
+        "13只",
+        "27.78%",
+        "超4500只个股上涨"
+      ],
+      "expected_direction": "down",
+      "subcategory": "连板情绪降温",
+      "memorization_likelihood": "low",
+      "target": "广宇集团",
+      "target_type": "company",
+      "period": "pre_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_204",
+      "news": {
+        "id": "2197256",
+        "title": "*ST松发：下属公司签订4艘VLCC超大型原油运输船建造合同",
+        "content": "【*ST松发：下属公司签订4艘VLCC超大型原油运输船建造合同】财联社11月11日电，*ST松发(603268.SH)公告称，公司下属公司恒力造船（大连）有限公司与欧洲知名船东签订了4艘VLCC超大型原油运输船的建造合同，合同金额合计约4-6亿美元。该合同的签订预计将对公司未来的业绩产生积极影响，有利于提高公司中长期市场竞争力和盈利能力。由于合同履行期较长，可能受到航运与船舶市场变化、客户需求、原材料价格波动、汇率波动等因素影响，敬请广大投资者注意投资风险。",
+        "publish_time": "2025-11-11 16:55:34",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "ST重组/船舶制造",
+      "key_entities": [
+        "*ST松发",
+        "恒力造船",
+        "VLCC"
+      ],
+      "key_numbers": [
+        "4艘",
+        "4-6亿美元"
+      ],
+      "expected_direction": "up",
+      "subcategory": "重大造船合同",
+      "memorization_likelihood": "medium",
+      "target": "*ST松发",
+      "target_type": "company",
+      "period": "post_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_205",
+      "news": {
+        "id": "1142048",
+        "title": "德才股份：未来仍将持续深化布局全建筑产业链 在新城建和新基建领域拓展更多细分业务",
+        "content": "【德才股份：未来仍将持续深化布局全建筑产业链 在新城建和新基建领域拓展更多细分业务】财联社9月27日电，德才股份近期接受机构调研时表示，经过多年的发展和布局，公司已经构建了全建筑产业链优势。未来公司仍将持续深化布局全建筑产业链，在新城建和新基建领域拓展更多的细分业务。公司目前的扩张以内生发展为主，在坚持战略方向不变的前提下，不排除通过收购兼并的方式进行产业链延伸，实现更好更快的发展。例如，公司参股青岛虚拟现实研究院，聚焦虚拟现实领域关键共性技术的研究突破，赋能建筑全产业链数字化智慧化转型。",
+        "publish_time": "2022-09-27 13:54:29",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "消息发布当日（2022-09-27）德才股份收涨10.2%，随后5个交易日累计上涨约8.3%，市场按利好交易，正反馈得到延续。",
+      "outcome_date": "2022-09-27",
+      "sector": "建筑装饰/新城建",
+      "key_entities": [
+        "德才股份",
+        "新城建",
+        "新基建",
+        "青岛虚拟现实研究院"
+      ],
+      "key_numbers": [
+        "全建筑产业链"
+      ],
+      "expected_direction": "up",
+      "subcategory": "机构调研战略表态",
+      "memorization_likelihood": "low",
+      "target": "德才股份",
+      "target_type": "company",
+      "period": "pre_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_206",
+      "news": {
+        "id": "2173751",
+        "title": "奥赛康：创新药ASKC202在2025年ESMO年会公布临床研究数据",
+        "content": "【奥赛康：创新药ASKC202在2025年ESMO年会公布临床研究数据】财联社10月19日电，奥赛康(002755.SZ)公告称，公司子公司江苏奥赛康药业于2025年10月18日在德国柏林召开的欧洲肿瘤内科学会（ESMO）年会上，以壁报形式首次公布新型cMET抑制剂ASKC202联合利厄替尼用于经表皮生长因子酪氨酸激酶抑制剂（EGFR-TKI）治疗失败伴MET扩增/过表达的局部晚期或转移性非小细胞肺癌的剂量递增及扩展临床试验研究数据。研究结果显示，ASKC202联合利厄替尼用于经EGFR-TKI治疗失败伴MET扩增/过表达的非小细胞肺癌显示出良好的耐受性和安全性，疗效上显示出肿瘤缓解率高、缓解持续时间长的获益信号。",
+        "publish_time": "2025-10-19 16:15:33",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "创新药/肿瘤",
+      "key_entities": [
+        "奥赛康",
+        "ASKC202",
+        "ESMO",
+        "利厄替尼"
+      ],
+      "key_numbers": [
+        "2025年10月18日"
+      ],
+      "expected_direction": "up",
+      "subcategory": "创新药临床数据披露",
+      "memorization_likelihood": "medium",
+      "target": "奥赛康",
+      "target_type": "company",
+      "period": "post_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_207",
+      "news": {
+        "id": "2292446",
+        "title": "春节后资金面前瞻：首周超2.2万亿元逆回购到期",
+        "content": "【春节后资金面前瞻：首周超2.2万亿元逆回购到期】财联社2月22日电，春节后首周（2/24-2/28），公开市场有超22000亿元逆回购到期，其中，7天逆回购到期规模为8524亿元、14天逆回购到期规模为14000亿元，此外，还将有3000亿元中期借贷便利（MLF）到期。“考虑到节后第一周资金到期压力较大，政府债缴款、存单到期、北交所打新压力也不弱，叠加税期走款，流动性缺口也显著扩张。”财通证券在研报中表示，1月“存强贷弱”支撑银行负债端逻辑有所弱化，节后资金缺口边际增加。天风证券在研报中指出，今年春节假期过后即为税期，历史上节后资金分层往往短暂走高，主因在于非银机构节前可能有维持杠杆或持券过节需求，节后短期融资到期压力下或阶段性推升非银资金价格。今年节后将直接面临税期走款扰动，大行融出改善的节奏或出现放缓，或意味着非银资金压力改善的契机，或将相应延缓至税期走款基本结束之后。",
+        "publish_time": "2026-02-22 09:06:45",
+        "category": "macro",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "资金面/A股流动性",
+      "key_entities": [
+        "逆回购",
+        "MLF",
+        "财通证券",
+        "天风证券"
+      ],
+      "key_numbers": [
+        "超22000亿元",
+        "8524亿元",
+        "14000亿元",
+        "3000亿元"
+      ],
+      "expected_direction": "down",
+      "subcategory": "流动性收紧前瞻",
+      "memorization_likelihood": "medium",
+      "target": "沪深300指数",
+      "target_type": "index",
+      "period": "post_cutoff",
+      "rarity_estimate": "common"
+    },
+    {
+      "id": "exp_208",
+      "news": {
+        "id": "2229802",
+        "title": "阿里通义百聆推出语音模型新版本",
+        "content": "【阿里通义百聆推出语音模型新版本】《科创板日报》15日讯，阿里通义宣布开源Fun-CosyVoice3-0.5B，该版本提供了zero-shot音色克隆能力，只需要你提供一段3秒以上的参考音频，即可复刻其音色并合成新语音，并且支持本地部署和二次开发。此外，通义推出轻量化版本Fun-ASR-Nano模型，总参数量压缩到0.8B，推理成本更低，现已开源，支持本地部署与定制化微调。",
+        "publish_time": "2025-12-15 16:36:46",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "AI语音/开源模型",
+      "key_entities": [
+        "阿里通义",
+        "Fun-CosyVoice3-0.5B",
+        "Fun-ASR-Nano"
+      ],
+      "key_numbers": [
+        "3秒以上",
+        "0.5B",
+        "0.8B"
+      ],
+      "expected_direction": "up",
+      "subcategory": "开源语音模型发布",
+      "memorization_likelihood": "medium",
+      "target": "AI语音应用板块",
+      "target_type": "sector",
+      "period": "post_cutoff",
+      "rarity_estimate": "medium"
+    },
+    {
+      "id": "exp_209",
+      "news": {
+        "id": "1988106",
+        "title": "恒瑞医药：子公司HRS-5965胶囊被纳入拟突破性治疗品种公示名单",
+        "content": "【恒瑞医药：子公司HRS-5965胶囊被纳入拟突破性治疗品种公示名单】财联社3月30日电，恒瑞医药(600276.SH)公告称，子公司成都盛迪医药的HRS-5965胶囊被国家药品监督管理局药品审评中心纳入拟突破性治疗品种公示名单，公示期7日。该药物为化学药品，注册分类为1类，拟定适应症为原发性IgA肾病。HRS-5965胶囊是一种补体因子B抑制剂，可降低尿蛋白，延缓肾脏疾病进展。截至目前，相关项目累计研发投入约1.42亿元。但药品研发存在诸多不确定性风险，包括技术、审批、政策等因素，以及审评政策和市场竞争形势等，因此该产品存在突破性治疗药物程序公示期被提出异议的风险。",
+        "publish_time": "2025-03-30 16:42:35",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "消息后首个交易日（2025-03-31）恒瑞医药收涨1.2%，随后5个交易日累计上涨约0.2%，市场按利好交易，正反馈得到延续。",
+      "outcome_date": "2025-03-31",
+      "sector": "创新药/肾病",
+      "key_entities": [
+        "恒瑞医药",
+        "成都盛迪医药",
+        "HRS-5965",
+        "国家药监局药审中心"
+      ],
+      "key_numbers": [
+        "1类",
+        "7日",
+        "1.42亿元"
+      ],
+      "expected_direction": "up",
+      "subcategory": "突破性治疗认定",
+      "memorization_likelihood": "low",
+      "target": "恒瑞医药",
+      "target_type": "company",
+      "period": "pre_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_210",
+      "news": {
+        "id": "2197745",
+        "title": "“生力军”持续扩大 上市公司中期分红渐成风尚",
+        "content": "【“生力军”持续扩大 上市公司中期分红渐成风尚】财联社11月12日电，上市公司中期分红积极性持续提升。Wind数据显示，截至11月11日，今年已有1083家公司宣布中期分红（含季报、半年报分红、特殊分红），分红金额合计7661.69亿元，已超去年中期分红金额。其中，超300家公司首次进行中期分红。在监管引导和内生需求双重驱动下，中期分红“生力军”持续壮大，中期分红渐成风尚。在业内人士看来，分红能力和稳定性是企业价值的“试金石”，多次分红既让投资者获得实实在在的经济回报，也有助于上市公司吸引长期资金，进而对A股整体的估值逻辑、投资文化产生深远影响，推动市场从“交易博弈”转向“价值投资”。",
+        "publish_time": "2025-11-12 06:42:44",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "红利资产/分红",
+      "key_entities": [
+        "Wind",
+        "上市公司中期分红",
+        "中期分红"
+      ],
+      "key_numbers": [
+        "1083家公司",
+        "7661.69亿元",
+        "超300家公司"
+      ],
+      "expected_direction": "up",
+      "subcategory": "中期分红扩容",
+      "memorization_likelihood": "medium",
+      "target": "中证红利指数",
+      "target_type": "index",
+      "period": "post_cutoff",
+      "rarity_estimate": "common"
+    },
+    {
+      "id": "exp_211",
+      "news": {
+        "id": "2199905",
+        "title": "13天12板合富中国：如股价进一步异常上涨 可能申请停牌核查",
+        "content": "【13天12板合富中国：如股价进一步异常上涨 可能申请停牌核查】财联社11月13日电，合富中国(603122.SH)公告称，公司股价累计涨幅已严重偏离基本面，投资者参与交易可能面临较大风险。如公司股价进一步异常上涨，公司可能申请停牌核查。自2025年10月28日至2025年11月13日，公司股票连续十三个交易日中有十二个交易日以涨停价收盘，并5次触及股价异常波动、3次触及严重异常波动情形，期间累计涨幅达230.84%。截至11月13日收盘，公司股价为22.10元/股，处于历史高位。股价短期内连续上涨，存在市场情绪过热、非理性炒作风险，已明显高于同期行业及上证指数涨幅，且严重显著偏离公司基本面，随时存在快速下跌风险。",
+        "publish_time": "2025-11-13 18:42:38",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "医疗流通/短线炒作",
+      "key_entities": [
+        "合富中国",
+        "停牌核查",
+        "股价异常上涨"
+      ],
+      "key_numbers": [
+        "13天12板",
+        "230.84%",
+        "22.10元/股"
+      ],
+      "expected_direction": "down",
+      "subcategory": "异动风险提示",
+      "memorization_likelihood": "medium",
+      "target": "合富中国",
+      "target_type": "company",
+      "period": "post_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_212",
+      "news": {
+        "id": "2176382",
+        "title": "A股三季报密集交卷 超七成已披露公司报喜",
+        "content": "【A股三季报密集交卷 超七成已披露公司报喜】财联社10月22日电，当前正值A股三季报密集披露阶段，一批业绩高增长公司受到投资者普遍关注。据统计，截至目前，共有360家上市公司已披露三季报业绩数据。按照三季报、业绩快报、预告净利润下限计算，合计有254家公司前三季度净利润为盈利且同比增长（含扭亏为盈），占已披露公司数量的比例达到七成以上。从行业看，这些业绩增长公司主要分布于电子、基础化工、汽车、电力设备、机械设备等行业。电子行业入围公司数量最多，有32家。受益于人工智能技术加速迭代，以及应用场景持续扩展等影响，多个电子细分行业景气上行，相关龙头公司业绩爆发。",
+        "publish_time": "2025-10-22 07:24:34",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "三季报/电子",
+      "key_entities": [
+        "A股上市公司",
+        "电子行业",
+        "人工智能"
+      ],
+      "key_numbers": [
+        "360家",
+        "254家",
+        "七成以上",
+        "32家"
+      ],
+      "expected_direction": "up",
+      "subcategory": "三季报业绩景气",
+      "memorization_likelihood": "medium",
+      "target": "电子板块",
+      "target_type": "sector",
+      "period": "post_cutoff",
+      "rarity_estimate": "common"
+    },
+    {
+      "id": "exp_213",
+      "news": {
+        "id": "1998720",
+        "title": "*ST文投：申请撤销股票交易退市风险警示及其他风险警示",
+        "content": "【*ST文投：申请撤销股票交易退市风险警示及其他风险警示】财联社4月9日电，*ST文投(600715.SH)公告称，公司已向上海证券交易所申请撤销股票交易退市风险警示及其他风险警示。根据中兴财光华会计师事务所出具的审计报告，公司2024年度期末净资产为正，且审计报告不再包含与持续经营相关的重大不确定性段。公司满足相关条件，但申请结果需等待上海证券交易所审核。审核期间，公司股票将正常交易。",
+        "publish_time": "2025-04-09 19:22:52",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "消息后首个交易日（2025-04-10）*ST文投收涨5.1%，随后5个交易日累计上涨约11.3%，市场按利好交易，正反馈得到延续。",
+      "outcome_date": "2025-04-10",
+      "sector": "ST摘帽/影视文旅",
+      "key_entities": [
+        "*ST文投",
+        "中兴财光华会计师事务所",
+        "上海证券交易所"
+      ],
+      "key_numbers": [
+        "2024年度期末净资产为正"
+      ],
+      "expected_direction": "up",
+      "subcategory": "申请撤销风险警示",
+      "memorization_likelihood": "low",
+      "target": "*ST文投",
+      "target_type": "company",
+      "period": "pre_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_214",
+      "news": {
+        "id": "2266705",
+        "title": "华民股份：控股子公司增资扩股引入外部投资者",
+        "content": "【华民股份：控股子公司增资扩股引入外部投资者】财联社1月22日电，华民股份(300345.SZ)公告称，公司拟与鸿新新能源、晶澳无锡签订《债权重组暨投资协议》，晶澳无锡以债转股方式对鸿新新能源进行增资扩股。晶澳无锡按照投前估值10亿元，以其对鸿新新能源享有的20,000万元债权以债转股的方式对鸿新新能源进行增资，其中11,600万元计入注册资本，8,400万元计入资本公积。增资完成后，鸿新新能源注册资本将增加至70,687.50万元，公司持有鸿新新能源的股权比例将变更为73.74%。本次交易不构成关联交易，不构成重大资产重组。",
+        "publish_time": "2026-01-22 18:21:12",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "光伏/债转股",
+      "key_entities": [
+        "华民股份",
+        "鸿新新能源",
+        "晶澳无锡"
+      ],
+      "key_numbers": [
+        "20000万元",
+        "10亿元",
+        "73.74%",
+        "70687.50万元"
+      ],
+      "expected_direction": "up",
+      "subcategory": "债转股增资扩股",
+      "memorization_likelihood": "medium",
+      "target": "华民股份",
+      "target_type": "company",
+      "period": "post_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_215",
+      "news": {
+        "id": "424050",
+        "title": "2019年43家新三板企业成功转板 挂牌企业年末加速冲刺IPO",
+        "content": "【2019年43家新三板企业成功转板 挂牌企业年末加速冲刺IPO】财联社1月1日讯，据证券时报，2019年共有43家新三板企业成功转板A股。其中，龙软科技、华特气体等14家企业在科创板上市。近期新三板公司再度出现上市辅导热潮，2019年12月49家企业公告辅导情况，为2019年单月最高。由此2019年超过200家新三板企业发布了上市辅导公告。与此同时，多家挂牌企业赶在年末冲刺IPO排队。目前IPO申请已获证监会受理的新三板企业为111家。",
+        "publish_time": "2020-01-01 14:20:56",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "消息后首个交易日（2020-01-02）华特气体收涨3.5%，随后5个交易日累计上涨约26.9%，市场按利好交易，正反馈得到延续。",
+      "outcome_date": "2020-01-02",
+      "sector": "新三板转板/科创板",
+      "key_entities": [
+        "新三板",
+        "龙软科技",
+        "华特气体",
+        "科创板"
+      ],
+      "key_numbers": [
+        "43家",
+        "14家",
+        "49家",
+        "111家"
+      ],
+      "expected_direction": "up",
+      "subcategory": "转板与IPO热度升温",
+      "memorization_likelihood": "medium",
+      "target": "华特气体",
+      "target_type": "company",
+      "period": "pre_cutoff",
+      "rarity_estimate": "medium"
+    },
+    {
+      "id": "exp_216",
+      "news": {
+        "id": "1457838",
+        "title": "嘉必优：2022年度业绩快报披露不准确、未及时审议并披露关联交易 公司及相关人员收到警示函",
+        "content": "【嘉必优：2022年度业绩快报披露不准确、未及时审议并披露关联交易 公司及相关人员收到警示函】《科创板日报》7日讯，嘉必优公告，公司于9月6日收到湖北证监局下发的《湖北证监局关于对嘉必优生物技术(武汉)股份有限公司、易德伟、王华标、易华荣出具警示函措施的决定》。据警示函，经查，嘉必优存在两项违规事实：一是2022年度业绩快报披露不准确，二是未及时审议并披露关联交易。易德伟为公司董事长兼总经理，王华标为公司董事兼财务总监，易华荣为公司副总经理兼董事会秘书。",
+        "publish_time": "2023-09-07 20:41:14",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "消息后首个交易日（2023-09-08）嘉必优收涨0.7%，随后5个交易日累计下跌约1.2%，初始反应偏钝化，但随后仍出现回落。",
+      "outcome_date": "2023-09-08",
+      "sector": "食品营养/监管风险",
+      "key_entities": [
+        "嘉必优",
+        "湖北证监局",
+        "易德伟"
+      ],
+      "key_numbers": [
+        "2022年度业绩快报",
+        "9月6日"
+      ],
+      "expected_direction": "down",
+      "subcategory": "警示函/信披违规",
+      "memorization_likelihood": "low",
+      "target": "嘉必优",
+      "target_type": "company",
+      "period": "pre_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_217",
+      "news": {
+        "id": "1795268",
+        "title": "四家科创板消费类芯片企业集体亮相：行业已现回暖信号 积极布局终端市场",
+        "content": "【四家科创板消费类芯片企业集体亮相：行业已现回暖信号 积极布局终端市场】财联社9月11日电，上交所9月10日举办2024年半年度科创板消费类芯片企业集体业绩说明会，聚辰股份、南芯科技、格科微、艾为电子等企业以线上方式集中亮相。“明年预计模拟芯片行业、消费电子行业等有望持续复苏，公司将继续巩固在消费电子充电领域的竞争优势，在汽车电子业务等领域也有望取得更好的突破。”南芯科技董事长兼总经理阮晨杰表示。格科微董事长兼首席执行官赵立新则称，公司对下半年高端产品出货量保持信心。艾为电子董事长兼总经理孙洪军、聚辰股份董事兼总经理张建臣也纷纷表示，对公司未来业绩及长期发展充满信心。巨丰投顾高级投资顾问朱华雷称，预计在全球AI、高效能运算（HPC）需求的爆发式增长下，以及在智能手机、个人电脑、服务器、汽车等下游市场的回暖驱动下，2024年的芯片行业有望迎来全面复苏。",
+        "publish_time": "2024-09-11 02:25:06",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "消息发布当日（2024-09-11）南芯科技收涨0.7%，随后5个交易日累计下跌约1.8%，市场初始按利好交易，但持续性不足。",
+      "outcome_date": "2024-09-11",
+      "sector": "消费芯片/科创板",
+      "key_entities": [
+        "南芯科技",
+        "聚辰股份",
+        "格科微",
+        "艾为电子"
+      ],
+      "key_numbers": [
+        "2024年半年度",
+        "9月10日"
+      ],
+      "expected_direction": "up",
+      "subcategory": "消费芯片业绩说明会",
+      "memorization_likelihood": "medium",
+      "target": "南芯科技",
+      "target_type": "company",
+      "period": "pre_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_218",
+      "news": {
+        "id": "2019746",
+        "title": "海南椰岛：将被实施退市风险警示及其他风险警示",
+        "content": "【海南椰岛：将被实施退市风险警示及其他风险警示】财联社4月29日电，海南椰岛(600238.SH)公告称，因公司2024年度经审计的扣除非经常性损益前后的净利润孰低者为负值，且扣除与主营业务无关的业务收入和不具备商业实质的收入后的营业收入低于1.75亿元，触及《上海证券交易所股票上市规则》相关规定，公司股票将被实施退市风险警示。同时，因公司2024年度内部控制审计被出具了否定意见，公司股票将被实施其他风险警示。实施退市风险警示后，公司A股简称将变更为*ST椰岛。",
+        "publish_time": "2025-04-29 21:55:41",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "消息后首个交易日（2025-05-06）海南椰岛收跌5.0%，随后5个交易日累计上涨约11.1%，利空冲击较短，随后出现修复。",
+      "outcome_date": "2025-05-06",
+      "sector": "白酒/ST风险",
+      "key_entities": [
+        "海南椰岛",
+        "退市风险警示",
+        "其他风险警示"
+      ],
+      "key_numbers": [
+        "1.75亿元"
+      ],
+      "expected_direction": "down",
+      "subcategory": "实施退市风险警示",
+      "memorization_likelihood": "low",
+      "target": "海南椰岛",
+      "target_type": "company",
+      "period": "pre_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_219",
+      "news": {
+        "id": "2269057",
+        "title": "投资日历：周一资本市场大事提醒",
+        "content": "【投资日历：周一资本市场大事提醒】\n①今日共有1只新股申购，为科创板的北芯生命（688712）。\n②国新办1月26日就2025年商务工作及运行情况举行新闻发布会。\n③第19届亚洲金融论坛将于1月26日举行，首设“全球产业峰会”。\n④中国信息通信研究院拟于1月26日召开2026年“星算·智联”太空算力研讨会。\n⑤广东省十四届人大五次会议将于1月26日上午在广州召开。\n⑥河南省第十四届人民代表大会第四次会议将于1月26日在郑州召开。\n⑦标普：自动化软件公司UiPath获纳入标普中型股400指数成分股，将于1月6日开盘前生效。\n⑧今日有2000亿元1年期中期借贷便利（MLF）和1583亿元7天期逆回购到期。\n⑨今日将公布德国1月IFO商业景气指数等数据。",
+        "publish_time": "2026-01-26 07:45:56",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "太空算力",
+      "key_entities": [
+        "中国信息通信研究院",
+        "星算·智联",
+        "太空算力研讨会"
+      ],
+      "key_numbers": [
+        "1月26日"
+      ],
+      "expected_direction": "up",
+      "subcategory": "投资日历/太空算力催化",
+      "memorization_likelihood": "medium",
+      "target": "太空算力板块",
+      "target_type": "sector",
+      "period": "post_cutoff",
+      "rarity_estimate": "common"
+    },
+    {
+      "id": "exp_220",
+      "news": {
+        "id": "2276993",
+        "title": "投资日历：周一资本市场大事提醒",
+        "content": "【投资日历：周一资本市场大事提醒】\n①今日共有2只新股申购，为北交所的爱得科技（920180）、科创板的易思维（688816）。\n②2026年春运将自2月2日启动，至3月13日结束。\n③山西省第十四届人民代表大会第五次会议将于2月2日召开。\n④亚洲虚拟现实XR产业展览会（AWE Asia 2026）将于2月2日至4日在新加坡举办。\n⑤今日有1505亿元7天期逆回购到期。\n⑥今日将公布美国1月ISM制造业PMI等数据。",
+        "publish_time": "2026-02-02 07:50:37",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "XR/VR",
+      "key_entities": [
+        "AWE Asia 2026",
+        "XR产业"
+      ],
+      "key_numbers": [
+        "2月2日至4日",
+        "2026年春运"
+      ],
+      "expected_direction": "up",
+      "subcategory": "投资日历/XR展会催化",
+      "memorization_likelihood": "medium",
+      "target": "XR/VR板块",
+      "target_type": "sector",
+      "period": "post_cutoff",
+      "rarity_estimate": "common"
+    },
+    {
+      "id": "exp_221",
+      "news": {
+        "id": "2241419",
+        "title": "深圳机场：拟收购深圳市机场国际快件海关监管中心有限公司1%股权",
+        "content": "【深圳机场：拟收购深圳市机场国际快件海关监管中心有限公司1%股权】财联社12月26日电，深圳机场(000089.SZ)公告称，公司拟以自有资金收购深国际全程物流（深圳）有限公司所持快件中心的1%股权，交易价格为380.74万元。本次交易完成后，公司持股快件中心的股权比例将由50%提升至51%，公司将控股快件中心，并将其纳入公司合并报表范围。此次交易旨在优化公司参股公司股权结构，提升企业治理水平，完善深圳机场“货”板块战略布局，增强协同效应。",
+        "publish_time": "2025-12-26 19:57:08",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "机场物流",
+      "key_entities": [
+        "深圳机场",
+        "快件中心",
+        "深国际全程物流"
+      ],
+      "key_numbers": [
+        "1%股权",
+        "380.74万元",
+        "50%提升至51%"
+      ],
+      "expected_direction": "up",
+      "subcategory": "收购少数股权并并表",
+      "memorization_likelihood": "low",
+      "target": "深圳机场",
+      "target_type": "company",
+      "period": "post_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_222",
+      "news": {
+        "id": "1918362",
+        "title": "A股强势反攻，A500ETF易方达（159361）今日成交额突破30亿元",
+        "content": "【A股强势反攻，A500ETF易方达（159361）今日成交额突破30亿元】截至收盘，全市场超5300只个股收涨。指数方面，中证A500指数上涨2.9%，沪深300指数上涨2.6%，创业板指数上涨4.7%，上证科创板50成份指数上涨3.1%。中证A500等宽基指数产品交投活跃，Wind数据显示，A500ETF易方达（159361）今日成交额突破30亿元，位居同类ETF前列。",
+        "publish_time": "2025-01-14 22:26:56",
+        "category": "macro",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "消息发布当日（2025-01-14）中证A500指数涨2.9%，随后5个交易日累计上涨约3.2%，市场按利好交易，正反馈得到延续。",
+      "outcome_date": "2025-01-14",
+      "sector": "A股宽基",
+      "key_entities": [
+        "中证A500指数",
+        "A500ETF易方达",
+        "沪深300指数"
+      ],
+      "key_numbers": [
+        "超5300只个股收涨",
+        "2.9%",
+        "30亿元"
+      ],
+      "expected_direction": "up",
+      "subcategory": "宽基反攻放量",
+      "memorization_likelihood": "medium",
+      "target": "中证A500指数",
+      "target_type": "index",
+      "period": "pre_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_223",
+      "news": {
+        "id": "2211719",
+        "title": "广济药业：公司目前生产经营正常 无应披露而未披露的重大事项",
+        "content": "【广济药业：公司目前生产经营正常 无应披露而未披露的重大事项】财联社11月26日电，广济药业(000952.SZ)公告称，公司股票交易连续三个交易日收盘价格涨幅偏离值累计超过20%，属于股票交易异常波动情况。经核实，公司前期披露的信息不存在需要补充、更正之处，近期公司生产经营情况正常，内外部经营环境未发生重大变化。公司及控股股东、实际控制人不存在应披露而未披露的重大事项，或处于筹划阶段的重大事项。股票交易异常波动期间，公司控股股东、实际控制人未发生买卖本公司股票的情形。",
+        "publish_time": "2025-11-26 17:38:31",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "unknown_post_cutoff",
+      "outcome_date": "unknown",
+      "sector": "维生素/医药",
+      "key_entities": [
+        "广济药业",
+        "股票交易异常波动",
+        "控股股东"
+      ],
+      "key_numbers": [
+        "连续三个交易日",
+        "涨幅偏离值累计超过20%"
+      ],
+      "expected_direction": "down",
+      "subcategory": "异动澄清",
+      "memorization_likelihood": "medium",
+      "target": "广济药业",
+      "target_type": "company",
+      "period": "post_cutoff",
+      "rarity_estimate": "medium"
+    },
+    {
+      "id": "exp_224",
+      "news": {
+        "id": "1563236",
+        "title": "广钢气体：拟斥资4950万元认购合肥启航恒鑫基金5.14%份额",
+        "content": "【广钢气体：拟斥资4950万元认购合肥启航恒鑫基金5.14%份额】《科创板日报》5日讯，广钢气体公告，为进一步探索和发现新的业务机会和增长点，公司拟借助专业投资机构在半导体等相关领域的资源优势和投资能力，实现扩充产品种类和规模的目标，同时通过股权投资赋能主业协同发展，持续提升公司的市场竞争力和持续盈利能力。公司拟作为有限合伙人以自有资金4,950万元认购合肥启航恒鑫基金份额，占合肥启航恒鑫基金募集总金额比例约为5.14%。本次投资中公司未对其他投资人承诺保底收益或进行退出担保。",
+        "publish_time": "2024-01-05 17:46:28",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "消息后首个交易日（2024-01-08）广钢气体收跌3.3%，随后5个交易日累计下跌约7.1%，市场未充分认可利好逻辑，股价延续走弱。",
+      "outcome_date": "2024-01-08",
+      "sector": "工业气体/半导体",
+      "key_entities": [
+        "广钢气体",
+        "合肥启航恒鑫基金",
+        "半导体"
+      ],
+      "key_numbers": [
+        "4950万元",
+        "5.14%"
+      ],
+      "expected_direction": "up",
+      "subcategory": "产业基金投资",
+      "memorization_likelihood": "low",
+      "target": "广钢气体",
+      "target_type": "company",
+      "period": "pre_cutoff",
+      "rarity_estimate": "medium"
+    },
+    {
+      "id": "exp_225",
+      "news": {
+        "id": "2044793",
+        "title": "隆扬电子：拟1.2亿元收购威斯双联51%股权",
+        "content": "【隆扬电子：拟1.2亿元收购威斯双联51%股权】财联社5月29日电，隆扬电子(301389.SZ)公告称，公司拟以1.2亿元收购常州威斯双联科技有限公司51%的股权，交易完成后，威斯双联将成为公司的控股子公司。威斯双联与隆扬电子同属同一行业，具有显著的协同效应，其在高分子材料及吸波材料研发领域具备深厚的技术积累和创新能力。本次交易无需提交股东大会审议，不构成关联交易和重大资产重组。",
+        "publish_time": "2025-05-29 22:30:36",
+        "category": "corporate",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "消息后首个交易日（2025-05-30）隆扬电子收跌3.2%，随后5个交易日累计上涨约3.8%，资金先分歧后修复，利好在随后几个交易日发酵。",
+      "outcome_date": "2025-05-30",
+      "sector": "电磁屏蔽/吸波材料",
+      "key_entities": [
+        "隆扬电子",
+        "威斯双联"
+      ],
+      "key_numbers": [
+        "1.2亿元",
+        "51%股权"
+      ],
+      "expected_direction": "up",
+      "subcategory": "并购控股子公司",
+      "memorization_likelihood": "low",
+      "target": "隆扬电子",
+      "target_type": "company",
+      "period": "pre_cutoff",
+      "rarity_estimate": "rare"
+    },
+    {
+      "id": "exp_226",
+      "news": {
+        "id": "2030485",
+        "title": "A股午后拉升，创业板指一度涨近2%，同类规模第一的创业板ETF（159915）成交活跃",
+        "content": "【A股午后拉升，创业板指一度涨近2%，同类规模第一的创业板ETF（159915）成交活跃】大盘午后走强，截至14:15，创业板指上涨0.8%，一度涨近2%，成份股中，指南针涨超5%，东方财富、同花顺涨超4%，创业板ETF（159915）盘中成交额突破20亿元。\n光大证券认为，当前A股市场的估值处于2010年以来的均值附近，而随着政策的积极发力，中长期资金带来的增量资金或将持续流入市场，对资本市场形成托底，A股市场有望震荡上行。\n创业板指数是A股市场重要标尺指数之一，成份股中战略性新兴产业占比较高。截至昨日，该指数滚动市盈率为31.1倍，处于指数2010年发布以来11.1%分位处，配置价值显现。\n创业板ETF（159915）最新规模约860亿元，在同标的指数ETF中位居第一，该产品管理费率加托管费率仅0.2%/年，可助力低成本布局创新创业企业发展机遇。",
+        "publish_time": "2025-05-14 14:48:00",
+        "category": "industry",
+        "source": "cls_telegraph"
+      },
+      "known_outcome": "消息发布当日（2025-05-14）创业板指涨1.0%，随后5个交易日累计下跌约0.7%，市场初始按利好交易，但持续性不足。",
+      "outcome_date": "2025-05-14",
+      "sector": "创业板/科技成长",
+      "key_entities": [
+        "创业板指",
+        "指南针",
+        "东方财富",
+        "同花顺"
+      ],
+      "key_numbers": [
+        "一度涨近2%",
+        "20亿元",
+        "31.1倍"
+      ],
+      "expected_direction": "up",
+      "subcategory": "午后指数拉升",
+      "memorization_likelihood": "medium",
+      "target": "创业板指",
+      "target_type": "index",
+      "period": "pre_cutoff",
+      "rarity_estimate": "rare"
+    }
+  ],
+  "skipped": [
+    {
+      "id": "v2_105",
+      "reason": "审计改聘潮是市场统计汇总，未给出单一、可验证的A股交易目标。"
+    },
+    {
+      "id": "v2_108",
+      "reason": "终止审核对象为未上市公司，公告本身缺少明确A股映射标的。"
+    },
+    {
+      "id": "v2_122",
+      "reason": "字节跳动总部迁址传闻为海外公司层面事件，对A股仅存在过长的概念映射链条。"
+    }
+  ]
+}

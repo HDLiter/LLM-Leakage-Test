@@ -9,7 +9,8 @@ import json
 import os
 import time
 from pathlib import Path
-from typing import Any, Optional
+from collections.abc import Sequence
+from typing import Any, Literal, cast, overload
 
 import httpx
 from dotenv import load_dotenv
@@ -225,30 +226,66 @@ class LLMClient:
         prompts: list[tuple[str, str]],
         max_concurrency: int,
         bypass_cache: bool,
-    ) -> list[LLMResponse]:
+        failure_isolated: bool = False,
+    ) -> list[LLMResponse | BaseException]:
         semaphore = asyncio.Semaphore(max_concurrency)
         async with httpx.AsyncClient(timeout=120.0) as client:
             tasks = [
                 self._async_single(client, semaphore, s, u, bypass_cache)
                 for s, u in prompts
             ]
+            if failure_isolated:
+                # Per-prompt isolation: failed prompts surface as Exception
+                # at the same index instead of killing the whole batch.
+                return list(await asyncio.gather(*tasks, return_exceptions=True))
+            # Legacy behavior: first failure raises, kills the batch.
             return list(await asyncio.gather(*tasks))
+
+    @overload
+    def batch_chat_concurrent(
+        self,
+        prompts: list[tuple[str, str]],
+        max_concurrency: int = ...,
+        bypass_cache: bool = ...,
+        *,
+        failure_isolated: Literal[False] = ...,
+    ) -> list[LLMResponse]: ...
+
+    @overload
+    def batch_chat_concurrent(
+        self,
+        prompts: list[tuple[str, str]],
+        max_concurrency: int = ...,
+        bypass_cache: bool = ...,
+        *,
+        failure_isolated: Literal[True],
+    ) -> list[LLMResponse | BaseException]: ...
 
     def batch_chat_concurrent(
         self,
         prompts: list[tuple[str, str]],
         max_concurrency: int = DEFAULT_CONCURRENCY,
         bypass_cache: bool = False,
-    ) -> list[LLMResponse]:
+        *,
+        failure_isolated: bool = False,
+    ) -> Sequence[LLMResponse | BaseException]:
         """Send multiple prompts concurrently via asyncio.
 
         Args:
             prompts: list of (system, user) tuples.
             max_concurrency: max parallel requests (default DEFAULT_CONCURRENCY).
             bypass_cache: skip cache lookup if True.
+            failure_isolated: when True, failures from individual prompts are
+                returned as BaseException objects at their stable index instead
+                of propagating and killing the batch. The caller is responsible
+                for checking each entry's type. Default False preserves the
+                legacy "first error raises" behavior.
 
         Returns:
-            list of LLMResponse in the same order as prompts.
+            list in the same order as prompts. When ``failure_isolated=False``
+            (default) every entry is an ``LLMResponse`` (any failure will have
+            already raised). When ``failure_isolated=True`` failed entries are
+            ``BaseException`` objects at their stable index.
         """
         try:
             loop = asyncio.get_running_loop()
@@ -260,8 +297,12 @@ class LLMClient:
             import nest_asyncio
             nest_asyncio.apply()
             return loop.run_until_complete(
-                self._batch_chat_async(prompts, max_concurrency, bypass_cache)
+                self._batch_chat_async(
+                    prompts, max_concurrency, bypass_cache, failure_isolated
+                )
             )
         return asyncio.run(
-            self._batch_chat_async(prompts, max_concurrency, bypass_cache)
+            self._batch_chat_async(
+                prompts, max_concurrency, bypass_cache, failure_isolated
+            )
         )

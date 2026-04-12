@@ -1,0 +1,1059 @@
+[
+  {
+    "candidate_id": "tc_031",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "国家医保局",
+      "2021年6月23日组织开展第五批国家药品集中采购",
+      "涉及61个品种且部分品种降价幅度超90%"
+    ],
+    "anchor_rationale": "The named authority, exact date, procurement round, and exact variety count uniquely identify this centralized drug-procurement event.",
+    "key_entities": [
+      "国家医保局",
+      "第五批国家药品集中采购"
+    ],
+    "key_numbers": [
+      "2021年6月23日",
+      "第五批",
+      "61个品种",
+      "超90%"
+    ],
+    "expected_direction": "down",
+    "subcategory": "第五批药品集采",
+    "target": "仿制药板块",
+    "target_type": "sector",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_032",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "中国人民银行、住建部",
+      "2020年8月20日召开重点房地产企业座谈会",
+      "明确提出“三道红线”及70%/100%/1倍三项指标"
+    ],
+    "anchor_rationale": "The named authorities, exact date, rule name, and threshold set uniquely identify this property-financing policy event.",
+    "key_entities": [
+      "中国人民银行",
+      "住建部",
+      "三道红线"
+    ],
+    "key_numbers": [
+      "2020年8月20日",
+      "70%",
+      "100%",
+      "1倍"
+    ],
+    "expected_direction": "down",
+    "subcategory": "三道红线融资新规",
+    "target": "房地产板块",
+    "target_type": "sector",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_033",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "OpenAI旗下ChatGPT",
+      "2023年2月1日月活用户突破1亿",
+      "A股AI概念股全线爆发"
+    ],
+    "anchor_rationale": "The named product, exact date, and exact user milestone uniquely identify this AI-adoption catalyst.",
+    "key_entities": [
+      "OpenAI",
+      "ChatGPT",
+      "昆仑万维",
+      "三六零",
+      "科大讯飞"
+    ],
+    "key_numbers": [
+      "2023年2月1日",
+      "1亿"
+    ],
+    "expected_direction": "up",
+    "subcategory": "ChatGPT用户破亿催化",
+    "target": "AI板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_034",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "光伏产业链价格持续下跌",
+      "多晶硅料从30万元/吨跌至不足8万元/吨",
+      "组件价格跌破1元/W且行业产能过剩"
+    ],
+    "anchor_rationale": "The text gives a sector-wide price-collapse clue, but it lacks a named specific entity and stays at class level rather than one event instance.",
+    "key_entities": [
+      "光伏产业链",
+      "多晶硅料",
+      "组件"
+    ],
+    "key_numbers": [
+      "2023年8月15日",
+      "30万元/吨",
+      "不足8万元/吨",
+      "超70%",
+      "1元/W"
+    ],
+    "expected_direction": "down",
+    "subcategory": "光伏价格下跌/产能过剩",
+    "target": "光伏板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_035",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "多家白酒企业中报预告显示消费复苏不及预期",
+      "五粮液批价跌破900元",
+      "国窖1573批价回落且渠道库存偏高"
+    ],
+    "anchor_rationale": "The named brands and price-pressure clues indicate a class-level sector slowdown rather than one discrete timed event.",
+    "key_entities": [
+      "五粮液",
+      "国窖1573",
+      "白酒企业"
+    ],
+    "key_numbers": [
+      "2023年7月10日",
+      "900元",
+      "800元"
+    ],
+    "expected_direction": "down",
+    "subcategory": "白酒消费复苏不及预期",
+    "target": "白酒板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_036",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "美国总统拜登",
+      "2022年8月10日正式签署《芯片与科学法案》",
+      "对中国半导体产业实施更严格出口管制"
+    ],
+    "anchor_rationale": "The named president, exact date, and full act title uniquely identify this semiconductor-policy event.",
+    "key_entities": [
+      "拜登",
+      "美国",
+      "《芯片与科学法案》"
+    ],
+    "key_numbers": [
+      "2022年8月10日"
+    ],
+    "expected_direction": "up",
+    "subcategory": "美国芯片法案签署",
+    "target": "国产半导体产业链",
+    "target_type": "sector",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_037",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "《中华人民共和国国民经济和社会发展第十四个五年规划和2035年远景目标纲要》",
+      "2021年3月15日正式发布",
+      "明确提出加快武器装备现代化并锚定2027年目标"
+    ],
+    "anchor_rationale": "The full outline title and exact release date uniquely identify this planning-document event.",
+    "key_entities": [
+      "《中华人民共和国国民经济和社会发展第十四个五年规划和2035年远景目标纲要》"
+    ],
+    "key_numbers": [
+      "2021年3月15日",
+      "2035年",
+      "2027年"
+    ],
+    "expected_direction": "up",
+    "subcategory": "十四五规划纲要",
+    "target": "军工板块",
+    "target_type": "sector",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_038",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "碳酸锂期货主力合约价格跌破20万元/吨",
+      "较2022年11月高点近60万元/吨暴跌超65%",
+      "锂电产业链面临去库存压力"
+    ],
+    "anchor_rationale": "The text gives a sector-wide commodity-slump clue, but it lacks a named specific entity and remains class level rather than one event instance.",
+    "key_entities": [
+      "碳酸锂期货",
+      "锂电产业链"
+    ],
+    "key_numbers": [
+      "2023年9月1日",
+      "20万元/吨",
+      "近60万元/吨",
+      "超65%"
+    ],
+    "expected_direction": "down",
+    "subcategory": "碳酸锂价格暴跌",
+    "target": "锂电产业链",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_039",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "工商银行",
+      "2024年3月15日A股股价创历史新高",
+      "银行股凭借5%以上股息率成为重点配置方向"
+    ],
+    "anchor_rationale": "The text names the company, a concrete price milestone, and an exact date, but it lacks a unique locator.",
+    "key_entities": [
+      "工商银行",
+      "银行板块"
+    ],
+    "key_numbers": [
+      "2024年3月15日",
+      "5%以上"
+    ],
+    "expected_direction": "up",
+    "subcategory": "银行高股息行情",
+    "target": "银行板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_040",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "中美",
+      "2020年1月15日在华盛顿签署第一阶段经贸协议",
+      "贸易摩擦暂时缓和"
+    ],
+    "anchor_rationale": "The named counterparties, exact date, and specific phase agreement uniquely identify this trade-deal signing event.",
+    "key_entities": [
+      "中国",
+      "美国",
+      "第一阶段经贸协议",
+      "华盛顿"
+    ],
+    "key_numbers": [
+      "2020年1月15日"
+    ],
+    "expected_direction": "up",
+    "subcategory": "中美第一阶段经贸协议",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_041",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "美联储",
+      "2022年6月16日宣布加息75个基点",
+      "将联邦基金利率目标区间上调至1.50%-1.75%"
+    ],
+    "anchor_rationale": "The exact date, hike size, and target-rate range uniquely identify this Fed tightening event.",
+    "key_entities": [
+      "美联储",
+      "鲍威尔"
+    ],
+    "key_numbers": [
+      "2022年6月16日",
+      "75个基点",
+      "1.50%-1.75%",
+      "1994年以来"
+    ],
+    "expected_direction": "down",
+    "subcategory": "美联储加息75个基点",
+    "target": "全球资本市场",
+    "target_type": "index",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "tc_042",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "国务院联防联控机制",
+      "2022年11月11日发布进一步优化疫情防控的二十条措施",
+      "取消次密接判定并缩短隔离时间"
+    ],
+    "anchor_rationale": "The named mechanism, exact date, and distinctive '20 measures' package uniquely identify this reopening-policy event.",
+    "key_entities": [
+      "国务院联防联控机制",
+      "进一步优化疫情防控的二十条措施"
+    ],
+    "key_numbers": [
+      "2022年11月11日",
+      "二十条"
+    ],
+    "expected_direction": "up",
+    "subcategory": "优化疫情防控二十条",
+    "target": "消费板块",
+    "target_type": "sector",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_101",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "海尔生物",
+      "2021年9月22日收到《青岛海尔生物医疗股份有限公司简式权益变动报告书》",
+      "奇君投资累计减持1585.72万股，占总股本5.00%"
+    ],
+    "anchor_rationale": "The report title, exact dates, and exact share-and-ratio figures uniquely identify this shareholder reduction event.",
+    "key_entities": [
+      "海尔生物",
+      "奇君投资",
+      "《青岛海尔生物医疗股份有限公司简式权益变动报告书》"
+    ],
+    "key_numbers": [
+      "2021年9月22日",
+      "2020年2月28日",
+      "1585.72万股",
+      "5.00%"
+    ],
+    "expected_direction": "down",
+    "subcategory": "股东减持进展",
+    "target": "海尔生物",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_102",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "国家发展改革委副秘书长肖渭明",
+      "2025-2026中国经济年会12月13日召开",
+      "提出全面实施“人工智能+”行动并完善低空经济产业生态"
+    ],
+    "anchor_rationale": "The text names the official, a concrete policy speech, and a tied meeting date, but it lacks a unique locator.",
+    "key_entities": [
+      "国家发展改革委",
+      "肖渭明",
+      "2025-2026中国经济年会"
+    ],
+    "key_numbers": [
+      "12月13日",
+      "2025-2026"
+    ],
+    "expected_direction": "up",
+    "subcategory": "人工智能+行动表态",
+    "target": "人工智能与低空经济板块",
+    "target_type": "sector",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_103",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "联翔股份",
+      "财务总监彭小红辞职并聘任周红芳为新任财务总监",
+      "第三届董事会提名委员会第四次会议、审计委员会第十次会议审议通过"
+    ],
+    "anchor_rationale": "The text names the company, a concrete management change, and a same-day report cue, but it lacks a unique locator.",
+    "key_entities": [
+      "联翔股份",
+      "彭小红",
+      "周红芳",
+      "董事会"
+    ],
+    "key_numbers": [
+      "6月23日",
+      "第三届",
+      "第四次",
+      "第十次"
+    ],
+    "expected_direction": "neutral",
+    "subcategory": "财务总监变更",
+    "target": "联翔股份",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_104",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "今日早盘市场放量走强",
+      "创业板指与科创50双双领涨",
+      "属于科技主线盘面复盘"
+    ],
+    "anchor_rationale": "This is a broad market roundup rather than one identifiable event.",
+    "key_entities": [
+      "创业板指",
+      "科创50",
+      "工业富联",
+      "海光信息",
+      "寒武纪"
+    ],
+    "key_numbers": [
+      "2连板",
+      "20CM",
+      "超10%"
+    ],
+    "expected_direction": "up",
+    "subcategory": "市场主线复盘",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_105",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "利欧股份",
+      "接受机构调研时表示已引入广告素材审核智能体",
+      "公司称已具备多模态内容的AI应用能力"
+    ],
+    "anchor_rationale": "The text names the company and a business-update clue, but the AI-capability statement remains vague rather than one discrete event.",
+    "key_entities": [
+      "利欧股份",
+      "广告素材审核智能体"
+    ],
+    "key_numbers": [
+      "9天6板",
+      "1月14日"
+    ],
+    "expected_direction": "up",
+    "subcategory": "机构调研/AI应用表态",
+    "target": "利欧股份",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_106",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "*ST建艺",
+      "控股股东珠海正方集团豁免14亿元债务本金及889.67万元利息",
+      "并捐赠4亿元现金资产且预计2025年12月31日前完成解除抵押"
+    ],
+    "anchor_rationale": "The named company, counterparty, and precise debt-waiver and gift amounts uniquely identify this bailout-style support event.",
+    "key_entities": [
+      "*ST建艺",
+      "珠海正方集团"
+    ],
+    "key_numbers": [
+      "14亿元",
+      "889.67万元",
+      "4亿元",
+      "2025年12月31日"
+    ],
+    "expected_direction": "up",
+    "subcategory": "债务豁免/现金捐赠",
+    "target": "*ST建艺",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_107",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "市场午后震荡回落",
+      "DeepSeek概念股多只跌停",
+      "属于午后盘面快评"
+    ],
+    "anchor_rationale": "This is routine intraday sector-and-market commentary rather than one identifiable event.",
+    "key_entities": [
+      "DeepSeek",
+      "杭钢股份",
+      "创业板指"
+    ],
+    "key_numbers": [
+      "14点",
+      "57亿",
+      "6板",
+      "近40%"
+    ],
+    "expected_direction": "down",
+    "subcategory": "AI应用板块退潮",
+    "target": "AI应用板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_108",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "长安汽车",
+      "控股子公司深蓝汽车拟增资扩股",
+      "预计募资规模约61.22亿元，其中非公开协议增资不超过31.22亿元"
+    ],
+    "anchor_rationale": "The named parent and subsidiary plus the precise fundraising structure and amounts uniquely identify this capital-raise event.",
+    "key_entities": [
+      "长安汽车",
+      "深蓝汽车",
+      "重庆产交所"
+    ],
+    "key_numbers": [
+      "12月12日",
+      "61.22亿元",
+      "31.22亿元"
+    ],
+    "expected_direction": "up",
+    "subcategory": "控股子公司增资扩股",
+    "target": "长安汽车",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_109",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "元利科技",
+      "拟500万元设立全资子公司山东抱一科技有限公司",
+      "现已取得营业执照"
+    ],
+    "anchor_rationale": "The named company, exact investment amount, and full subsidiary name uniquely identify this subsidiary-establishment event.",
+    "key_entities": [
+      "元利科技",
+      "山东抱一科技有限公司"
+    ],
+    "key_numbers": [
+      "2月3日",
+      "500万元"
+    ],
+    "expected_direction": "neutral",
+    "subcategory": "设立全资子公司",
+    "target": "元利科技",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_110",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "腾景科技",
+      "控股子公司合肥众波收到YVO4产品单笔采购订单",
+      "总金额为8760.60万元"
+    ],
+    "anchor_rationale": "The named company and subsidiary, specific product, and exact order amount uniquely identify this sales-order event.",
+    "key_entities": [
+      "腾景科技",
+      "合肥众波",
+      "YVO4产品"
+    ],
+    "key_numbers": [
+      "10月22日",
+      "8760.60万元"
+    ],
+    "expected_direction": "up",
+    "subcategory": "销售订单签订",
+    "target": "腾景科技",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_111",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "多只芯片主题指数收跌",
+      "中国银河证券看好存储芯片下一轮周期",
+      "属于芯片板块与ETF布局观点"
+    ],
+    "anchor_rationale": "This is routine sector-performance and positioning commentary, not one identifiable event.",
+    "key_entities": [
+      "中证半导体材料设备主题指数",
+      "上证科创板芯片设计主题指数",
+      "中证芯片产业指数",
+      "中国银河证券"
+    ],
+    "key_numbers": [
+      "-1.0%",
+      "-1.2%",
+      "-1.3%",
+      "-1.5%"
+    ],
+    "expected_direction": "up",
+    "subcategory": "芯片板块走势/ETF营销",
+    "target": "芯片板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_112",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "倍轻松",
+      "拟发行1,541万股",
+      "2021年6月30日初步询价时间为9:30-15:00"
+    ],
+    "anchor_rationale": "The named company plus the exact issuance size and schedule uniquely identify this IPO inquiry event.",
+    "key_entities": [
+      "倍轻松",
+      "科创板"
+    ],
+    "key_numbers": [
+      "1,541万股",
+      "25.00%",
+      "6,164万股",
+      "2021年6月30日",
+      "9:30-15:00"
+    ],
+    "expected_direction": "up",
+    "subcategory": "IPO初步询价安排",
+    "target": "倍轻松",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_113",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "中国联通集团研究院和辽宁分公司携手中兴通讯和联发科技",
+      "近日在大连成功完成时频双聚合方案（FAST）的商用验证",
+      "这是3GPP R16上行载波聚合特性的首次验证"
+    ],
+    "anchor_rationale": "The text names the parties, a concrete validation event, and a relative time anchor, but it lacks a unique locator.",
+    "key_entities": [
+      "中国联通",
+      "中兴通讯",
+      "联发科技",
+      "FAST",
+      "3GPP R16",
+      "大连"
+    ],
+    "key_numbers": [
+      "3.5GHz+2.1GHz",
+      "R16"
+    ],
+    "expected_direction": "up",
+    "subcategory": "5G商用验证",
+    "target": "5G产业链",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_114",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "A股上市公司2025年年报业绩预告进入加速披露期",
+      "451家披露、42家净利增幅下限超100%",
+      "AI被概括为业绩增长驱动力"
+    ],
+    "anchor_rationale": "This is a broad earnings-season summary rather than one identifiable event.",
+    "key_entities": [
+      "A股上市公司",
+      "Wind",
+      "AI"
+    ],
+    "key_numbers": [
+      "1月19日18时",
+      "451家",
+      "156家",
+      "42家",
+      "100%"
+    ],
+    "expected_direction": "up",
+    "subcategory": "年报预告高增/AI驱动",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_115",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "中证A500等宽基指数收跌",
+      "华西证券称多种因素仍支撑牛市延续",
+      "属于宽基指数与ETF营销文案"
+    ],
+    "anchor_rationale": "This is routine index-performance and ETF-positioning commentary, not one identifiable event.",
+    "key_entities": [
+      "中证A500指数",
+      "中证A100指数",
+      "中证A50指数",
+      "华西证券",
+      "A500ETF易方达"
+    ],
+    "key_numbers": [
+      "-0.5%",
+      "-0.5%",
+      "-0.4%"
+    ],
+    "expected_direction": "up",
+    "subcategory": "宽基指数表现/ETF营销",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_116",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "光刻胶板块逆势活跃",
+      "晶瑞电材20CM涨停",
+      "消息面上T150 A光刻胶通过半导体工艺量产验证"
+    ],
+    "anchor_rationale": "The sector rally and catalyst clue remain class-level and do not pin one clearly identified event instance.",
+    "key_entities": [
+      "晶瑞电材",
+      "国风新材",
+      "武汉太紫微光电科技有限公司",
+      "T150 A光刻胶"
+    ],
+    "key_numbers": [
+      "20CM",
+      "120nm"
+    ],
+    "expected_direction": "up",
+    "subcategory": "光刻胶板块走势",
+    "target": "光刻胶板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_117",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "红利板块震荡上行",
+      "恒生红利低波ETF易方达最新规模突破80亿元创历史新高",
+      "后半部分是ETF费率与产品营销"
+    ],
+    "anchor_rationale": "This is routine factor-performance and ETF-marketing copy, not one identifiable event.",
+    "key_entities": [
+      "恒生红利低波ETF易方达",
+      "易方达基金",
+      "中证红利指数",
+      "中证红利低波动指数"
+    ],
+    "key_numbers": [
+      "0.8%",
+      "0.7%",
+      "0.5%",
+      "0.4%",
+      "约2000万份",
+      "80亿元",
+      "0.15%/年"
+    ],
+    "expected_direction": "up",
+    "subcategory": "红利风格走势/ETF营销",
+    "target": "红利板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_118",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "今日是本月最后一个交易日",
+      "全市场超4700只个股下跌",
+      "属于收评式盘面综述"
+    ],
+    "anchor_rationale": "This is a routine closing market roundup rather than one identifiable event.",
+    "key_entities": [
+      "沪指",
+      "深成指",
+      "创业板指",
+      "科创50",
+      "北证50",
+      "准油股份",
+      "海南椰岛",
+      "中大力德"
+    ],
+    "key_numbers": [
+      "3.82%",
+      "超4700只",
+      "近200股",
+      "1.87万亿",
+      "1376亿",
+      "1.98%",
+      "2.89%"
+    ],
+    "expected_direction": "down",
+    "subcategory": "A股收评",
+    "target": "A股市场",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_119",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "卫信康",
+      "全资子公司近日收到国家药监局核准签发的利多卡因丁卡因乳膏《药物临床试验批准通知书》",
+      "同意该药品开展局部麻醉临床试验"
+    ],
+    "anchor_rationale": "The text names the company, a concrete drug-approval event, and a relative time anchor, but it lacks a unique locator.",
+    "key_entities": [
+      "卫信康",
+      "西藏中卫诚康药业有限公司",
+      "国家药监局",
+      "利多卡因丁卡因乳膏",
+      "《药物临床试验批准通知书》"
+    ],
+    "key_numbers": [
+      "12月3日"
+    ],
+    "expected_direction": "up",
+    "subcategory": "药物临床批件",
+    "target": "卫信康",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_120",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "上海证券交易所",
+      "近日召开“科创板八条”生物医药专题培训及座谈会",
+      "与会企业围绕并购重组具体措施建言"
+    ],
+    "anchor_rationale": "The text names the institution, a concrete meeting, and a relative time anchor, but it lacks a unique locator.",
+    "key_entities": [
+      "上海证券交易所",
+      "科创板八条",
+      "三友医疗",
+      "美迪西"
+    ],
+    "key_numbers": [
+      "7月13日"
+    ],
+    "expected_direction": "up",
+    "subcategory": "科创板八条专题座谈会",
+    "target": "科创板生物医药板块",
+    "target_type": "sector",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_121",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "深科达",
+      "公布2023年限制性股票激励计划",
+      "拟授予264.74万股，授予价格12.50元/股"
+    ],
+    "anchor_rationale": "The named company and precise share-volume and price details uniquely identify this incentive-plan event.",
+    "key_entities": [
+      "深科达",
+      "2023年限制性股票激励计划"
+    ],
+    "key_numbers": [
+      "2023年",
+      "105人",
+      "12.50元/股",
+      "264.74万股",
+      "3.27%"
+    ],
+    "expected_direction": "up",
+    "subcategory": "限制性股票激励计划",
+    "target": "深科达",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_122",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "首届“冰超”开启赛程、多地“冰雪假”陆续敲定",
+      "冰雪经济板块最高涨幅近30%",
+      "整篇是冰雪经济升温的行业综述"
+    ],
+    "anchor_rationale": "This is a broad industry trend summary rather than one identifiable event.",
+    "key_entities": [
+      "哈尔滨乾卯雪龙体育用品有限公司",
+      "李智博",
+      "冰超"
+    ],
+    "key_numbers": [
+      "近30%",
+      "2025年至2026年",
+      "2025年上半年",
+      "80%"
+    ],
+    "expected_direction": "up",
+    "subcategory": "冰雪经济景气升温",
+    "target": "冰雪经济板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_123",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "今天凌晨OpenAI技术直播发布ChatGPT Agent",
+      "AI智能体概念股开盘活跃",
+      "南兴股份一字涨停"
+    ],
+    "anchor_rationale": "The text names the company, a concrete product-release event, and a relative time anchor, but it lacks a unique locator.",
+    "key_entities": [
+      "OpenAI",
+      "ChatGPT Agent",
+      "南兴股份"
+    ],
+    "key_numbers": [
+      "7月18日"
+    ],
+    "expected_direction": "up",
+    "subcategory": "AI产品发布催化",
+    "target": "AI智能体板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_124",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "超260家科创板公司公布2025年业绩预告",
+      "报喜公司数量达105家",
+      "属于板块业绩预告统计与趋势总结"
+    ],
+    "anchor_rationale": "This is a broad board-level statistics and outlook piece rather than one identifiable event.",
+    "key_entities": [
+      "科创板",
+      "Wind"
+    ],
+    "key_numbers": [
+      "超260家",
+      "2025年",
+      "105家",
+      "约四成",
+      "超50家",
+      "1月29日19时30分"
+    ],
+    "expected_direction": "up",
+    "subcategory": "科创板业绩预告统计",
+    "target": "科创板",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_125",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "工程机械板块异动拉升",
+      "建设机械涨停",
+      "上海证券仅给出行业需求回暖观点"
+    ],
+    "anchor_rationale": "This is routine sector-move and broker-commentary coverage, not one identifiable event.",
+    "key_entities": [
+      "建设机械",
+      "浙矿股份",
+      "达刚控股",
+      "建科智能",
+      "南方路机",
+      "上海证券"
+    ],
+    "key_numbers": [
+      "10月16日"
+    ],
+    "expected_direction": "up",
+    "subcategory": "工程机械板块走势",
+    "target": "工程机械板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_126",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "千方科技",
+      "2026年2月12日非独立董事吴司韵辞职",
+      "同日选举孙大勇为第六届董事会职工代表董事"
+    ],
+    "anchor_rationale": "The named company, exact date, departing director, and replacement election uniquely identify this board-change event.",
+    "key_entities": [
+      "千方科技",
+      "吴司韵",
+      "孙大勇",
+      "第六届董事会"
+    ],
+    "key_numbers": [
+      "2026年2月12日"
+    ],
+    "expected_direction": "neutral",
+    "subcategory": "董事辞职",
+    "target": "千方科技",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_127",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "奥士康",
+      "将回购股份价格上限由39.40元/股调整为53.35元/股",
+      "价格上限调整自2025年8月13日起生效"
+    ],
+    "anchor_rationale": "The named company, exact effective date, and precise revised buyback cap uniquely identify this buyback-plan adjustment.",
+    "key_entities": [
+      "奥士康"
+    ],
+    "key_numbers": [
+      "39.40元/股",
+      "53.35元/股",
+      "2025年8月13日"
+    ],
+    "expected_direction": "up",
+    "subcategory": "回购方案调整",
+    "target": "奥士康",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "exp_128",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "爱玛科技",
+      "发布2021年限制性股票激励计划(草案)",
+      "拟授予706万股，授予价格20.23元/股"
+    ],
+    "anchor_rationale": "The named company and exact share-volume and grant-price details uniquely identify this incentive-plan draft.",
+    "key_entities": [
+      "爱玛科技",
+      "2021年限制性股票激励计划(草案)"
+    ],
+    "key_numbers": [
+      "2021年",
+      "706万股",
+      "1.75%",
+      "20.23元/股"
+    ],
+    "expected_direction": "up",
+    "subcategory": "限制性股票激励计划",
+    "target": "爱玛科技",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  }
+]

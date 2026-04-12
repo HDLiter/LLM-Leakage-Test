@@ -1,0 +1,1900 @@
+{
+  "analysis": [
+    {
+      "id": "tc_001",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2024年9月24日",
+        "央行宣布降准降息",
+        "推出多项金融支持政策"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_002",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2024年2月5日",
+        "A股三大指数大幅低开",
+        "沪指跌破2700点"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_003",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2023年7月24日",
+        "中央政治局会议定调下半年经济工作"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_004",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2021年7月23日",
+        "《关于进一步减轻义务教育阶段学生作业负担和校外培训负担的意见》",
+        "中办国办印发意见"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_005",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2024年3月1日",
+        "证监会主席吴清首次公开亮相",
+        "强调从严监管"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_006",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2021年10月15日",
+        "多地限电停产",
+        "能耗双控政策持续加码"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_007",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2022年3月16日",
+        "国务院金融稳定发展委员会召开专题会议"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_008",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2023年8月27日",
+        "组合拳",
+        "财政部、税务总局宣布印花税减半征收"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_009",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2024年1月18日",
+        "《'数据要素×'三年行动计划（2024—2026年）》",
+        "国家数据局等17部门联合印发数据要素发展意见"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_010",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2021年8月27日",
+        "工信部召开互联网行业专项整治行动会议"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_011",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2024年4月12日",
+        "国九条",
+        "《关于加强监管防范风险推动资本市场高质量发展的若干意见》"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_012",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2022年4月15日",
+        "央行宣布全面降准0.25个百分点",
+        "0.25个百分点"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_013",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2023年7月7日",
+        "蚂蚁集团被罚71.23亿元",
+        "平台经济整改基本完成"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_014",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2024年9月24日",
+        "《上市公司监管指引第10号——市值管理》",
+        "证监会发布市值管理指引"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_015",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "2021年3月10日",
+        "碳中和目标推动新能源板块持续走强"
+      ],
+      "rationale": "policy target plus sector narrative narrows the time window, but this remains theme-level rather than one singular event"
+    },
+    {
+      "id": "tc_016",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2020年5月19日",
+        "康美药业财务造假被证监会处罚",
+        "虚增营收近300亿"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_017",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2020年4月2日",
+        "瑞幸咖啡自曝财务造假22亿",
+        "股价暴跌75%"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_018",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2021年9月13日",
+        "恒大集团债务危机全面爆发",
+        "理财产品逾期兑付"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_019",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "2023年4月20日",
+        "牧原股份一季度巨亏超26亿",
+        "猪周期底部持续"
+      ],
+      "rationale": "named company and quarter-specific earnings point to a specific filing, but quarterly loss reports are routine"
+    },
+    {
+      "id": "tc_020",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "2021年4月16日",
+        "贵州茅台一季度净利润同比增长超26%",
+        "业绩超预期"
+      ],
+      "rationale": "named company and quarter-specific earnings point to a specific filing, but quarterly results are routine"
+    },
+    {
+      "id": "tc_021",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "2022年1月6日",
+        "国家能源集团与中国神华推进煤电一体化整合"
+      ],
+      "rationale": "specific corporate restructuring plan is identifiable, but it is still a routine enterprise announcement type"
+    },
+    {
+      "id": "tc_022",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "2020年1月14日",
+        "美团完成摩拜单车品牌整合",
+        "共享单车全面并入美团生态"
+      ],
+      "rationale": "specific corporate integration step narrows it to one announcement, but brand integration is a routine company event"
+    },
+    {
+      "id": "tc_023",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2020年6月19日",
+        "中国中免借壳国旅联合上市获批",
+        "免税龙头登陆A股"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_024",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2022年7月15日",
+        "紫光集团进入破产重整程序",
+        "半导体巨头命运未卜"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_025",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "2020年6月8日",
+        "中国神车",
+        "中国中车合并五年回顾"
+      ],
+      "rationale": "retrospective commentary references a known merger, but the article itself is a broad look-back rather than one unique event"
+    },
+    {
+      "id": "tc_026",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2023年8月29日",
+        "华为Mate60 Pro突然开售",
+        "搭载自研麒麟9000S芯片"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_027",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2023年1月3日",
+        "比亚迪2022年全年销量超186万辆",
+        "超越特斯拉成全球新能源车销冠"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_028",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2020年7月16日",
+        "中芯国际科创板上市首日大涨超200%",
+        "市值突破6000亿"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_029",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2024年1月26日",
+        "《生物安全法案》",
+        "药明康德被美国国会提案列入制裁名单"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_030",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2022年6月23日",
+        "宁德时代发布麒麟电池",
+        "能量密度创全球新高"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_031",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2021年6月23日",
+        "国家医保局推进第五批药品集采",
+        "涉及61个品种"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_032",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2020年8月20日",
+        "三道红线",
+        "央行住建部约谈房企"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_033",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2023年2月1日",
+        "ChatGPT用户破亿引爆全球AI热潮",
+        "A股AI概念全线涨停"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_034",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "2023年8月15日",
+        "光伏产业链价格全线崩塌",
+        "硅料价格较高点跌超70%"
+      ],
+      "rationale": "industry pricing collapse is a broad trend and could describe multiple adjacent weeks or months"
+    },
+    {
+      "id": "tc_035",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "2023年7月10日",
+        "白酒板块消费复苏不及预期",
+        "库存压力显现"
+      ],
+      "rationale": "sector weakness and inventory commentary are recurring and not tied to one unique headline event"
+    },
+    {
+      "id": "tc_036",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2022年8月10日",
+        "《芯片与科学法案》",
+        "美国芯片法案签署"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_037",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2021年3月15日",
+        "《中华人民共和国国民经济和社会发展第十四个五年规划和2035年远景目标纲要》",
+        "十四五规划纲要发布"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_038",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "2023年9月1日",
+        "2022年11月",
+        "碳酸锂期货价格跌破20万元/吨"
+      ],
+      "rationale": "commodity price-threshold commentary is trend-like and can recur across nearby trading sessions"
+    },
+    {
+      "id": "tc_039",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "2024年3月15日",
+        "银行板块高股息策略持续受追捧",
+        "工商银行股价创历史新高"
+      ],
+      "rationale": "high-dividend bank rotation is a recurring market style rather than one distinct headline event"
+    },
+    {
+      "id": "tc_040",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2020年1月15日",
+        "中美签署第一阶段经贸协议",
+        "贸易摩擦暂时缓和"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_041",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2022年6月16日",
+        "美联储加息75个基点",
+        "创28年来最大单次加息幅度"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "tc_042",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2022年11月11日",
+        "国务院发布优化疫情防控二十条措施"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "exp_101",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "2021年9月22日",
+        "2020年2月28日",
+        "《青岛海尔生物医疗股份有限公司简式权益变动报告书》"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_102",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "人工智能+",
+        "贯彻落实中央经济工作会议精神，以高质量发展为‘十五五’开好局",
+        "国家发改委肖渭明"
+      ],
+      "rationale": "specific company or institution action narrows it to a period or filing, but lacks a singular headline-level anchor"
+    },
+    {
+      "id": "exp_103",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "联翔股份",
+        "财务总监彭小红因个人原因辞职 聘任周红芳为新任财务总监"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_104",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "市场主线",
+        "科技股方向全线爆发 算力硬件、芯片股双双领涨",
+        "10%"
+      ],
+      "rationale": "daily market-theme commentary is recurring and not uniquely tied to one real-world event"
+    },
+    {
+      "id": "exp_105",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "9天6板利欧股份",
+        "在内容治理环节引入广告素材审核智能体 已具备多模态内容的...",
+        "6板"
+      ],
+      "rationale": "specific company or institution action narrows it to a period or filing, but lacks a singular headline-level anchor"
+    },
+    {
+      "id": "exp_106",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "四连板*ST建艺",
+        "控股股东豁免公司14亿元债务本金及889.67万元利息...",
+        "14亿元"
+      ],
+      "rationale": "distinctive named event or milestone is specific enough to identify a single real-world occurrence"
+    },
+    {
+      "id": "exp_107",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "14点快评",
+        "DeepSeek等AI应用方向持续退潮 短线情绪跌至冰点",
+        "6板"
+      ],
+      "rationale": "intraday sentiment commentary is recurring and only weakly anchored to a specific event"
+    },
+    {
+      "id": "exp_108",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "长安汽车",
+        "控股子公司深蓝汽车拟增资扩股 募资规模约61.22亿元",
+        "61.22亿元"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_109",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "元利科技",
+        "拟500万元设立全资子公司山东抱一科技有限公司",
+        "500万元"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_110",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "腾景科技",
+        "签订8760.60万元YVO4产品销售订单",
+        "8760.60万元"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_111",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "芯片板块短期调整不改周期上行",
+        "持续关注科创芯片设计ETF易方达（589030）等产品布...",
+        "1.0%"
+      ],
+      "rationale": "ETF marketing plus broad cycle commentary is generic and could fit many adjacent periods"
+    },
+    {
+      "id": "exp_112",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "2021年6月30日",
+        "倍轻松",
+        "IPO拟公开发行1541万股 6月30日初步询价"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_113",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "3.5GHz+2.1GHz",
+        "中国联通携手中兴通讯和联发科技完成时频双聚合商用验证"
+      ],
+      "rationale": "specific company or institution action narrows it to a period or filing, but lacks a singular headline-level anchor"
+    },
+    {
+      "id": "exp_114",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "40余家上市公司净利翻番 AI成业绩增长强大驱动力",
+        "451家",
+        "156家"
+      ],
+      "rationale": "multi-company earnings roundup points to a reporting season, not one uniquely identifiable event"
+    },
+    {
+      "id": "exp_115",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "多种因素仍有望支撑牛市行情延续",
+        "持续关注A500ETF易方达（159361）等产品投资机...",
+        "0.5%"
+      ],
+      "rationale": "ETF marketing plus broad market outlook is generic and not tied to one specific event"
+    },
+    {
+      "id": "exp_116",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "光刻胶板块逆势活跃 晶瑞电材20CM涨停",
+        "财联社10月16日电，光刻胶板块逆势活跃，晶瑞电材、国风..."
+      ],
+      "rationale": "recurring market or sector commentary; weakly tied to any single real-world event"
+    },
+    {
+      "id": "exp_117",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "红利板块震荡上行",
+        "恒生红利低波ETF易方达（159545）最新规模突破80...",
+        "80亿元"
+      ],
+      "rationale": "ETF flow/scale commentary is recurring marketing copy rather than a unique event"
+    },
+    {
+      "id": "exp_118",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "收评",
+        "创业板指大跌3.82% 全市场超4700只个股下跌",
+        "3.82%"
+      ],
+      "rationale": "daily market close commentary is recurring and not tied to one singular headline event"
+    },
+    {
+      "id": "exp_119",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "《药物临床试验批准通知书》",
+        "卫信康",
+        "利多卡因丁卡因乳膏药物临床试验获批准"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_120",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "科创板八条",
+        "上交所召开“科创板八条”专题座谈会 医药企业家建言并购重..."
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_121",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "深科达",
+        "拟推264.74万股限制性股票激励计划",
+        "264.74万股"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_122",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "冰超",
+        "冰雪假",
+        "资本关注企业加码 冰雪经济持续升温"
+      ],
+      "rationale": "industry temperature-check coverage is broad trend commentary rather than one specific event"
+    },
+    {
+      "id": "exp_123",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "AI智能体概念股开盘活跃 南兴股份一字涨停",
+        "5%"
+      ],
+      "rationale": "specific company or institution action narrows it to a period or filing, but lacks a singular headline-level anchor"
+    },
+    {
+      "id": "exp_124",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "答卷",
+        "科创板超260份业绩预告出炉订单增长彰显发展潜力",
+        "260家"
+      ],
+      "rationale": "earnings-season roundup narrows the period but not one unique headline event"
+    },
+    {
+      "id": "exp_125",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "工程机械板块异动拉升 建设机械涨停",
+        "财联社10月16日电，建设机械直线拉升涨停，浙矿股份、达..."
+      ],
+      "rationale": "recurring market or sector commentary; weakly tied to any single real-world event"
+    },
+    {
+      "id": "exp_126",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "2026年2月12日",
+        "千方科技",
+        "非独立董事吴司韵辞职"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_127",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "2025年8月13日",
+        "奥士康",
+        "调整回购股份价格上限至53.35元/股"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_128",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "爱玛科技",
+        "拟推706万股的2021年限制性股票激励计划",
+        "706万股"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_129",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "2021年2月26日",
+        "青山纸业",
+        "已累计回购A股2725万股"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_130",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "吸金",
+        "月内净流入领跑港股红利类ETF",
+        "恒生红利低波ETF（159545）最新规模突破30亿元"
+      ],
+      "rationale": "ETF flow/scale commentary is recurring marketing copy rather than a unique event"
+    },
+    {
+      "id": "exp_144",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "昨日行情回顾",
+        "4100只",
+        "9%"
+      ],
+      "rationale": "daily recap format is recurring; even with examples, it is not anchored to one distinct headline event"
+    },
+    {
+      "id": "exp_145",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "人形",
+        "AI＋机器人",
+        "中信建投"
+      ],
+      "rationale": "industry trend or roundup language is generic and could fit multiple adjacent periods"
+    },
+    {
+      "id": "exp_146",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "A股2025年年报业绩预告亮相 超半数公司预喜",
+        "108家",
+        "60家"
+      ],
+      "rationale": "earnings-preview roundup narrows the reporting window but not one singular event"
+    },
+    {
+      "id": "exp_147",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "TrendForce",
+        "下半年8英寸晶圆厂产能利用率持续下探 预估仅50%至60...",
+        "50%"
+      ],
+      "rationale": "industry forecast language is generic and could fit multiple adjacent quarters"
+    },
+    {
+      "id": "exp_148",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "2025年11月17日",
+        "2026年2月16日",
+        "碧兴物联"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_149",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "传化智联",
+        "子公司签署股权及债权转让协议",
+        "90%"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_150",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "光力科技",
+        "董事兼副总经理李祖庆计划减持不超过656 000股公司股...",
+        "0.19%"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_151",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "竞价看龙头",
+        "4板",
+        "5.68%"
+      ],
+      "rationale": "recurring pre-open market roundup gives weak day-level cues but not a distinct headline event"
+    },
+    {
+      "id": "exp_152",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "诺诺网",
+        "2025年央视315晚会曝光第八个行业乱象",
+        "手机抽奖疯狂敛财 手机抽奖公司号称一天流水20亿元"
+      ],
+      "rationale": "distinctive named event or milestone is specific enough to identify a single real-world occurrence"
+    },
+    {
+      "id": "exp_153",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "公用事业化",
+        "国泰君安",
+        "煤炭价格企稳 预计下周煤价回升"
+      ],
+      "rationale": "broker strategy note is generic and not tied to one unique real-world event"
+    },
+    {
+      "id": "exp_154",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "产能约束",
+        "中信建投",
+        "AI有望成为第五次通用性技术浪潮"
+      ],
+      "rationale": "research commentary about AI as a technology wave is broad and recurring"
+    },
+    {
+      "id": "exp_155",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "海油工程",
+        "签署5.23亿美元海外项目合同",
+        "5.23亿美元"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_156",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "2025年7月1日",
+        "海立股份",
+        "公司基本面未发生重大变化"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_157",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "双杰电气",
+        "董事许专计划减持不超过0.47%公司股份",
+        "0.47%"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_158",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "张江高科",
+        "拟不超1.4亿元参投合伙企业",
+        "1.4亿元"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_159",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "猎鹰航空",
+        "峰飞航空",
+        "获阿联酋猎鹰航空50架eVTOL订单 年底开启交付"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_160",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "14点快评",
+        "芯片股午后继续加强"
+      ],
+      "rationale": "intraday board-strength commentary is recurring and only weakly anchored"
+    },
+    {
+      "id": "exp_161",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "2025年4月25日",
+        "浙江唐德影视股份有限公司",
+        "浙江华智数媒传媒股份有限公司"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_162",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "2025年12月31日",
+        "《刑事判决书》",
+        "中恒电气"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_163",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "中国通号召开低空经济工作推进会",
+        "《科创板日报》9日讯，5月7日，中国通号党委书记、董事长..."
+      ],
+      "rationale": "specific company or institution action narrows it to a period or filing, but lacks a singular headline-level anchor"
+    },
+    {
+      "id": "exp_164",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "《上海市支持先进制造业转型升级三年行动方案（2026—2028年）》",
+        "上海",
+        "到2028年 新增年产值10亿元以上制造业企业100家"
+      ],
+      "rationale": "distinctive named event or milestone is specific enough to identify a single real-world occurrence"
+    },
+    {
+      "id": "exp_165",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "Omdia",
+        "液晶电视面板Q2将出现年增19%的强势反弹",
+        "19%"
+      ],
+      "rationale": "industry forecast/report language is generic and not linked to one singular event"
+    },
+    {
+      "id": "exp_166",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "2025年3月25日",
+        "张小泉",
+        "间接控股股东富春控股集团被启动预重整"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_167",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "歪脑筋",
+        "蹭热点",
+        "财联社时评"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_168",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "孚能科技",
+        "镇江一期已开始投产 镇江二期预计今年下半年逐步投产",
+        "8GWh"
+      ],
+      "rationale": "specific company or institution action narrows it to a period or filing, but lacks a singular headline-level anchor"
+    },
+    {
+      "id": "exp_169",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "市场主线",
+        "算力硬件方向再迎爆发 把握热点的轮动节奏仍是关键"
+      ],
+      "rationale": "daily market-theme commentary is recurring and not uniquely tied to one event"
+    },
+    {
+      "id": "exp_170",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "南都电源",
+        "控股股东终止筹划控制权变更事项 股票复牌"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_171",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "7月14日涨停分析",
+        "8只",
+        "79%"
+      ],
+      "rationale": "limit-up analysis is a recurring market column rather than one distinct real-world event"
+    },
+    {
+      "id": "exp_172",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "机构市",
+        "科创板“机构市”特征凸显"
+      ],
+      "rationale": "broad market-structure commentary is trend-level and not a single unique event"
+    },
+    {
+      "id": "exp_173",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "龙蟒佰利拟出资3亿元跨界进入磷酸铁锂电池业务",
+        "3亿元"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_174",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "*ST名家",
+        "申请撤销因重整而被实施的退市风险警示"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_175",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "中科宇航",
+        "计划于近日择机开展力鸿一号遥一飞行器的亚轨道飞行试验任务"
+      ],
+      "rationale": "specific company or institution action narrows it to a period or filing, but lacks a singular headline-level anchor"
+    },
+    {
+      "id": "exp_176",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "石基零售与阿里云达成合作 转投阿里云PolarDB可帮客...",
+        "50%"
+      ],
+      "rationale": "specific company or institution action narrows it to a period or filing, but lacks a singular headline-level anchor"
+    },
+    {
+      "id": "exp_177",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "杰瑞股份",
+        "拟与关联方投资设立控股子公司 拓展小型模块化反应堆SMR...",
+        "1907.10万元"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_178",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "2020年7月13日",
+        "震有科技",
+        "发行价为16.25元/股 7月13日申购"
+      ],
+      "rationale": "specific company or institution action narrows it to a period or filing, but lacks a singular headline-level anchor"
+    },
+    {
+      "id": "exp_179",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "吸金",
+        "科创板系列指数集体涨超2%",
+        "关注科创板50ETF（588080）等产品配置价值"
+      ],
+      "rationale": "ETF product commentary is recurring and weakly anchored"
+    },
+    {
+      "id": "exp_180",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "上游NAND价格持续上涨令存储厂商加大成本管控力度 多数...",
+        "30%"
+      ],
+      "rationale": "industry price-trend coverage is broad and could match multiple nearby periods"
+    },
+    {
+      "id": "exp_181",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2026年1月21日",
+        "2025年12月30日",
+        "2026年1月22日"
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "exp_182",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "十五五",
+        "半导体国产替代加速",
+        "南方基金郑晓曦紧抓光刻机产业链投资机遇"
+      ],
+      "rationale": "fund-marketing language around a broad industry theme is generic and not one unique event"
+    },
+    {
+      "id": "exp_183",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "证监会同意3家科创板企业IPO注册",
+        "3家"
+      ],
+      "rationale": "specific company or institution action narrows it to a period or filing, but lacks a singular headline-level anchor"
+    },
+    {
+      "id": "exp_184",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "2022年4月27日",
+        "新锐股份",
+        "112.70万股限售股将于4月27日解禁上市"
+      ],
+      "rationale": "specific company or institution action narrows it to a period or filing, but lacks a singular headline-level anchor"
+    },
+    {
+      "id": "exp_185",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "创业板震荡调整",
+        "科技产业扩散方向受关注，创业板ETF易方达（159915...",
+        "0.5%"
+      ],
+      "rationale": "ETF marketing plus broad allocation advice is recurring and only weakly anchored"
+    },
+    {
+      "id": "exp_186",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "广东省集成电路行业协会今日正式成立",
+        "《科创板日报》17日讯，今日，2020年第23届中国集成..."
+      ],
+      "rationale": "specific company or institution action narrows it to a period or filing, but lacks a singular headline-level anchor"
+    },
+    {
+      "id": "exp_187",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "2025年12月18日",
+        "江苏展芯",
+        "宏达电子"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_188",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "天风证券",
+        "拟将40亿元次级债务展期一年并下调利率",
+        "40亿元"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_189",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "高盛",
+        "建议高配中国A股和H股 继续看好互联网、汽车、半导体、耐..."
+      ],
+      "rationale": "sell-side allocation advice is generic strategy commentary rather than one distinct event"
+    },
+    {
+      "id": "exp_190",
+      "anchor_level": 0,
+      "anchor_cues": [
+        "投资日历",
+        "周三资本市场大事提醒",
+        "2只"
+      ],
+      "rationale": "recurring schedule template with multiple calendar items rather than a single real-world event"
+    },
+    {
+      "id": "exp_191",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "牛股",
+        "双主线",
+        "年度“牛股”"
+      ],
+      "rationale": "annual market roundup is period-specific but still a broad summary rather than one singular event"
+    },
+    {
+      "id": "exp_192",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "数字经济方向继续活跃 科创信息3连板",
+        "财联社10月17日电，数字经济概念股继续活跃，创业板科创..."
+      ],
+      "rationale": "sector-move copy is generic and could fit many trading sessions"
+    },
+    {
+      "id": "exp_193",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "市场主线",
+        "市场再现放量普涨 大金融、科技股成为盘面的领涨核心",
+        "4%"
+      ],
+      "rationale": "daily market-theme commentary is recurring and not uniquely tied to one event"
+    },
+    {
+      "id": "exp_194",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "唯捷创芯",
+        "L-PAMiD产品将实现更大规模出货 预计下半年整体情况..."
+      ],
+      "rationale": "specific company or institution action narrows it to a period or filing, but lacks a singular headline-level anchor"
+    },
+    {
+      "id": "exp_195",
+      "anchor_level": 0,
+      "anchor_cues": [
+        "投资日历",
+        "周五资本市场大事提醒",
+        "1只"
+      ],
+      "rationale": "recurring schedule template with multiple calendar items rather than a single real-world event"
+    },
+    {
+      "id": "exp_196",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "金安国纪",
+        "拟出售上海金板科技60%股权",
+        "60%"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_197",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "怡达股份",
+        "控股子公司泰兴怡达吸收合并其全资子公司万淇生物科技"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_198",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "2026年1月12日",
+        "2021年11月29日",
+        "百元股数量创历史新高 科技新贵扎堆"
+      ],
+      "rationale": "industry trend or roundup language is generic and could fit multiple adjacent periods"
+    },
+    {
+      "id": "exp_199",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "2025年5月9日",
+        "2025年4月23日",
+        "顺博合金"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_200",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "AI产业链题材股局部活跃",
+        "人工智能ETF（159819）半日成交额近8亿元",
+        "8亿元"
+      ],
+      "rationale": "ETF/sector-move copy is recurring and weakly anchored"
+    },
+    {
+      "id": "exp_201",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "商业火箭第一股",
+        "可重复使用火箭产能提升项目",
+        "可重复使用火箭技术提升项目"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_202",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "趣睡科技",
+        "控股股东、实际控制人之一致行动人及首发前员工持股平台完成..."
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_203",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "4月14日连板股分析",
+        "连板股晋级率不足三成 板块快速轮动",
+        "13只"
+      ],
+      "rationale": "limit-up analysis is a recurring market column rather than one distinct real-world event"
+    },
+    {
+      "id": "exp_204",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "*ST松发",
+        "下属公司签订4艘VLCC超大型原油运输船建造合同",
+        "4-6亿美元"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_205",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "德才股份",
+        "未来仍将持续深化布局全建筑产业链 在新城建和新基建领域拓..."
+      ],
+      "rationale": "company strategy comments are broad and could fit many adjacent periods"
+    },
+    {
+      "id": "exp_206",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "2025年10月18日",
+        "奥赛康",
+        "创新药ASKC202在2025年ESMO年会公布临床研究..."
+      ],
+      "rationale": "exact date plus named entities/details make this a uniquely identifiable event"
+    },
+    {
+      "id": "exp_207",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "考虑到节后第一周资金到期压力较大，政府债缴款、存单到期、北交所打新压力也不弱，叠加税期走款，流动性缺口也显著扩张。",
+        "春节后资金面前瞻",
+        "首周超2.2万亿元逆回购到期"
+      ],
+      "rationale": "liquidity outlook for a holiday week is a recurring calendar-style analysis rather than one singular event"
+    },
+    {
+      "id": "exp_208",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "阿里通义百聆推出语音模型新版本",
+        "《科创板日报》15日讯，阿里通义宣布开源Fun-Cosy..."
+      ],
+      "rationale": "distinctive named event or milestone is specific enough to identify a single real-world occurrence"
+    },
+    {
+      "id": "exp_209",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "恒瑞医药",
+        "子公司HRS-5965胶囊被纳入拟突破性治疗品种公示名单"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_210",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "生力军",
+        "“生力军”持续扩大 上市公司中期分红渐成风尚",
+        "1083家"
+      ],
+      "rationale": "broad dividend-trend coverage is a recurring market theme rather than one distinct event"
+    },
+    {
+      "id": "exp_211",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "2025年10月28日",
+        "2025年11月13日",
+        "13天12板合富中国"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_212",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "A股三季报密集交卷 超七成已披露公司报喜",
+        "360家",
+        "254家"
+      ],
+      "rationale": "earnings-season roundup narrows the reporting window but not one unique headline event"
+    },
+    {
+      "id": "exp_213",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "*ST文投",
+        "申请撤销股票交易退市风险警示及其他风险警示"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_214",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "《债权重组暨投资协议》",
+        "华民股份",
+        "控股子公司增资扩股引入外部投资者"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_215",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "2019年12月",
+        "2019年43家新三板企业成功转板 挂牌企业年末加速冲刺...",
+        "43家"
+      ],
+      "rationale": "yearly market statistics and IPO rush commentary summarize a period rather than one event"
+    },
+    {
+      "id": "exp_216",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "《湖北证监局关于对嘉必优生物技术(武汉)股份有限公司、易德伟、王华标、易华荣出具警示函措施的决定》",
+        "嘉必优",
+        "2022年度业绩快报披露不准确、未及时审议并披露关联交易..."
+      ],
+      "rationale": "specific company or institution action narrows it to a period or filing, but lacks a singular headline-level anchor"
+    },
+    {
+      "id": "exp_217",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "四家科创板消费类芯片企业集体亮相",
+        "行业已现回暖信号 积极布局终端市场"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_218",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "《上海证券交易所股票上市规则》",
+        "海南椰岛",
+        "将被实施退市风险警示及其他风险警示"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_219",
+      "anchor_level": 0,
+      "anchor_cues": [
+        "全球产业峰会",
+        "星算·智联",
+        "投资日历"
+      ],
+      "rationale": "recurring schedule template with multiple calendar items rather than a single real-world event"
+    },
+    {
+      "id": "exp_220",
+      "anchor_level": 0,
+      "anchor_cues": [
+        "投资日历",
+        "周一资本市场大事提醒",
+        "2只"
+      ],
+      "rationale": "recurring schedule template with multiple calendar items rather than a single real-world event"
+    },
+    {
+      "id": "exp_221",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "深圳机场",
+        "拟收购深圳市机场国际快件海关监管中心有限公司1%股权",
+        "1%"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_222",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "A股强势反攻",
+        "A500ETF易方达（159361）今日成交额突破30亿...",
+        "30亿元"
+      ],
+      "rationale": "ETF turnover plus broad market rebound language is recurring and weakly anchored"
+    },
+    {
+      "id": "exp_223",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "广济药业",
+        "公司目前生产经营正常 无应披露而未披露的重大事项",
+        "20%"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_224",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "广钢气体",
+        "拟斥资4950万元认购合肥启航恒鑫基金5.14%份额",
+        "4950万元"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_225",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "隆扬电子",
+        "拟1.2亿元收购威斯双联51%股权",
+        "1.2亿元"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_226",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "A股午后拉升",
+        "创业板指一度涨近2%，同类规模第一的创业板ETF（159...",
+        "2%"
+      ],
+      "rationale": "ETF/market-move copy is recurring and not tied to one singular event"
+    },
+    {
+      "id": "exp_230",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "郭明錤",
+        "苹果第一代AR/MR头显或与iPhone 15一起发布..."
+      ],
+      "rationale": "specific company or institution action narrows it to a period or filing, but lacks a singular headline-level anchor"
+    },
+    {
+      "id": "exp_231",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "竞价看龙头",
+        "9板",
+        "5.93%"
+      ],
+      "rationale": "recurring pre-open market roundup gives weak day-level cues but not a distinct headline event"
+    },
+    {
+      "id": "exp_232",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "科创板50指数午后冲高",
+        "科创板50ETF（588080）等产品受市场关注",
+        "1%"
+      ],
+      "rationale": "ETF product commentary is recurring and weakly anchored"
+    },
+    {
+      "id": "exp_233",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "地天板",
+        "市场主线",
+        "2板"
+      ],
+      "rationale": "market-theme column is recurring and only weakly tied to a singular real-world event"
+    },
+    {
+      "id": "exp_234",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "中天火箭",
+        "与航天彩虹设立控股子公司",
+        "5000万元"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_235",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "市场主线",
+        "大消费板块迎来集体反弹 良性轮动下留意AI后续回流强度",
+        "5%"
+      ],
+      "rationale": "daily market-theme commentary is recurring and not uniquely tied to one event"
+    },
+    {
+      "id": "exp_236",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "中文传媒",
+        "全资子公司拟认购私募股权基金份额",
+        "1.67亿元"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_237",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "*ST云网",
+        "独立董事徐小舸因个人原因辞职"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_238",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "数字现象",
+        "上证报",
+        "上证综指与创业板指并不具备可比性"
+      ],
+      "rationale": "editorial-style market commentary is broad and not anchored to one specific event"
+    },
+    {
+      "id": "exp_239",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "科创板系列指数跌超1%",
+        "算力端获看好，关注科创50ETF易方达（588080）、...",
+        "1%"
+      ],
+      "rationale": "ETF product commentary is recurring and weakly anchored"
+    },
+    {
+      "id": "exp_240",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "收评",
+        "沪指震荡反弹涨0.66% 全市场超170股涨停",
+        "0.66%"
+      ],
+      "rationale": "daily market close commentary is recurring and not tied to one singular headline event"
+    },
+    {
+      "id": "exp_241",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "智元机器人第5000台具身机器人量产下线",
+        "5000台",
+        "1846台"
+      ],
+      "rationale": "distinctive named event or milestone is specific enough to identify a single real-world occurrence"
+    },
+    {
+      "id": "exp_242",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "2025年7月3日",
+        "永太科技",
+        "因名誉权纠纷 公司及子公司起诉天赐材料"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_243",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "惠伦晶体",
+        "公司及实控人因涉嫌信披违法违规被证监会立案",
+        "5.34%"
+      ],
+      "rationale": "specific company or institution action narrows it to a period or filing, but lacks a singular headline-level anchor"
+    },
+    {
+      "id": "exp_244",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "2025年4月7日",
+        "2025年8月27日",
+        "《解除留置通知书》"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_245",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "AIGC板块走强 万兴科技盘初涨超10%",
+        "10%",
+        "1100亿美元"
+      ],
+      "rationale": "sector-move copy is generic and could fit many trading sessions"
+    },
+    {
+      "id": "exp_246",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "吃掉",
+        "中科大教授孙玄",
+        "AI或将“吃掉”全球五分之一电力 核聚变或将破解能源瓶颈"
+      ],
+      "rationale": "specific company or institution action narrows it to a period or filing, but lacks a singular headline-level anchor"
+    },
+    {
+      "id": "exp_247",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "2025年5月",
+        "常青科技",
+        "七期（特种高分子单体二期）项目正式投产"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_248",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "AI医疗概念股开盘大涨 润达医疗等涨停",
+        "10%"
+      ],
+      "rationale": "specific company or institution action narrows it to a period or filing, but lacks a singular headline-level anchor"
+    },
+    {
+      "id": "exp_249",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "A股年内分红总额超去年达2.56万亿元 创出历史新高",
+        "2.56万亿元"
+      ],
+      "rationale": "yearly dividend statistic is period-specific but still a broad summary rather than one unique event"
+    },
+    {
+      "id": "exp_250",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "机器人产业指数高开高走涨超4%",
+        "机器人ETF易方达（159530）全天获超3.3亿份净申...",
+        "4%"
+      ],
+      "rationale": "ETF flow/sector heat copy is recurring and weakly anchored"
+    },
+    {
+      "id": "exp_251",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "稀土永磁板块异动拉升 英洛华直线涨停",
+        "10%"
+      ],
+      "rationale": "sector-move copy is generic and could fit many trading sessions"
+    },
+    {
+      "id": "exp_252",
+      "anchor_level": 3,
+      "anchor_cues": [
+        "电报|羟氯喹正在9家医疗机构开展治疗新冠肺炎的临床试验",
+        "9家",
+        "76%"
+      ],
+      "rationale": "distinctive named event or milestone is specific enough to identify a single real-world occurrence"
+    },
+    {
+      "id": "exp_253",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "上纬新材",
+        "具身智能机器人业务目前尚为样机产出 处于宣发初期"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_254",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "市场主线",
+        "两市涨停个股不足10只 留意情绪冰点后修复机会",
+        "10只"
+      ],
+      "rationale": "daily market-theme commentary is recurring and only weakly anchored"
+    },
+    {
+      "id": "exp_255",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "钨价中枢再度上移 上市公司业绩大幅改善",
+        "财联社2月10日电，近期，钨价持续上涨"
+      ],
+      "rationale": "commodity price-trend coverage is broad and could match multiple nearby periods"
+    },
+    {
+      "id": "exp_256",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "鲁西化工",
+        "40万吨有机硅项目投产"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_257",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "机构称A股市场预计延续震荡抬升格局",
+        "关注A500ETF易方达（159361）等产品投资机会",
+        "2.3%"
+      ],
+      "rationale": "ETF marketing plus broad market outlook is generic and not tied to one specific event"
+    },
+    {
+      "id": "exp_258",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "汇洲智能",
+        "拟参与竞拍上海航天壹亘智能科技有限公司75%股权",
+        "75%"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_259",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "《药品注册证书》",
+        "华纳药厂",
+        "获得卡前列素氨丁三醇注射液药品注册证书"
+      ],
+      "rationale": "named entity plus a concrete announcement narrows this to a specific filing, but the event type is routine"
+    },
+    {
+      "id": "exp_260",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "Strategy Analytics",
+        "2022年Q3台积电代工收益超过200亿美元",
+        "3台"
+      ],
+      "rationale": "specific company or institution action narrows it to a period or filing, but lacks a singular headline-level anchor"
+    },
+    {
+      "id": "exp_261",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "易中天",
+        "市场主线",
+        "市场延续缩量整理格局 静待更为明确转强信号出现"
+      ],
+      "rationale": "daily market-theme commentary is recurring and not uniquely tied to one event"
+    },
+    {
+      "id": "exp_262",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "机构",
+        "AI手机2026年出货挑战6亿台",
+        "6亿台"
+      ],
+      "rationale": "shipment forecast language is generic and could fit multiple adjacent periods"
+    },
+    {
+      "id": "exp_263",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "上周五行情回顾",
+        "11%",
+        "2.1万亿元"
+      ],
+      "rationale": "daily recap format is recurring; even with examples, it is not anchored to one distinct headline event"
+    },
+    {
+      "id": "exp_264",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "黄仁勋认证（JENSEN APPROVED）",
+        "消息称三星将向英伟达独家供应12层HBM3E"
+      ],
+      "rationale": "specific company or institution action narrows it to a period or filing, but lacks a singular headline-level anchor"
+    },
+    {
+      "id": "exp_265",
+      "anchor_level": 1,
+      "anchor_cues": [
+        "券商开年调研440家A股公司 电力设备、化工板块热度上升",
+        "440家",
+        "1000家"
+      ],
+      "rationale": "broker survey roundup summarizes a period rather than one singular event"
+    },
+    {
+      "id": "exp_266",
+      "anchor_level": 2,
+      "anchor_cues": [
+        "经营模式有所调整 ST天圣重组后将转变为医药制造单主业",
+        "财联社11月26日讯， ST天圣25日晚间在回复深交所重..."
+      ],
+      "rationale": "specific company or institution action narrows it to a period or filing, but lacks a singular headline-level anchor"
+    }
+  ],
+  "summary": {
+    "level_3": 40,
+    "level_2": 83,
+    "level_1": 65,
+    "level_0": 4,
+    "by_period": {
+      "pre_cutoff": {
+        "3": 34,
+        "2": 51,
+        "1": 40,
+        "0": 0
+      },
+      "post_cutoff": {
+        "3": 6,
+        "2": 32,
+        "1": 25,
+        "0": 4
+      }
+    }
+  }
+}

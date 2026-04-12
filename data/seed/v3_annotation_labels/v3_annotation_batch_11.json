@@ -1,0 +1,1072 @@
+[
+  {
+    "candidate_id": "v3_l_064",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "国家能源局披露",
+      "今年前7月",
+      "全国新增发电装机容量超1.7亿千瓦，其中风电太阳能新增装机超1.2亿千瓦"
+    ],
+    "anchor_rationale": "The text names the authority, a concrete power-capacity data release, and tied report periods, but it lacks a unique locator.",
+    "key_entities": [
+      "国家能源局",
+      "中证绿色电力指数",
+      "易方达中证绿色电力ETF"
+    ],
+    "key_numbers": [
+      "前7月",
+      "1.7亿千瓦",
+      "1.2亿千瓦",
+      "超七成"
+    ],
+    "expected_direction": "up",
+    "subcategory": "新能源装机数据披露",
+    "target": "绿色电力板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_241",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "浩欧博",
+      "湖南浩欧博生物医药有限公司近日获得医疗器械注册证",
+      "注册证编号为湘械注准20252400964"
+    ],
+    "anchor_rationale": "The named company and exact registration-certificate number uniquely locate this approval event.",
+    "key_entities": [
+      "浩欧博",
+      "湖南浩欧博生物医药有限公司",
+      "湖南省药品监督管理局",
+      "免疫球蛋白G4（IgG4）测定试剂盒",
+      "《医疗器械注册证》"
+    ],
+    "key_numbers": [
+      "1项",
+      "湘械注准20252400964",
+      "2030年11月30日"
+    ],
+    "expected_direction": "up",
+    "subcategory": "医疗器械注册证获批",
+    "target": "浩欧博",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_128",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "华特达因",
+      "子公司达因药业收到《药品注册证书》",
+      "盐酸可乐定缓释片用于儿童和青少年ADHD治疗"
+    ],
+    "anchor_rationale": "This named-company drug-approval note lacks a usable in-text time anchor or unique locator.",
+    "key_entities": [
+      "华特达因",
+      "达因药业",
+      "国家药品监督管理局",
+      "《药品注册证书》",
+      "盐酸可乐定缓释片"
+    ],
+    "key_numbers": [
+      "6-17岁"
+    ],
+    "expected_direction": "up",
+    "subcategory": "药品注册证书获批",
+    "target": "华特达因",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_167",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "汇得科技",
+      "股票连续两个交易日收盘价格涨幅偏离值累计超过20%",
+      "《2025年度向特定对象发行A股股票预案》已披露且定增事项待注册"
+    ],
+    "anchor_rationale": "The text names the company, a concrete abnormal-volatility clarification, and a tied time window, but it lacks a unique locator.",
+    "key_entities": [
+      "汇得科技",
+      "上海证券交易所",
+      "中国证监会",
+      "《2025年度向特定对象发行A股股票预案》"
+    ],
+    "key_numbers": [
+      "两个交易日",
+      "20%",
+      "2025年度"
+    ],
+    "expected_direction": "down",
+    "subcategory": "异常波动/定增不确定性",
+    "target": "汇得科技",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_065",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "道指连续第七个交易日上涨再创收盘新高",
+      "纳斯达克100指数突破2021年11月高点",
+      "大型科技股普涨"
+    ],
+    "anchor_rationale": "This is a daily U.S. market roundup rather than one identifiable event.",
+    "key_entities": [
+      "道琼斯指数",
+      "纳斯达克100指数",
+      "标普500指数",
+      "甲骨文",
+      "英伟达"
+    ],
+    "key_numbers": [
+      "第七个交易日",
+      "0.15%",
+      "0.35%",
+      "0.52%",
+      "2.92%"
+    ],
+    "expected_direction": "up",
+    "subcategory": "美股收盘综述",
+    "target": "美股市场",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_024",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "山东玻纤",
+      "中国证监会证监许可[2020]1517号文",
+      "网上路演时间为2020年8月20日9:00-12:00"
+    ],
+    "anchor_rationale": "The exact approval number and roadshow schedule uniquely identify this IPO roadshow event.",
+    "key_entities": [
+      "山东玻纤",
+      "中国证券监督管理委员会"
+    ],
+    "key_numbers": [
+      "1亿股",
+      "证监许可[2020]1517号",
+      "2020年8月20日",
+      "9:00-12:00"
+    ],
+    "expected_direction": "up",
+    "subcategory": "IPO网上路演安排",
+    "target": "山东玻纤",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_224",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "欣锐科技",
+      "公司于2025年10月24日召开董事会审议通过《关于终止盐城项目合作的议案》",
+      "原合作项目投资3.6亿元用于超级充电项目"
+    ],
+    "anchor_rationale": "The named company, exact board date, resolution title, and project amount uniquely identify this termination event.",
+    "key_entities": [
+      "欣锐科技",
+      "盐城市城南新区开发建设投资有限公司",
+      "《关于终止盐城项目合作的议案》",
+      "《项目合作协议书》"
+    ],
+    "key_numbers": [
+      "2025年10月24日",
+      "13,200万元",
+      "3.6亿元"
+    ],
+    "expected_direction": "down",
+    "subcategory": "项目合作终止",
+    "target": "欣锐科技",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_095",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "截至午盘，沪深300指数翻红",
+      "中金公司给出市场估值与政策判断",
+      "沪深300ETF易方达低成本配置文案"
+    ],
+    "anchor_rationale": "This is routine index-performance and ETF-marketing commentary without a discrete event.",
+    "key_entities": [
+      "沪深300ETF易方达",
+      "沪深300指数",
+      "中金公司"
+    ],
+    "key_numbers": [
+      "0.17%",
+      "1月12日",
+      "8.8倍",
+      "0.2%/年"
+    ],
+    "expected_direction": "up",
+    "subcategory": "宽基指数表现/ETF营销",
+    "target": "沪深300指数",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_062",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "TechInsights最新预测",
+      "2024年9月26日至10月6日印度节日季首波智能手机销量同比增长11%",
+      "三星和苹果市场份额分别为20%和16%"
+    ],
+    "anchor_rationale": "The text names the institution, a concrete market-forecast release, and an exact sales window, but it lacks a unique locator.",
+    "key_entities": [
+      "TechInsights",
+      "三星",
+      "苹果"
+    ],
+    "key_numbers": [
+      "2024年9月26日至10月6日",
+      "11%",
+      "78%",
+      "20%",
+      "16%"
+    ],
+    "expected_direction": "up",
+    "subcategory": "智能手机销量预测",
+    "target": "智能手机行业",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_153",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "同洲电子",
+      "瑞众人寿计划在2026年1月28日至2026年4月27日减持",
+      "减持不超过752.44万股，占总股本不超过1%"
+    ],
+    "anchor_rationale": "The exact reduction window and share amount uniquely identify this shareholder sell-down plan.",
+    "key_entities": [
+      "同洲电子",
+      "瑞众人寿保险有限责任公司"
+    ],
+    "key_numbers": [
+      "2026年1月28日",
+      "2026年4月27日",
+      "752.44万股",
+      "1%"
+    ],
+    "expected_direction": "down",
+    "subcategory": "股东减持计划",
+    "target": "同洲电子",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_220",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "拓新药业",
+      "全资子公司近日收到河南省市场监督管理局核发的《食品生产许可证》",
+      "新增3个产品的生产资质"
+    ],
+    "anchor_rationale": "The text names the company, a concrete license-change event, and a relative time anchor, but it lacks a unique locator.",
+    "key_entities": [
+      "拓新药业",
+      "新乡精泉生物技术有限公司",
+      "河南省市场监督管理局",
+      "《食品生产许可证》",
+      "2-氧代戊二酸",
+      "L-瓜氨酸",
+      "4-氨基丁酸"
+    ],
+    "key_numbers": [
+      "3个产品"
+    ],
+    "expected_direction": "up",
+    "subcategory": "食品生产许可证变更",
+    "target": "拓新药业",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_054",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "维力医疗",
+      "于近日收到《中国证监会行政许可申请受理单》",
+      "非公开发行A股股票行政许可申请获受理"
+    ],
+    "anchor_rationale": "The text names the company, a concrete financing-acceptance event, and a relative time anchor, but it lacks a unique locator.",
+    "key_entities": [
+      "维力医疗",
+      "中国证监会",
+      "《中国证监会行政许可申请受理单》"
+    ],
+    "key_numbers": [],
+    "expected_direction": "up",
+    "subcategory": "定增申请获受理",
+    "target": "维力医疗",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_089",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "根据最新披露的基金中期报告",
+      "中央汇金投资有限责任公司大幅“扫货”宽基ETF",
+      "多位牛散成为上证50ETF、创业板50ETF前十大持有人"
+    ],
+    "anchor_rationale": "The text names a specific institution, a concrete ETF-buying action, and a reporting-period time anchor, but it lacks a unique locator.",
+    "key_entities": [
+      "中央汇金投资有限责任公司",
+      "上证50ETF",
+      "创业板50ETF"
+    ],
+    "key_numbers": [
+      "基金中期报告",
+      "数亿元",
+      "前十大"
+    ],
+    "expected_direction": "up",
+    "subcategory": "ETF投资者结构数据",
+    "target": "A股ETF市场",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_058",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "深圳低空经济高质量发展大会于今日上午召开",
+      "将发布《深圳市低空起降设施高质量建设方案（2024-2025）》",
+      "启用深圳低空运行管理中心"
+    ],
+    "anchor_rationale": "The named conference and full policy title uniquely locate this low-altitude-economy policy event.",
+    "key_entities": [
+      "深圳低空经济高质量发展大会",
+      "《深圳市低空起降设施高质量建设方案（2024-2025）》",
+      "深圳低空运行管理中心",
+      "宗申动力"
+    ],
+    "key_numbers": [
+      "今日上午",
+      "2024-2025",
+      "3连板"
+    ],
+    "expected_direction": "up",
+    "subcategory": "低空经济政策发布",
+    "target": "低空经济板块",
+    "target_type": "sector",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_135",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "天齐锂业",
+      "同日召开董事会聘任朱辉担任副总经理兼财务负责人",
+      "邹军原定任期至2026年4月13日"
+    ],
+    "anchor_rationale": "The text names the company, a concrete management-change event, and a tied same-day time cue, but it lacks a unique locator.",
+    "key_entities": [
+      "天齐锂业",
+      "邹军",
+      "朱辉",
+      "董事会"
+    ],
+    "key_numbers": [
+      "2026年4月13日"
+    ],
+    "expected_direction": "neutral",
+    "subcategory": "高管变动",
+    "target": "天齐锂业",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_078",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "浩通科技",
+      "公开发行股份2,833.3334万股",
+      "2021年6月30日初步询价、2021年7月6日申购"
+    ],
+    "anchor_rationale": "The named company plus the exact issuance size and schedule uniquely identify this IPO inquiry event.",
+    "key_entities": [
+      "浩通科技",
+      "创业板"
+    ],
+    "key_numbers": [
+      "2,833.3334万股",
+      "2021年6月30日",
+      "2021年7月6日",
+      "25%"
+    ],
+    "expected_direction": "up",
+    "subcategory": "IPO初步询价安排",
+    "target": "浩通科技",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_120",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "全国碳交易市场",
+      "股权由九个试点省市的碳交易所分别持有",
+      "即将于6月底前上线交易"
+    ],
+    "anchor_rationale": "The text names the market platform, a concrete ownership-setup event, and a time anchor, but it lacks a unique locator.",
+    "key_entities": [
+      "全国碳交易市场",
+      "湖北碳交易所",
+      "上海碳交易所"
+    ],
+    "key_numbers": [
+      "6月底前",
+      "九个试点省市",
+      "9家"
+    ],
+    "expected_direction": "up",
+    "subcategory": "碳交易市场股权框架",
+    "target": "全国碳交易市场",
+    "target_type": "sector",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_217",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "华泰证券于今日发布关于安井食品的研报",
+      "首次覆盖并给予买入评级",
+      "目标价99.38港元"
+    ],
+    "anchor_rationale": "The text names the company, a concrete analyst-rating action, and a same-day time anchor, but it lacks a unique locator.",
+    "key_entities": [
+      "华泰证券",
+      "安井食品"
+    ],
+    "key_numbers": [
+      "99.38港元",
+      "25-27年",
+      "7.5%"
+    ],
+    "expected_direction": "up",
+    "subcategory": "券商评级/目标价调整",
+    "target": "安井食品",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_046",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "美联新材",
+      "公司股票价格自2022年6月14日至2022年7月4日期间触发赎回条款",
+      "董事会决定不提前赎回“美联转债”"
+    ],
+    "anchor_rationale": "The named company, exact trigger window, and bond-specific action uniquely identify this convertible-bond decision.",
+    "key_entities": [
+      "美联新材",
+      "美联转债",
+      "《创业板公开发行可转换公司债券募集说明书》"
+    ],
+    "key_numbers": [
+      "2022年6月14日",
+      "2022年7月4日",
+      "9.5元/股",
+      "130%",
+      "12.35元/股",
+      "2022年9月30日"
+    ],
+    "expected_direction": "neutral",
+    "subcategory": "可转债不提前赎回",
+    "target": "美联新材",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_107",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "今日中证汽车零部件主题指数下跌0.8%",
+      "中证智能电动汽车指数下跌1.4%",
+      "汽车零部件ETF和智能汽车50ETF产品关注"
+    ],
+    "anchor_rationale": "This is routine auto-sector index performance and product-marketing copy, not one identifiable event.",
+    "key_entities": [
+      "中证汽车零部件主题指数",
+      "中证智能电动汽车指数",
+      "汽车零部件ETF",
+      "智能汽车50ETF"
+    ],
+    "key_numbers": [
+      "-0.8%",
+      "-1.4%"
+    ],
+    "expected_direction": "down",
+    "subcategory": "汽车板块走势/ETF营销",
+    "target": "汽车板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_200",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "天际股份",
+      "收到行政监管措施决定书和监管函",
+      "因商誉减值测试不规范、财务核算不准确、信息披露不规范"
+    ],
+    "anchor_rationale": "This named-company enforcement note has a concrete violation event but no usable in-text time anchor or unique locator.",
+    "key_entities": [
+      "天际股份",
+      "中国证券监督管理委员会广东监管局",
+      "深圳证券交易所",
+      "行政监管措施决定书",
+      "监管函"
+    ],
+    "key_numbers": [],
+    "expected_direction": "down",
+    "subcategory": "行政监管措施/监管函",
+    "target": "天际股份",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_184",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "美股盘前要闻一览",
+      "美国股指期货、欧洲股市、多家公司与政策消息并列",
+      "属于打包式盘前新闻汇总"
+    ],
+    "anchor_rationale": "This is a bundled premarket digest of unrelated items rather than one identifiable event.",
+    "key_entities": [
+      "道琼斯指数期货",
+      "纳斯达克100指数期货",
+      "摩根大通",
+      "微软",
+      "丰田"
+    ],
+    "key_numbers": [
+      "0.81%",
+      "1.21%",
+      "1.80%",
+      "1.5万亿美元",
+      "78%"
+    ],
+    "expected_direction": "neutral",
+    "subcategory": "美股盘前要闻汇总",
+    "target": "美股市场",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_115",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "昀冢科技",
+      "确定2022年3月1日为首次授予日",
+      "以2.02元/股向8名激励对象授予107.00万股"
+    ],
+    "anchor_rationale": "The exact grant date, price, and share count uniquely identify this equity-incentive grant.",
+    "key_entities": [
+      "昀冢科技",
+      "《2022年限制性股票激励计划(草案)》"
+    ],
+    "key_numbers": [
+      "2022年3月1日",
+      "2.02元/股",
+      "8名",
+      "107.00万股"
+    ],
+    "expected_direction": "up",
+    "subcategory": "股权激励授予",
+    "target": "昀冢科技",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_040",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "生态环境部审议并原则通过《温室气体自愿减排交易管理办法（试行）》",
+      "CCER重启进入倒计时",
+      "暂停逾六年"
+    ],
+    "anchor_rationale": "The named ministry and full policy title uniquely locate this CCER policy event.",
+    "key_entities": [
+      "生态环境部",
+      "CCER",
+      "《温室气体自愿减排交易管理办法（试行）》",
+      "北京绿色交易所"
+    ],
+    "key_numbers": [
+      "六年",
+      "1万亿元"
+    ],
+    "expected_direction": "up",
+    "subcategory": "CCER重启政策",
+    "target": "碳金融市场",
+    "target_type": "sector",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_211",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "今日早盘“红利+”指数小幅回调",
+      "截至午间收盘中证红利指数和国证自由现金流指数均下跌0.4%",
+      "相关ETF近一周净流入和连续加仓属于产品营销"
+    ],
+    "anchor_rationale": "This is routine factor-index performance and ETF-positioning commentary, not one identifiable event.",
+    "key_entities": [
+      "红利ETF易方达",
+      "自由现金流ETF易方达",
+      "中证红利指数",
+      "国证自由现金流指数",
+      "国证价值100指数"
+    ],
+    "key_numbers": [
+      "-0.4%",
+      "-0.4%",
+      "-0.3%",
+      "超2.5亿元",
+      "15个交易日"
+    ],
+    "expected_direction": "down",
+    "subcategory": "红利风格走势/ETF营销",
+    "target": "红利板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_029",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "一汽富维",
+      "与吉林省仿生机器人创新中心签订《战略合作协议》",
+      "合作内容覆盖通用平台产品和通用大模型建设"
+    ],
+    "anchor_rationale": "This named-company cooperation note is concrete but lacks a usable in-text time anchor or unique locator.",
+    "key_entities": [
+      "一汽富维",
+      "吉林省仿生机器人创新中心",
+      "《战略合作协议》"
+    ],
+    "key_numbers": [],
+    "expected_direction": "up",
+    "subcategory": "战略合作协议",
+    "target": "一汽富维",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_102",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "北理工及工信部研究者",
+      "成功开发钙钛矿量子点微阵列",
+      "可用于Micro LED显示器等色转换场景"
+    ],
+    "anchor_rationale": "This research-breakthrough note names institutions and a concrete result but lacks a usable in-text time anchor or unique locator.",
+    "key_entities": [
+      "北京理工大学",
+      "工信部",
+      "钙钛矿量子点（PQDs）微阵列",
+      "Micro LED"
+    ],
+    "key_numbers": [],
+    "expected_direction": "up",
+    "subcategory": "显示技术研发突破",
+    "target": "Micro LED产业链",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_097",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "中证A50ETF易方达（563080）3月18日上市",
+      "本周中证A50指数上涨1.4%",
+      "上海证券给出2024年市场双回暖判断"
+    ],
+    "anchor_rationale": "The named ETF and exact listing date uniquely identify this product launch even though the rest is market commentary.",
+    "key_entities": [
+      "中证A50ETF易方达",
+      "中证A50指数",
+      "上海证券"
+    ],
+    "key_numbers": [
+      "3月18日",
+      "0.7%",
+      "1.4%",
+      "4.2%",
+      "0.7%"
+    ],
+    "expected_direction": "up",
+    "subcategory": "宽基ETF上市",
+    "target": "中证A50指数",
+    "target_type": "index",
+    "category": "macro",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_114",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "中证人工智能主题指数和上证科创板人工智能指数均上涨4.8%",
+      "人工智能ETF早盘获2800万份净申购",
+      "上海证券称AI芯片自主化逻辑不变"
+    ],
+    "anchor_rationale": "This is sector-performance and ETF-flow commentary with only class-level catalysts rather than one identifiable event.",
+    "key_entities": [
+      "中证人工智能主题指数",
+      "上证科创板人工智能指数",
+      "人工智能ETF",
+      "上海证券"
+    ],
+    "key_numbers": [
+      "4.8%",
+      "4.8%",
+      "2800万份",
+      "近10亿元",
+      "5日"
+    ],
+    "expected_direction": "up",
+    "subcategory": "人工智能板块走势/ETF营销",
+    "target": "人工智能板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_138",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "贵州茅台",
+      "发布第四届董事会2026年度第一次会议决议公告",
+      "会议同意《2026年贵州茅台酒市场化运营方案》"
+    ],
+    "anchor_rationale": "The named company and full board-scheme title uniquely locate this channel and pricing adjustment event.",
+    "key_entities": [
+      "贵州茅台",
+      "《2026年贵州茅台酒市场化运营方案》",
+      "i茅台",
+      "第四届董事会2026年度第一次会议"
+    ],
+    "key_numbers": [
+      "2026年度",
+      "五大渠道"
+    ],
+    "expected_direction": "neutral",
+    "subcategory": "营销体系/价格机制调整",
+    "target": "贵州茅台",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_148",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "神州细胞",
+      "公司于2025年12月12日召开第三届董事会第五次会议",
+      "《关于2026年度对外捐赠额度的议案》规定额度为2025年实际捐赠支出的50%~150%"
+    ],
+    "anchor_rationale": "The exact board date and full proposal title uniquely identify this donation-cap decision.",
+    "key_entities": [
+      "神州细胞",
+      "第三届董事会第五次会议",
+      "《关于2026年度对外捐赠额度的议案》"
+    ],
+    "key_numbers": [
+      "2025年12月12日",
+      "2026年度",
+      "50%~150%"
+    ],
+    "expected_direction": "neutral",
+    "subcategory": "对外捐赠额度议案",
+    "target": "神州细胞",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_151",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "萃华珠宝",
+      "截至2026年2月6日累计借款逾期本金为2.54亿元",
+      "2月10日起股票简称变更为“ST萃华”"
+    ],
+    "anchor_rationale": "The exact date, debt-default amounts, and ST-renaming schedule uniquely identify this risk-warning event.",
+    "key_entities": [
+      "萃华珠宝",
+      "ST萃华",
+      "人民法院"
+    ],
+    "key_numbers": [
+      "2026年2月6日",
+      "2.54亿元",
+      "45个",
+      "472万元",
+      "2026年2月9日",
+      "2026年2月10日",
+      "5%"
+    ],
+    "expected_direction": "down",
+    "subcategory": "账户冻结/实施ST",
+    "target": "萃华珠宝",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_063",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "华安鑫创",
+      "自2024年8月2日至公告披露日合计收到项目定点通知6个",
+      "涉及11款产品并来自三一重卡、北汽集团等客户"
+    ],
+    "anchor_rationale": "The exact start date, notice count, product count, and named customers make this designation wave uniquely locatable.",
+    "key_entities": [
+      "华安鑫创",
+      "三一重卡",
+      "北汽集团",
+      "北汽福田",
+      "长城汽车"
+    ],
+    "key_numbers": [
+      "2024年8月2日",
+      "6个",
+      "11款",
+      "3年至5年"
+    ],
+    "expected_direction": "up",
+    "subcategory": "项目定点通知",
+    "target": "华安鑫创",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_192",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "优必选中标“广西具身智能数据采集及测试中心设备采购及安装”项目",
+      "订单金额达1.26亿元",
+      "Walker系列人形机器人全年合计已获得超6.3亿元订单"
+    ],
+    "anchor_rationale": "The named company, exact project title, and exact order amounts uniquely locate this humanoid-robot order event.",
+    "key_entities": [
+      "优必选",
+      "Walker S2",
+      "国证机器人产业指数",
+      "机器人ETF易方达"
+    ],
+    "key_numbers": [
+      "10:28",
+      "3.1%",
+      "1.26亿元",
+      "超6.3亿元",
+      "近3亿元",
+      "约115亿元"
+    ],
+    "expected_direction": "up",
+    "subcategory": "人形机器人订单催化/ETF营销",
+    "target": "人形机器人板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_223",
+    "anchor_level": 2,
+    "anchor_cues": [
+      "凯普生物",
+      "全资子公司近日收到《医疗器械生产许可证》",
+      "生产范围新增Ⅱ类18妇产科、辅助生殖和避孕器械"
+    ],
+    "anchor_rationale": "The text names the company, a concrete production-license change, and a relative time anchor, but it lacks a unique locator.",
+    "key_entities": [
+      "凯普生物",
+      "潮州凯普生物化学有限公司",
+      "广东省药品监督管理局",
+      "《医疗器械生产许可证》"
+    ],
+    "key_numbers": [
+      "Ⅱ类18",
+      "2029年1月8日"
+    ],
+    "expected_direction": "up",
+    "subcategory": "医疗器械生产许可证变更",
+    "target": "凯普生物",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_082",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "红豆股份",
+      "公司于2023年4月10日收到上交所通知",
+      "《关于受理江苏红豆实业股份有限公司沪市主板上市公司发行证券申请的通知》(上证上审(再融资)〔2023〕187号)"
+    ],
+    "anchor_rationale": "The exact date, full notice title, and notice number uniquely identify this refinancing acceptance event.",
+    "key_entities": [
+      "红豆股份",
+      "上海证券交易所",
+      "《关于受理江苏红豆实业股份有限公司沪市主板上市公司发行证券申请的通知》"
+    ],
+    "key_numbers": [
+      "2023年4月10日",
+      "187号"
+    ],
+    "expected_direction": "up",
+    "subcategory": "定增申请获受理",
+    "target": "红豆股份",
+    "target_type": "company",
+    "category": "corporate",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_h_048",
+    "anchor_level": 3,
+    "anchor_cues": [
+      "上交所相关负责人回应科创成长层规则安排",
+      "《科创板上市公司自律监管指引第5号——科创成长层》",
+      "科创成长层公司简称后增加标识“U”"
+    ],
+    "anchor_rationale": "The named exchange and full rule title uniquely locate this Growth Layer rule release.",
+    "key_entities": [
+      "上海证券交易所",
+      "《科创板上市公司自律监管指引第5号——科创成长层》",
+      "科创成长层"
+    ],
+    "key_numbers": [
+      "第5号",
+      "U"
+    ],
+    "expected_direction": "up",
+    "subcategory": "科创成长层规则",
+    "target": "科创板",
+    "target_type": "sector",
+    "category": "policy",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_182",
+    "anchor_level": 1,
+    "anchor_cues": [
+      "南向资金今日早盘净买入超90亿港元",
+      "1月期间南向资金累计净买入689亿港元",
+      "恒生科技ETF和港股通互联网ETF获资金加仓"
+    ],
+    "anchor_rationale": "This is sector-and-flow commentary with time-bounded market data rather than one identifiable event.",
+    "key_entities": [
+      "恒生科技ETF易方达",
+      "港股通互联网ETF易方达",
+      "恒生科技指数",
+      "中证港股通互联网指数"
+    ],
+    "key_numbers": [
+      "-1.2%",
+      "-1.6%",
+      "超90亿港元",
+      "689亿港元",
+      "超10亿元",
+      "3亿元"
+    ],
+    "expected_direction": "up",
+    "subcategory": "港股科技ETF资金流向",
+    "target": "港股科技板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_123",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "连板股风格依旧低迷",
+      "昨日4只3连板个股中仅郴电国际晋级",
+      "今日放量“T”字板与短线策略点评并列"
+    ],
+    "anchor_rationale": "This is a daily trading-theme analysis rather than one identifiable event.",
+    "key_entities": [
+      "万方发展",
+      "正虹科技",
+      "郴电国际"
+    ],
+    "key_numbers": [
+      "4只",
+      "3连板",
+      "5板"
+    ],
+    "expected_direction": "down",
+    "subcategory": "连板股盘面解析",
+    "target": "连板股情绪",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  },
+  {
+    "candidate_id": "v3_l_247",
+    "anchor_level": 0,
+    "anchor_cues": [
+      "截至午间收盘，中证人工智能主题指数上涨0.5%",
+      "上证科创板人工智能指数上涨0.1%",
+      "人工智能ETF半日成交额超3亿元"
+    ],
+    "anchor_rationale": "This is routine sector-index performance and ETF-marketing copy, not one identifiable event.",
+    "key_entities": [
+      "中证人工智能主题指数",
+      "上证科创板人工智能指数",
+      "人工智能ETF",
+      "科创人工智能ETF"
+    ],
+    "key_numbers": [
+      "0.5%",
+      "0.1%",
+      "超3亿元"
+    ],
+    "expected_direction": "up",
+    "subcategory": "人工智能板块走势/ETF营销",
+    "target": "人工智能板块",
+    "target_type": "sector",
+    "category": "industry",
+    "rubric_version": "1.0"
+  }
+]

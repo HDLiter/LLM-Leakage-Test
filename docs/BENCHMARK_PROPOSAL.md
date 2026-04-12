@@ -112,6 +112,44 @@ Tentative structure:
 - CPT experiment design (Phase D-E) carries over unchanged
 - `--cutoff-date` pipeline enhancement already done
 
+## Data Licensing & Reproducibility
+
+### Chinese (CLS Telegraph)
+
+CLS (财联社) content is commercially copyrighted. The benchmark release will
+**NOT** include original article text. Instead:
+
+- Publish: case metadata, factor annotations, verified outcomes, SR/FO texts,
+  probe results, and article fingerprints (hash + date + entity)
+- Provide: a reconstruction script that matches fingerprints against a user's
+  own CLS corpus copy
+- This follows the same pattern as FinBERT-CN and other Chinese financial NLP
+  datasets that use proprietary news sources
+
+### English
+
+SEC EDGAR filings are public domain (US government works). Stock price data
+from Yahoo Finance / Alpha Vantage is freely accessible. English cases can be
+published with full text, making this portion of the benchmark fully
+self-contained.
+
+### Reproducibility Toolkit
+
+The annotation pipeline (outcome verification, anchor scoring, frequency
+computation, SR/FO generation) will be released as **Claude Code skills**
+(ARIS skill format), enabling users to:
+
+1. **Reconstruct the Chinese portion** — given their own CLS corpus, run
+   `/annotate-benchmark` to reproduce all annotations locally using their
+   own LLM (local or API)
+2. **Extend to new languages/sources** — the skills are parameterized by
+   data source; users can point them at any financial news corpus
+3. **Reproduce with different models** — `/run-memorization-probe` runs
+   the full probe protocol on any OpenAI-compatible endpoint
+
+This lowers the reproduction barrier from "re-implement our pipeline" to
+"install Claude Code + run a skill," while respecting data licensing.
+
 ## Open Questions for Review
 
 1. Is 2000+2000 the right scale, or should we go larger?
@@ -120,6 +158,9 @@ Tentative structure:
 4. How to handle models with unknown cutoffs (DeepSeek)?
 5. Is the 3-task probe protocol sufficient, or add more task types?
 6. Timeline feasibility for EMNLP 2026 ARR (May 25 deadline)?
+7. Skill design: what granularity? One monolithic skill or composable steps?
+8. Should the English portion also avoid full-text (for uniformity), or
+   publish full-text as a feature?
 
 ---
 

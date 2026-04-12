@@ -42,12 +42,15 @@ OUTPUT_PATH = ROOT / "data" / "results" / "sensitivity_analysis.json"
 # Bug 3 fix: report MH on both strict (legacy bool) and hedged
 # (strict ∪ neutral retreat) variants for each task. Strict reproduces the
 # v3 baseline; hedged adds the cases the strict definition undercounted.
-METRICS = [
+# Falls back to legacy key names if amber keys are missing.
+_AMBER_METRICS = [
     "fo_flip_direct_strict",
     "fo_flip_direct_hedged",
     "fo_flip_impact_strict",
     "fo_flip_impact_hedged",
 ]
+_LEGACY_METRICS = ["fo_flip_direct", "fo_flip_impact"]
+METRICS = _AMBER_METRICS  # resolved at runtime in main()
 
 
 def _load_anchor_field() -> str:
@@ -192,12 +195,22 @@ def _firth_substitute_logit(
 
 
 def main() -> int:
+    global METRICS
+
     if not RESULTS_PATH.exists():
         print(f"ERROR: results file not found: {RESULTS_PATH}")
         return 1
 
     raw = json.loads(RESULTS_PATH.read_text(encoding="utf-8"))
     cases = raw.get("cases", [])
+
+    # Detect stale data and fall back to legacy keys
+    sample_metrics = cases[0].get("metrics", {}) if cases else {}
+    if "fo_flip_direct_strict" not in sample_metrics:
+        print("WARNING: results file lacks amber-mirror-lattice keys "
+              "(fo_flip_*_strict/_hedged). Falling back to legacy keys.",
+              file=sys.stderr)
+        METRICS = _LEGACY_METRICS
     print(f"Loaded {len(cases)} cases from {RESULTS_PATH}")
 
     anchor_field = _load_anchor_field()

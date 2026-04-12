@@ -208,10 +208,12 @@ b3716cf 2026-03-13 Fix SyntaxError: replace Chinese curly quotes with plain text
 
 ## 计划文件索引
 
-- `amber-mirror-lattice.md` — 创建：2026-04-11（文件创建时间）；目的：修复 v3 pipeline 的 5 个 silent bugs、重跑 D1、更新结果并设置 G1-G4 审阅门；状态：主线已完成，Plan 中可选的 matched positive control / Phase F 仍未见落地。
-- `deep-floating-lake.md` — 创建：2026-04-09（文件创建时间，文内无显式日期）；目的：把诊断样本扩到 400-700、重建 anchor/frequency/reversibility 标注，并实现 batched pipeline；状态：已完成，结果写入 `docs/PILOT_RESULTS.md` Phase 3。
-- `gentle-bouncing-wozniak.md` — 创建：2026-04-06（文件创建时间）；目的：实现 E_pilot，包括 `direct_prediction` vs `decomposed_impact` 的 same-template bridge 和 false-outcome CPT；状态：已完成，产出 `docs/PILOT_RESULTS.md` 初版与 `refine-logs/pilot_discussion/`。
-- `jiggly-soaring-scroll.md` — 创建：2026-03-28（文件创建时间）；目的：修复另一个 ConceptEngine/事件检测故事的剩余 code review finding；状态：与本项目无直接关系，可在后续 agent 分析时忽略。
+> 计划文件已从 `~/.claude/plans/` 迁移至项目本地 `plans/` 目录（2026-04-12）。
+
+- `phase5-qwen-positive-control.md` — 创建：2026-04-12；目的：Qwen 正向对照（CPT 4-arm 设计）+ 跨模型复制 + 综合分析；状态：**当前活跃计划**。
+- `amber-mirror-lattice.md` — 创建：2026-04-11；目的：修复 v3 pipeline 的 5 个 silent bugs、重跑 D1、更新结果并设置 G1-G4 审阅门；状态：已完成。
+- `deep-floating-lake.md` — 创建：2026-04-09；目的：把诊断样本扩到 400-700、重建 anchor/frequency/reversibility 标注，并实现 batched pipeline；状态：已完成。
+- `gentle-bouncing-wozniak.md` — 创建：2026-04-06；目的：实现 E_pilot，包括 `direct_prediction` vs `decomposed_impact` 的 same-template bridge 和 false-outcome CPT；状态：已完成。
 
 ## Memory 索引摘要
 

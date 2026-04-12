@@ -665,3 +665,137 @@ effect (pre>post on impact_hedged), not the stratum × temporal interaction.
 
 - **B3 frequency_class:** the BM25 query loop is dominated by `rank_bm25.BM25Okapi.get_scores`, which is a Python loop over 1M dicts per query token (~10s/case for our query shape). On 682 cases that's ~1.9 hours. Backgrounded after D1; sensitivity slices that depend on `frequency_class` (E2) will run once it lands. None of the primary inferences depend on frequency_class.
 - **Firth substitute:** true Firth's penalized logit is not available in Python 3.12 (firthlogist requires <3.11) and rpy2 has no R installed on this host. We use `statsmodels.Logit.fit_regularized(method='l1', alpha=1.0)` and document the substitution in `docs/FIRTH_DECISION.md`. Primary inference therefore stays MH.
+
+---
+
+## Phase 5: Qwen Baseline (Cross-Model Replication)
+
+**Date:** 2026-04-12
+**Model:** Qwen2.5-7B-Instruct-AWQ via local vLLM
+**Cases:** 606 (same dataset as Phase 4 DeepSeek)
+**Tasks:** direct_prediction.base, decomposed_impact.base, decomposed_authority.matched
+**Pipeline version:** v4 (authority task + multi-model support)
+**Results file:** `data/results/qwen_arm0_baseline_results.json`
+
+### 5.1 Data Quality
+
+| Task | Valid originals | Rate |
+|---|---|---|
+| direct_prediction.base | 594/606 | 98.0% |
+| decomposed_impact.base | 582/606 | 96.0% |
+| decomposed_authority.matched | 593/606 | 97.9% |
+
+### 5.2 Cutoff Date Issue
+
+The dataset's period split uses 2025-09-30 (designed for DeepSeek). Qwen 2.5 was
+released Sept 2024 with training cutoff ≈ mid-2024. Re-analysis uses Qwen-specific
+cutoff 2024-06-30, producing a 3-segment view:
+
+| Segment | N | DeepSeek | Qwen |
+|---|---|---|---|
+| both_pre (≤2024-06) | 187 | likely in training | likely in training |
+| deepseek_only (2024-07 ~ 2025-09) | 145 | likely in training | after cutoff |
+| both_post (≥2025-10) | 274 | after cutoff | after cutoff |
+
+Pipeline now supports `--cutoff-date YYYY-MM-DD` to override period assignment.
+
+### 5.3 FO Flip Rates (Qwen cutoff = 2024-06-30)
+
+| Task | Metric | pre | post | diff |
+|---|---|---|---|---|
+| direct | fo_flip_hedged | 35.2% (n=176) | 23.6% (n=403) | +11.7% |
+| impact | fo_flip_hedged | 31.5% (n=168) | 30.8% (n=383) | +0.7% |
+| authority | fo_any_change | 30.1% (n=183) | 26.0% (n=404) | +4.1% |
+
+**No task-dependent pattern.** DeepSeek showed direct(post>pre) vs impact(pre>post)
+divergence; Qwen shows uniform pre>post across all three tasks. Impact difference
+is negligible (+0.7%) and insensitive to cutoff choice (0.7-3.0% across 2024-03
+to 2024-12).
+
+### 5.4 SR Flip vs FO Flip (Two Probe Comparison)
+
+| Task | Period | SR flip | FO flip | Gap |
+|---|---|---|---|---|
+| direct | pre | 53.4% | 35.2% | +18.2% |
+| direct | post | 61.3% | 23.6% | +37.7% |
+| impact | pre | 75.9% | 31.5% | +44.3% |
+| impact | post | 76.7% | 30.8% | +45.9% |
+| authority | pre | 23.6% | 30.1% | -6.4% |
+| authority | post | 17.4% | 26.0% | -8.6% |
+
+Key findings:
+- **direct**: SR and FO have **opposite** period effects (SR: post>pre; FO: pre>post)
+- **impact**: neither probe shows period effect
+- **authority**: FO > SR (inverted gap) — false-outcome injection changes authority
+  assessment more than article reversal does, possibly because the injected hint
+  carries implicit source-credibility signals
+
+### 5.5 Anchor Stratification
+
+#### FO Flip (direct hedged) by Period × Anchor
+
+| Cell | Rate | N |
+|---|---|---|
+| pre/strongly_anchored | 26.2% | 107 |
+| pre/weakly_anchored | **49.3%** | 69 |
+| post/strongly_anchored | 27.4% | 201 |
+| post/weakly_anchored | 19.8% | 202 |
+
+Weakly_anchored pre-cutoff shows 49.3% FO flip — the largest effect in the dataset.
+But post/weakly (19.8%) is lower than post/strongly (27.4%), which is counterintuitive.
+
+**Root cause: Simpson's paradox from direction imbalance.**
+
+| Cell | up:down ratio | FO flip (up) | FO flip (down) |
+|---|---|---|---|
+| pre/weakly | 1.4:1 | 45.0% | 55.2% |
+| post/weakly | **5.3:1** | 17.5% | 32.3% |
+
+Down cases flip more in all cells, but post/weakly is 84% up cases, dragging
+the aggregate down. Additionally, post/weakly is dominated by sector/index
+targets (sector=109, index=70, company=29) where generic FO probes ("据了解，
+该板块表现低迷") are less persuasive than company-specific probes.
+
+#### FO Generation Method Confound
+
+| Cell | llm_negated rate | generic rate |
+|---|---|---|
+| pre/strongly | 34.8% (n=46) | 19.7% (n=61) |
+| pre/weakly | 52.2% (n=23) | 47.8% (n=46) |
+| post/strongly | 15.0% (n=20) | 28.7% (n=181) |
+| post/weakly | 41.2% (n=17) | 17.8% (n=185) |
+
+`llm_negated` (case-specific negation from verified outcome) consistently produces
+higher flip rates than `generic_post_cutoff` (template phrase). The mix of methods
+covaries with period, confounding pre/post comparisons.
+
+### 5.6 Summary of Cross-Model Comparison
+
+| Finding | DeepSeek Phase 4 | Qwen Baseline |
+|---|---|---|
+| Task-dependent FO pattern | Yes (direct post>pre, impact pre>post) | **No** (uniform pre≥post) |
+| Anchor effect > period effect | Partially | **Yes, clearly** |
+| Impact memorization signal | OR=1.95, p=0.022 | Absent (+0.7%) |
+| FO method confound | Present but less dominant | **Dominant confound** |
+
+Corresponds to Plan failure tree: "Qwen baseline shows no pattern → Effect is
+model-specific → Bound claims to DeepSeek case study."
+
+### 5.7 Methodological Issues Identified
+
+Three structural problems with the current 606-case benchmark surfaced during
+this analysis:
+
+1. **41% of cases lack verified known_outcome** — FO probe degrades to generic
+   template with much weaker persuasive power. Pre/post comparisons are
+   confounded by FO method quality.
+
+2. **Severe distributional imbalance** — direction (up:down = 5.3:1 in some cells),
+   target_type, and category are unevenly distributed across period × anchor cells.
+   Produces Simpson's paradox in aggregate statistics.
+
+3. **Cells too small after stratification** — direction × anchor × period ×
+   target_type crosses yield cells with <20 cases, insufficient for stable estimates.
+
+These issues motivate a redesigned, larger, more balanced benchmark — see
+`docs/BENCHMARK_PROPOSAL.md`.

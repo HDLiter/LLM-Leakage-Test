@@ -1,7 +1,7 @@
 # Project Timeline & Document Index
 
 > 本文档是项目探索过程的时间轴索引，供后续 agent 快速理解项目历史和文档关系。
-> 最后更新：2026-04-11
+> 最后更新：2026-04-12
 
 ## 项目概述
 
@@ -44,11 +44,30 @@
 - **Notebooks**: 无；工作流改为 “先审计 bug，再修复，再 rerun，再做写作 gate review”。
 - **产出文档**: `BUG_AUDIT_amber.md`、`REVIEW_amber_G1*.md`、`REVIEW_amber_G2*.md`、`REVIEW_amber_G3.md`、`REVIEW_amber_G4*.md`，以及 `PILOT_RESULTS.md` 的 Phase 4 段落。
 - **关键提交**: `4421da2`、`dd76d01`、`5eb4cf4`。
-- **关键发现**: Bug 1 修复后恢复约 150 个 CFLS 可评分 case；Bug 3 把 `decomposed_impact` 的 CPT 结论从“全零/退化”改写为 memorization-direction（pooled MH OR≈1.95），但 `direct_prediction` 仍主要呈现 suggestibility。
+- **关键发现**: Bug 1 修复后恢复约 150 个 CFLS 可评分 case；Bug 3 把 `decomposed_impact` 的 CPT 结论从”全零/退化”改写为 memorization-direction（pooled MH OR≈1.95），但 `direct_prediction` 仍主要呈现 suggestibility。
+
+### Phase 5: Qwen positive control → data-centric pivot（2026-04-12）
+
+- **Notebooks**: 无；工作流延续 plan-driven pipeline。
+- **产出文档**: `PREREGISTRATION.md`（v1.3 frozen）、`DECISION_20260411_post_amber.md`、`plans/phase5-qwen-positive-control.md`、`refine-logs/decision_20260411/*`、`PILOT_RESULTS.md` §5（Qwen baseline）、`BENCHMARK_PROPOSAL.md`（data-centric pivot）。
+- **代码改动**: `config/settings_qwen.yaml`；`_build_client()` 参数化；`LLMClient` 增加 `top_p`/`repetition_penalty`/`request_logprobs`；`PILOT_TASKS` 扩展到 3 个（加入 `decomposed_authority.matched`）；`_detect_fo_any_change()` 用于非方向性任务；pipeline 支持 `--settings`/`--model`/`--base-url`/`--api-key-env`/`--cutoff-date`/`--fo-override`；`PIPELINE_VERSION` → v4。
+- **关键提交**: `d33f4a9`（Phase 5 setup）、`da878cd`（B0 hardening + Qwen baseline）、`605e56b`（baseline results + benchmark proposal）、`c066f56`（licensing + skills）、`b6eee3c`（CLS licensing Q）、`c12a43f`（masking + multi-method track）。
+- **关键发现**:
+  1. Qwen 2.5 7B AWQ baseline 跑 606 cases × 3 tasks，0 errors，但 **DeepSeek 的 task-dependent 模式未复现**（impact pre-post 差异仅 +0.7%）。
+  2. 数据集 cutoff（2025-09-30）是为 DeepSeek 设计的，对 Qwen（真实 cutoff ≈ 2024-06）需要 period 重新划分 → 催生 `--cutoff-date` pipeline 参数。
+  3. 现有 606-case benchmark 暴露三个结构性问题：41% 缺 verified outcome、direction 严重失衡（Simpson's paradox）、分层后 cell 过小。
+  4. 论文方向从 “DeepSeek 单模型 memorization 检测” pivot 到 “FinMem-Bench：factor-controlled cross-lingual 数据集论文”；现有 pilot 结果转为 Section 2 motivation。
 
 ## 近 30 次提交参考
 
 ```text
+c12a43f 2026-04-12 benchmark proposal: add masking/mitigation track + multi-method compatibility
+b6eee3c 2026-04-12 benchmark proposal: add CLS licensing as open question
+c066f56 2026-04-12 benchmark proposal: add data licensing + reproducibility toolkit section
+605e56b 2026-04-12 Phase 5 B: Qwen baseline results + FinMem-Bench proposal
+da878cd 2026-04-12 Phase 5 B0: pipeline hardening + Qwen baseline run
+d33f4a9 2026-04-12 Phase 5 setup: pre-registration (v1.3) + decision record + execution plan
+4a00374 2026-04-12 docs: add project timeline & document index
 5eb4cf4 2026-04-11 amber-mirror-lattice: Phase D re-run + Phase E results update
 dd76d01 2026-04-11 amber G2a fix: add stale-data guardrails to analysis scripts
 4421da2 2026-04-11 amber-mirror-lattice: Phase A audit + Phase B bug fixes (5 bugs)
@@ -112,6 +131,9 @@ b3716cf 2026-03-13 Fix SyntaxError: replace Chinese curly quotes with plain text
 - `REVIEW_amber_G3.md` — 时间：2026-04-11（git）；背景：Phase 4，重跑完成后需要做数据一致性审阅；内容：直接用 `diagnostic_2_results.json` 复算 schema、stratum 和 headline numbers；依赖：先读 `PILOT_RESULTS.md` Phase 4 草稿。
 - `REVIEW_amber_G4.md` — 时间：2026-04-11（git）；背景：Phase 4，写作阶段需要防止 overclaim；内容：指出 `PILOT_RESULTS.md` Phase 4 中哪些结论超出表格所能支持的范围；依赖：先读 `PILOT_RESULTS.md`。
 - `REVIEW_amber_G4_round2.md` — 时间：2026-04-11（git）；背景：Phase 4，G4 首轮修改后要二次确认措辞已经收敛；内容：检查剩余 overclaim/phase contamination 问题；依赖：先读 `REVIEW_amber_G4.md` 与更新后的 `PILOT_RESULTS.md`。
+- `PREREGISTRATION.md` — 时间：2026-04-11（git）/冻结于 v1.3；背景：Phase 5 A，Plan 要求在跑 Qwen 前先锁死 confirmatory protocol；内容：outcome 定义、primary hypothesis（Arm 2 vs Arm 1 on exposed cases）、secondary contrasts、alpha、failure tree；依赖：先读 `plans/phase5-qwen-positive-control.md`。
+- `DECISION_20260411_post_amber.md` — 时间：2026-04-11（git）；背景：Phase 4 → Phase 5 决策记录；内容：为什么选 "Qwen positive control + comprehensive analysis" 路线（而非 "paper draft" 或 "DeepSeek replication"）；依赖：先读 `PILOT_RESULTS.md` Phase 4 段落。
+- `BENCHMARK_PROPOSAL.md` — 时间：2026-04-12（本次会话）；背景：Phase 5 Qwen baseline 暴露了三个 benchmark 结构性问题后，直接把论文定位 pivot 到 data-centric 方向；内容：FinMem-Bench 初步规格（2000 中文 + 2000 英文、6 factor taxonomy、probe + masking + multi-method compatibility、data licensing、Claude Code skill 复现工具包）；状态：outline draft，等待下一会话多 agent review；依赖：先读 `PILOT_RESULTS.md` §5、`plans/phase5-qwen-positive-control.md`。
 
 ### refine-logs/
 

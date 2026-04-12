@@ -59,11 +59,9 @@ common_schemas:
             from:
               type: string
               minLength: 1
-              maxLength: 200
             to:
               type: string
               minLength: 1
-              maxLength: 200
 
 templates:
   semantic_reversal:

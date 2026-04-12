@@ -523,39 +523,52 @@ _FALSE_OUTCOME_PHRASES_POSITIVE = [
 ]
 
 
-_NEGATE_SWAP_MAP: dict[str, str] = {}
-for _a, _b in [
-    ("大幅上涨", "大幅下跌"), ("上涨", "下跌"), ("涨幅", "跌幅"),
-    ("走强", "走弱"), ("反弹", "回调"), ("暴涨", "暴跌"),
-    ("利好", "利空"), ("积极", "消极"), ("乐观", "悲观"),
-    ("回升", "下滑"), ("企稳", "失守"), ("高涨", "低迷"),
-    ("加仓", "减仓"), ("涨停", "跌停"),
-]:
-    _NEGATE_SWAP_MAP[_a] = _b
-    _NEGATE_SWAP_MAP[_b] = _a
-
-# Build regex once — match longest first to avoid partial matches
-import re as _re
-_NEGATE_PATTERN = _re.compile(
-    "|".join(_re.escape(k) for k in sorted(_NEGATE_SWAP_MAP, key=len, reverse=True))
+# Direction-token sets used as a *check-only* polarity validator on the
+# LLM-negated false outcome (Bug 4 fix). These tokens are NOT used to
+# generate any probe (mode purification rule); they only score whether a
+# given (known_outcome, negation) pair shows opposite polarity.
+_POSITIVE_TOKENS = (
+    "上涨", "大涨", "走高", "走强", "拉升", "反弹", "回升", "上行",
+    "增长", "提升", "增加", "扩大", "改善", "向好", "利好", "盈利",
+    "扭亏", "上调", "增持", "买入", "上涨幅度", "涨幅",
+)
+_NEGATIVE_TOKENS = (
+    "下跌", "大跌", "走低", "走弱", "回落", "下挫", "下行", "崩盘",
+    "重挫", "下降", "减少", "缩减", "恶化", "转差", "利空", "亏损",
+    "下调", "减持", "卖出", "跌幅",
 )
 
 
-def _negate_outcome(known_outcome: str, target: str) -> tuple[str, bool]:
-    """Produce a plausible false version of a known outcome.
+def _polarity_of_text(text: str) -> str:
+    """Return 'pos', 'neg', 'mixed', or 'neutral' based on token presence."""
+    if not text:
+        return "neutral"
+    has_pos = any(tok in text for tok in _POSITIVE_TOKENS)
+    has_neg = any(tok in text for tok in _NEGATIVE_TOKENS)
+    if has_pos and has_neg:
+        return "mixed"
+    if has_pos:
+        return "pos"
+    if has_neg:
+        return "neg"
+    return "neutral"
 
-    Uses single-pass regex replacement to avoid double-swap bugs.
-    Returns ``(negated_text, any_swap_made)``.
+
+def check_negation_polarity_flipped(known_outcome: str, negated: str) -> bool:
+    """Cheap polarity check used to validate LLM-negated false outcomes.
+
+    Returns True iff the negated text has a polarity opposite to the
+    known_outcome. Used as a *validator* (Bug 4) — never as a fallback
+    probe. The detection is regex-token based, so it can return False
+    negatives on outcomes phrased without explicit direction tokens. In
+    that case the validator is permissive: if either side is 'neutral'
+    or 'mixed', we accept the negation rather than discarding it.
     """
-    swaps_made = 0
-
-    def _replacer(m: _re.Match) -> str:
-        nonlocal swaps_made
-        swaps_made += 1
-        return _NEGATE_SWAP_MAP[m.group(0)]
-
-    negated = _NEGATE_PATTERN.sub(_replacer, known_outcome)
-    return negated, swaps_made > 0
+    p_known = _polarity_of_text(known_outcome)
+    p_neg = _polarity_of_text(negated)
+    if p_known in ("neutral", "mixed") or p_neg in ("neutral", "mixed"):
+        return True
+    return p_known != p_neg
 
 
 _NEGATE_OUTCOME_PROMPT_SYSTEM = (
@@ -582,18 +595,25 @@ def generate_false_outcome_cpt(
     expected_direction: str,
     target: str,
     client: "LLMClient | None" = None,
-) -> tuple[str, str]:
+    max_attempts: int = 3,
+) -> tuple[str | None, str]:
     """Inject a plausible false-outcome hint into the article.
 
-    Three modes (in priority order):
-    - **llm_negated** (when *client* is provided and *known_outcome* is real):
-      uses LLM to generate a natural, context-aware false outcome.
-    - **regex_negated** (fallback if LLM unavailable or fails):
-      uses single-pass regex swap of directional words.
-    - **generic** (when *known_outcome* is empty / ``unknown_post_cutoff``):
-      falls back to directional templates.
+    Two clearly separated probe modalities (NO mixing — see Phase 2 of the
+    deep-floating-lake plan):
 
-    Returns ``(modified_article, cpt_mode)``.
+    - **generic_post_cutoff** (when *known_outcome* is empty / unknown_post_cutoff):
+      directional template, no API call. Used by post-cutoff cases.
+    - **llm_negated** (when *known_outcome* is real and *client* is provided):
+      LLM-generated context-aware false outcome. Used by pre-cutoff cases.
+      Retries up to ``max_attempts`` times with cache bypass on retry.
+      On exhaustion or sanity-check failure, returns ``(None, "llm_failed")``
+      so the caller can exclude the case from CPT analysis with a missingness
+      footnote. **No regex/generic fallback for pre-cutoff** — mixing probe
+      modalities (LLM-negated vs regex-swapped vs generic-template) within one
+      analysis introduces a confound that's worse than missing data.
+
+    Returns ``(modified_article_or_None, cpt_mode)``.
     """
     import random as _random
 
@@ -610,43 +630,31 @@ def generate_false_outcome_cpt(
             phrases = _FALSE_OUTCOME_PHRASES_NEGATIVE
         phrase = _random.choice(phrases).format(target=target)
         hint = f"（注：据了解，{phrase}。）"
-        return f"{article}\n{hint}", "generic"
+        return f"{article}\n{hint}", "generic_post_cutoff"
 
-    # ── Outcome-specific: try LLM first, regex fallback ──
+    # ── Pre-cutoff: LLM-only, no fallback ──
+    if client is None:
+        return None, "llm_failed"
 
-    false_outcome: str | None = None
-    mode = "regex_negated"
+    system = _NEGATE_OUTCOME_PROMPT_SYSTEM
+    user = _NEGATE_OUTCOME_PROMPT_USER.format(known_outcome=_known)
 
-    if client is not None:
+    for attempt in range(max_attempts):
         try:
-            system = _NEGATE_OUTCOME_PROMPT_SYSTEM
-            user = _NEGATE_OUTCOME_PROMPT_USER.format(known_outcome=_known)
-            resp = client.chat(system, user)
+            resp = client.chat(system, user, bypass_cache=attempt > 0)
             text = resp.raw_response.strip()
-            # Basic sanity: not empty, not identical to original, reasonable length
-            if text and text != _known and len(text) < len(_known) * 3:
-                false_outcome = text
-                mode = "llm_negated"
+            # Sanity: not empty, not identical to original, reasonable length
+            if not (text and text != _known and len(text) < len(_known) * 3):
+                continue
+            # Bug 4 fix: cheap polarity check. We accept the negation only
+            # if it actually flips polarity (or if either side is too vague
+            # to classify, in which case we trust the LLM and accept).
+            if not check_negation_polarity_flipped(_known, text):
+                continue
+            hint = f"（注：据了解，{text}。）"
+            return f"{article}\n{hint}", "llm_negated"
         except Exception:
-            pass  # fall through to regex
+            continue
 
-    if false_outcome is None:
-        negated, any_swap = _negate_outcome(_known, target)
-        if any_swap:
-            false_outcome = negated
-            mode = "regex_negated"
-        else:
-            # No swap possible — generic fallback
-            direction = expected_direction.strip().lower()
-            if direction in ("up", "positive", "strong_positive"):
-                phrases = _FALSE_OUTCOME_PHRASES_NEGATIVE
-            elif direction in ("down", "negative", "strong_negative"):
-                phrases = _FALSE_OUTCOME_PHRASES_POSITIVE
-            else:
-                phrases = _FALSE_OUTCOME_PHRASES_NEGATIVE
-            phrase = _random.choice(phrases).format(target=target)
-            false_outcome = phrase
-            mode = "generic_fallback"
-
-    hint = f"（注：据了解，{false_outcome}。）"
-    return f"{article}\n{hint}", mode
+    # Exhausted retries or all attempts failed sanity checks.
+    return None, "llm_failed"

@@ -358,20 +358,36 @@ def excess_invariance_by_task(results: list[dict], task_types: list[str]) -> dic
 # ── Standalone FO-flip detection (H3 fix) ─────────────────────────
 
 
+_FO_POS = {"up", "positive", "strong_positive"}
+_FO_NEG = {"down", "negative", "strong_negative"}
+_FO_NEUTRAL = {"neutral"}
+
+
 def _detect_fo_flip(
     orig: dict,
     cf_false_outcome: dict,
     expected_direction: str,
     target_field: str = "",
-) -> bool | None:
-    """Score false-outcome flip independently of CFLS.
+) -> str | None:
+    """Classify a false-outcome (CPT) response into a flip category.
+
+    Returns one of:
+        - ``"strict_flip"``  — the model crossed to the polarity opposite of
+          ``expected_direction`` (i.e. accepted the planted false outcome).
+        - ``"hedged_flip"``  — ORIG was non-neutral and FO retreated to
+          neutral. The model didn't fully accept the plant, but it
+          *abandoned* its original stance under contradictory evidence —
+          a memorization-direction signal that the strict definition misses.
+        - ``"no_flip"``      — ORIG and FO are equal, or any other pattern
+          where the model held its ground.
+        - ``None``           — scoring not possible (slots missing).
 
     When *target_field* is set (e.g. ``"direction"`` or ``"fund_impact"``),
     only that slot is checked — preventing a shock_impact change from
     counting as a fund_impact flip.
 
-    Returns True if the model moved toward the injected false outcome,
-    False if it resisted, or None if scoring is not possible.
+    See ``fo_flip_label_to_strict`` / ``fo_flip_label_to_hedged`` for the
+    bool projections used by aggregation code.
     """
     orig_slots = _extract_slots(orig)
     fo_slots = _extract_slots(cf_false_outcome)
@@ -381,25 +397,62 @@ def _detect_fo_flip(
     # Restrict to target_field if specified
     check_keys = [target_field] if target_field and target_field in orig_slots else list(orig_slots)
 
-    _POS = {"up", "positive", "strong_positive"}
-    _NEG = {"down", "negative", "strong_negative"}
+    saw_hedged = False
 
     for key in check_keys:
         orig_val = orig_slots.get(key, "")
         fo_val = fo_slots.get(key, "")
         if orig_val == fo_val:
             continue
+
+        orig_polarity = (
+            "pos" if orig_val in _FO_POS
+            else ("neg" if orig_val in _FO_NEG
+                  else ("neutral" if orig_val in _FO_NEUTRAL else "unknown"))
+        )
+        fo_polarity = (
+            "pos" if fo_val in _FO_POS
+            else ("neg" if fo_val in _FO_NEG
+                  else ("neutral" if fo_val in _FO_NEUTRAL else "unknown"))
+        )
+
         if expected_direction:
-            expected_polarity = "pos" if expected_direction in _POS | {"up"} else "neg"
-            fo_polarity = "pos" if fo_val in _POS else ("neg" if fo_val in _NEG else "neutral")
+            expected_polarity = "pos" if expected_direction in _FO_POS | {"up"} else "neg"
             if (
                 (expected_polarity == "pos" and fo_polarity == "neg")
                 or (expected_polarity == "neg" and fo_polarity == "pos")
             ):
-                return True
+                return "strict_flip"
+            if orig_polarity in ("pos", "neg") and fo_polarity == "neutral":
+                saw_hedged = True
         else:
-            return True
-    return False
+            # No expected_direction available — treat any movement as a strict flip
+            # (legacy behavior of returning True). Hedged is unrecognizable here.
+            return "strict_flip"
+
+    return "hedged_flip" if saw_hedged else "no_flip"
+
+
+def fo_flip_label_to_strict(label: str | None) -> bool | None:
+    """Project the FO flip label down to the legacy strict bool.
+
+    Returns True iff label == 'strict_flip'. Returns None on label==None
+    so that the rescored field carries the same missingness as the source.
+    """
+    if label is None:
+        return None
+    return label == "strict_flip"
+
+
+def fo_flip_label_to_hedged(label: str | None) -> bool | None:
+    """Project the FO flip label down to the hedged-or-stricter bool.
+
+    Returns True iff label is 'strict_flip' OR 'hedged_flip'. Returns None
+    on label==None.
+    """
+    if label is None:
+        return None
+    return label in ("strict_flip", "hedged_flip")
 
 
 # ── CFLS scoring (E_pilot) ────────────────────────────────────────

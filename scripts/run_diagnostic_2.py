@@ -24,16 +24,18 @@ from src.pilot import (
     _atomic_write,
     _build_client,
     prepare_conditions,
+    run_chunk_batched,
     run_single_case,
 )
 from src.prompt_loader import PromptLoader
 
-DEFAULT_CASES_PATH = ROOT / "data" / "seed" / "test_cases_expanded.json"
+DEFAULT_CASES_PATH = ROOT / "data" / "seed" / "test_cases_v3.json"
 DEFAULT_OUTPUT_PATH = ROOT / "data" / "results" / "diagnostic_2_results.json"
 DEFAULT_MAX_CONCURRENCY = 20
+DEFAULT_CHUNK_SIZE = 50
 SAVE_EVERY = 10
 # Bump this whenever H2/H3 or scoring logic changes to invalidate stale checkpoints
-PIPELINE_VERSION = 2  # v1=original, v2=H2+H3 fixes
+PIPELINE_VERSION = 3  # v1=original, v2=H2+H3 fixes, v3=anchor/frequency strata + 3-phase batching
 UNKNOWN_OUTCOME_DATE = "9999-12-31"
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
@@ -229,11 +231,31 @@ def adapt_case(raw_case: dict[str, Any]) -> CaseBundle:
         case_id = ensure_string(raw_case.get("id"), default="<unknown>")
         raise ValueError(f"Failed to adapt case {case_id}: {exc}") from exc
 
+    # v3 fields (anchor_level, frequency_class, reversibility) — present in
+    # test_cases_v3.json after Phase B annotation. Older case files may omit
+    # them; default to None so downstream stratification handles "unknown".
+    anchor_level_raw = raw_case.get("anchor_level")
+    anchor_level = (
+        int(anchor_level_raw)
+        if anchor_level_raw is not None and str(anchor_level_raw).strip() != ""
+        else None
+    )
+    frequency_class = ensure_string(raw_case.get("frequency_class"), default="") or None
+    reversibility = ensure_string(raw_case.get("reversibility"), default="") or None
+
     metadata = {
         "period": ensure_string(raw_case.get("period"), default="unknown"),
         "rarity_estimate": ensure_string(
             pick_value(raw_case.get("rarity_estimate"), raw_case.get("rarity"), default="unknown"),
             default="unknown",
+        ),
+        "anchor_level": anchor_level,
+        "frequency_class": frequency_class,
+        "reversibility": reversibility,
+        "anchor_binary": (
+            "strongly_anchored" if anchor_level is not None and anchor_level >= 2
+            else "weakly_anchored" if anchor_level is not None
+            else None
         ),
         "known_outcome_available": known_outcome_available,
         "original_known_outcome": ensure_string(raw_case.get("known_outcome")),
@@ -275,9 +297,14 @@ def load_eligible_cases(path: Path, limit: int = 0) -> tuple[list[CaseBundle], d
         "n_filtered_neutral": counts["neutral"],
         "n_filtered_missing_target_or_type": counts["missing_target_or_type"],
         "eligible_by_period": dict(Counter(bundle.metadata["period"] for bundle in eligible)),
-        "eligible_by_rarity_estimate": dict(Counter(bundle.metadata["rarity_estimate"] for bundle in eligible)),
-        "eligible_by_memorization_likelihood": dict(
-            Counter(bundle.test_case.memorization_likelihood for bundle in eligible),
+        "eligible_by_anchor_level": dict(
+            Counter(str(bundle.metadata.get("anchor_level")) for bundle in eligible),
+        ),
+        "eligible_by_anchor_binary": dict(
+            Counter(str(bundle.metadata.get("anchor_binary")) for bundle in eligible),
+        ),
+        "eligible_by_frequency_class": dict(
+            Counter(str(bundle.metadata.get("frequency_class")) for bundle in eligible),
         ),
     }
     return eligible, stats
@@ -293,6 +320,86 @@ def make_condition_summary(conditions: dict[str, dict[str, Any]]) -> dict[str, d
             "article_available": bool(condition.get("article")),
         }
     return summary
+
+
+def compute_cf_failure_summary(
+    case_results: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Per-CF-type and per-stratum failure / scored counts.
+
+    Surfaces the missing-data structure that ``aggregate_case_results`` would
+    otherwise hide behind ``count`` (cases that failed CF generation are
+    silently dropped from the per-task mean denominator).
+
+    Returns a dict with three blocks:
+        - ``n_cf_failed_by_type``: total cases where each CF type was skipped
+          (sr_direction, sr_fund_impact, neutral_paraphrase). Detected via
+          ``responses[cond].skipped == True``.
+        - ``cf_failed_by_stratum``: same counts split by ``period/anchor_binary``.
+        - ``n_scored_by_task_x_stratum``: per-task ``cfls != None`` count by
+          stratum, so the reader can compute ``n_scored / n_total`` per cell.
+    """
+    fail_total: Counter[str] = Counter()
+    fail_by_stratum: dict[str, Counter[str]] = {
+        "sr_direction": Counter(),
+        "sr_fund_impact": Counter(),
+        "neutral_paraphrase": Counter(),
+    }
+    n_total_by_stratum: Counter[str] = Counter()
+    n_scored_by_task_x_stratum: dict[str, Counter[str]] = {
+        task_id: Counter() for task_id in PILOT_TASKS
+    }
+
+    for case_result in case_results:
+        period = case_result.get("period") or "unknown"
+        anchor = case_result.get("anchor_binary") or "unknown"
+        cell = f"{period}/{anchor}"
+        n_total_by_stratum[cell] += 1
+
+        tasks = case_result.get("tasks", {})
+        direct = tasks.get("direct_prediction.base", {})
+        impact = tasks.get("decomposed_impact.base", {})
+        direct_resp = direct.get("responses", {}) if isinstance(direct, dict) else {}
+        impact_resp = impact.get("responses", {}) if isinstance(impact, dict) else {}
+
+        sr_dir_skipped = bool(direct_resp.get("semantic_reversal", {}).get("skipped"))
+        sr_imp_skipped = bool(impact_resp.get("semantic_reversal", {}).get("skipped"))
+        np_skipped = bool(
+            direct_resp.get("neutral_paraphrase", {}).get("skipped")
+            or impact_resp.get("neutral_paraphrase", {}).get("skipped")
+        )
+
+        if sr_dir_skipped:
+            fail_total["sr_direction"] += 1
+            fail_by_stratum["sr_direction"][cell] += 1
+        if sr_imp_skipped:
+            fail_total["sr_fund_impact"] += 1
+            fail_by_stratum["sr_fund_impact"][cell] += 1
+        if np_skipped:
+            fail_total["neutral_paraphrase"] += 1
+            fail_by_stratum["neutral_paraphrase"][cell] += 1
+
+        # Per-task scored counts (cfls != None)
+        for task_id in PILOT_TASKS:
+            task_block = tasks.get(task_id, {}) if isinstance(tasks, dict) else {}
+            cfls_score = (
+                task_block.get("cfls", {}).get("cfls")
+                if isinstance(task_block, dict) else None
+            )
+            if cfls_score is not None:
+                n_scored_by_task_x_stratum[task_id][cell] += 1
+
+    return {
+        "n_cf_failed_by_type": dict(fail_total),
+        "cf_failed_by_stratum": {
+            cf_type: dict(counter) for cf_type, counter in fail_by_stratum.items()
+        },
+        "n_total_by_stratum": dict(n_total_by_stratum),
+        "n_scored_by_task_x_stratum": {
+            task_id: dict(counter)
+            for task_id, counter in n_scored_by_task_x_stratum.items()
+        },
+    }
 
 
 def aggregate_case_results(case_results: list[dict[str, Any]]) -> dict[str, Any]:
@@ -350,6 +457,27 @@ def aggregate_by_field(case_results: list[dict[str, Any]], field: str) -> dict[s
     }
 
 
+def aggregate_by_joint(
+    case_results: list[dict[str, Any]],
+    field_a: str,
+    field_b: str,
+) -> dict[str, Any]:
+    """Aggregate by a joint key, used for period × anchor cell tables."""
+    grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for case_result in case_results:
+        a = ensure_string(case_result.get(field_a), default="unknown")
+        b = ensure_string(case_result.get(field_b), default="unknown")
+        grouped[f"{a}/{b}"].append(case_result)
+
+    return {
+        key: {
+            "n_cases": len(group),
+            "aggregated": aggregate_case_results(group),
+        }
+        for key, group in sorted(grouped.items())
+    }
+
+
 def load_resume_state(path: Path) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     """Load previously saved successful cases and error records."""
     if not path.exists():
@@ -386,6 +514,7 @@ def build_output_payload(
     """Build the saved Diagnostic 2 payload."""
     completed_ids = {case_result["case_id"] for case_result in case_results}
     aggregated = aggregate_case_results(case_results)
+    cf_summary = compute_cf_failure_summary(case_results)
 
     payload = {
         "meta": {
@@ -409,11 +538,20 @@ def build_output_payload(
             "n_filtered_neutral": stats["n_filtered_neutral"],
             "n_filtered_missing_target_or_type": stats["n_filtered_missing_target_or_type"],
             "eligible_by_period": stats["eligible_by_period"],
-            "eligible_by_rarity_estimate": stats["eligible_by_rarity_estimate"],
-            "eligible_by_memorization_likelihood": stats["eligible_by_memorization_likelihood"],
+            "eligible_by_anchor_level": stats.get("eligible_by_anchor_level", {}),
+            "eligible_by_anchor_binary": stats.get("eligible_by_anchor_binary", {}),
+            "eligible_by_frequency_class": stats.get("eligible_by_frequency_class", {}),
+            "n_total_cases": len(case_results),
+            "n_cf_failed_by_type": cf_summary["n_cf_failed_by_type"],
+            "cf_failed_by_stratum": cf_summary["cf_failed_by_stratum"],
+            "n_total_by_stratum": cf_summary["n_total_by_stratum"],
+            "n_scored_by_task_x_stratum": cf_summary["n_scored_by_task_x_stratum"],
             "adapter": {
                 "unknown_known_outcome_handling": "known_outcome='' and outcome_date='9999-12-31'",
-                "false_outcome_cpt_strategy": "reuse src.masking.generate_false_outcome_cpt with expected_direction-driven polarity flip",
+                "false_outcome_cpt_strategy": (
+                    "Phase 2 LLM-only negation for pre-cutoff (cpt_mode=llm_negated|llm_failed); "
+                    "generic directional template for post-cutoff (cpt_mode=generic_post_cutoff)."
+                ),
             },
         },
         "cases": case_results,
@@ -421,8 +559,15 @@ def build_output_payload(
         "aggregated": aggregated,
         "stratified": {
             "by_period": aggregate_by_field(case_results, "period"),
-            "by_rarity_estimate": aggregate_by_field(case_results, "rarity_estimate"),
-            "by_memorization_likelihood": aggregate_by_field(case_results, "memorization_likelihood"),
+            "by_anchor_level": aggregate_by_field(case_results, "anchor_level"),
+            "by_anchor_binary": aggregate_by_field(case_results, "anchor_binary"),
+            "by_frequency_class": aggregate_by_field(case_results, "frequency_class"),
+            "by_period_x_anchor_level": aggregate_by_joint(
+                case_results, "period", "anchor_level",
+            ),
+            "by_period_x_anchor_binary": aggregate_by_joint(
+                case_results, "period", "anchor_binary",
+            ),
         },
     }
     return payload
@@ -491,6 +636,17 @@ def parse_args() -> argparse.Namespace:
         help="Max concurrent API requests inside each case (capped at 20)",
     )
     parser.add_argument(
+        "--chunk-size",
+        type=int,
+        default=DEFAULT_CHUNK_SIZE,
+        help="Cases per batched chunk (Phase1->Phase2->Phase3->Phase4 per chunk)",
+    )
+    parser.add_argument(
+        "--legacy",
+        action="store_true",
+        help="Use the legacy per-case sequential pipeline instead of 3-phase batching",
+    )
+    parser.add_argument(
         "--resume",
         action="store_true",
         help="Resume from an existing output file by skipping already completed cases",
@@ -546,66 +702,178 @@ def main() -> int:
     client = _build_client()
     loader = PromptLoader(prompts_dir=str(PROMPTS_DIR))
 
+    def _attach_metadata(case_result: dict[str, Any], bundle: CaseBundle) -> None:
+        case_result["period"] = bundle.metadata["period"]
+        case_result["rarity_estimate"] = bundle.metadata["rarity_estimate"]
+        case_result["anchor_level"] = bundle.metadata.get("anchor_level")
+        case_result["anchor_binary"] = bundle.metadata.get("anchor_binary")
+        case_result["frequency_class"] = bundle.metadata.get("frequency_class")
+        case_result["reversibility"] = bundle.metadata.get("reversibility")
+        case_result["known_outcome_available"] = bundle.metadata["known_outcome_available"]
+        case_result["is_expanded_case"] = bundle.metadata["is_expanded_case"]
+
     try:
-        for bundle in eligible_cases:
-            tc = bundle.test_case
-            direction = getattr(tc.expected_direction, "value", tc.expected_direction)
-            ordinal = case_positions.get(tc.id, len(completed_results) + 1)
+        if args.legacy:
+            print("Mode: LEGACY per-case sequential pipeline (--legacy)")
+            for bundle in eligible_cases:
+                tc = bundle.test_case
+                direction = getattr(tc.expected_direction, "value", tc.expected_direction)
+                ordinal = case_positions.get(tc.id, len(completed_results) + 1)
 
-            print(f"\n[{ordinal}/{stats['n_eligible_cases']}] {tc.id} | {tc.target} ({tc.target_type}) | {direction}")
-            try:
-                print("  Generating counterfactual conditions...")
-                conditions = prepare_conditions(client, loader, tc)
-                for cond_name, cond in conditions.items():
-                    if cond_name in ("original", "false_outcome_cpt"):
+                print(f"\n[{ordinal}/{stats['n_eligible_cases']}] {tc.id} | {tc.target} ({tc.target_type}) | {direction}")
+                try:
+                    print("  Generating counterfactual conditions...")
+                    conditions = prepare_conditions(client, loader, tc)
+                    for cond_name, cond in conditions.items():
                         status = "OK"
-                    elif cond.get("failed"):
-                        status = "FAILED"
-                    else:
-                        status = "OK"
-                    print(f"    {cond_name}: {status}")
+                        if cond_name not in ("original",) and cond.get("failed"):
+                            status = "FAILED"
+                        print(f"    {cond_name}: {status}")
 
-                print("  Running tasks...")
-                case_result = run_single_case(
-                    client=client,
-                    loader=loader,
-                    tc=tc,
-                    conditions=conditions,
-                    max_concurrency=max_concurrency,
-                )
-                case_result["period"] = bundle.metadata["period"]
-                case_result["rarity_estimate"] = bundle.metadata["rarity_estimate"]
-                case_result["known_outcome_available"] = bundle.metadata["known_outcome_available"]
-                case_result["is_expanded_case"] = bundle.metadata["is_expanded_case"]
-                case_result["condition_summary"] = make_condition_summary(conditions)
+                    print("  Running tasks...")
+                    case_result = run_single_case(
+                        client=client,
+                        loader=loader,
+                        tc=tc,
+                        conditions=conditions,
+                        max_concurrency=max_concurrency,
+                    )
+                    _attach_metadata(case_result, bundle)
+                    case_result["condition_summary"] = make_condition_summary(conditions)
 
-                errors = drop_errors_for_case(errors, tc.id)
-                completed_results.append(case_result)
+                    errors = drop_errors_for_case(errors, tc.id)
+                    completed_results.append(case_result)
 
-                cfls_direct = case_result["metrics"]["cfls_direct"]
-                cfls_impact = case_result["metrics"]["cfls_impact"]
-                direct_text = f"{cfls_direct:.2f}" if cfls_direct is not None else "N/A"
-                impact_text = f"{cfls_impact:.2f}" if cfls_impact is not None else "N/A"
-                print(f"  CFLS: direct={direct_text}, impact={impact_text}")
-            except Exception as exc:
-                errors = drop_errors_for_case(errors, tc.id)
-                errors.append(
-                    {
+                    cfls_direct = case_result["metrics"]["cfls_direct"]
+                    cfls_impact = case_result["metrics"]["cfls_impact"]
+                    direct_text = f"{cfls_direct:.2f}" if cfls_direct is not None else "N/A"
+                    impact_text = f"{cfls_impact:.2f}" if cfls_impact is not None else "N/A"
+                    print(f"  CFLS: direct={direct_text}, impact={impact_text}")
+                except Exception as exc:
+                    errors = drop_errors_for_case(errors, tc.id)
+                    errors.append({
                         "case_id": tc.id,
                         "target": tc.target,
                         "target_type": tc.target_type,
                         "expected_direction": direction,
                         "period": bundle.metadata["period"],
-                        "rarity_estimate": bundle.metadata["rarity_estimate"],
+                        "anchor_level": bundle.metadata.get("anchor_level"),
+                        "frequency_class": bundle.metadata.get("frequency_class"),
+                        "stage": "legacy_pipeline",
                         "error_type": type(exc).__name__,
                         "error": str(exc),
                         "timestamp": datetime.now(UTC).isoformat(),
-                    },
-                )
-                print(f"  [ERROR] Case {tc.id} failed: {type(exc).__name__}: {exc}")
+                    })
+                    print(f"  [ERROR] Case {tc.id} failed: {type(exc).__name__}: {exc}")
 
-            processed_count = len(completed_results) + len(errors)
-            if processed_count > 0 and processed_count % SAVE_EVERY == 0:
+                processed_count = len(completed_results) + len(errors)
+                if processed_count > 0 and processed_count % SAVE_EVERY == 0:
+                    save_checkpoint(
+                        output_path=args.output,
+                        case_results=completed_results,
+                        errors=errors,
+                        stats=stats,
+                        cases_path=args.cases,
+                        seed=args.seed,
+                        max_concurrency=max_concurrency,
+                        resumed=resumed,
+                        partial=True,
+                    )
+                    print(f"  Checkpoint saved to {args.output}")
+        else:
+            chunk_size = max(1, args.chunk_size)
+            n_chunks = (len(eligible_cases) + chunk_size - 1) // chunk_size
+            print(f"Mode: BATCHED 3-phase pipeline | chunk_size={chunk_size} | n_chunks={n_chunks}")
+
+            for chunk_idx in range(n_chunks):
+                start = chunk_idx * chunk_size
+                end = min(start + chunk_size, len(eligible_cases))
+                chunk_bundles = eligible_cases[start:end]
+                chunk_tcs = [b.test_case for b in chunk_bundles]
+                bundle_by_id = {b.test_case.id: b for b in chunk_bundles}
+
+                print(f"\n=== Chunk {chunk_idx + 1}/{n_chunks} ({len(chunk_tcs)} cases: indices {start}..{end - 1}) ===")
+                t_chunk = datetime.now(UTC)
+                try:
+                    chunk_results, chunk_errors = run_chunk_batched(
+                        client=client,
+                        loader=loader,
+                        test_cases=chunk_tcs,
+                        max_concurrency=max_concurrency,
+                    )
+                except Exception as exc:
+                    # Catastrophic failure of an entire chunk -- record one error
+                    # per case and keep going.
+                    print(f"  [CHUNK ERROR] {type(exc).__name__}: {exc}")
+                    for tc in chunk_tcs:
+                        errors = drop_errors_for_case(errors, tc.id)
+                        errors.append({
+                            "case_id": tc.id,
+                            "target": tc.target,
+                            "stage": "chunk_pipeline",
+                            "error_type": type(exc).__name__,
+                            "error": str(exc),
+                            "timestamp": datetime.now(UTC).isoformat(),
+                        })
+                    save_checkpoint(
+                        output_path=args.output,
+                        case_results=completed_results,
+                        errors=errors,
+                        stats=stats,
+                        cases_path=args.cases,
+                        seed=args.seed,
+                        max_concurrency=max_concurrency,
+                        resumed=resumed,
+                        partial=True,
+                    )
+                    continue
+
+                # Attach metadata + record successful results
+                for case_result in chunk_results:
+                    bundle = bundle_by_id.get(case_result["case_id"])
+                    if bundle is None:
+                        continue
+                    _attach_metadata(case_result, bundle)
+                    errors = drop_errors_for_case(errors, case_result["case_id"])
+                    completed_results.append(case_result)
+
+                # Record per-case errors from the chunk
+                for err in chunk_errors:
+                    case_id = err.get("case_id", "<unknown>")
+                    bundle = bundle_by_id.get(case_id)
+                    errors = drop_errors_for_case(errors, case_id)
+                    errors.append({
+                        "case_id": case_id,
+                        "target": getattr(bundle.test_case, "target", "") if bundle else "",
+                        "period": bundle.metadata["period"] if bundle else "unknown",
+                        "anchor_level": bundle.metadata.get("anchor_level") if bundle else None,
+                        "stage": err.get("stage", "scoring"),
+                        "error_type": "chunk_case_error",
+                        "error": err.get("reason", ""),
+                        "timestamp": datetime.now(UTC).isoformat(),
+                    })
+
+                # Diagnostic: count llm_failed CPT cases in this chunk
+                llm_failed_pre = sum(
+                    1 for cr in chunk_results
+                    if (
+                        bundle_by_id.get(cr["case_id"])
+                        and bundle_by_id[cr["case_id"]].metadata.get("known_outcome_available")
+                        and (
+                            cr.get("tasks", {})
+                            .get("direct_prediction.base", {})
+                            .get("responses", {})
+                            .get("false_outcome_cpt", {})
+                            .get("skipped", False)
+                        )
+                    )
+                )
+                elapsed = (datetime.now(UTC) - t_chunk).total_seconds()
+                print(f"  chunk wall time: {elapsed:.1f}s | "
+                      f"completed={len(chunk_results)} | "
+                      f"errors={len(chunk_errors)} | "
+                      f"llm_failed_pre={llm_failed_pre}")
+
                 save_checkpoint(
                     output_path=args.output,
                     case_results=completed_results,
@@ -615,9 +883,9 @@ def main() -> int:
                     seed=args.seed,
                     max_concurrency=max_concurrency,
                     resumed=resumed,
-                    partial=True,
+                    partial=(chunk_idx + 1 < n_chunks),
                 )
-                print(f"  Checkpoint saved to {args.output}")
+                print(f"  Checkpoint saved: {len(completed_results)}/{stats['n_eligible_cases']} done, {len(errors)} errors")
     except KeyboardInterrupt:
         print("\nInterrupted; saving partial progress...")
         save_checkpoint(

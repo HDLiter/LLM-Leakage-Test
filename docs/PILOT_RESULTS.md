@@ -403,6 +403,258 @@ conda run -n rag_finance python scripts/sensitivity_analysis.py
 **Q3: Is the bidirectional confound hypothesis supported?**
 → **No additional support beyond Phase 2.** Anchor stratification was the planned test for whether memorization signal hides inside specific anchor strata. With Breslow-Day p=0.56 and stratum ORs 0.39 / 0.64 both bracketing the pooled 0.51, there is no anchor × temporal interaction. The simpler explanation — input sensitivity for CFLS, suggestibility for CPT, both measured cleanly — survives.
 
+---
+
+## Phase 4 (amber-mirror-lattice): Post-Bug-Fix Re-run
+
+**Date:** 2026-04-11
+**Plan:** `~/.claude/plans/amber-mirror-lattice.md`
+**Pipeline version:** 3 (same schema; 5 bug fixes applied)
+**Cases:** 606 eligible (same pool as Phase 3)
+**Bug fixes applied:** see `docs/BUG_AUDIT_amber.md` for full audit
+
+### Bug-fix audit summary
+
+A multi-agent code review of the Phase 3 pipeline found 5 bugs (3 P0, 2 P1)
+that systematically biased the v3 null result. Phase A confirmed all 5 via
+independent audit scripts; the G1 Codex review passed (round 2). The headline
+finding from the Phase A rescore (no API calls): the `decomposed_impact`
+conclusion inverts from null to memorization-direction under the Bug 3 fix.
+
+| Bug | Fix | Verified impact |
+|---|---|---|
+| 1. `changed_spans` maxLength:200 killed whole-sentence CF rewrites | Dropped maxLength from schema | CF failure 1.0% (was 17% in Phase 3); NP failure **0** (was 121/606=20% in Phase 3); +144 direct, +149 impact scored cases recovered |
+| 2. Aggregation missing-data opaque | Per-stratum denominators surfaced in meta | Now in `n_cf_failed_by_type`, `cf_failed_by_stratum`, `n_scored_by_task_x_stratum` |
+| 3. `_detect_fo_flip` coded neutral retreat as no-flip | Enum: `strict_flip/hedged_flip/no_flip`; both strict and hedged reported | See MH tables below |
+| 4. LLM-negated FO had no polarity check | `check_negation_polarity_flipped()` validator | 0 `llm_failed_pre` (polarity check is permissive on vague outcomes) |
+| 5. Probe modality split by `known_outcome_available`, not period | `cpt_mode` persisted per case; cpt_mode arm in analysis | 115 llm_negated + 491 generic = 606 |
+
+### Key definitions for this section
+
+- **`pre_cutoff` / `post_cutoff`**: cases published before / after the model's
+  training data cutoff (2025-09-30). Pre-cutoff events may have been seen during
+  training; post-cutoff events could not have been.
+- **`fo_flip` (false-outcome flip)**: whether the model changed its prediction
+  toward a planted false outcome. Measured on two tasks: `direct_prediction`
+  (direction: up/down) and `decomposed_impact` (fund_impact: positive/negative).
+- **`strict_flip`**: model crossed to the polarity *opposite* its original
+  prediction (e.g., up → down). This is the Phase 3 legacy definition.
+- **`hedged_flip`**: model retreated from a non-neutral original prediction to
+  neutral (e.g., down → neutral). Treated as a partial concession to the plant.
+- **`hedged` (union)**: strict_flip ∪ hedged_flip. The Phase 4 primary metric.
+- **CFLS (Counterfactual Leakage Susceptibility)**: per-case score =
+  `slot_invariance(orig, cf_reversal) - slot_invariance(orig, paraphrase)`.
+  Positive = suspicious stability under semantic reversal. Requires all three
+  conditions (original, SR, NP) to be valid; cases with failed CF generation
+  get `cfls=None` and are excluded from the CFLS aggregate (see Bug 1/2).
+- **OR orientation**: in all MH tables, OR < 1 means post > pre (suggestibility
+  direction); OR > 1 means pre > post (memorization direction).
+- **Denominators in cross-tables**: per-metric denominators (e.g., 110 vs 115
+  for llm_negated) exclude cases where orig or FO task output was invalid
+  (`fo_flip_*_label = None`). The cpt_mode counts (115/217/274) are case-level;
+  the cross-table denominators are metric-level (cases with scorable output).
+- **`cpt_mode`**: the probe modality used for the false-outcome plant.
+  `llm_negated` = LLM-rewritten outcome (115 pre-cutoff cases with known outcomes);
+  `generic_post_cutoff` = directional template (all 274 post + 217 pre without
+  known outcomes).
+
+### D1 Results (606 cases, all bug fixes)
+
+#### Aggregate CFLS (Bug 1 fix recovered ~150 more scored cases)
+
+Phase 3 comparison values are from the "Phase 3 (deep-floating-lake): D1 Results"
+section above and from `data/results/diagnostic_2_results.v3_pre_amber.json`.
+
+| Task | n_scored (Phase 3) | n_scored (Phase 4) | mean CFLS | positive_rate |
+|---|---|---|---|---|
+| direct_prediction.base  | 447 | **591** | -0.799 | 2.0% |
+| decomposed_impact.base  | 434 | **583** | -0.703 | 1.0% |
+
+Cross-task Spearman ρ = 0.091 (p=0.029, n=574).
+
+#### CFLS temporal split (Mann-Whitney U)
+
+| Task | pre mean (n) | post mean (n) | U | p |
+|---|---|---|---|---|
+| cfls_direct | -0.750 (324) | -0.858 (267) | 47010 | **0.0065** |
+| cfls_impact | -0.695 (325) | -0.713 (258) | 42529 | 0.70 |
+
+Direct CFLS temporal effect strengthened from p=0.035 (Phase 3, n=447) to
+**p=0.0065** (Phase 4, n=591) with 144 more scored cases. Post-cutoff remains
+more negative. Same interpretation: model follows article *more* on unseen
+events.
+
+#### Mantel-Haenszel stratified by `anchor_binary` (primary inference)
+
+**`fo_flip_direct_strict`** (reproduces Phase 3 legacy definition):
+
+| Stratum | n | pre flip | post flip | OR | Fisher p |
+|---|---|---|---|---|---|
+| strongly_anchored | 323 | 6/184 (3.3%) | 7/139 (5.0%) | 0.636 | 0.57 |
+| weakly_anchored   | 277 | 4/144 (2.8%) | 9/133 (6.8%) | 0.394 | 0.16 |
+| **POOLED MH**     | 600 | 10/328 (3.0%) | 16/272 (5.9%) | **0.505** | **p=0.094** |
+
+Breslow-Day: stat=0.33, p=0.57. Consistent with Phase 3 (OR=0.51, p=0.095).
+
+**`fo_flip_direct_hedged`** (strict ∪ neutral retreat; Bug 3 fix):
+
+| Stratum | n | pre flip | post flip | OR | Fisher p |
+|---|---|---|---|---|---|
+| strongly_anchored | 323 | 25/184 (13.6%) | 28/139 (20.1%) | 0.623 | 0.13 |
+| weakly_anchored   | 277 | 23/144 (16.0%) | 30/133 (22.6%) | 0.653 | 0.17 |
+| **POOLED MH**     | 600 | 48/328 (14.6%) | 58/272 (21.3%) | **0.638** | **p=0.036** |
+
+Breslow-Day: stat=0.011, p=0.92 (does not reject homogeneity).
+Direct hedged is now statistically significant at α=0.05. Direction is still
+**post > pre** — the suggestibility interpretation strengthens, not inverts.
+
+**`fo_flip_impact_strict`** (reproduces Phase 3 legacy; degenerate):
+
+| Stratum | n | pre flip | post flip | OR | Fisher p |
+|---|---|---|---|---|---|
+| strongly_anchored | 320 | 0/182 (0.0%) | 1/138 (0.7%) | 0.376 | 0.43 |
+| weakly_anchored   | 271 | 0/144 (0.0%) | 2/127 (1.6%) | 0.217 | 0.22 |
+| **POOLED MH**     | 591 | 0/326 (0.0%) | 3/265 (1.1%) | **0.000** | **p=0.058** |
+
+Consistent with Phase 3 (degenerate OR, all-zero pre cells).
+
+**`fo_flip_impact_hedged`** (strict ∪ neutral retreat; **headline result**):
+
+| Stratum | n | pre flip | post flip | OR | Fisher p |
+|---|---|---|---|---|---|
+| strongly_anchored | 320 | 16/182 (8.8%) | 9/138 (6.5%) | 1.382 | 0.53 |
+| weakly_anchored   | 271 | 24/144 (16.7%) | 9/127 (7.1%) | **2.622** | **0.024** |
+| **POOLED MH**     | 591 | 40/326 (12.3%) | 18/265 (6.8%) | **1.953** | **p=0.022** |
+
+Breslow-Day: stat=1.16, p=0.28 (homogeneous — pooling is valid).
+
+**This is the headline finding.** Under the hedged definition, pre-cutoff
+cases show a **2× higher flip rate** than post-cutoff on the fund_impact task
+(12.3% vs 6.8%, pooled MH OR=1.95, p=0.022). Both anchor strata point in the
+same direction (OR=1.38 and 2.62, BD p=0.28). The effect is numerically larger
+in the weakly-anchored stratum (OR=2.62, p=0.024), though Breslow-Day p=0.28
+does not reject stratum homogeneity — the difference in stratum ORs may
+reflect underpowered interaction rather than a genuine anchor × temporal effect.
+
+This pattern is **consistent with a memorization-direction interpretation**:
+pre-cutoff cases, which the model may have seen during training, show more
+hedged retreats under the planted false outcome than post-cutoff cases. The
+**strict** definition sees zero pre-cutoff impact flips (degenerate OR),
+so this association was **entirely hidden** by Bug 3's coding of neutral
+retreat as "no flip".
+
+#### Probe-modality analysis (Bug 5 fix — `cpt_mode` × `period` cross-table)
+
+The pre arm is mixed: 115 cases use `llm_negated` probes (LLM-rewritten
+outcome), 217 use `generic_post_cutoff` (directional template). The post arm
+is uniform (274 generic). To check whether the impact_hedged pre>post effect
+is a probe-shape artifact, we decompose by `period × cpt_mode`:
+
+**`fo_flip_impact_hedged`:**
+
+| period | cpt_mode | hedged flip rate |
+|---|---|---|
+| pre_cutoff   | llm_negated          | 13/110 (11.8%) |
+| pre_cutoff   | generic_post_cutoff  | 27/216 (12.5%) |
+| post_cutoff  | generic_post_cutoff  | 18/265 ( 6.8%) |
+
+Within the `generic_post_cutoff` arm only (apples-to-apples on probe shape),
+the pre>post effect persists: pre=12.5% vs post=6.8%. The llm_negated pre rate
+(11.8%) is actually *lower* than the generic pre rate (12.5%), so the
+LLM-specific probe shape is not inflating the pre arm. The pre>post effect
+is present regardless of probe modality.
+
+**`fo_flip_direct_hedged`:**
+
+| period | cpt_mode | hedged flip rate |
+|---|---|---|
+| pre_cutoff   | llm_negated          | 17/113 (15.0%) |
+| pre_cutoff   | generic_post_cutoff  | 31/215 (14.4%) |
+| post_cutoff  | generic_post_cutoff  | 58/272 (21.3%) |
+
+For direct, within-generic also shows post>pre (14.4% vs 21.3%), consistent
+with the MH result. Probe modality is not the driver.
+
+#### Penalized-logit supplement (L1 Firth substitute)
+
+| Metric | period_post coef → OR |
+|---|---|
+| fo_flip_direct_strict | exp(coef) = 1.54 |
+| fo_flip_direct_hedged | exp(coef) = 1.47 |
+| fo_flip_impact_strict | exp(coef) = 1.23 |
+| fo_flip_impact_hedged | exp(coef) = 0.54 |
+
+For `fo_flip_impact_hedged`, the L1 penalized logit gives
+`period_post OR = 0.54` — i.e., post-cutoff has a **lower** flip rate, consistent
+with the MH direction (pre > post). L1 shrinkage damps the magnitude relative
+to MH (0.54 vs 1/1.95 = 0.51), as expected.
+
+### Updated Q1/Q2/Q3 Answers (post-Phase 4, bug-fixed)
+
+**Q1: Is CFLS a true negative or measurement failure?**
+→ **True negative, strengthened by Bug 1 fix.** With 591 scored cases (was 447),
+post-cutoff CFLS is more negative than pre-cutoff (p=0.0065, was 0.035). The
+additional 144 cases recovered by the Bug 1 fix — disproportionately from
+`post_cutoff/strongly_anchored` where CF failures had been worst — did not
+reveal a hidden memorization signal. CFLS measures reading-comprehension input
+sensitivity; it does not detect memorization in this regime.
+
+**Q2: Does CPT measure memorization or suggestibility?**
+→ **Revised from Phase 3.** Phase 3 answered "suggestibility only" because
+the strict `fo_flip` definition showed post>pre for both tasks. Phase 4
+supersedes this with the hedged definition (Bug 3 fix), which reveals a
+task-dependent pattern:
+- **Direct-prediction (direction):** suggestibility dominates. Pooled MH
+  OR=0.64 (hedged, p=0.036) — post-cutoff cases flip more than pre-cutoff
+  across both anchor strata (BD p=0.92). The model follows plausible-sounding
+  false outcomes regardless of training exposure.
+- **Decomposed-impact (fund_impact):** consistent with a memorization-direction
+  effect. Pooled MH OR=1.95 (hedged, p=0.022) — pre-cutoff cases hedge toward
+  neutral 2× more often than post-cutoff. This is the direction expected if the
+  model resists the planted false outcome on cases it may have memorized. This
+  association was **entirely masked** by Bug 3's strict definition (which coded
+  neutral retreat as "no flip" and saw zero pre-cutoff events).
+- **Interpretation split:** the direction task (binary up/down) is more
+  amenable to suggestibility because the model's priors on direction are weak;
+  the fund_impact task involves a more graded assessment where prior knowledge
+  may create stronger resistance to contradictory evidence.
+- **Caveat:** this is an association, not a causal claim. The pre arm is mixed
+  (115 llm_negated + 217 generic); the post arm is uniform (274 generic). The
+  within-modality cross-table (see above) shows the impact_hedged effect
+  persists within the generic-only subsample (pre=12.5% vs post=6.8%), but a
+  principled 2×2 cross design (Phase F optional) would strengthen the causal
+  interpretation.
+
+**Q3: Is the bidirectional confound hypothesis supported?**
+→ **Revised from Phase 3.** Phase 3 answered "no additional support." Phase 4
+supersedes: anchor stratification on `fo_flip_impact_hedged` shows stratum
+ORs of 2.62 (weakly-anchored) vs 1.38 (strongly-anchored), with the point
+estimates in the direction predicted by the confound hypothesis (weaker
+anchoring → larger effect). However, Breslow-Day p=0.28 does **not** reject
+stratum homogeneity, so the interaction is unconfirmed. The study is
+underpowered for this interaction test. The primary finding is the main
+effect (pre>post on impact_hedged), not the stratum × temporal interaction.
+
+### Remaining caveats
+
+1. **Construct validity vs Carlini/Nasr:** our metric (counterfactual input
+   sensitivity + hedging behavior) measures a different construct from verbatim
+   extraction or benchmark contamination. A matched positive control (Phase F:
+   continued-pretrained Qwen) would be the strongest defense of the impact
+   finding.
+2. **Frequency × period confound:** `frequency_class` covaries with `period`
+   (see Phase 3 caveat). Sensitivity slices within frequency_class are not
+   interpretable as "within frequency" because low-frequency is almost
+   exclusively pre-cutoff. Fix pending.
+3. **Power for OR<2:** the 606-case sample's 80% MDE at α=0.05 for the MH
+   design is ≈OR=2.4. The observed impact_hedged OR=1.95 is below this
+   threshold, meaning a replication study with the same N might not reproduce
+   the finding. A future iteration should add ~200 cases to reach the
+   conservative 160-per-cell target.
+4. **No positive control:** Phase F (continued-pretrained Qwen) was not
+   executed in this iteration. It remains the recommended next step for
+   defending the impact finding.
+
 ### Carry-over follow-ups (queued for the next iteration)
 
 - **D2 reversibility annotation:** `scripts/annotate_reversibility.py build` was wired to read `condition_summary.sr_direction.article` from the D2 results. The current chunked driver doesn't yet persist the SR rewritten article into `condition_summary` (it stores `failed` + `source` only). Either (a) extend the driver to also write `cf_payload.rewritten_article` into `condition_summary`, or (b) re-derive SR text from the cached LLM responses. Then run `scripts/annotate_reversibility.py build` and dispatch the resulting batches via Codex MCP.

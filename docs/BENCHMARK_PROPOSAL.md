@@ -150,6 +150,58 @@ computation, SR/FO generation) will be released as **Claude Code skills**
 This lowers the reproduction barrier from "re-implement our pipeline" to
 "install Claude Code + run a skill," while respecting data licensing.
 
+## Masking & Mitigation Track
+
+Beyond detection, the benchmark should support **memorization mitigation**
+experiments. The dataset needs to be "mask-friendly" — structured so that
+masking interventions can be applied cleanly and their effects measured.
+
+### Mask-Friendly Design Requirements
+
+Each case should preserve enough structured metadata to support systematic
+masking without manual per-case effort:
+
+| Field | Purpose | Enables |
+|---|---|---|
+| `key_entities` | Named companies, people, agencies | Entity masking / substitution |
+| `key_numbers` | Prices, percentages, dates | Numeric masking |
+| `publish_date` | Article timestamp | Year/date masking |
+| `sector` | Industry sector | Sector masking |
+| `event_type` | Earnings, M&A, policy, etc. | Event-type controls |
+
+### Masking Strategies to Support
+
+| Strategy | How | What it tests |
+|---|---|---|
+| **Year masking** | Replace dates with placeholders | Temporal anchoring |
+| **Entity masking** | Replace company/person names with generic tokens | Entity-specific memorization |
+| **Number masking** | Replace financial figures | Numeric recall |
+| **Full paraphrase** | LLM rewrite preserving semantics, changing surface form | Verbatim vs semantic memorization |
+| **Entity substitution** | Replace real entity with a plausible fictional one | Name-triggered recall |
+
+The benchmark should ship with pre-generated masked variants (at least
+entity-masked and year-masked) so users can run masking experiments without
+additional LLM calls.
+
+### Multi-Method Compatibility
+
+The benchmark should be usable not just with our SR/FO probes but also with
+established memorization detection methods from the literature:
+
+| Method family | What it needs from the benchmark | Status |
+|---|---|---|
+| **Counterfactual probes** (ours: SR, FO) | Article + reversal + false outcome | Core protocol |
+| **Min-K% / perplexity** (Shi et al. 2024) | Raw article text + model logprobs | Supported via white-box track |
+| **Membership inference** (Carlini et al.) | In-training vs out-of-training labels | Supported via period labels |
+| **Extraction attacks** (verbatim recall) | Known text spans to prompt for | Can derive from known_outcome |
+| **Continued pre-training** (our CPT arms) | Training corpus + eval cases | Supported via CPT split design |
+| **Benchmark contamination** (Golchin & Surdeanu) | Benchmark items as prompts | Adaptable |
+
+To support training-based methods (CPT, fine-tuning studies), the benchmark
+can include an optional **extended corpus** beyond the eval cases — a larger
+pool of articles (10K-50K) suitable for training experiments, with proper
+train/eval separation guarantees.
+
 ## Open Questions for Review
 
 1. Is 2000+2000 the right scale, or should we go larger?
@@ -164,6 +216,9 @@ This lowers the reproduction barrier from "re-implement our pipeline" to
 9. CLS licensing: approach CLS after benchmark is built with a concrete
    proposal. Possible outcomes: full-text license, summary-only, or
    fallback to metadata+fingerprint scheme.
+10. Which masking variants to ship pre-generated vs leave to users?
+11. How large should the extended training corpus be (10K? 50K)?
+12. Which external memorization methods to prioritize for compatibility?
 
 ---
 

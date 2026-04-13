@@ -14,6 +14,14 @@
 
 ---
 
+## R1 Additions
+
+- **Measuring memorization in language models via probabilistic extraction:** Formalizes extraction as a probabilistic memorization measurement problem; this matters because the R1 NLP review cites it as the strongest extraction-style comparator if FinMem-Bench claims extraction compatibility.
+- **OWL:** Probes cross-lingual recall of memorized texts; this matters because the R1 NLP review uses it to argue that cross-lingual memorization is no longer an open niche by itself.
+- **Pretraining Data Detection for Large Language Models: A Divergence-based Calibration Method:** Calibrates pretraining-data detection beyond raw Min-K% scores; this matters because the R1 NLP review cites PatentMIA-style divergence calibration as realistic partial support for FinMem-Bench.
+
+---
+
 ## Counterfactual Memorization in Neural Language Models
 **Authors & Year:** Zhang et al. (2021)
 

@@ -56,6 +56,19 @@
 
 ---
 
+## R1 Additions
+
+- **CLEAN-EVAL:** Cleans evaluation on contaminated LLMs by rebuilding the test side rather than trusting raw benchmark scores; this matters because the R1 NLP review cites it as direct prior art in contamination-resistant benchmark construction.
+- **PaCoST:** Uses paired variants plus significance testing to detect contamination; this matters because the R1 NLP review treats counterpart-based detection as already established, raising the bar for FinMem-Bench.
+- **An Open-Source Data Contamination Report for Large Language Models:** Systematizes contamination reporting across open models; this matters because the R1 NLP review cites dataset-level contamination auditing as established infrastructure.
+- **Leak, Cheat, Repeat:** Documents contamination and evaluation malpractice in closed-source LLMs; this matters because the R1 NLP review argues benchmark claims need tighter release and validity language.
+- **Data Contamination Can Cross Language Barriers:** Shows contamination can transfer through translation/paraphrase; this matters because the R1 Stats review uses it to reject naive CN/EN independence assumptions.
+- **LastingBench:** Designs a benchmark to stay useful despite knowledge leakage over time; this matters because the R1 NLP and Editor reviews cite it as prior art for leakage-resistant benchmark maintenance.
+- **VarBench:** Perturbs benchmark variables dynamically to stress contamination-sensitive evaluation; this matters because the R1 NLP review uses it as another comparator in the crowded contamination-benchmark space.
+- **How Can I Publish My LLM Benchmark Without Giving the True Answers Away?:** Proposes publication strategies that preserve benchmark validity; this matters because the R1 Stats review uses it to justify hidden-answer and dev/test separation for FinMem-Bench.
+
+---
+
 ## Leakage and the Reproducibility Crisis in ML-Based Science
 **Authors & Year:** Kapoor & Narayanan (2023)
 

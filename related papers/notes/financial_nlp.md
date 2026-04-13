@@ -14,6 +14,12 @@
 
 ---
 
+## R1 Additions
+
+- **InvestorBench:** Benchmarks LLM-based agents on financial decision-making tasks; this matters because the R1 Editor review uses it as a finance capability benchmark contrast, clarifying that FinMem-Bench should target temporally inadmissible dependence rather than generic finance ability.
+
+---
+
 ## CFinBench: A Comprehensive Chinese Financial Benchmark for Large Language Models
 **Authors & Year:** Nie et al. (2024)
 

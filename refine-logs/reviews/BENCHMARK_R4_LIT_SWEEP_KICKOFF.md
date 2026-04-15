@@ -29,9 +29,13 @@ This document is a self-contained context packet for a fresh session whose sole 
    - "Open considerations for downstream tracks" — especially the Thales dedicated session section and CMMD fleet section
 2. **`refine-logs/reviews/BENCHMARK_R4_FINAL_SYNTHESIS.md`** — R4 closure
 3. **`refine-logs/reviews/BENCHMARK_R4_FINAL_REVIEW.md`** — cold reader's critique; the biggest single risk is construct collapse
-4. **`docs/CMMD_MODEL_FLEET_SURVEY.md`** — current fleet recommendation
-5. **`related papers/INDEX.md`** — what papers are already in the library
-6. **`related papers/notes/*.md`** — topic-level summaries of library papers
+4. **`refine-logs/reviews/BENCHMARK_R4_POST_V5_2_INTEGRATION_REVIEW.md`** — integration review that triggered the v5.2 cleanup; useful for knowing what was in tension
+5. **`docs/CMMD_MODEL_FLEET_SURVEY.md`** — current fleet recommendation; Sub-task C references it directly
+6. **`docs/THALES_SIGNAL_PROFILE_REVIEW.md`** — Thales topic/modality/authority review; Sub-task A's Modality and Authority literature checks depend on this
+7. **`related papers/INDEX.md`** — what papers are already in the library
+8. **`related papers/notes/*.md`** — topic-level summaries of library papers
+
+**Scope boundary note**: this kickoff owns the **broad factor/provenance literature sweep**. R5 (`BENCHMARK_R5_KICKOFF.md`) owns a narrower **detector-specific targeted sweep** within R5 Step 1 only. The two do not overlap: this sweep focuses on factor-level prior art, chronologically-controlled baseline evaluation, broad 2024-2026 landscape, and construct validity; R5's sweep focuses on detector family state of the art. If a paper is relevant to both (e.g., MemGuard-Alpha), this sweep owns the factor-level interpretation and R5's sweep owns the detector-level interpretation.
 
 ---
 

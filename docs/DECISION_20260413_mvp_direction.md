@@ -86,9 +86,8 @@ Critical finding from Quant R3 (B2): baostock's 15-minute CSI 300 historical dat
 
 **Decision:** Sampling unit = event cluster, not article. One canonical case per cluster.
 
-**R3 refinements:**
-- **Canonical selection rule** is deferred to the **Thales-joint track** (T1). v1 said "annotator picks earliest OR most representative with reasoning"; NLP + Stats both flagged this as too discretionary. The Thales project has parallel canonical-selection + entity-extraction needs, so this will be designed jointly.
-- **Placeholder selection rule for R4 purposes only**: assume a deterministic rule will exist (most likely `earliest article in cluster`, with tie-breakers on length and source authority). R4 factors should not depend on the exact rule.
+**R3 refinements (superseded by Principle P2 in v5.2)**:
+- **Canonical selection rule is now fixed by Principle P2** (two-stage Event Phase sampling: random phase assignment → earliest article of that phase within cluster, with full algorithm specified in P2 including no-match handling, tie-breakers, seeds). Earlier drafts said this was deferred to the Thales-joint track; that is **no longer true** as of v5/v5.2. **The Thales-joint session only operationalizes phase labeling rules, tie-breakers, QC, clustering, and entity extraction — it does NOT decide canonical selection**. The canonical-selection rule is a fixed v5.2 commitment.
 - **Cluster membership**: the schema will store full cluster member IDs even though only the canonical case is annotated, so downstream frequency analysis can reference it (NLP R3).
 
 **Updated target N (Stats R3 recalc):**
@@ -103,7 +102,7 @@ Critical finding from Quant R3 (B2): baostock's 15-minute CSI 300 historical dat
 - Pilot annotation set = 150 cases, doubly annotated
 - Factors will be computed on the canonical text, but cluster-level statistics (size, first-seen time) are available as factor inputs
 
-**Status:** Confirmed direction. Selection rule → Thales-joint track.
+**Status:** Confirmed direction. **Canonical selection rule is fixed by Principle P2**, NOT deferred to Thales-joint session. The Thales-joint session owns clustering algorithm, entity extraction, and phase-labeling operational details only.
 
 ---
 
@@ -148,7 +147,7 @@ Critical finding from Quant R3 (B2): baostock's 15-minute CSI 300 historical dat
 
 ### Decision 6 — Event clustering + Thales integration [DEFERRED, with Thales]
 
-**Unchanged from v1.** Clustering pipeline + entity extraction will be designed jointly with Thales in a separate session after user prepares Thales materials. Canonical doc selection rule (T1 from R3) joins this track.
+**Unchanged from v1 for the clustering/entity extraction parts.** Clustering pipeline + entity extraction will be designed jointly with Thales in a separate session after user prepares Thales materials. **Canonical doc selection rule is NO LONGER in this track** — v5 moved it to Principle P2 as a fixed rule. The Thales-joint session only handles clustering algorithm, entity extraction, phase-labeling classifier rules, and QC.
 
 **R4 can assume:** Clustering produces `duplicate_cluster_id`, `duplicate_cluster_size`, `first_seen_time`, `canonical_doc_id`, and a list of cluster member article IDs. Entity extraction produces `key_entities` per case.
 
@@ -210,7 +209,7 @@ These are NOT "problems pushed aside" — each has a dedicated working track. Th
 | Track | Scope | Depends on | Blocks |
 |---|---|---|---|
 | **Point-in-time analysis** | D2 fields + D4 outcome function + intraday vs daily-close decision | fresh session | R5/R6 detector choice (partially) |
-| **Thales-joint design** | Clustering pipeline + entity extraction + canonical doc selection rule (T1) | Thales materials from user | Production annotation start |
+| **Thales-joint design** | Clustering pipeline + entity extraction + phase labeling rules + QC (canonical SELECTION is already fixed by Principle P2; not in Thales-joint scope) | Thales materials from user | Production annotation start |
 | **LLM annotation protocol** | Full workflow spec, prompt design, IAA thresholds, human QA budget (T2) | Pilot data | Production annotation start |
 
 ---
@@ -241,9 +240,9 @@ R4 agents should treat the following as given and NOT relitigate:
 
 ## What R4 produced (post-closure)
 
-R4 ran four sub-rounds in one day: Step 1 brainstorm (4 Codex agents, 30 factor proposals total), Step 1 orchestrator synthesis, Step 2 review of the integrated 12-factor shortlist (4 Codex agents, 10/10/6/2 GO counts), Challenger cross-model check (Claude sub-agent, 3 IMPORTANT amendments), and a cold-reader pass that triggered v5. Final outputs:
+R4 ran four sub-rounds in one day: Step 1 brainstorm (4 Codex agents, 30 factor proposals total), Step 1 orchestrator synthesis, Step 2 review of the integrated 12-factor shortlist (4 Codex agents, 10/10/6/2 GO counts), Challenger cross-model check (Claude sub-agent, 3 IMPORTANT amendments), and a cold-reader pass that triggered v5. A post-v5 integration review then drove v5.1 (Reprint Status drop) and v5.2 (CMMD + Thales integration + hierarchical Event Type + per-factor construct caveats). Final outputs:
 
-1. **The 12-factor shortlist** organized by Editor's narrative hierarchy (4 spine + 4 secondary + 2 auxiliary + 1 control + 1 sampling-design factor + 4 reserve items + 4 dropped candidates). Each spine and secondary factor has a concept definition, a construct caveat (per cold-reader feedback — see "Construct caveats" notes within each factor block), a Decision-10 justification, an operationalization sketch (algorithmic details deferred to Thales-joint session for clustering- and entity-dependent factors), a predicted effect direction, and a hierarchy assignment.
+1. **The 12-factor shortlist** organized by Editor's narrative hierarchy (4 spine + 4 secondary + 2 auxiliary + 1 control + 1 sampling-design factor + **3 reserve items + 5 dropped candidates** after v5.1 Reprint drop). Each spine and secondary factor has a concept definition, a construct caveat (per cold-reader feedback — see "Construct caveats" notes within each factor block), a Decision-10 justification, an operationalization sketch (algorithmic details deferred to Thales-joint session for clustering- and entity-dependent factors), a predicted effect direction, and a hierarchy assignment.
 2. **Methodology principles P1-P5** (extra-corpus signal principle, Event Phase two-stage sampling rule, Anchor outcome-blind selection protocol, pre-registered interaction menu framework, R5-vs-R4 boundary).
 3. **Convergent risks R1-R4** (shared annotation dependence, major-entity prominence correlation bloc, anchor outcome-blind discipline, construct collapse — R4 added in v5 from cold-reader feedback).
 4. **Initial target N = 3,200** gross clusters with stopping-rule adaptive sampling; user has indicated willingness to scale up if balance requirements are not met.
@@ -355,7 +354,9 @@ Until then, **P1 remains tightly met with only Tradability Tier as the pure extr
 
 ### Principle P1 — Extra-corpus signal principle
 
-CLS-internal statistics (cluster_size, CLS-based entity salience, CLS-based reprint rate) are proxies for CLS corpus properties, NOT LLM training-set properties. The CLS corpus is small relative to any LLM's actual pretraining corpus; distributions in CLS may diverge from distributions in pretraining. Factors that leverage **extra-corpus signals** (market-based Tradability, multi-media Reprint coverage as proxy for external dissemination, historical event-family frequency) have **independent diagnostic value** precisely because they do NOT rely on CLS-internal counts.
+CLS-internal statistics (cluster_size, CLS-based entity salience, CLS-based template recurrence) are proxies for CLS corpus properties, NOT LLM training-set properties. The CLS corpus is small relative to any LLM's actual pretraining corpus; distributions in CLS may diverge from distributions in pretraining. Factors that leverage **extra-corpus signals** (market-based liquidity tiers, external knowledge-graph lookups, and — pending Thales sync — publisher-metadata-based authority) have **independent diagnostic value** precisely because they do NOT rely on CLS-internal counts.
+
+**v5.1/v5.2 reality**: Reprint Status was dropped (CLS is aggregator-dominated, no discriminative signal), so the only pure extra-corpus active factor currently in the shortlist is **Tradability Tier**. Authority is a candidate but cannot be extra-corpus without publisher metadata (which the CLS raw schema does not contain). P1 is currently at **minimum satisfaction** and this is acknowledged as a known weakness; the upcoming Thales dedicated sync session and R4 literature sweep may surface a second extra-corpus factor to restore headroom.
 
 **Practical rule**: whenever a factor is proposed, label it as "CLS-internal," "case×model" (depends on model-side metadata), or "extra-corpus" (independent of both CLS and the model). Keep at least 2 extra-corpus factors in the shortlist at all times.
 
@@ -378,9 +379,8 @@ CLS-internal statistics (cluster_size, CLS-based entity salience, CLS-based repr
 | Session Timing | CLS-internal (timestamp) | No | Trivial from CLS metadata |
 | Event Phase | CLS-internal (rule-based) | Partial | Phase labeling depends on rule quality |
 | Text Length | CLS-internal | No | Trivial |
-| Reprint Status (reserve) | **extra-corpus** | No | Whether the article matches a public-domain source — independent of CLS |
 
-**Extra-corpus count**: 2 in the active shortlist (Tradability Tier + Reprint Status if promoted from reserve) + 1 case×model variable (Cutoff Exposure) that is also pipeline-independent. **Principle P1 is minimally satisfied** but tightly. If Reprint Status is not promoted, only Tradability Tier remains as a pure extra-corpus factor — and Tradability is auxiliary in the hierarchy. **R5 should consider promoting at least one detector-derived signal that is also pipeline-independent** to give P1 more headroom.
+**Extra-corpus count (v5.2 reality)**: **1 pure extra-corpus factor** in the active shortlist (Tradability Tier) + 1 case×model variable (Cutoff Exposure) that is pipeline-independent but model-specific. Reprint Status was dropped in v5.1 as non-discriminative on CLS (see Dropped section below). **Principle P1 is currently tight**: a single extra-corpus factor that is also auxiliary (not in the spine) does not give the benchmark strong headroom against Risk R4 construct collapse. **Possible P1 restorations (all deferred)**: (a) Thales `Authority` re-operationalized via external publisher metadata, blocked by CLS schema lacking a publisher field; (b) R4 literature sweep may surface new extra-corpus candidates; (c) detector-derived CMMD agreement score in R5 could act as a quasi-extra-corpus signal. Status: acknowledged weakness, not yet repaired.
 
 ### Principle P2 — Event Phase two-stage sampling (supersedes prior canonical selection rule)
 
@@ -411,6 +411,8 @@ Anchor Strength operationalization is decided via a pre-registered comparison ex
 **Sampling**: 150 CLS cases via stratified random over (pre/post cutoff × target type × text length tertile × propagation × event type).
 
 **Annotators**: 3 independent raters — 2 model families (Claude, Codex) + 1 human — each applying ALL 3 rubrics (Quant density count / NLP triple specificity / Editor 0-3 rubric) to ALL 150 cases. Total = 450 annotations per rubric = 1,350 annotations.
+
+**Randomized rubric order within each rater**: for each case, the order in which the 3 rubrics are applied is randomized per (rater × case) with a fixed seed. This prevents systematic carryover effects (e.g., a rater subconsciously anchoring later rubrics to their first rubric's score). The randomization order is published with the release so reviewers can verify.
 
 **Primary reliability metric**: **ordinal Krippendorff's α** (see Concept Definitions below) computed per rubric, with **95% bootstrap confidence intervals** from 2,000 resamples. At n=150, the bootstrap CI half-width is expected to be approximately ±0.05 (compared to ±0.10 at n=50, which was too wide to support the decision rule).
 
@@ -502,7 +504,7 @@ Addressed by Principle P3. Duplicated here because it is the cleanest potential 
 
 The cold reader's biggest single-risk finding. The 12-factor shortlist looks broad but actually collapses into **3 latent constructs**, not 12:
 
-1. **Repetition / surface reuse**: Propagation Intensity, Template Rigidity, Reprint Status, surface_template_recurrence robustness companion
+1. **Repetition / surface reuse**: Propagation Intensity (event_burst + historical_family_recurrence terms), Template Rigidity, surface_template_recurrence robustness companion (cluster-aware and cluster-free variants)
 2. **Prominence / attention**: Entity Salience (target part), Target Scope, Tradability Tier
 3. **Institutional stage / source provenance**: Structured Event Type, Disclosure Regime, Event Phase, Session Timing
 
@@ -529,7 +531,7 @@ If the eventual analysis "shows" memorization is stronger for high-propagation, 
 - Company share ≥ 70% (for Tradability subset)
 - Tradability binary minority within company subset ≥ 25%
 - Event Phase all 4 types have ≥ 200 cases each (for two-stage sampling to work)
-- Event Type: each of the 7+ categories has ≥ minimum cell (to be set in R6)
+- Event Type: **coarse confirmatory groups (5-7 bins, the secondary label layer) must meet minimum cell count per group** (to be set in R6); **fine primary labels (15-20 bins, after Thales 13-type subdivision) are descriptive only and are NOT balance-gated** — they may have sparse cells without blocking data collection, per the v5.2 hierarchical labeling decision
 
 If stopping conditions are not met at N=3,200, sampling continues. N may scale up to 3,500-4,500 in practice; user has indicated willingness to purchase additional annotation capacity.
 

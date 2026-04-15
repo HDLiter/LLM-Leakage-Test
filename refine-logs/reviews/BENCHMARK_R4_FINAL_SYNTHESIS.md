@@ -3,7 +3,7 @@
 **Date:** 2026-04-13 (R4 opened and closed within one day)
 **Orchestrator:** Claude Code
 **Scope:** R4 = factor investigation (what dimensions to measure per case, with what operationalization and what statistical structure)
-**Output:** this synthesis + `docs/DECISION_20260413_mvp_direction.md` v4 + BENCHMARK_R4A/R4B/R4_CHALLENGER review files
+**Output:** this synthesis + `docs/DECISION_20260413_mvp_direction.md` v5.2 + BENCHMARK_R4A/R4B/R4_CHALLENGER review files
 
 ---
 
@@ -17,9 +17,9 @@ R4 ran as four sequential sub-rounds over one day:
 | **R4 Step 1 synthesis** | Orchestrator | Aggregate the 30 proposed factors into a convergence map, identify divergences | BENCHMARK_R4A_SYNTHESIS.md |
 | **R4 Step 2** (review) | 4 Codex domain agents, independent reviews of the 12-factor shortlist the user integrated from Step 1 | Evaluate the integrated draft, respond to user methodology inputs, answer detail questions | BENCHMARK_R4B_{QUANT,NLP,STATS,EDITOR}.md |
 | **R4 Challenger** | Claude cross-model sub-agent (non-Codex, for model-family diversity) | Surface blind spots shared across the 4 Codex agents | BENCHMARK_R4_CHALLENGER.md |
-| **User integration** | User + Orchestrator | Fold R4 Step 2 and Challenger findings into decisions, update decision document to v4 | `docs/DECISION_20260413_mvp_direction.md` v4 |
+| **User integration** | User + Orchestrator | Fold R4 Step 2 and Challenger findings into decisions, update decision document | `docs/DECISION_20260413_mvp_direction.md` v5.2 |
 
-Total factor proposals generated: 30 (Step 1) → reviewed and integrated into a 12-factor shortlist (Step 2) → refined by 3 Challenger-addressed amendments → final v4.
+Total factor proposals generated: 30 (Step 1) → reviewed and integrated into a 12-factor shortlist (Step 2) → refined by 3 Challenger-addressed amendments → cleaned up by post-v4 cold-reader review (→ v5) → Reprint Status dropped as non-discriminative on CLS (→ v5.1) → CMMD + Thales investigation integration + hierarchical Event Type + per-factor construct caveats (→ v5.2) → integration review cleanup → **final v5.2**.
 
 ---
 
@@ -34,33 +34,35 @@ R4 sits at the end of a 4-round escalation from "this proposal has 3 papers stap
 | R3 | Are the specific MVP decisions operationally sound? | 4 of 6 open decisions needed rework; B1/B2/B3 critical; all resolved or routed. |
 | R4 Step 1 | What factors should the benchmark measure? | Brainstorm only, no convergence requirement. |
 | R4 Step 2 | Does the integrated 12-factor shortlist hold up? | 10/10/6/2 GO counts (Quant/NLP/Stats/Editor); Editor raised 2 venue-drift blocks that user accepted as narrative-hierarchy reshuffle rather than factor removal. |
-| R4 Challenger | Any shared blind spots across 4 Codex agents? | No BLOCKING issues; 3 IMPORTANT amendments applied to v4. |
+| R4 Challenger | Any shared blind spots across 4 Codex agents? | No BLOCKING issues; 3 IMPORTANT amendments applied (now in v5.2). |
 
 **Net**: from a fractured R1 to a converged R4, without loss of project ambition. The 12-factor shortlist preserves Quant's alpha-bridge (via the auxiliary tier), NLP's literature-backed factors (as the spine), Stats' power discipline (via Editor's hierarchy + expanded N + principles P3/P4), and Editor's venue discipline (via the spine/secondary/auxiliary structure). All four agents have substantive representation in the final shortlist.
 
 ---
 
-## R4 final outputs (by reference to v4)
+## R4 final outputs (by reference to v5.2)
 
-R4 produces **no new content beyond what is captured in `docs/DECISION_20260413_mvp_direction.md` v4**. The decision doc is the authoritative artifact; this synthesis is an index into it. The v4 sections that R4 is responsible for:
+R4 produces **no new content beyond what is captured in `docs/DECISION_20260413_mvp_direction.md` v5.2**. The decision doc is the authoritative artifact; this synthesis is an index into it. The v5.2 sections that R4 is responsible for:
 
-1. **§ "R4 Step 1 + Step 2 outcome: 12-factor shortlist"** — the 12 factors organized by Editor's hierarchy: 4 spine + 4 secondary + 2 auxiliary + 1 control + 1 sampling-design factor (Event Phase), plus 4 reserve items and 4 dropped items.
+1. **§ "R4 Step 1 + Step 2 outcome: 12-factor shortlist"** — the 12 factors organized by Editor's hierarchy: 4 spine + 4 secondary + 2 auxiliary + 1 control + 1 sampling-design factor (Event Phase), plus **3 reserve items and 5 dropped items** (Reprint Status moved from reserve to dropped in v5.1 as non-discriminative on CLS).
 
 2. **§ "Methodology principles (captured from R4 Step 2)"** — principles P1 through P5:
    - **P1** Extra-corpus signal principle (at least 2 extra-corpus factors always in the shortlist)
    - **P2** Event Phase two-stage sampling (replaces canonical selection rule)
    - **P3** Anchor Strength outcome-blind experiment, n=150, with bootstrap CI reporting and escape hatch
-   - **P4** Pre-registered interaction menu, 5-7 cross-factor 2×2 pairs, including 2 cross-agent pairs added in v4
+   - **P4** Pre-registered interaction menu, 5-7 cross-factor 2×2 pairs, including 2 cross-agent pairs added in v5.2
    - **P5** Detector-dependent factors are R5 territory
 
-3. **§ "R4 Step 2 convergent risks (captured for pre-commit documentation)"** — risks R1/R2/R3:
-   - **R1** Shared annotation dependence across 4 factors; mitigated by the v4 dual robustness companion on Propagation Intensity (cluster-aware + cluster-free variants)
-   - **R2** Major-entity prominence correlation bloc; mitigated by joint modeling mandate and the v4 tail-entity diagnostic interaction pair
+3. **§ "R4 Step 2 convergent risks (captured for pre-commit documentation)"** — risks **R1/R2/R3/R4**:
+   - **R1** Shared annotation dependence across 4 factors; mitigated by the v5.2 dual robustness companion on Propagation Intensity (cluster-aware + cluster-free variants, the cluster-free version being fully annotation-free AND clustering-free)
+   - **R2** Major-entity prominence correlation bloc; mitigated by joint modeling mandate and the v5.2 tail-entity diagnostic interaction pair
+   - **R3** Anchor outcome-blind discipline; mitigated by Principle P3
+   - **R4** Construct collapse into a prominence/repetition proxy benchmark (the cold reader's biggest single-risk finding); mitigated by joint modeling mandate, bloc-level secondary analysis, tail-entity diagnostic, cluster-free robustness companion, and per-factor construct caveats
    - **R3** Anchor outcome-blind discipline; mitigated by Principle P3
 
 4. **§ "Target N and sampling strategy"** — initial target N = 3,200 gross clusters, with explicit stopping conditions for adaptive resampling. User will scale up if balance requirements are not met.
 
-5. **§ "R4 Challenger outcome (v4)"** — 3 IMPORTANT findings from the cross-model check, all addressed.
+5. **§ "R4 Challenger outcome (v5.2)"** — 3 IMPORTANT findings from the cross-model check, all addressed.
 
 6. **§ "Open considerations for downstream tracks"** — items routed to dedicated downstream sessions rather than deferred indefinitely:
    - Spine factor dependency on the Thales-joint pipeline (handoff note for R5)
@@ -134,7 +136,7 @@ R5 is **detector investigation**. The inputs R5 must take from R4:
 
 1. The 12-factor shortlist is locked. R5 does not add or remove factors.
 2. Methodology principles P1-P5 are binding on R5.
-3. Risks R1-R3 are documented and must be carried forward.
+3. Risks R1-R4 are documented and must be carried forward. Especially R4 (construct collapse): R5 detector choices must diversify mechanism families to avoid amplifying the prominence/repetition correlation bloc.
 4. Target N = 3,200 (initial reference) + stopping conditions; R5 must respect this.
 5. Case text for measurement = CLS text (Decision 5 from v2/v3, still binding).
 6. Pre-commit granularity = 档位 2 偏 1 (Decision 9).

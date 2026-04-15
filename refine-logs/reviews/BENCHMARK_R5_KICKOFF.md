@@ -1,8 +1,8 @@
 # BENCHMARK R5 — Detector Investigation Kickoff
 
-**Date created:** 2026-04-13 (end of R4)
-**Status:** PENDING — to be started in a new session
-**Predecessor:** R4 closed (conceptually). See `BENCHMARK_R4_FINAL_SYNTHESIS.md` and `docs/DECISION_20260413_mvp_direction.md` v5.
+**Date created:** 2026-04-13 (end of R4, amended after post-v5.2 integration review)
+**Status:** PENDING — to be started in a new session AFTER the R4 literature sweep completes
+**Predecessor:** R4 conceptually closed. See `BENCHMARK_R4_FINAL_SYNTHESIS.md` and `docs/DECISION_20260413_mvp_direction.md` **v5.2** (v5.1 dropped Reprint Status; v5.2 integrated CMMD 6-model fleet + Thales signal profile findings + hierarchical Event Type + per-factor construct caveats). **R4 literature sweep (`BENCHMARK_R4_LIT_SWEEP_KICKOFF.md`) must run before R5** to prevent further MemGuard-Alpha-style prior-art surprises.
 
 This document is a self-contained context packet for whoever opens R5 in a new conversation. It bundles everything the next session needs to start cleanly without re-reading R1-R4 in full.
 
@@ -16,17 +16,22 @@ The dependent variable: a memorization detector score per case per detector per 
 
 ## Required reading before starting R5
 
-1. **`docs/DECISION_20260413_mvp_direction.md` v5** — the authoritative decision document. Especially:
+1. **`docs/DECISION_20260413_mvp_direction.md` v5.2** — the authoritative decision document (v5.2, NOT v5). Especially:
    - "R4 Step 1 + Step 2 outcome: 12-factor shortlist" — the locked factor list
    - "Methodology principles (P1-P5)"
    - "R4 Step 2 convergent risks (R1-R4)" — especially R4 (construct collapse)
-   - "Open considerations for downstream tracks"
-2. **`refine-logs/reviews/BENCHMARK_R4_FINAL_SYNTHESIS.md`** — the R4 closure document
-3. **`refine-logs/reviews/BENCHMARK_R4_FINAL_REVIEW.md`** — cold reader's critique of R4
-4. **Two relevant prior-art papers** (recently added to library):
+   - "Open considerations for downstream tracks" — includes the accepted CMMD 6-model fleet
+   - Version history section — read v5.1 and v5.2 entries specifically to understand what changed from v5
+2. **`docs/CMMD_MODEL_FLEET_SURVEY.md`** — the full CMMD 6-model fleet survey, including cost estimates, reproducibility landmines, and fallback options. R5 starts from this fleet as the default and either pins or amends with justification.
+3. **`docs/THALES_SIGNAL_PROFILE_REVIEW.md`** — Thales topic / modality / authority review. Relevant for understanding the Modality-as-possible-replacement-for-Disclosure-Regime decision and the Authority-as-possible-extra-corpus-factor decision (both deferred to Thales dedicated session).
+4. **`refine-logs/reviews/BENCHMARK_R4_FINAL_SYNTHESIS.md`** — the R4 closure document
+5. **`refine-logs/reviews/BENCHMARK_R4_FINAL_REVIEW.md`** — cold reader's critique of R4
+6. **`refine-logs/reviews/BENCHMARK_R4_POST_V5_2_INTEGRATION_REVIEW.md`** — integration review that triggered v5.2 cleanup
+7. **If the R4 literature sweep has completed**, also read: `docs/FACTOR_LITERATURE_PROVENANCE.md` and `docs/LITERATURE_SWEEP_2026_04.md` + any new papers it added
+8. **Two relevant prior-art papers** (recently added to library):
    - `related papers/MemGuard-Alpha Memorization Financial Forecasting.pdf` (Roy & Roy 2026, arxiv 2603.26797) — direct competitor; proposes MCS + CMMD detector framework
    - `related papers/GSM-Symbolic Understanding Reasoning Limits.pdf` (Mirzadeh et al. 2024, arxiv 2410.05229) — methodological precedent for surface-invariant perturbation as memorization diagnostic
-5. **Library memorization-detection notes**: `related papers/notes/memorization_extraction.md`, `related papers/notes/contamination_detection.md`
+9. **Library memorization-detection notes**: `related papers/notes/memorization_extraction.md`, `related papers/notes/contamination_detection.md`, `related papers/notes/temporal_lookahead.md`
 
 ## R5 scope
 
@@ -55,7 +60,7 @@ The dependent variable: a memorization detector score per case per detector per 
 
 1. The 12-factor shortlist is locked. R5 chooses detectors that operate ON these factors, not new factors.
 2. Methodology principles P1-P5 are binding. P5 specifically says "detector-dependent factors are R5 territory" — this is your green light to design detector-specific stratification fields.
-3. Risks R1-R4 carry forward. Especially R4 (construct collapse): R5 detector choices should NOT amplify the prominence/repetition correlation bloc. If a detector is most sensitive to surface reuse (Min-K%, char-ngram methods), recognize that it will produce signals on bloc 1 (Propagation, Template, Reprint) regardless of memorization, and pair it with detectors sensitive to other constructs.
+3. Risks R1-R4 carry forward. Especially R4 (construct collapse): R5 detector choices should NOT amplify the prominence/repetition correlation bloc. If a detector is most sensitive to surface reuse (Min-K%, char-ngram methods), recognize that it will produce signals on bloc 1 (Propagation Intensity including its event_burst + historical_family_recurrence terms, Template Rigidity, surface_template_recurrence robustness companion) regardless of memorization, and pair it with detectors sensitive to other constructs. **Note**: Reprint Status was dropped in v5.1 — it is no longer part of bloc 1 or any factor list.
 4. Target N = 3,200 gross clusters (initial reference) with stopping-rule adaptive sampling.
 5. Case text for memorization measurement = CLS text. Always.
 6. Pre-commit granularity = 档位 2 偏 1.
@@ -93,18 +98,16 @@ These were left open by R4 because they belong to R5:
 
 1. **Ensemble vs single-detector strategy** — MemGuard-Alpha uses 5 MIA methods + logistic regression. Should FinMem-Bench detector layer also be an ensemble, or a set of independent detectors reported side-by-side? (Trade-off: ensemble has stronger signal but harder to interpret per-factor; independent detectors are weaker but more interpretable.)
 
-2. **White-box vs black-box split** — DeepSeek has broken logprobs (per `infra_capabilities.md` memory). White-box detectors (Min-K%, MIA, perplexity) can ONLY run on Qwen / Llama / Baichuan / Yi etc. Does R5 commit to white-box primary / black-box secondary, or vice versa? Or both as parallel tracks?
+2. **White-box vs black-box split** — DeepSeek-chat has broken logprobs in the existing infrastructure (documented in project memory `infra_capabilities.md`). White-box detectors (Min-K%, MIA, perplexity) can ONLY run on Qwen / GLM / local vLLM models. The v5.2 CMMD fleet provides 3 local white-box members (Qwen 2.5-7B, GLM-4-9B-0414, Qwen3-14B) and 3 black-box hosted members. **Open question**: does R5 commit to white-box primary / black-box secondary, or vice versa? Or both as parallel tracks reported side-by-side? This affects the detector × model matrix shape.
 
-3. **CMMD feasibility** — can we assemble 3-4 Chinese LLMs with genuinely different training cutoffs?
-   - Qwen 2.5 7B (cutoff ≈ 2024-03 to 2024-08)
-   - Qwen 2 7B (cutoff ≈ 2023-08 to 2024-03)
-   - DeepSeek-chat (cutoff approximate, possibly mid-2024)
-   - ChatGLM3-6B (cutoff ≈ 2023-10)
-   - Baichuan2-7B (cutoff ≈ 2023-09)
-   - Yi-6B / Yi-9B (cutoff ≈ 2024)
-   - InternLM2 7B (cutoff ≈ 2024)
-   - DeepSeek-v3 (cutoff ≈ 2024-08)
-   R5 needs to verify cutoffs and pick at least 3 with non-overlapping windows.
+3. **CMMD feasibility** — **v5.2 accepted a 6-model reference fleet** (see `docs/CMMD_MODEL_FLEET_SURVEY.md`):
+   1. Qwen 2.5-7B-Instruct (local, cutoff 2023-10, white-box)
+   2. DeepSeek-V2.5 (OpenRouter, cutoff ~2024-03, black-box)
+   3. GLM-4-9B-0414 (local, cutoff 2024-06-30 — ONLY officially-documented cutoff, white-box)
+   4. DeepSeek-V3 `deepseek-chat-v3-0324` (OpenRouter, cutoff 2024-07, black-box)
+   5. Qwen3-14B (local, cutoff 2025-01, white-box)
+   6. Claude Sonnet 4.5 `claude-sonnet-4-5-20250929` (OpenRouter, cutoff 2025-01 reliable / 2025-07 extended, black-box, non-Chinese-vendor diversity)
+   R5 should **start from this fleet as the default** and either pin it into pre-commit OR amend with explicit justification (e.g., if the R4 literature sweep surfaces DatedGPT or ChronoBERT/GPT as viable additions). **Critical reproducibility requirement**: pre-commit MUST pin to dated checkpoints (`-0324`, `-20250929`, `-0414`, HF commit SHAs) and lock OpenRouter provider routing.
 
 4. **FinMem-NoOp design** — what counts as "irrelevant but plausible" in CLS? How is it generated? Is it LLM-generated (introducing a new annotation dependency) or rule-based (e.g., insert a sentence about an unrelated ticker drawn from the same time window)? The design question is: how much information does the inserted clause carry, and how is "irrelevant" verified?
 
@@ -176,21 +179,27 @@ Per the cold reader's recommendation:
 
 ---
 
-## Open question for the user before starting R5: literature review timing
+## Literature review sequencing (resolved after v5.2 integration review)
 
-The user (end of R4) raised the idea of a **broad literature review** after R5 — covering local papers + new online papers + papers cited by local papers — given how much value MemGuard-Alpha and GSM-Symbolic added to R4.
+The earlier version of this kickoff proposed splitting literature review into "targeted detector sweep inside R5 + broad review after R5." That has been **superseded** by a different sequencing after the post-v5.2 integration review:
 
-The orchestrator's recommendation (to be discussed before R5 starts):
+**Final sequencing (v5.2)**:
 
-**Yes, do a broad literature review. But split the timing into TWO passes**:
+1. **R4 Literature Sweep** — runs in a **fresh session BEFORE R5**. See `BENCHMARK_R4_LIT_SWEEP_KICKOFF.md` for the full scope. This sweep owns:
+   - Per-factor literature provenance check for all 12 active + 3 reserve + 2 possible-addition factors
+   - Broad 2024-2026 sweep for memorization / contamination / financial NLP / factor-controlled benchmark papers we may have missed
+   - Chronologically-controlled baseline investigation (DatedGPT, ChronoBERT/ChronoGPT, Time Machine GPT, FINSABER) for possible CMMD fleet additions
+   - Cited-but-unread sweep from existing library
+   - Construct-collapse 3-bloc validation against published work
+   - Output: appendix to v5.2 → v6 of the decision document
 
-1. **Targeted detector-family sweep INSIDE R5**, between R5A Step 1 (brainstorm) and R5A Step 2 (shortlist convergence). This sweep specifically asks: "for each detector family proposed in Step 1, are there recent papers (2024-2026) we should be aware of that change our understanding of the family's strengths or weaknesses? Are there detector families we missed entirely?" This is BOUNDED — it scopes to detector papers only — and it directly informs R5A Step 2. Without this, R5 risks missing CMMD-equivalent gaps in our knowledge.
+2. **R5 Detector Investigation** — runs in a **fresh session AFTER the R4 literature sweep completes**. R5 does NOT run its own literature sweep; it inherits the R4 sweep's output. R5 scope is strictly detector selection, operationalization, and factor × detector matrix design.
 
-2. **Broad open-ended literature review AFTER R5 closes**, before paper-writing begins. This sweep covers: (a) all papers relevant to FinMem-Bench's claim (memorization, contamination, financial NLP, factor-controlled benchmarks), (b) papers cited by the papers we already have but we haven't read, (c) new papers from the last 6 months across these topics, (d) papers we may have missed because they are in adjacent fields (cognitive science, mechanistic interpretability, causal inference for ML). This sweep produces the related-work section of the paper and surfaces any framing risks before submission.
+3. **R5 targeted detector-focused spot checks** — if during R5 Step 1 brainstorm a specific detector family is unclear about its recent state of the art, R5 can run small targeted arxiv searches. This is bounded spot-checking, NOT a broad sweep.
 
-**Why split**: a single broad review before R5 wastes effort on detector-irrelevant papers; a single broad review after R5 leaves R5 vulnerable to CMMD-style misses. The split gives R5 tactical input early and the paper writing stage strategic input late.
+**Why this sequencing**: the R4 literature sweep produces factor provenance that R5 needs to design detectors that are genuinely informative per factor. Running R5 first would risk picking detectors on factors whose literature grounding is still weak. MemGuard-Alpha being discovered post-R4 is exactly the kind of surprise the R4 sweep is designed to prevent.
 
-**Why MemGuard-Alpha matters here**: it was discovered AFTER R4 closed. If we had done the targeted sweep at R4 entry, we might have absorbed it as input rather than as a post-hoc patch. R5 should not repeat this mistake.
+**If the user chooses to skip the R4 literature sweep** (only option if timeline is extremely tight), R5 can still proceed but R5 Step 1 must include a tighter targeted sweep for each proposed detector, and construct-collapse mitigation becomes weaker.
 
 ---
 
@@ -204,4 +213,4 @@ When the user opens R5 in a new conversation, the new session should:
 4. Decide whether to run R5A Step 1 immediately or do the targeted literature sweep first
 5. Begin R5
 
-The new session does NOT need to re-read R1-R4 reviews in full unless a specific question requires it. v5 of the decision document is the authoritative state.
+The new session does NOT need to re-read R1-R4 reviews in full unless a specific question requires it. **v5.2 of the decision document is the authoritative state.**

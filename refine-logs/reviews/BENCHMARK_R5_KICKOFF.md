@@ -107,7 +107,7 @@ These were left open by R4 because they belong to R5:
    4. DeepSeek-V3 `deepseek-chat-v3-0324` (OpenRouter, cutoff 2024-07, black-box)
    5. Qwen3-14B (local, cutoff 2025-01, white-box)
    6. Claude Sonnet 4.5 `claude-sonnet-4-5-20250929` (OpenRouter, cutoff 2025-01 reliable / 2025-07 extended, black-box, non-Chinese-vendor diversity)
-   R5 should **start from this fleet as the default** and either pin it into pre-commit OR amend with explicit justification (e.g., if the R4 literature sweep surfaces DatedGPT or ChronoBERT/GPT as viable additions). **Critical reproducibility requirement**: pre-commit MUST pin to dated checkpoints (`-0324`, `-20250929`, `-0414`, HF commit SHAs) and lock OpenRouter provider routing.
+   R5 should treat this fleet as a **strong reference, NOT a default starting point** (per v5.3 user clarification). R5 agents have freedom to explore model candidates more broadly — the fleet survey is one input among several, and the R4 literature sweep may surface chronologically-controlled alternatives (DatedGPT, ChronoBERT/ChronoGPT, Time Machine GPT, FINSABER) that change the optimal fleet. **Critical reproducibility requirement (applies whatever fleet R5 picks)**: pre-commit MUST pin to dated checkpoints (`-0324`, `-20250929`, `-0414`, HF commit SHAs) and lock OpenRouter provider routing.
 
 4. **FinMem-NoOp design** — what counts as "irrelevant but plausible" in CLS? How is it generated? Is it LLM-generated (introducing a new annotation dependency) or rule-based (e.g., insert a sentence about an unrelated ticker drawn from the same time window)? The design question is: how much information does the inserted clause carry, and how is "irrelevant" verified?
 

@@ -192,3 +192,101 @@
 - Our best method ach ieves an accuracy between 92% and 100% in detecting if an LLM is contaminated with seven datasets, containing train and test/validation partitions, when con trasted with manual evaluation by human experts.
 
 **Insight for our project:** This paper informs our contamination protocol and benchmark design. Its methods translate into CFLS-adjacent checks using temporally fresh Chinese news, counterfactual variants, and evidence-intrusion probes that separate leakage from genuine inference. It also maps directly to evidence-intrusion scoring.
+
+---
+
+## One Model Many Scores: Using Multiverse Analysis to Prevent Fairness Hacking and Evaluate the Influence of Model Design Decisions
+**Authors & Year:** Simson et al. (2023)
+
+**Summary:** Simson, Pfisterer, and Kern introduce multiverse analysis for algorithmic fairness to make hidden design and evaluation choices explicit instead of letting them silently shape reported metrics. By enumerating plausible modeling and scoring decisions, they show that the same underlying system can look substantially more or less fair depending on which evaluation universe is chosen.
+
+**Key methods/findings**
+- Treats design and evaluation choices as an explicit grid of possible universes rather than a single analyst-selected path.
+- Computes fairness and performance across all universes to quantify robustness and identify which decisions move the metric most.
+- Shows how fairness hacking can arise when the reported score depends heavily on analyst degrees of freedom.
+
+**Insight for our project:** This is not article-side memorization evidence, but it strongly supports the pre-registered interaction menu around Cutoff Exposure, Entity Salience, and Structured Event Type by showing how evaluation choices can manufacture apparent robustness. It should seed multiverse-style sensitivity reporting for R5 contamination and SR/FO counterfactual detectors; the caveat is that the application domain is fairness evaluation, so the transfer is methodological rather than finance-specific.
+
+---
+
+## Benchmarking Large Language Models Under Data Contamination: A Survey from Static to Dynamic Evaluation
+**Authors & Year:** Chen et al. (2025)
+
+**Summary:** Chen et al. survey how LLM benchmarking has moved from static contamination-prone setups toward dynamic evaluation. They review attempts to harden static benchmarks, argue that dynamic benchmarks still lack consistent quality criteria, and propose design principles that future contamination-resistant benchmarks should satisfy.
+
+**Key methods/findings**
+- Reviews both strengthened static benchmarks and newer dynamic benchmarks through the lens of contamination risk.
+- Identifies the lack of standardized criteria for judging dynamic benchmark quality as a central open problem.
+- Proposes design principles for dynamic benchmarking and catalogs the limitations of current benchmark-building practice.
+
+**Insight for our project:** This strengthens Cutoff Exposure and the benchmark-construction logic around contamination-resistant evaluation rather than any single article-side factor. It should seed R5 contamination detectors plus the reporting layer around SR/FO and FinMem-NoOp probes; the caveat is that, as a survey, it organizes the field but does not validate one detector or one finance setting empirically.
+
+---
+
+## Quantifying Construct Validity in LLM Evaluations
+**Authors & Year:** Kearns (2026)
+
+**Summary:** Kearns argues that benchmark scores should not be treated as capabilities by default because benchmark contamination, annotator error, and measurement noise can all distort what a score means. The thesis proposes a structured capabilities model that combines the scale-aware logic of scaling laws with the measurement-error logic of latent-variable models, and shows that this hybrid gives more interpretable and better generalizing latent capability estimates on OpenLLM Leaderboard data.
+
+**Key methods/findings**
+- Critiques both pure latent-factor models and pure scaling-law models as insufficient for construct-valid LLM evaluation.
+- Introduces a structured capabilities model that lets model scale inform latent capability while still modeling benchmark noise.
+- Reports better parsimonious fit and stronger out-of-distribution benchmark prediction than the two main alternatives.
+
+**Insight for our project:** This directly supports the Risk R4 v6.1 refinement by treating observed benchmark scores as noisy indicators rather than direct capability readouts. It strengthens the 4-bloc reframing because scale, latent capability, task family, and observed score need to be modeled separately if FinMem-Bench wants a defensible nomological network rather than a single leakage scalar.
+
+---
+
+## Establishing Construct Validity in LLM Capability Benchmarks Requires Nomological Networks
+**Authors & Year:** Freiesleben (2026)
+
+**Summary:** Freiesleben examines recent claims that LLMs possess human-like capabilities such as reasoning and asks what kind of construct-validity framework can justify those claims. Comparing the nomological, inferential, and causal accounts of validity, the paper argues that the nomological account is the best fit for current LLM capability research because it gives a substantive framework for relating theory, measures, and expected empirical relations without requiring overly strong ontological commitments.
+
+**Key methods/findings**
+- Reviews three major construct-validity traditions and compares their suitability for LLM capability claims.
+- Argues that nomological networks provide the most useful foundation for current benchmark-based capability research.
+- Uses reasoning benchmarks as a concrete case to show how construct meaning depends on patterned relations among measures, not one score alone.
+
+**Insight for our project:** This is the clearest methodological support for the Risk R4 v6.1 move from a flat contamination checklist to a nomological-network argument. It directly justifies the 4-bloc framing by requiring FinMem-Bench factors, detector families, external comparators, and observed outcomes to cohere as a structured network rather than as one benchmark number.
+
+---
+
+## Evaluating Evaluation Metrics: A Framework for Analyzing NLG Evaluation Metrics using Measurement Theory
+**Authors & Year:** Xiao et al. (2023)
+
+**Summary:** Xiao, Zhang, Lai, and Liao treat evaluation metrics themselves as measurement instruments whose reliability and validity must be studied rather than assumed. Their MetricEval framework formalizes sources of measurement error, offers statistical tools for quantifying uncertainty, and shows on summarization metrics that both human and LLM-based evaluation procedures can suffer from conflated validity structures and reliability problems.
+
+**Key methods/findings**
+- Builds MetricEval from measurement theory rather than from ad hoc metric comparison.
+- Separates reliability and validity questions and provides tools for quantifying uncertainty in evaluation scores.
+- Finds concrete validity and reliability problems in both human-evaluation and LLM-based summarization metrics.
+
+**Insight for our project:** This strengthens Risk R4 v6.1 by giving a measurement-theory backbone for why each FinMem-Bench score should be treated as an instrument with error, not as the construct itself. Within the 4-bloc reframing, it supports explicit distinction between latent leakage constructs and the observed detector outputs that only imperfectly measure them.
+
+---
+
+## Revealing the Structure of Language Model Capabilities
+**Authors & Year:** Burnell et al. (2023)
+
+**Summary:** Burnell, Hao, Conway, and Hernandez Orallo analyze benchmark results from 29 LLMs across 27 tasks to ask whether language-model capability is unitary or multidimensional. Using Bayesian and frequentist factor analysis, they find that performance is better explained by three broad latent factors - reasoning, comprehension, and core language modeling - and that these factors relate differently to model size and instruction tuning.
+
+**Key methods/findings**
+- Applies both Bayesian and frequentist factor analysis to a multi-model, multi-task benchmark matrix.
+- Finds that LLM performance is better explained by three latent abilities than by a monolithic general factor.
+- Shows that the extracted abilities have different relationships to scale and instruction tuning.
+
+**Insight for our project:** This supports the Risk R4 v6.1 move toward a 4-bloc latent-structure view by showing that benchmark performance is already multi-factor even before contamination enters the picture. It helps justify separating FinMem-Bench's observed detector behavior into distinct latent dimensions instead of forcing every validity question into one aggregate leakage score.
+
+---
+
+## Do These LLM Benchmarks Agree? Fixing Benchmark Evaluation with BenchBench
+**Authors & Year:** Perlitz et al. (2024)
+
+**Summary:** Perlitz and coauthors study Benchmark Agreement Testing (BAT), the common practice of validating a new benchmark by checking how well it agrees with existing ones. Across more than 40 benchmarks, they show that small methodological choices in BAT can materially change conclusions about benchmark validity, and they respond by proposing best practices plus the BenchBench package and leaderboard for more standardized agreement analysis.
+
+**Key methods/findings**
+- Shows that overlooked methodological choices can substantially alter benchmark-agreement conclusions.
+- Proposes best practices for Benchmark Agreement Testing and packages them in BenchBench.
+- Releases a meta-benchmark leaderboard for evaluating benchmarks against their peers.
+
+**Insight for our project:** This strengthens Risk R4 v6.1 at the nomological-network layer by giving concrete machinery for checking whether FinMem-Bench agrees with the right neighboring measures and disagrees with the wrong ones. In the 4-bloc framing, it supports a structured agreement block rather than ad hoc comparator anecdotes when we argue for construct validity.

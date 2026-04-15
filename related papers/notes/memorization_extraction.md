@@ -146,3 +146,129 @@
 - In this work we design experiments to test the key ideas in this theory.
 
 **Insight for our project:** This paper motivates CFLS as a leakage-sensitive score because memorized traces can surface even without explicit retrieval. It supports counterfactual testing that perturbs dates, entities, and narrative details to check whether DeepSeek-chat is reciting stored Chinese financial news patterns rather than reasoning from evidence.
+
+---
+
+## Quantifying Memorization and Detecting Training Data of Pre-trained Language Models using Japanese Newspaper
+**Authors & Year:** Ishihara & Takahashi (2024)
+
+**Summary:** Ishihara and Takahashi study memorization in a non-English news setting by pre-training Japanese GPT-2 models on newspaper corpora and then probing whether classic English-language findings still hold. They report the same core pattern: memorization risk rises with duplication in the training data, larger model size, and shorter prompts, and they further show that Japanese training examples remain detectable through membership inference.
+
+**Key methods/findings**
+- Pre-trains domain-specific Japanese GPT-2 models on newspaper articles rather than relying on general English benchmarks.
+- Replicates the duplication, model-size, and prompt-length effects previously reported in English memorization studies.
+- Demonstrates that membership inference can detect Japanese newspaper training data, warning that domain PLMs can copy and paste valuable text at scale.
+
+**Insight for our project:** This directly strengthens Propagation Intensity and Template Rigidity in a news domain that is much closer to CLS than the usual English web corpora. It should seed R5 Min-K%, MIA, and extraction families on Chinese announcement text; the caveat is that the evidence comes from GPT-2-style domain PLMs rather than current frontier chat models.
+
+---
+
+## Deduplicating Training Data Makes Language Models Better
+**Authors & Year:** Lee et al. (2021)
+
+**Summary:** Lee et al. show that standard LM corpora contain extensive near-duplicates and long repeated substrings, with measurable consequences for memorization and evaluation. Their deduplication pipeline sharply reduces verbatim copying, lowers train-test overlap, and lets models reach equal or better accuracy with fewer training steps.
+
+**Key methods/findings**
+- Finds that over 1% of unprompted LM output can be copied verbatim from duplicated training data.
+- Introduces practical tools for removing near-duplicates and long repeated substrings from large corpora such as C4.
+- Shows that deduplication cuts memorized emission roughly tenfold while improving training efficiency and evaluation validity.
+
+**Insight for our project:** This is foundational support for Template Rigidity and also backs Propagation Intensity because repeated substrings and near-duplicate templates materially raise copying risk. It should seed R5 extraction, Min-K%, and duplicate-aware calibration baselines; the caveat is that the paper studies general-language corpora rather than finance-specific or temporally controlled benchmarks.
+
+---
+
+## A Comparative Analysis of LLM Memorization at Statistical and Internal Levels: Cross-Model Commonalities and Model-Specific Signatures
+**Authors & Year:** Chen et al. (2026)
+
+**Summary:** Chen, Han, and Miyao compare memorization behavior across multiple open model families instead of treating one family as universal evidence. They connect statistical regularities such as log-linear scaling and frequency effects with internal analyses of layer decoding and attention-head importance, separating cross-model commonalities from family-specific signatures.
+
+**Key methods/findings**
+- Studies memorization across Pythia, OpenLLaMa, StarCoder, and OLMo families rather than within a single lineage.
+- Finds log-linear scaling of memorization with model size and shared frequency and domain distribution patterns for memorized sequences.
+- Shows that important memorization heads and internal decoding patterns have both shared structure and family-specific differences.
+
+**Insight for our project:** This strengthens Propagation Intensity, Template Rigidity, and the case for cross-family comparison instead of single-model memorization claims. It should seed R5 CMMD alongside Min-K%, MIA, and extraction because the paper explicitly separates shared regularities from family-specific signatures; the caveat is that the experiments use open model families and generic corpora rather than finance-specific data.
+
+---
+
+## Membership Inference Attacks Against Machine Learning Models
+**Authors & Year:** Shokri et al. (2016)
+
+**Summary:** Shokri, Stronati, Song, and Shmatikov introduce the black-box membership inference attack in its now-standard form: given a record and query access to a model, infer whether that record appeared in training. Their attack trains shadow models and a separate inference model to distinguish the prediction patterns associated with members versus non-members, and demonstrates leakage on commercial ML-as-a-service systems and sensitive classification tasks.
+
+**Key methods/findings**
+- Formalizes black-box membership inference using shadow-model simulation of the target model's train/non-train confidence patterns.
+- Demonstrates successful attacks on models trained by commercial providers such as Google and Amazon, including a privacy-sensitive hospital-discharge dataset.
+- Analyzes which settings increase leakage and evaluates mitigation ideas rather than treating attack accuracy as a fixed property.
+
+**Insight for our project:** This is the canonical anchor for the R5 MIA detector family. It justifies keeping membership-style probes in FinMem-Bench even when we move to finance text, because the core signal is still train-versus-non-train confidence asymmetry; the caveat is that the original evidence comes from supervised classifiers rather than generative LLMs on temporal news.
+
+---
+
+## Membership Inference Attacks From First Principles
+**Authors & Year:** Carlini et al. (2021)
+
+**Summary:** Carlini and coauthors argue that average-case attack accuracy is the wrong way to judge membership inference because it hides whether an attack can identify any members at very low false-positive rates. They derive a likelihood-ratio attack (LiRA) that combines prior ideas into a stronger decision rule and show that it is substantially more powerful than earlier attacks when evaluated in the low-FPR regime relevant to practical privacy claims.
+
+**Key methods/findings**
+- Reframes MIA evaluation around true-positive rate at very low false-positive rates rather than coarse average accuracy.
+- Introduces LiRA, which compares a point's likelihood under member and non-member score distributions.
+- Reports roughly an order-of-magnitude improvement over prior attacks in the low-FPR regime.
+
+**Insight for our project:** This sharpens the R5 MIA family by telling us what a credible detector threshold should look like when false accusations of memorization are costly. For FinMem-Bench, it argues for reporting low-FPR operating points or calibrated score tails, not just average separation between contaminated and clean items.
+
+---
+
+## Min-K%++: Improved Baseline for Detecting Pre-Training Data from LLMs
+**Authors & Year:** Zhang et al. (2024)
+
+**Summary:** Zhang and colleagues revisit pretraining-data detection and argue that earlier Min-K%-style heuristics lack a sound theoretical basis. They reinterpret the task as detecting whether an input behaves like a local mode of the model's learned distribution, derive Min-K%++ from that view, and show state-of-the-art detection performance on both WikiMIA and the harder MIMIR benchmark.
+
+**Key methods/findings**
+- Gives a local-maxima interpretation of why training examples should be distinguishable under maximum-likelihood training.
+- Designs Min-K%++ to test whether an input forms a mode or unusually high-probability region under conditional token distributions.
+- Improves AUROC over prior baselines on WikiMIA and remains competitive on the more difficult MIMIR setting.
+
+**Insight for our project:** This directly supports the R5 Min-K% detector family and strengthens Propagation Intensity as a token-level signature of memorized exposure. It matters for FinMem-Bench because Min-K%++ is a stronger black-box screening baseline for Chinese announcement text than raw likelihood heuristics, though the benchmark evidence still comes from generic corpora rather than finance-specific disclosures.
+
+---
+
+## Inherent Challenges of Post-Hoc Membership Inference for LLMs
+**Authors & Year:** Meeus et al. (2024)
+
+**Summary:** The current arXiv version of this paper is retitled as a SoK on LLM membership inference, but its central claim is the same: post-hoc MIA evaluation for LLMs is fundamentally confounded by distribution shift between guessed members and guessed non-members. Meeus and coauthors review recent LLM MIA work, show that widely used post-hoc datasets are separable even by a model-free bag-of-words classifier, and argue that many strong memorization claims are therefore not methodologically secure.
+
+**Key methods/findings**
+- Reviews recent LLM MIA work and highlights that most methods are evaluated on member/non-member sets assembled after model release rather than randomized at collection time.
+- Uses a model-less bag-of-words classifier to show substantial member/non-member distribution shift in six post-hoc datasets.
+- Recommends randomized splits, injected unique sequences, randomized fine-tuning, and stronger post-hoc controls as more defensible evaluation designs.
+
+**Insight for our project:** This is a crucial caution for the R5 MIA family: detector wins on post-hoc splits may reflect dataset shift rather than true memorization. For FinMem-Bench, it supports explicit clean/control construction, randomized counterfactuals, and cross-family triangulation before we interpret a positive MIA score as evidence of article-level leakage.
+
+---
+
+## How Much Do Language Models Copy From Their Training Data? Evaluating Linguistic Novelty in Text Generation Using RAVEN
+**Authors & Year:** McCoy et al. (2023)
+
+**Summary:** McCoy, Smolensky, Linzen, Gao, and Celikyilmaz propose RAVEN, a set of novelty analyses that separate local sequential overlap from larger-scale structural novelty in generated text. Across four English language models, they find that generated text is substantially less novel than human text at the local n-gram and dependency level, while sentence-level structure can remain novel; nevertheless, models sometimes still reproduce extremely long copied passages from training data.
+
+**Key methods/findings**
+- Introduces RAVEN to measure both sequential novelty and syntactic novelty rather than relying on a single overlap score.
+- Shows that local linguistic structure in model generations is much less novel than human-written baselines from the test set.
+- Documents cases where models duplicate training passages longer than 1,000 words despite apparently novel higher-level structure.
+
+**Insight for our project:** This strengthens Template Rigidity and the extraction-style branch of R5 by showing that copying can hide beneath superficially varied surface text. For FinMem-Bench, it supports novelty-sensitive checks on announcement narratives and motivates pairing Min-K% or MIA scores with textual-novelty diagnostics before declaring an output clean.
+
+---
+
+## Memorization Without Overfitting: Analyzing the Training Dynamics of LLMs
+**Authors & Year:** Tirumala et al. (2022)
+
+**Summary:** Tirumala, Markosyan, Zettlemoyer, and Aghajanyan study exact memorization through training rather than only at the end of training. They show that larger language models memorize faster and forget less, can absorb more exact training data before classic overfitting appears, and tend to lock onto nouns and numbers early - suggesting that entity-like and value-like tokens act as anchors for memorizing individual examples.
+
+**Key methods/findings**
+- Tracks exact memorization in both causal and masked language modeling across model sizes and training stages.
+- Finds that larger models memorize faster, retain more memorized material, and can do so before standard overfitting diagnostics trigger.
+- Shows that nouns and numbers are memorized especially early, supporting the idea that they act as identifiers for memorized examples.
+
+**Insight for our project:** This directly supports Propagation Intensity and the entity/date-sensitive side of FinMem-Bench because dates, ticker-linked entities, and numeric outcomes are exactly the tokens we worry about in Chinese disclosures. It should inform R5 Min-K%, extraction, and entity-conditioned probes; the caveat is that the paper studies training dynamics in general LLMs rather than downstream finance prompting.

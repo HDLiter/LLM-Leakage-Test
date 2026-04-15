@@ -165,3 +165,101 @@
 - Overall, our work argues that understanding multi-dimensional features is necessary to mechanistically decompose some model behaviors.
 
 **Insight for our project:** This paper is directly aligned with our setting because Chinese financial news is time sensitive. It supports CFLS scoring against publication dates, fake-date counterfactuals, and tests for evidence intrusion where DeepSeek-chat answers with post-cutoff knowledge not licensed by the supplied article. It also maps directly to evidence-intrusion scoring.
+
+---
+
+## A Fast and Effective Solution to the Problem of Look-ahead Bias in LLMs
+**Authors & Year:** Merchant & Levy (2025)
+
+**Summary:** Merchant and Levy tackle look-ahead bias without retraining a frontier model from scratch. Their method adjusts inference-time logits of a large base model by combining a small forget model with a small retain model, aiming to suppress post-cutoff knowledge while preserving the information that should remain available.
+
+**Key methods/findings**
+- Targets finance backtesting settings where full point-in-time retraining is too expensive to be practical.
+- Uses paired specialized models to steer the base model away from forgotten knowledge and toward retained knowledge at generation time.
+- Reports removal of both verbatim and semantic leakage, with better bias correction than prior approaches.
+
+**Insight for our project:** This strengthens Cutoff Exposure as a spine factor and clarifies that temporal leakage has both verbatim and semantic forms. It could seed R5 perplexity-based and SR/FO counterfactual detector families by providing a concrete forget-versus-retain probe baseline; the caveat is that it is a mitigation method, not an evaluation benchmark, so its success criterion is corrected generation rather than direct benchmark validity.
+
+---
+
+## Do Large Language Models (LLMs) Understand Chronology?
+**Authors & Year:** Wongchamcharoen & Glasserman (2025)
+
+**Summary:** Wongchamcharoen and Glasserman test whether finance-facing LLM workflows can safely assume chronological understanding. They evaluate chronological ordering, conditional sorting, and anachronism detection tasks and show that models often preserve local order while failing to maintain a globally consistent timeline, with explicit reasoning budget helping substantially on harder variants.
+
+**Key methods/findings**
+- Builds three chronology task families: ordering, filter-then-order conditional sorting, and anachronism detection.
+- Finds exact-match chronology degrades as sequence length grows even when rank correlation remains relatively high.
+- Shows that extra reasoning budget materially improves performance, especially on filtering-heavy tasks.
+
+**Insight for our project:** This strengthens Cutoff Exposure and the interpretation layer around Anchor Strength because chronology failures can masquerade as leakage failures if prompts assume perfect temporal ordering. It should seed R5 SR/FO counterfactual probes and chronology-sensitive prompt checks; the caveat is that a poor score may reflect ordering or filtering weakness rather than memorization itself.
+
+---
+
+## Time Machine GPT
+**Authors & Year:** Drinkall et al. (2024)
+
+**Summary:** Drinkall, Rahimikia, Pierrehumbert, and Zohren argue that time-sensitive applications need models whose knowledge is intentionally bounded by date rather than merely described by a nominal cutoff. They introduce Time Machine GPT, a family of point-in-time language models trained to avoid future factual leakage, and position these models as a practical way to study language change and to reduce look-ahead bias in forecasting settings.
+
+**Key methods/findings**
+- Trains point-in-time LLMs designed to be nonprognosticative rather than relying on temporally indiscriminate corpora.
+- Frames temporally bounded pretraining as useful both for language-evolution research and for forecasting applications.
+- Releases both models and temporally grounded datasets to support controlled evaluation.
+
+**Insight for our project:** This strengthens Cutoff Exposure as a core factor and provides a point-in-time comparator family for R5 cross-cutoff checks. In FinMem-Bench terms, it supports using temporally bounded models or cut-off-specific baselines to distinguish genuine inference from recall of inadmissible future data.
+
+---
+
+## Lookahead Bias in Pretrained Language Models
+**Authors & Year:** Sarkar & Vafa (2024)
+
+**Summary:** Sarkar and Vafa show that empirical work using pretrained language-model outputs can inherit a temporal lookahead bias whenever pretraining data contains future information relative to the analysis date. They propose direct tests based on events that should be unpredictable from a prespecified information set, apply those tests to earnings-call risk-factor prediction and election forecasting, and find evidence that prompting alone does not reliably remove the bias.
+
+**Key methods/findings**
+- Defines direct lookahead-bias tests around outcomes that should be unpredictable given the allowed information set.
+- Finds lookahead bias in both financial and political applications of pretrained language models.
+- Argues that the robust fix is point-in-time training data without survivorship bias rather than prompt engineering alone.
+
+**Insight for our project:** This is direct prior art for the R5 Cutoff Exposure family and especially for zero-context recall probes. It supports treating "can the model recover the target without article evidence?" as a first-class detector in FinMem-Bench, with the caveat that the paper diagnoses bias at the task level rather than announcement-level contamination.
+
+---
+
+## Caution Ahead: Numerical Reasoning and Look-ahead Bias in AI Models
+**Authors & Year:** Levy (2025)
+
+**Summary:** Levy studies why AI systems appear so strong on accounting and finance tasks and argues that much of the apparent superiority reflects modeling artifacts rather than economically grounded mechanisms. The paper combines experiments on numerical reasoning and temporal leakage, showing both that commercial LLMs reason poorly about numbers and that they can benefit materially from look-ahead bias in finance-related prediction settings.
+
+**Key methods/findings**
+- Opens the black box on finance-facing AI systems by testing numerical reasoning and temporal leakage side by side.
+- Finds that LLMs exhibit very poor numerical reasoning despite strong-looking downstream results.
+- Shows that significant look-ahead bias in commercial LLMs can explain a sizable share of apparent predictability.
+
+**Insight for our project:** This supports Cutoff Exposure while adding an important caveat for interpretation: some failures are leakage, others are raw numerical weakness. For FinMem-Bench, it argues that R5 temporal detectors should be read alongside numeric-sanity or structure-preserving controls so we do not mistake arithmetic incompetence for clean decontamination.
+
+---
+
+## RealTime QA: What's the Answer Right Now?
+**Authors & Year:** Kasai et al. (2022)
+
+**Summary:** Kasai and coauthors introduce REALTIME QA, a dynamic benchmark that repeatedly asks systems about current-world facts and evaluates them on a weekly cadence. Their experiments show that large pretrained models can update answers effectively when retrieval supplies fresh evidence, but they also reveal a persistent failure mode: when retrieval is weak, the models fall back to stale parametric knowledge and answer with outdated information.
+
+**Key methods/findings**
+- Builds a dynamic question-answering benchmark around newly emerging facts rather than static benchmark items.
+- Shows that GPT-3 and related systems improve substantially when coupled with up-to-date retrieval.
+- Finds that models still default to outdated answers when retrieved evidence is insufficient or incomplete.
+
+**Insight for our project:** This strengthens Cutoff Exposure and the evidence-intrusion side of R5 because it shows that stale parametric memory remains active unless current evidence is strong enough to override it. For FinMem-Bench, it supports retrieval-free versus evidence-supplied comparisons as a way to detect when answers are being driven by memorized future knowledge rather than the article context.
+
+---
+
+## AI's Predictable Memory in Financial Analysis
+**Authors & Year:** Didisheim, Fraschini & Somoza (2025)
+
+**Summary:** Didisheim, Fraschini, and Somoza propose a practical way to quantify look-ahead bias in financial LLM applications by asking models to retrieve historical stock returns without contextual support. They treat the resulting accuracy as a proxy for memorization-driven predictability and show that this pure look-ahead bias is systematically larger for lower-frequency data, broader aggregates such as indexes, and larger models, while becoming negligible for smaller models on higher-frequency individual-stock tasks.
+
+**Key methods/findings**
+- Uses zero-context return retrieval as an operational proxy for memorization-driven predictability in finance.
+- Shows that bias rises with lower data frequency, larger model size, and more aggregated targets such as indexes.
+- Finds that adding same-day market context can materially increase contamination for larger models, while GPT-4.1-nano remains close to unbiased.
+
+**Insight for our project:** This is unusually close to our use case and directly links finance memorization to Cutoff Exposure via a measurable zero-context recall test. It strengthens the case for treating finance memorization as a proxy detector family inside FinMem-Bench and for logging article-free recall before interpreting in-context performance as genuine reasoning.

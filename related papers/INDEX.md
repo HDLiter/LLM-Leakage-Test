@@ -16,6 +16,16 @@
 - [Scalable Extraction of Training Data](Scalable Extraction of Training Data from Language Models.pdf)
 - [Secret Sharer Unintended Memorization](Secret Sharer Unintended Memorization.pdf)
 - [What Neural Networks Memorize and Why](What Neural Networks Memorize Long Tail.pdf)
+- [Quantifying Memorization and Detecting Training Data of PLMs using Japanese Newspaper](Japanese Newspaper Memorization PLM.pdf)
+- [Deduplicating Training Data Makes Language Models Better](Deduplicating Training Data Makes LMs Better.pdf)
+- [A Comparative Analysis of LLM Memorization at Statistical and Internal Levels](Cross-Model Memorization Statistical Internal.pdf)
+- [Membership Inference Attacks Against Machine Learning Models](MIA Against Machine Learning Models.pdf)
+- [Membership Inference Attacks From First Principles](MIA From First Principles.pdf)
+- [Min-K%++: Improved Baseline for Detecting Pre-Training Data from LLMs](Min-K++ Detecting Pretraining Data.pdf)
+- [Inherent Challenges of Post-Hoc Membership Inference for LLMs](Inherent Challenges Post-Hoc MIA LLMs.pdf)
+- [How Much Do Language Models Copy From Their Training Data? Evaluating Linguistic Novelty in Text Generation Using RAVEN](RAVEN Linguistic Novelty LMs.pdf)
+- [Memorization Without Overfitting: Analyzing the Training Dynamics of LLMs](Memorization Without Overfitting.pdf)
+
 
 ## Benchmark Contamination & Leakage Detection
 
@@ -40,6 +50,13 @@
 - [Task Contamination](Task Contamination Not Few-Shot.pdf)
 - [Time Travel in LLMs](Time Travel in LLMs Tracing Contamination.pdf)
 - [VarBench](VarBench Dynamic Variable Perturbation.pdf)
+- [Benchmarking Large Language Models Under Data Contamination: A Survey from Static to Dynamic Evaluation](Benchmarking LLMs Data Contamination Static Dynamic.pdf)
+- [Quantifying Construct Validity in LLM Evaluations](Quantifying Construct Validity LLM Evaluations.pdf)
+- [Establishing Construct Validity in LLM Capability Benchmarks Requires Nomological Networks](Construct Validity LLM Nomological Networks.pdf)
+- [Evaluating Evaluation Metrics: A Framework for Analyzing NLG Evaluation Metrics using Measurement Theory](Evaluating NLG Metrics Measurement Theory.pdf)
+- [Revealing the Structure of Language Model Capabilities](Structure of LM Capabilities Factor Analysis.pdf)
+- [Do These LLM Benchmarks Agree? Fixing Benchmark Evaluation with BenchBench](BenchBench Benchmark Agreement.pdf)
+
 
 ## Temporal Knowledge & Look-Ahead Bias
 
@@ -55,6 +72,14 @@
 - [Set the Clock](Set the Clock Temporal Alignment LMs.pdf)
 - [The Memorization Problem in LLMs’ Economic Forecasts](Memorization Problem LLMs Economic Forecasts.pdf)
 - [Time Is Encoded in the Weights of Finetuned Language Models](Time Encoded in Weights Finetuned LMs.pdf)
+- [A Fast and Effective Solution to the Problem of Look-ahead Bias in LLMs](Fast Effective Solution Look-ahead Bias LLMs.pdf)
+- [Do Large Language Models (LLMs) Understand Chronology?](Do LLMs Understand Chronology.pdf)
+- [Time Machine GPT](Time Machine GPT.pdf)
+- [Lookahead Bias in Pretrained Language Models](Lookahead Bias in Pretrained LMs.pdf)
+- [Caution Ahead: Numerical Reasoning and Look-ahead Bias in AI Models](Caution Ahead Numerical Reasoning Look-ahead.pdf)
+- [RealTime QA: What's the Answer Right Now?](RealTime QA.pdf)
+- [AI's Predictable Memory in Financial Analysis](AIs Predictable Memory Financial Analysis.md) *(HTML→markdown, paywalled PDF unavailable)*
+
 
 ## Knowledge Editing & Localization
 
@@ -104,6 +129,11 @@
 - [Profit Mirage](Profit_Mirage_Revisiting_Information_Leakage_in_LL.pdf)
 - [Structured Event Representation and Stock Return Predictability](Structured Event Representation Stock Return.pdf)
 - [Your AI, Not Your View](Your AI, Not Your View The Bias of LLMs in Investment Analysis.pdf)
+- [Fine-Grained Classification of Announcement News Events in the Chinese Stock Market](Fine-Grained Chinese Stock Announcement Events.pdf)
+- [Evaluating LLMs in Finance Requires Explicit Bias Consideration](Evaluating LLMs Finance Explicit Bias.pdf)
+- [Anonymization and Information Loss](Anonymization and Information Loss.pdf)
+- [LiveTradeBench: Seeking Real-World Alpha with Large Language Models](LiveTradeBench Real-World Alpha LLM.pdf)
+
 
 ## Prompting & Reasoning Techniques
 
@@ -113,6 +143,11 @@
 - [Language Models Don’t Always Say What They Think](Unfaithful Explanations in CoT.pdf)
 - [Least-to-Most Prompting Complex Reasoning](Least-to-Most Prompting Complex Reasoning.pdf)
 - [Rationalizing Neural Predictions](Rationalizing Neural Predictions.pdf)
+
+## Methodology & Meta-Evaluation
+
+- [One Model Many Scores: Using Multiverse Analysis to Prevent Fairness Hacking](Multiverse Analysis Fairness Hacking.pdf)
+
 
 ## Calibration, Uncertainty & Robustness
 

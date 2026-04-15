@@ -14,6 +14,20 @@
 
 ---
 
+## GSM-Symbolic: Understanding the Limitations of Mathematical Reasoning in LLMs
+**Authors & Year:** Mirzadeh, Alizadeh, Shahrokhi, Tuzel, Bengio, Farajtabar (2024)
+
+**Summary:** Introduces GSM-Symbolic, a templated variant of GSM8K that generates mathematically equivalent questions by perturbing surface tokens (names, numbers, entities). Measures robustness across rephrasings and difficulty-controlled complexity tiers, and adds a GSM-NoOp variant with irrelevant-but-plausible clauses inserted into problems.
+
+**Key methods/findings**
+- LLM accuracy varies significantly across equivalent instantiations of the same template, revealing variance hidden by single-seed GSM8K scores.
+- Performance degrades as problems get longer/more clauses, even when reasoning depth is held constant.
+- Inserting an irrelevant clause (NoOp) drops accuracy by up to 65%, which the authors interpret as evidence that models pattern-match training-set reasoning trajectories rather than execute symbolic logic.
+
+**Insight for our project:** This is a near-perfect methodological analogue for FinMem-Bench in a different domain: surface-invariant perturbation of a memorized benchmark exposes recitation, which is exactly what our counterfactual entity/date swaps and evidence-intrusion probes do for CLS Chinese financial news. The NoOp result in particular justifies our "distractor clause" intrusion variant and gives us a citable precedent that distribution-preserving perturbation is a legitimate memorization-vs-reasoning separator.
+
+---
+
 ## Disentangling Memory and Reasoning Ability in LLMs
 **Authors & Year:** Jin et al. (2025)
 

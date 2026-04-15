@@ -9,6 +9,7 @@
 - [Do Membership Inference Attacks Work on Large Language Models?](Do Membership Inference Attacks Work on Large Language Models.pdf)
 - [Entity-level Memorization in LLMs](Entity-level Memorization in LLMs.pdf)
 - [Extracting Training Data from Large Language Models](Extracting Training Data from LLMs 2020.pdf)
+- [MemGuard-Alpha: Detecting and Filtering Memorization-Contaminated Signals in LLM Financial Forecasting](MemGuard-Alpha Memorization Financial Forecasting.pdf)
 - [OWL](OWL Cross-Lingual Recall Memorized Texts.pdf)
 - [Pretraining Data Detection via Divergence-based Calibration](Pretraining Data Detection Divergence Calibration.pdf)
 - [Quantifying Memorization Across Neural Language Models](Quantifying Memorization Across Neural LMs.pdf)
@@ -108,6 +109,7 @@
 
 - [CHiLL](CHiLL Zero-Shot Feature Extraction Clinical.pdf)
 - [Disentangling Memory and Reasoning Ability in LLMs](Disentangling Memory and Reasoning in LLMs.pdf)
+- [GSM-Symbolic: Understanding the Limitations of Mathematical Reasoning in LLMs](GSM-Symbolic Understanding Reasoning Limits.pdf)
 - [Language Models Don’t Always Say What They Think](Unfaithful Explanations in CoT.pdf)
 - [Least-to-Most Prompting Complex Reasoning](Least-to-Most Prompting Complex Reasoning.pdf)
 - [Rationalizing Neural Predictions](Rationalizing Neural Predictions.pdf)

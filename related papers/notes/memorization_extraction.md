@@ -19,6 +19,7 @@
 - **Measuring memorization in language models via probabilistic extraction:** Formalizes extraction as a probabilistic memorization measurement problem; this matters because the R1 NLP review cites it as the strongest extraction-style comparator if FinMem-Bench claims extraction compatibility.
 - **OWL:** Probes cross-lingual recall of memorized texts; this matters because the R1 NLP review uses it to argue that cross-lingual memorization is no longer an open niche by itself.
 - **Pretraining Data Detection for Large Language Models: A Divergence-based Calibration Method:** Calibrates pretraining-data detection beyond raw Min-K% scores; this matters because the R1 NLP review cites PatentMIA-style divergence calibration as realistic partial support for FinMem-Bench.
+- **MemGuard-Alpha (Roy & Roy, 2026):** Combines MIA-style scores with temporal features (MemGuard Composite Score) and Cross-Model Memorization Disagreement across LLMs with different training cutoffs to flag memorization-contaminated trading signals; reports 7x return gap between clean and tainted signals and 49% Sharpe uplift. Directly relevant to FinMem-Bench because it operationalizes "memorization hurts downstream alpha" on the same CLS-style Chinese-news setting we target, and the cross-cutoff disagreement trick is a cheap black-box anchor we can reuse alongside CFLS and evidence intrusion.
 
 ---
 

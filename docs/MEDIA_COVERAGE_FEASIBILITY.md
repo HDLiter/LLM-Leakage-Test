@@ -1,3 +1,5 @@
+> **Status (2026-04-16, post-R5A-freeze)**: Reserve-factor feasibility memo. **Coverage Breadth is NOT in the frozen confirmatory family** (see `R5A_FROZEN_SHORTLIST.md`); this document analyzes whether it could be promoted later. Drop "13th active factor" reading. Sample size reference: 3,200 gross / 2,560 scorable (not 3,200 alone).
+
 # Media Coverage Factor — Feasibility Analysis
 
 **Date:** 2026-04-14

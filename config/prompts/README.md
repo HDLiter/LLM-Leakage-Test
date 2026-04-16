@@ -1,4 +1,14 @@
-# Prompt Schema Freeze for CLS-Leak
+# Prompt Schema Freeze for CLS-Leak (Phase 0-4 LEGACY)
+
+> **Status (2026-04-16, post-R5A-freeze)**: This document describes the **legacy Phase 0-4 task-probe schema** used for the early single-model exploration on DeepSeek-chat. It is **NOT the current measurement schema**. The four-layer R5A measurement framework (Factor / Perturbation / Operator / Estimand) supersedes this work for all benchmark-stage measurement.
+>
+> **Current authoritative schema:** [`R5A_OPERATOR_SCHEMA.md`](R5A_OPERATOR_SCHEMA.md) — defines the four operators (P_predict, P_logprob, P_extract, P_schema) used in the R5A confirmatory family.
+>
+> **What survives from this document:** `direct_prediction.*` is the conceptual ancestor of `P_predict`; `counterfactual_templates.semantic_reversal` is reused as the C_SR perturbation generation rule. `decomposed_authority.*` has been **dropped** (early Phase 0-4 attempt incompatible with the four-layer framework). See `R5A_OPERATOR_SCHEMA.md` §8 (Crosswalk) for the full mapping from legacy prompts to R5A operators.
+>
+> **Files in this directory** (`task_prompts.yaml`, `counterfactual_templates.yaml`, `schema_validation.py`) remain as Phase 0-4 reference but are not part of the R5A pipeline.
+
+---
 
 Frozen on `2026-04-05-v2`. These prompts define the task-conditioned probes and rewrite templates for the study on look-ahead leakage in Chinese financial news. Instruction text is in English, article input is Chinese, inference is fixed at `temperature = 0`, and the input unit is now an `(article, target)` pair.
 

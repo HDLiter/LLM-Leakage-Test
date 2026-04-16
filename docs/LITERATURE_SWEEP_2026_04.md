@@ -1,3 +1,5 @@
+> **Status (2026-04-16, post-R5A-freeze)**: Historical R4 literature sweep feeding decision-doc v5.3→v6.2. Retained for citation provenance. Current scope conclusions (e.g., "keep 6-model fleet") have been **superseded** by `refine-logs/reviews/R5A_FLEET_REVIEW/FLEET_REVIEW_R2_SYNTHESIS.md` (9-model fleet) and `refine-logs/reviews/R5A_STEP2/R5A_FROZEN_SHORTLIST.md` (four-layer measurement scope). Detector pool / D1-D12 terminology has been replaced by Factor / Perturbation / Operator / Estimand framework.
+
 # FinMem-Bench — R4 Literature Sweep (2026-04-14)
 
 **Status:** Session 1 of the sweep — Sub-tasks A, B, C completed. Sub-tasks D (cited-but-unread) and E (3-bloc construct-collapse validation) deferred to Session 2 by design (user mid-sweep checkpoint).

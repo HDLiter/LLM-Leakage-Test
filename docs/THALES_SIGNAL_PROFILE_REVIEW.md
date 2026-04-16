@@ -1,3 +1,5 @@
+> **Status (2026-04-16, post-R5A-freeze)**: Background review informing Bloc 3 operationalization (Structured Event Type, Modality, Authority). **Does not change the frozen confirmatory family.** Event Type comparison ("FinMem 7-cat draft") is pre-freeze; current taxonomy is hierarchical (15-20 fine + 5-7 coarse).
+
 # Thales Signal Profile Review — for FinMem-Bench Factor Design
 
 Date: 2026-04-13

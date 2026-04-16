@@ -10,6 +10,8 @@ codex_threads:
   editor: 019d944c-f972-7a00-842d-531f31f60ff4
 ---
 
+> **Status (2026-04-16, post-R5A-freeze)**: Authoritative for the frozen 9-model core fleet. The "GPT-5.4 optional 10th" discussion is historical pre-freeze context; the freeze locks the 9-model core. Operator policy (per `MEASUREMENT_FRAMEWORK.md`): `P_logprob` requires thinking OFF on all 5 white-box models; `P_predict` and `P_extract` use each model's default deployed mode. References to "logprob detectors" and "behavioral detectors" map to `P_logprob` and `P_predict`/`P_extract` operators respectively.
+
 # R5A Fleet Review Round 2 — Synthesis
 
 Round 2 incorporated 4 new user-proposed design principles (thinking mode fleet-wide, same-cutoff falsification pairs, architecture coverage, multi-tier size matching). Consensus is high; the main remaining tension is GPT version choice.

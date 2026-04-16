@@ -22,7 +22,7 @@
 - [Membership Inference Attacks Against Machine Learning Models](MIA Against Machine Learning Models.pdf)
 - [Membership Inference Attacks From First Principles](MIA From First Principles.pdf)
 - [Min-K%++: Improved Baseline for Detecting Pre-Training Data from LLMs](Min-K++ Detecting Pretraining Data.pdf)
-- [Inherent Challenges of Post-Hoc Membership Inference for LLMs](Inherent Challenges Post-Hoc MIA LLMs.pdf)
+- [SoK: Membership Inference Attacks on LLMs are Rushing Nowhere (Meeus et al. 2024)](Inherent Challenges Post-Hoc MIA LLMs.pdf)
 - [How Much Do Language Models Copy From Their Training Data? Evaluating Linguistic Novelty in Text Generation Using RAVEN](RAVEN Linguistic Novelty LMs.pdf)
 - [Memorization Without Overfitting: Analyzing the Training Dynamics of LLMs](Memorization Without Overfitting.pdf)
 
@@ -56,6 +56,8 @@
 - [Evaluating Evaluation Metrics: A Framework for Analyzing NLG Evaluation Metrics using Measurement Theory](Evaluating NLG Metrics Measurement Theory.pdf)
 - [Revealing the Structure of Language Model Capabilities](Structure of LM Capabilities Factor Analysis.pdf)
 - [Do These LLM Benchmarks Agree? Fixing Benchmark Evaluation with BenchBench](BenchBench Benchmark Agreement.pdf)
+- [When Benchmarks are Targets: Revealing the Sensitivity of Large Language Model Leaderboards (Alzahrani et al. 2024)](Alzahrani2024 Benchmark Sensitivity.pdf)
+- [When Can We Trust LLM Results? Reproducibility Crisis in LLM Research (2024)](LLM Reproducibility Crisis Survey.pdf)
 
 
 ## Temporal Knowledge & Look-Ahead Bias

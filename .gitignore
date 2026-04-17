@@ -20,6 +20,7 @@ __pycache__/
 
 # Claude Code
 .claude/skills/
+.claude/settings.local.json
 
 # Large datasets
 data/cls_telegraph_raw/

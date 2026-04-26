@@ -1,0 +1,148 @@
+# R5A frozen 9-model fleet (plan v2.2 §14.2, operator schema §7).
+#
+# Authority: this file is the single source of truth for per-model and
+# per-operator behavior. Adapters must read thinking control, prompt
+# overlay policy, route locks, echo support, and offline fallbacks from
+# here rather than duplicating them in code.
+#
+# `<TBD>` placeholders are pinned at run time per plan §10.1 and recorded
+# in the run manifest. Do not commit a confirmatory run with `<TBD>`
+# values still in place.
+
+fleet_version: "r5a-v1.0-2026-04-26"
+
+models:
+
+  # ---- White-box (5) -----------------------------------------------------
+
+  qwen2.5-7b:
+    family: qwen
+    access: white_box
+    provider: vllm
+    cutoff_date: 2023-10-31
+    tokenizer_family: qwen
+    tokenizer_sha: <TBD>
+    hf_commit_sha: <TBD>
+    p_logprob:
+      thinking_control: default_off
+      prompt_overlay_policy: none
+      route_lock_required: hf_commit_sha
+      echo_supported: true
+    p_predict:
+      thinking_control: default_deployed
+      prompt_overlay_policy: baseline_only
+
+  qwen2.5-14b:
+    family: qwen
+    access: white_box
+    provider: vllm
+    cutoff_date: 2023-10-31
+    tokenizer_family: qwen
+    tokenizer_sha: <TBD>
+    hf_commit_sha: <TBD>
+    p_logprob:
+      thinking_control: default_off
+      prompt_overlay_policy: none
+      route_lock_required: hf_commit_sha
+      echo_supported: true
+    p_predict:
+      thinking_control: default_deployed
+      prompt_overlay_policy: baseline_only
+
+  qwen3-8b:
+    family: qwen
+    access: white_box
+    provider: vllm
+    cutoff_date: 2025-01-31
+    tokenizer_family: qwen3
+    tokenizer_sha: <TBD>
+    hf_commit_sha: <TBD>
+    p_logprob:
+      thinking_control: append_no_think_sentinel
+      prompt_overlay_policy: none
+      route_lock_required: hf_commit_sha
+      echo_supported: true
+    p_predict:
+      thinking_control: default_deployed
+      prompt_overlay_policy: baseline_only
+
+  qwen3-14b:
+    family: qwen
+    access: white_box
+    provider: vllm
+    cutoff_date: 2025-01-31
+    tokenizer_family: qwen3
+    tokenizer_sha: <TBD>
+    hf_commit_sha: <TBD>
+    p_logprob:
+      thinking_control: append_no_think_sentinel
+      prompt_overlay_policy: none
+      route_lock_required: hf_commit_sha
+      echo_supported: true
+    p_predict:
+      thinking_control: default_deployed
+      prompt_overlay_policy: baseline_only
+
+  glm-4-9b:
+    family: glm
+    access: white_box
+    provider: vllm
+    cutoff_date: 2024-06-30
+    tokenizer_family: glm4
+    tokenizer_sha: <TBD>
+    hf_commit_sha: <TBD>
+    p_logprob:
+      thinking_control: system_message_toggle
+      prompt_overlay_policy: none
+      route_lock_required: hf_commit_sha
+      echo_supported: false
+      fallback: offline_hf_scorer
+    p_predict:
+      thinking_control: default_deployed
+      prompt_overlay_policy: baseline_only
+
+  # ---- Black-box (4) -----------------------------------------------------
+
+  deepseek-v3-0324:
+    family: deepseek
+    access: black_box
+    provider: deepseek
+    api_model_name: deepseek-chat
+    cutoff_date: 2024-07-31
+    p_predict:
+      thinking_control: default_deployed
+      prompt_overlay_policy: baseline_only
+      route_lock_required: provider_model_id
+
+  gpt-4.1:
+    family: openai
+    access: black_box
+    provider: openai
+    api_model_name: gpt-4.1-2025-04-14
+    cutoff_date: 2024-06-30
+    p_predict:
+      thinking_control: default_deployed
+      prompt_overlay_policy: baseline_only
+      route_lock_required: provider_model_id
+
+  gpt-5.1:
+    family: openai
+    access: black_box
+    provider: openai
+    api_model_name: <TBD>
+    cutoff_date: 2024-09-30
+    p_predict:
+      thinking_control: default_deployed
+      prompt_overlay_policy: baseline_only
+      route_lock_required: provider_model_id
+
+  claude-sonnet-4.6:
+    family: anthropic
+    access: black_box
+    provider: anthropic
+    api_model_name: <TBD>
+    cutoff_date: 2025-08-31
+    p_predict:
+      thinking_control: extended_thinking_off
+      prompt_overlay_policy: baseline_only
+      route_lock_required: provider_model_id

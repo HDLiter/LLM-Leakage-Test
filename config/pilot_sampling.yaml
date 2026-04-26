@@ -1,0 +1,44 @@
+# Pilot case-sampling specification (plan v2.2 §6).
+#
+# Consumed by scripts/sample_phase7_pilot.py (WS4) to build
+# data/pilot/manifests/pilot_100_cases.json. The factor schema
+# referenced by `factor_schema_path` is produced by WS0.5 and is not
+# yet authored — this file is structural; numeric quotas come straight
+# from the plan and are pilot-iterable only via the rebalance rule
+# (preserve N=100 first; only escalate to a memo if rebalance fails).
+
+manifest_id: phase7-pilot-100
+total_cases: 100
+
+source:
+  primary: cls_v3
+  fallback_seed: data/seed/test_cases_v3.json
+
+# Bucket composition (plan §6.2)
+buckets:
+  pre_cutoff_verified_outcome: 60
+  pre_cutoff_factor_supplement: 20
+  post_cutoff_negative_control: 20
+
+# Date-window targets within the 80 pre-cutoff cases (plan §6.2)
+date_windows:
+  - { range: "<= 2023-10-31",          target: 20 }
+  - { range: "2023-11-01..2024-06-30", target: 30 }
+  - { range: "2024-07-01..2025-01-31", target: 30 }
+  - { range: ">= 2026-02-01",          target: 20 }
+
+# Quotas (plan §6.3)
+category_min_per_top_level: 15  # policy / corporate / industry / macro
+event_type_min_per_super_type:
+  five_supertypes: 12
+  four_supertypes: 15
+factor_split_pre_cutoff_per_side: 20
+factor_split_fo_eligible_per_side: 15
+
+# Effective sample-size matrix (plan §6.4)
+n_eff:
+  target: 20  # design target
+  minimum: 15 # minimum acceptable; below this collapse tertile -> binary
+
+# WS0.5 factor schema (TBD: path frozen by the Thales-alignment session)
+factor_schema_path: <TBD-WS0.5>

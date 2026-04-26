@@ -1,0 +1,32 @@
+# R5A pilot runtime defaults (plan v2.2 §10.2, §14.2).
+#
+# Concurrency caps and the trust_env=false / proxy=none policy are
+# load-bearing: project memory `feedback_concurrency.md` records that
+# the local proxy interferes with DeepSeek and the dockerized vLLM
+# endpoint, and `feedback_concurrency.md` records that 50 (the legacy
+# default) overruns DeepSeek and the local GPU.
+
+runtime:
+  seed: 20260417
+  retry_max: 5
+  timeout_seconds: 120
+  cache_enabled: true
+  runstate_db: data/pilot/runstate.db
+
+providers:
+
+  deepseek:
+    max_concurrency: 20
+    trust_env: false
+    proxy: none
+
+  vllm:
+    max_concurrency: 16
+    trust_env: false
+    proxy: none
+
+  openai:
+    max_concurrency: 8
+
+  anthropic:
+    max_concurrency: 8

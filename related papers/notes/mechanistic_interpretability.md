@@ -109,3 +109,19 @@
 - We show that feed-forward layers in transformerbased language models operate as key-value memories, where each key correlates with textual patterns in the training examples, and each value induces a distribution over the output vocabulary.
 
 **Insight for our project:** This paper helps us reason about the internal route from entity cue to answer token. It is useful for framing entity-cue dependence, for interpreting counterfactual sensitivity, and for connecting CFLS failures to specific retrieval-like or association-like mechanisms.
+
+---
+
+## When Truth Is Overridden: Uncovering the Internal Origins of Sycophancy in Large Language Models
+**Authors & Year:** Wang, Li, Yang, Zhang & Wang (2025), arxiv 2508.02087v4
+
+**Summary:** Mechanistic study of how an LLM's correct internal answer gets overridden by an external user opinion. Uses MMLU multiple-choice questions in three conditions (Plain / Opinion-only / Opinion+Expertise) on Qwen2.5-7B-Instruct, Llama-3.1-8B-Instruct, and 5 other 1-8B models. Identifies a **two-stage override**: a mid-late-layer Decision-Score shift (~layer 19-22) precedes a final-layer KL-divergence consolidation (~layer 27-32). Bidirectional activation patching at the critical late layer suppresses sycophancy by 36% (Llama) and induces it to 47% in clean Plain runs — establishing causal control. Expertise framing (beginner / intermediate / advanced) collapses into a single representational cluster (cosine sim 0.99+), showing models do not encode professional authority internally even though they encode opinion direction. First-person framing produces orthogonal late-layer representations to third-person (cosine sim ≈0).
+
+**Key methods/findings**
+- **Decision Score (DS):** normalized logit-lens metric `DS(x) = (l_x − min) / (max − min + ε)` per layer, ranges 0–1, tracks how strongly each layer prefers each option.
+- **Layer-wise KL divergence** between hidden state distributions of Plain vs Opinion-only runs identifies the layer of representational override; small in early/middle, sharp rise in final 5-15% of layers.
+- **Activation patching:** swap hidden state at critical layer between Plain and Opinion-only forward passes; bidirectional reversibility confirms causal mediation.
+- **PCA + cosine similarity** on hidden-state centroids across conditions shows whether conditions cluster distinctly (Opinion-only vs Plain) or collapse (expertise levels).
+- Critical layers: Llama-3.1-8B layer 32 (KL peak) / 19 (DS shift); Qwen2.5-7B layer 27 (KL peak) / 22 (DS shift). All 5+ other models follow the same two-stage pattern in appendix.
+
+**Insight for our project:** This is the **structural template for the WS6 mechanistic study of E_FO** in our project. Our C_FO inserts a fake outcome into a financial article that contradicts the model's memorized real outcome — the conflict is structurally identical to "user opinion vs internal correct answer" in this paper, except the polarity is inverted: we want the model to **resist** the fake outcome (memorization signal), not succumb to it (sycophancy). The same DS / KL / activation-patching toolkit applies directly: we should localize at which layer the network's output diverges from the C_FO baseline, identify the "memorization override" layer per model, and use bidirectional patching to demonstrate causal control. The paper's result that override consolidates in the final 25% of layers gives us a layer-window prior to pre-register. Tooling required on our side: `offline_hf` backend with `output_hidden_states=True`, `LogProbTrace.hidden_states_uri` field, and a new `analysis/mechanistic.py` module implementing DS / KL / patching helpers (~200 lines). WS6 trigger: behavioral E_FO clears its quality gate (mean |delta| > 0 on ≥ 5/14 models given the post-2026-04-27 fleet). See `docs/DECISION_20260427_pcsg_redefinition.md` §2.5 for the full integration spec.

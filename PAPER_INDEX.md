@@ -1,8 +1,8 @@
 # Paper Index
 
-> **Last sync:** 2026-04-16 (post-R5A-freeze cleanup)
-> **Previous sync:** 2026-04-06
-> **Total PDFs in `related papers/`:** 128
+> **Last sync:** 2026-04-27 (added Wang et al. sycophancy mechanism for WS6 conditional)
+> **Previous sync:** 2026-04-16 (post-R5A-freeze cleanup)
+> **Total PDFs in `related papers/`:** 129
 > **Status legend:** `IN_LIBRARY` = PDF on disk; `REFERENCED_ONLY` = cited in project docs / sweeps but no PDF in `related papers/`.
 
 This index is a **categorical pointer view** for fast navigation. The richer per-paper records (sha256, abstract excerpts, page counts, author guesses) live alongside the PDFs:
@@ -169,6 +169,7 @@ This file at repo root is the human-facing categorical index that ties paper fil
 | `Propagation Pitfalls Knowledge Editing.pdf` | Hua et al. 2024 | Editing fails on reasoning chains | IN_LIBRARY |
 | `MIRAGE Model Internals Answer Attribution.pdf` | — | Internals-based answer attribution | IN_LIBRARY |
 | `TRAK Attributing Model Behavior at Scale.pdf` | Park et al. 2023 | Training-data attribution at scale | IN_LIBRARY |
+| `When Truth Is Overridden Internal Origins Sycophancy.pdf` | Wang et al. 2025 (arxiv 2508.02087) | Decision-Score logit-lens + KL divergence + activation patching localize sycophancy override to late layers; methodology directly transferable to WS6 C_FO mechanistic study | IN_LIBRARY |
 
 ## 10. Entity representation, temporal latents, knowledge conflicts
 

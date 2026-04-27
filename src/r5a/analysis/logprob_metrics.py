@@ -165,18 +165,43 @@ def compute_cts(
 
 
 # ---------------------------------------------------------------------------
-# Paired Cutoff Surprise Gap (E_PCSG)
+# Paired Cutoff Surprise Gap (E_PCSG) — registry-driven (2026-04-27)
 # ---------------------------------------------------------------------------
 
 
-def compute_pcsg(trace_late: LogProbTrace, trace_early: LogProbTrace) -> float:
-    """Mean logprob difference (late - early) over the article.
+def _eligible_for_pair(trace: LogProbTrace, max_token_id_inclusive: int) -> bool:
+    """Vocab-intersection eligibility check for cross-version PCSG pairs.
 
-    Plan §8.1A defines E_PCSG as paired logprob gap on tokenizer-matched
-    temporal pairs. The two traces MUST come from the same tokenizer SHA
-    (and therefore the same token IDs, same length) — otherwise the
-    contrast is uninterpretable. We refuse to compute on mismatched
-    inputs rather than silently aligning.
+    The 2026-04-27 PCSG redefinition allows pairs whose tokenizer
+    classes match but vocabs differ in extension tokens (e.g. Qwen2.5
+    vs Qwen3). Articles whose tokenization triggers any token ID above
+    the pair-declared ceiling break alignment and must be excluded.
+    """
+    if not trace.raw_token_ids:
+        return False
+    return max(trace.raw_token_ids) <= max_token_id_inclusive
+
+
+def compute_pcsg(
+    trace_late: LogProbTrace,
+    trace_early: LogProbTrace,
+    *,
+    max_token_id_inclusive: int | None = None,
+) -> float:
+    """Mean logprob difference (late - early) over a PCSG pair.
+
+    Plan §8.1A + 2026-04-27 amendment (`docs/DECISION_20260427_pcsg_redefinition.md`):
+    - Same `case_id` (paired observation).
+    - Both traces' `raw_token_ids` must satisfy the pair's
+      `max_token_id_inclusive` rule (vocab intersection).
+    - Token IDs must match position-by-position (this is a hard
+      tokenization-alignment requirement, not just shared vocab).
+    - The two tokenizer SHAs may differ (cross-version pair) AS LONG AS
+      both share the same tokenizer class — checked at the YAML
+      `tokenizer_compat` level by the operator before this is called.
+
+    Returns the mean of `(logprob_late - logprob_early)` over matched
+    tokens. Positive values mean the late model is more familiar.
     """
 
     if trace_late.case_id != trace_early.case_id:
@@ -184,17 +209,21 @@ def compute_pcsg(trace_late: LogProbTrace, trace_early: LogProbTrace) -> float:
             f"case_id mismatch: late={trace_late.case_id}, "
             f"early={trace_early.case_id}"
         )
-    if trace_late.tokenizer_sha != trace_early.tokenizer_sha:
-        raise ValueError(
-            "tokenizer_sha mismatch — E_PCSG requires identical tokenizer; "
-            f"late={trace_late.tokenizer_sha[:12]}..., "
-            f"early={trace_early.tokenizer_sha[:12]}..."
-        )
+
+    if max_token_id_inclusive is not None:
+        for label, trace in (("late", trace_late), ("early", trace_early)):
+            if not _eligible_for_pair(trace, max_token_id_inclusive):
+                raise ValueError(
+                    f"trace {label}.case_id={trace.case_id!r} contains a "
+                    f"token ID > {max_token_id_inclusive}; ineligible for "
+                    f"this PCSG pair (vocab-intersection violation)"
+                )
+
     if trace_late.raw_token_ids != trace_early.raw_token_ids:
         raise ValueError(
-            "token IDs differ between paired traces despite tokenizer match; "
-            "this should never happen — check for input-text drift or "
-            "tokenizer config divergence"
+            "token IDs differ between paired traces; cross-version pairs "
+            "still require position-aligned IDs in the intersection vocab. "
+            "Check for input-text drift or tokenizer-class divergence."
         )
 
     late = np.asarray(trace_late.token_logprobs, dtype=np.float64)
@@ -202,9 +231,61 @@ def compute_pcsg(trace_late: LogProbTrace, trace_early: LogProbTrace) -> float:
     return float(np.mean(late - early))
 
 
+def compute_pcsg_capacity_curve(
+    traces_by_case_and_model: dict[tuple[str, str], LogProbTrace],
+    params_by_model: dict[str, int],
+    *,
+    max_token_id_inclusive: int | None = None,
+) -> list[dict[str, float | str | int]]:
+    """One-row-per-(case, model) tidy table for capacity-curve regression.
+
+    Inputs:
+      - `traces_by_case_and_model[(case_id, model_id)]` -> LogProbTrace
+      - `params_by_model[model_id]` -> total parameter count (e.g. 1.5e9, 7e9)
+
+    Output: list of dicts with keys
+      `case_id, model_id, params, log2_params, mean_logprob`.
+    Use this output to fit `mean_logprob ~ β · log2(params) + ε` as
+    OLS or a mixed-effects regression with case_id as random intercept.
+
+    Cutoff is held fixed *across the input* (caller is responsible for
+    only including same-cutoff models in the regression — typically one
+    model family at a time).
+    """
+
+    if not traces_by_case_and_model:
+        return []
+
+    rows: list[dict[str, float | str | int]] = []
+    for (case_id, model_id), trace in traces_by_case_and_model.items():
+        if model_id not in params_by_model:
+            raise ValueError(f"params_by_model is missing entry for {model_id!r}")
+        if (
+            max_token_id_inclusive is not None
+            and not _eligible_for_pair(trace, max_token_id_inclusive)
+        ):
+            continue  # skip ineligible cases for this curve
+        params = int(params_by_model[model_id])
+        if params <= 0:
+            raise ValueError(f"non-positive params for {model_id!r}: {params}")
+        mean_lp = float(np.mean(trace.token_logprobs))
+        rows.append(
+            {
+                "case_id": case_id,
+                "model_id": model_id,
+                "params": params,
+                "log2_params": math.log2(params),
+                "mean_logprob": mean_lp,
+            }
+        )
+
+    return rows
+
+
 __all__ = [
     "compute_cts",
     "compute_mink_pct",
     "compute_mink_pp",
     "compute_pcsg",
+    "compute_pcsg_capacity_curve",
 ]

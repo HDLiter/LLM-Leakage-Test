@@ -1,24 +1,23 @@
 """vLLM completion-endpoint backend for `P_logprob`.
 
 Per plan §5.2, the backend MUST hit the **completion** endpoint
-(not chat) and request `echo=True, max_tokens=0, logprobs=True,
-top_logprobs=5`. Chat endpoints add a chat template wrapping that
-contaminates the per-token logprobs we score.
+(not chat) and request `echo=True, max_tokens=0, logprobs=top_k`.
+Chat endpoints add a chat template wrapping that contaminates the
+per-token logprobs we score.
 
-The backend issues two calls per article:
-  1. `POST /v1/tokenize` — to obtain the integer token IDs (vLLM's
-     completion response only returns string tokens, not IDs);
-  2. `POST /v1/completions` with echo — to obtain the per-token
-     logprob trace.
+Token-alignment strategy (rewritten 2026-04-27 after WS0+WS1 review):
+  1. Call `POST /v1/tokenize` once to obtain canonical integer IDs.
+  2. Call `POST /v1/completions` with `prompt=<list[int]>` (vLLM accepts
+     pre-tokenized input directly), so the completion path cannot
+     re-tokenize and the response logprobs align 1:1 with the IDs.
+  3. The first position's `token_logprob` is `None` (no left context);
+     any *interior* `None` is a backend pathology — fail the trace.
+  4. We never insert sentinel placeholder IDs. If alignment is off,
+     the trace is rejected.
 
-We refuse to construct a `LogProbTrace` if the two responses disagree
-on token count beyond a one-token BOS/EOS allowance, since the trace
-would be unusable for downstream paired analysis.
-
-Network policy follows project memory `feedback_codex_mcp.md` /
-`infra_capabilities.md`: `trust_env=False`, `proxy=None`. The caller
-should set `NO_PROXY=localhost,127.0.0.1,host.docker.internal` in the
-environment before launching the script.
+Network policy (project memory `infra_capabilities.md`):
+  `trust_env=False`, `proxy=None`. Caller should set
+  `NO_PROXY=localhost,127.0.0.1,host.docker.internal` before launching.
 """
 
 from __future__ import annotations
@@ -35,7 +34,10 @@ from ..contracts import (
 )
 
 
-_TOKEN_COUNT_TOLERANCE = 1  # one BOS/EOS difference is allowed; logged in the trace
+# Status codes that indicate a transient condition worth retrying;
+# everything else (especially 400/401/403/422) means our request
+# shape is wrong and retrying just hides the real error.
+_TRANSIENT_STATUS = frozenset({408, 409, 425, 429, 500, 502, 503, 504})
 
 
 class VLLMBackendError(RuntimeError):
@@ -45,21 +47,21 @@ class VLLMBackendError(RuntimeError):
 class VLLMLogprobBackend:
     """Async vLLM completion client that returns `LogProbTrace` records.
 
-    Constructor inputs come from the resolved fleet `ModelConfig` and the
-    runtime config; the backend itself does not load YAML.
+    Constructor inputs come from the resolved fleet `ModelConfig` and
+    the runtime config; the backend itself does not load YAML.
 
     Args:
         base_url: e.g. ``http://localhost:8000`` (no trailing ``/v1``).
-        served_model_name: the string vLLM was launched with via
-            ``--served-model-name``; this is what /v1/models lists.
-        model_id: our fleet model_id (used in trace records).
-        tokenizer_family: from fleet config; for record-keeping.
-        tokenizer_sha: pinned tokenizer commit SHA; recorded in trace.
-        hf_commit_sha: pinned model commit SHA; recorded in trace.
-        timeout_seconds: per-request timeout.
-        max_retries: simple count-based retry for transient 5xx / I/O errors.
-        top_logprobs: how many alternative tokens to request per position.
-            Plan §5.2 fixes this at 5.
+        served_model_name: vLLM ``--served-model-name`` (what /v1/models lists).
+        model_id: fleet model_id, used in trace records.
+        tokenizer_family / tokenizer_sha / hf_commit_sha: pinning fields.
+        quant_scheme: e.g. ``"AWQ-INT4"`` or ``"fp16"``; recorded into trace.
+        weight_dtype: optional ``"float16"`` / ``"bfloat16"``; recorded.
+        vllm_image_digest: optional Docker image SHA; recorded.
+        timeout_seconds: per-HTTP-request timeout.
+        max_retries: count of retries for transient failures only.
+        top_logprobs: how many alternative tokens per position. Plan §5.2
+            calls for 5; can be raised per Stats-lens recommendation.
     """
 
     def __init__(
@@ -71,6 +73,9 @@ class VLLMLogprobBackend:
         tokenizer_family: str,
         tokenizer_sha: str,
         hf_commit_sha: str,
+        quant_scheme: str,
+        weight_dtype: str | None = None,
+        vllm_image_digest: str | None = None,
         timeout_seconds: int = 120,
         max_retries: int = 3,
         top_logprobs: int = 5,
@@ -81,13 +86,15 @@ class VLLMLogprobBackend:
         self.tokenizer_family = tokenizer_family
         self.tokenizer_sha = tokenizer_sha
         self.hf_commit_sha = hf_commit_sha
-        self.max_retries = max_retries
+        self.quant_scheme = quant_scheme
+        self.weight_dtype = weight_dtype
+        self.vllm_image_digest = vllm_image_digest
+        self.max_retries = max(1, max_retries)
         self.top_logprobs = top_logprobs
         self._client = httpx.AsyncClient(
             base_url=self.base_url,
             timeout=timeout_seconds,
             trust_env=False,
-            # httpx accepts None to disable proxies entirely
             proxy=None,
         )
 
@@ -104,7 +111,6 @@ class VLLMLogprobBackend:
     # ------------------------------------------------------------------ probes
 
     async def list_models(self) -> list[str]:
-        """Sanity probe; returns the model IDs vLLM is currently serving."""
         resp = await self._client.get("/v1/models")
         resp.raise_for_status()
         data = resp.json().get("data", [])
@@ -115,57 +121,50 @@ class VLLMLogprobBackend:
     async def trace(self, *, case_id: str, article_text: str) -> LogProbTrace:
         """Compute one `LogProbTrace` for `article_text` on this model."""
 
+        # Step 1: canonical tokenization
         token_ids = await self._tokenize(article_text)
-        completion = await self._echo_completion(article_text)
+        if len(token_ids) < 2:
+            raise VLLMBackendError(
+                f"article {case_id} encodes to <2 tokens; cannot score"
+            )
 
-        logprobs_obj = completion.get("choices", [{}])[0].get("logprobs") or {}
+        # Step 2: echo completion driven by the IDs themselves
+        completion = await self._echo_completion(token_ids)
+
+        choice = completion.get("choices", [{}])[0]
+        logprobs_obj = choice.get("logprobs") or {}
         token_logprobs = logprobs_obj.get("token_logprobs") or []
+        top_logprobs_field = logprobs_obj.get("top_logprobs") or []
 
-        # vLLM returns None for the first token (no left context); drop
-        # leading Nones and any (rare) interior Nones to keep arrays aligned.
-        cleaned: list[float] = []
-        kept_indices: list[int] = []
+        if len(token_logprobs) != len(token_ids):
+            raise VLLMBackendError(
+                "vLLM /v1/completions returned a logprob list whose length "
+                f"({len(token_logprobs)}) differs from the prompt token "
+                f"count ({len(token_ids)}) for case {case_id}; refusing "
+                "to misalign the trace"
+            )
+
+        # Strict None handling: only the first position may be None
+        # (no left context for the first token). Interior None means
+        # the backend hit a pathology we should not silently smooth over.
+        cleaned_lp: list[float] = []
+        cleaned_ids: list[int] = []
+        cleaned_top: list[list[float]] = []
         for i, lp in enumerate(token_logprobs):
             if lp is None:
-                continue
-            cleaned.append(float(lp))
-            kept_indices.append(i)
+                if i != 0:
+                    raise VLLMBackendError(
+                        f"interior None logprob at position {i} for case "
+                        f"{case_id} (only position 0 may be None)"
+                    )
+                continue  # drop the leading None
+            cleaned_lp.append(float(lp))
+            cleaned_ids.append(int(token_ids[i]))
+            cleaned_top.append(_extract_top_alternatives(top_logprobs_field, i))
 
-        if not cleaned:
+        if not cleaned_lp:
             raise VLLMBackendError(
                 f"completion returned no usable logprobs for case {case_id}"
-            )
-
-        # Align raw_token_ids to the kept positions. /tokenize returns the
-        # full token list; vLLM completion's logprobs.tokens has the same
-        # length within tolerance.
-        completion_tokens = logprobs_obj.get("tokens") or []
-        n_completion = len(completion_tokens)
-        n_tokenize = len(token_ids)
-        if abs(n_completion - n_tokenize) > _TOKEN_COUNT_TOLERANCE:
-            raise VLLMBackendError(
-                f"token count mismatch beyond ±{_TOKEN_COUNT_TOLERANCE}: "
-                f"/tokenize={n_tokenize}, completion={n_completion}"
-            )
-
-        # Map kept_indices (into the completion array) onto raw_token_ids
-        # (from /tokenize). When counts differ by 1, assume the discrepancy
-        # is a leading or trailing BOS/EOS that vLLM added on the
-        # completion path; trim the longer side from the front.
-        head_drop = max(0, n_completion - n_tokenize)
-        ids_aligned: list[int] = []
-        for idx in kept_indices:
-            tok_idx = idx - head_drop
-            if 0 <= tok_idx < n_tokenize:
-                ids_aligned.append(int(token_ids[tok_idx]))
-            else:
-                # the kept position fell outside the /tokenize range;
-                # placeholder so list lengths stay equal
-                ids_aligned.append(-1)
-
-        if len(ids_aligned) != len(cleaned):
-            raise VLLMBackendError(
-                "internal alignment error between token IDs and logprobs"
             )
 
         fingerprint = RequestFingerprint(
@@ -186,9 +185,15 @@ class VLLMLogprobBackend:
             tokenizer_family=self.tokenizer_family,
             tokenizer_sha=self.tokenizer_sha,
             hf_commit_sha=self.hf_commit_sha,
-            article_token_count=len(cleaned),
-            raw_token_ids=ids_aligned,
-            token_logprobs=cleaned,
+            quant_scheme=self.quant_scheme,
+            weight_dtype=self.weight_dtype,
+            vllm_image_digest=self.vllm_image_digest,
+            article_token_count=len(cleaned_lp),
+            raw_token_ids=cleaned_ids,
+            token_logprobs=cleaned_lp,
+            top_alternative_logprobs=cleaned_top,
+            top_logprobs_k=self.top_logprobs,
+            prefix_token_count=0,  # vLLM /tokenize default add_special_tokens behavior
             thinking_mode="off",
             backend="vllm_completion",
             fingerprint=fingerprint,
@@ -197,17 +202,24 @@ class VLLMLogprobBackend:
     # ------------------------------------------------------------- HTTP helpers
 
     async def _tokenize(self, text: str) -> list[int]:
-        payload = {"model": self.served_model_name, "prompt": text}
+        payload = {
+            "model": self.served_model_name,
+            "prompt": text,
+            "add_special_tokens": True,  # default; explicit for parity with offline_hf
+        }
         data = await self._post_with_retry("/v1/tokenize", payload)
         tokens = data.get("tokens")
         if not isinstance(tokens, list) or not tokens:
             raise VLLMBackendError(f"/v1/tokenize returned no tokens: {data!r}")
         return [int(t) for t in tokens]
 
-    async def _echo_completion(self, text: str) -> dict:
+    async def _echo_completion(self, token_ids: list[int]) -> dict:
+        # Pass pre-tokenized IDs as the prompt — vLLM accepts list[int]
+        # natively on /v1/completions, which guarantees the response
+        # logprob list aligns with the IDs we supplied.
         payload = {
             "model": self.served_model_name,
-            "prompt": text,
+            "prompt": token_ids,
             "echo": True,
             "max_tokens": 0,
             "temperature": 0.0,
@@ -220,24 +232,78 @@ class VLLMLogprobBackend:
         for attempt in range(self.max_retries):
             try:
                 resp = await self._client.post(path, json=payload)
-                if resp.status_code >= 500:
+            except httpx.TransportError as exc:
+                last_err = exc
+            else:
+                if resp.status_code in _TRANSIENT_STATUS:
                     last_err = httpx.HTTPStatusError(
-                        f"server error {resp.status_code}",
+                        f"transient {resp.status_code} on {path}: "
+                        f"{resp.text[:200]}",
                         request=resp.request,
                         response=resp,
                     )
+                elif 400 <= resp.status_code < 500:
+                    # Permanent client error — retrying just hides the bug.
+                    raise VLLMBackendError(
+                        f"POST {path} failed with non-retryable "
+                        f"{resp.status_code}: {resp.text[:500]}"
+                    )
                 else:
-                    resp.raise_for_status()
-                    return resp.json()
-            except (httpx.TransportError, httpx.HTTPStatusError) as exc:
-                last_err = exc
-            # exponential backoff: 1s, 2s, 4s ...
-            await asyncio.sleep(2.0 ** attempt)
+                    try:
+                        return resp.json()
+                    except ValueError as exc:
+                        raise VLLMBackendError(
+                            f"POST {path} returned status {resp.status_code} "
+                            f"but the body is not JSON: {resp.text[:200]}"
+                        ) from exc
+
+            # Backoff before next attempt: 1s, 2s, 4s ...
+            if attempt + 1 < self.max_retries:
+                await asyncio.sleep(2.0**attempt)
 
         assert last_err is not None
         raise VLLMBackendError(
-            f"POST {path} failed after {self.max_retries} attempts: {last_err}"
+            f"POST {path} failed after {self.max_retries} transient retries: "
+            f"{last_err}"
         ) from last_err
+
+
+def _extract_top_alternatives(
+    top_logprobs_field: list, position: int
+) -> list[float]:
+    """Extract a flat list of alternative-token logprobs at one position.
+
+    vLLM returns `top_logprobs[i]` as either `None` (position 0) or a
+    dict mapping token-string -> logprob. We discard the token strings
+    (Min-K%++ scoring uses only the magnitudes) and keep the numeric
+    values sorted descending so that downstream code can treat the
+    inner list as "top-K logprobs in rank order".
+    """
+
+    if position >= len(top_logprobs_field):
+        return []
+    cell = top_logprobs_field[position]
+    if cell is None:
+        return []
+    # Some vLLM versions return list[{"token": str, "logprob": float}, ...]
+    # rather than dict[str, float]; handle both shapes.
+    if isinstance(cell, dict):
+        values = list(cell.values())
+    elif isinstance(cell, list):
+        values = []
+        for item in cell:
+            if isinstance(item, dict):
+                lp = item.get("logprob")
+                if lp is None:
+                    continue
+                values.append(lp)
+            else:
+                values.append(item)
+    else:
+        return []
+    values = [float(v) for v in values if v is not None]
+    values.sort(reverse=True)
+    return values
 
 
 __all__ = ["VLLMBackendError", "VLLMLogprobBackend"]

@@ -11,7 +11,7 @@ import hashlib
 from pathlib import Path
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class ProviderRuntime(BaseModel):
@@ -20,6 +20,18 @@ class ProviderRuntime(BaseModel):
     max_concurrency: int = Field(gt=0)
     trust_env: bool = False
     proxy: str | None = None  # "none" / null / explicit URL
+
+    @field_validator("proxy", mode="before")
+    @classmethod
+    def _normalize_proxy_none(cls, value: object) -> object:
+        """Allow YAML `proxy: none` / `proxy: null` / `proxy: ""` to mean
+        "no proxy" (Python None) so adapters can pass it directly to
+        httpx without further string handling."""
+        if value is None:
+            return None
+        if isinstance(value, str) and value.lower() in {"none", "null", ""}:
+            return None
+        return value
 
 
 class RuntimeBlock(BaseModel):

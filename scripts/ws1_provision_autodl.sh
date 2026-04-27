@@ -23,7 +23,10 @@
 
 set -euo pipefail
 
-VLLM_IMAGE_TAG="${VLLM_IMAGE_TAG:-vllm/vllm-openai:v0.7.0}"
+# vLLM v0.7.0 lacks Qwen3ForCausalLM (added in v0.8.5). Pin to a recent
+# stable that supports both Qwen2.5 AWQ and Qwen3 AWQ; verify on a
+# minor smoke per the WS1 stage-1 plan.
+VLLM_IMAGE_TAG="${VLLM_IMAGE_TAG:-vllm/vllm-openai:v0.10.0}"
 DATA_ROOT="${DATA_ROOT:-/data}"
 HF_ENDPOINT="${HF_ENDPOINT:-https://hf-mirror.com}"
 
@@ -109,7 +112,7 @@ cat <<'EOF'
 
 Next steps (per model, low-risk first; see plans/ws1-cloud-execution.md §5):
 
-  # qwen2.5-7b
+  # qwen2.5-7b — AWQ via vLLM (low risk; same family already verified locally)
   huggingface-cli download Qwen/Qwen2.5-7B-Instruct-AWQ \
       --revision <pinned-sha> \
       --local-dir /data/models/qwen2.5-7b
@@ -126,8 +129,31 @@ Next steps (per model, low-risk first; see plans/ws1-cloud-execution.md §5):
   python scripts/ws1_run_logprob.py \
       --model qwen2.5-7b --smoke --vllm-url http://localhost:8000
 
-Repeat for qwen2.5-14b, qwen3-8b (AWQ), qwen3-14b (AWQ), and finally
-glm-4-9b (fp16; if vLLM echo fails, switch to --backend offline_hf and
-make sure scripts/ws1_provision_autodl.sh was rerun with --with-torch).
+Repeat for the post-2026-04-27 capacity-curve fleet:
+  Qwen2.5: 1.5B, 3B, 7B, 14B, 32B  (all AWQ, --quantization awq_marlin)
+  Qwen3:   4B, 8B, 14B, 32B        (all AWQ; needs vLLM >= 0.8.5)
+
+GLM-4-9B requires --trust-remote-code (custom ChatGLM4Tokenizer):
+
+  huggingface-cli download THUDM/glm-4-9b-chat \
+      --revision <pinned-sha> \
+      --local-dir /data/models/glm-4-9b
+  docker run -d --gpus all --rm \
+      -v /data/models/glm-4-9b:/model \
+      -p 8000:8000 \
+      $(cat /data/vllm_image_digest.txt) \
+      --model /model \
+      --served-model-name glm-4-9b \
+      --gpu-memory-utilization 0.85 \
+      --trust-remote-code \
+      --dtype float16
+  cd /data/repo
+  python scripts/ws1_run_logprob.py \
+      --model glm-4-9b --smoke --vllm-url http://localhost:8000
+  # If echo=True is unsupported on GLM, fall through to offline_hf:
+  python scripts/ws1_run_logprob.py \
+      --model glm-4-9b --smoke --backend offline_hf \
+      --model-path /data/models/glm-4-9b --device cuda --torch-dtype float16
+  # (offline_hf path requires this script was run with --with-torch)
 
 EOF

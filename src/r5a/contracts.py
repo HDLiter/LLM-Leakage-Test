@@ -12,11 +12,12 @@ Authority:
 
 from __future__ import annotations
 
+import math
 from datetime import date, datetime
 from enum import Enum
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 # ---------------------------------------------------------------------------
@@ -223,22 +224,103 @@ class PredictRecord(BaseModel):
     raw_response_sha256: str
 
 
+LOGPROB_TRACE_SCHEMA_VERSION = "v2.0"
+
+
 class LogProbTrace(BaseModel):
-    """P_logprob output row. Per plan §5.2 + operator schema §4.4."""
+    """P_logprob output row. Per plan §5.2, operator schema §4.4, and the
+    2026-04-27 amendment in `docs/DECISION_20260427_pcsg_redefinition.md`.
+
+    Schema versioning: bump `schema_version` whenever a new field is
+    added so that downstream consumers can detect and refuse mismatched
+    artifacts. v2.0 introduces `top_alternative_token_ids`,
+    `top_alternative_logprobs`, `quant_scheme`, `weight_dtype`,
+    `vllm_image_digest`, `hidden_states_uri`, and the integrity
+    validators. v1.0 (in-flight pre-2026-04-27) traces are NOT readable
+    under v2.0 — none have been written yet, so this is forward-only.
+    """
 
     model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal["v2.0"] = "v2.0"
 
     case_id: str
     model_id: str
     tokenizer_family: str
     tokenizer_sha: str
     hf_commit_sha: str
-    article_token_count: int
+    quant_scheme: str  # e.g. "AWQ-INT4", "fp16"; recorded for cross-precision sanity
+    weight_dtype: str | None = None  # "float16" / "bfloat16" / "float32" / null for INT4
+    vllm_image_digest: str | None = None  # Docker image SHA256 if backend was vLLM
+
+    article_token_count: int = Field(ge=1)
     raw_token_ids: list[int]
     token_logprobs: list[float]
+
+    # Per-position alternative-token logprobs from vLLM's top_logprobs.
+    # Stored as a ragged list[list[float]] because Parquet handles it
+    # natively. Outer length == article_token_count; inner length is
+    # bounded by top_logprobs_k (typically 5) but may be 0 at the first
+    # position (vLLM returns null there). Token-string identifiers of
+    # the alternatives are NOT persisted: Min-K%++ scoring only needs
+    # the logprob values, and the OpenAI-compatible top_logprobs field
+    # exposes token strings, not token IDs.
+    top_alternative_logprobs: list[list[float]] = Field(default_factory=list)
+    top_logprobs_k: int = Field(ge=0, default=0)
+
+    # Special-token / prefix bookkeeping: how many tokens at the head of
+    # `raw_token_ids` are model-injected prefix (e.g. GLM's `[gMASK]<sop>`)
+    # rather than article content. Downstream analysis MUST skip these for
+    # E_CTS / E_PCSG so that comparisons stay article-content-only.
+    prefix_token_count: int = Field(ge=0, default=0)
+
+    # Optional pointer to a separately-stored hidden-state tensor file
+    # (.safetensors). Populated only when WS6 hidden-state extraction
+    # was requested at scoring time.
+    hidden_states_uri: str | None = None
+
     thinking_mode: Literal["off"]
     backend: Literal["vllm_completion", "offline_hf"]
     fingerprint: RequestFingerprint
+
+    @model_validator(mode="after")
+    def _check_consistency(self) -> "LogProbTrace":
+        n = len(self.raw_token_ids)
+        if n != len(self.token_logprobs):
+            raise ValueError(
+                "raw_token_ids and token_logprobs must have equal length; "
+                f"got {n} vs {len(self.token_logprobs)}"
+            )
+        if n != self.article_token_count:
+            raise ValueError(
+                f"article_token_count ({self.article_token_count}) != "
+                f"len(raw_token_ids) ({n})"
+            )
+        if any(t < 0 for t in self.raw_token_ids):
+            raise ValueError("raw_token_ids contains negative values")
+        if any(not math.isfinite(lp) for lp in self.token_logprobs):
+            raise ValueError("token_logprobs contains non-finite values")
+
+        if self.top_alternative_logprobs:
+            if len(self.top_alternative_logprobs) != n:
+                raise ValueError(
+                    "top_alternative_logprobs must align with raw_token_ids"
+                )
+            if self.top_logprobs_k > 0:
+                for i, lps in enumerate(self.top_alternative_logprobs):
+                    if lps and len(lps) > self.top_logprobs_k:
+                        raise ValueError(
+                            f"top_alternative_logprobs at position {i} has "
+                            f"{len(lps)} entries; declared k={self.top_logprobs_k}"
+                        )
+
+        if self.prefix_token_count > self.article_token_count:
+            raise ValueError(
+                f"prefix_token_count ({self.prefix_token_count}) exceeds "
+                f"article_token_count ({self.article_token_count})"
+            )
+
+        return self
 
 
 # ---------------------------------------------------------------------------

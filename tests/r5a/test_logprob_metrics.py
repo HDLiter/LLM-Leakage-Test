@@ -12,6 +12,7 @@ from src.r5a.analysis.logprob_metrics import (
     compute_mink_pct,
     compute_mink_pp,
     compute_pcsg,
+    compute_pcsg_capacity_curve,
 )
 from src.r5a.contracts import LogProbTrace, RequestFingerprint, SeedSupport
 
@@ -125,6 +126,7 @@ def _make_trace(
         tokenizer_family="qwen",
         tokenizer_sha=tokenizer_sha,
         hf_commit_sha="hf-xyz",
+        quant_scheme="AWQ-INT4",
         article_token_count=len(token_logprobs),
         raw_token_ids=raw_token_ids,
         token_logprobs=token_logprobs,
@@ -150,11 +152,33 @@ def test_pcsg_paired_gap():
     assert gap == pytest.approx(0.625)
 
 
-def test_pcsg_rejects_tokenizer_mismatch():
-    early = _make_trace(tokenizer_sha="tok-old")
-    late = _make_trace(tokenizer_sha="tok-new")
-    with pytest.raises(ValueError, match="tokenizer_sha mismatch"):
-        compute_pcsg(trace_late=late, trace_early=early)
+def test_pcsg_allows_cross_version_tokenizer_sha():
+    # 2026-04-27 amendment: tokenizer SHAs may differ across pair members
+    # (Qwen2.5 vs Qwen3) provided token IDs match position-by-position
+    # within the declared vocab intersection.
+    early = _make_trace(tokenizer_sha="qwen25-sha")
+    late = _make_trace(tokenizer_sha="qwen3-sha")
+    out = compute_pcsg(trace_late=late, trace_early=early)
+    assert out == 0.0  # identical logprobs in fixture
+
+
+def test_pcsg_rejects_token_above_intersection_ceiling():
+    # Probe article tokenized to an extension token (151665+) cannot be
+    # cross-version-paired; PCSG must refuse.
+    early = _make_trace(raw_token_ids=[101, 202, 303, 404])
+    late = _make_trace(raw_token_ids=[101, 202, 303, 404])
+    # base call passes
+    out = compute_pcsg(trace_late=late, trace_early=early, max_token_id_inclusive=500)
+    assert out == 0.0
+    # but if any ID exceeds the ceiling, raise
+    early_bad = _make_trace(raw_token_ids=[101, 202, 303, 151667])
+    late_bad = _make_trace(raw_token_ids=[101, 202, 303, 151667])
+    with pytest.raises(ValueError, match="vocab-intersection violation"):
+        compute_pcsg(
+            trace_late=late_bad,
+            trace_early=early_bad,
+            max_token_id_inclusive=151664,
+        )
 
 
 def test_pcsg_rejects_case_id_mismatch():
@@ -196,3 +220,61 @@ def test_cts_rejects_zero_overlap_freq_table():
     trace = _make_trace()
     with pytest.raises(ValueError, match="zero tokens"):
         compute_cts(trace, frequency_table={9999: -0.1})
+
+
+# ---------------------------------------------------------------------------
+# compute_pcsg_capacity_curve (added 2026-04-27)
+# ---------------------------------------------------------------------------
+
+
+def test_capacity_curve_basic():
+    # Two cases × three model sizes within Qwen2.5 family.
+    # mean_logprob hand-set so the regression has a non-trivial slope.
+    rows = compute_pcsg_capacity_curve(
+        traces_by_case_and_model={
+            ("c1", "qwen2.5-3b"): _make_trace(case_id="c1", model_id="qwen2.5-3b", token_logprobs=[-3.0, -3.0, -3.0, -3.0]),
+            ("c1", "qwen2.5-7b"): _make_trace(case_id="c1", model_id="qwen2.5-7b", token_logprobs=[-2.0, -2.0, -2.0, -2.0]),
+            ("c1", "qwen2.5-14b"): _make_trace(case_id="c1", model_id="qwen2.5-14b", token_logprobs=[-1.5, -1.5, -1.5, -1.5]),
+            ("c2", "qwen2.5-3b"): _make_trace(case_id="c2", model_id="qwen2.5-3b", token_logprobs=[-2.5, -2.5, -2.5, -2.5]),
+            ("c2", "qwen2.5-7b"): _make_trace(case_id="c2", model_id="qwen2.5-7b", token_logprobs=[-1.8, -1.8, -1.8, -1.8]),
+            ("c2", "qwen2.5-14b"): _make_trace(case_id="c2", model_id="qwen2.5-14b", token_logprobs=[-1.2, -1.2, -1.2, -1.2]),
+        },
+        params_by_model={
+            "qwen2.5-3b": 3_000_000_000,
+            "qwen2.5-7b": 7_000_000_000,
+            "qwen2.5-14b": 14_000_000_000,
+        },
+    )
+    assert len(rows) == 6
+    # log2(params) and mean_logprob should both be present and positive log scale
+    for r in rows:
+        assert r["log2_params"] > 30  # billions span this region
+        assert r["mean_logprob"] < 0  # logprobs are negative
+
+
+def test_capacity_curve_skips_ineligible_under_intersection():
+    rows = compute_pcsg_capacity_curve(
+        traces_by_case_and_model={
+            ("c1", "qwen2.5-7b"): _make_trace(
+                case_id="c1", raw_token_ids=[100, 200, 300, 400]
+            ),
+            ("c1", "qwen3-8b"): _make_trace(
+                case_id="c1", raw_token_ids=[100, 200, 300, 151667]  # extension
+            ),
+        },
+        params_by_model={"qwen2.5-7b": 7_000_000_000, "qwen3-8b": 8_000_000_000},
+        max_token_id_inclusive=151664,
+    )
+    # Only the qwen2.5-7b row survives the intersection guard
+    assert len(rows) == 1
+    assert rows[0]["model_id"] == "qwen2.5-7b"
+
+
+def test_capacity_curve_rejects_missing_params():
+    with pytest.raises(ValueError, match="params_by_model is missing"):
+        compute_pcsg_capacity_curve(
+            traces_by_case_and_model={
+                ("c1", "qwen2.5-3b"): _make_trace(),
+            },
+            params_by_model={},  # empty
+        )

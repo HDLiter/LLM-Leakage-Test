@@ -8,17 +8,34 @@ Per-model invocation pattern (smoke):
         --vllm-url http://localhost:8000 \
         --output-dir data/pilot/logprob_traces
 
-For the GLM fallback path (vLLM `echo=True` unsupported), pass
-`--backend offline_hf --model-path /data/models/glm-4-9b`.
+Per-model invocation pattern (pilot, after WS4 builds the manifest):
 
-Plan refs: §5.2 step 6 (operator + persistence), §10.2 (no proxy /
-trust_env false), §14.3 (CLI shape).
+    python scripts/ws1_run_logprob.py \
+        --model qwen2.5-7b \
+        --pilot \
+        --pilot-articles data/pilot/manifests/pilot_100_articles.json \
+        --vllm-url http://localhost:8000 \
+        --output-dir data/pilot/logprob_traces
+
+For the GLM fallback path (vLLM `echo=True` unsupported), pass
+`--backend offline_hf --model-path /data/models/glm-4-9b`. By default
+the backend is selected from `config/fleet/r5a_fleet.yaml`'s
+`p_logprob.echo_supported` and `p_logprob.fallback` fields.
+
+Plan refs:
+- §5.2 step 6 (operator + persistence)
+- §5.2 step 7 (smoke gate)
+- §10.2 (no proxy / trust_env false)
+- §14.3 (CLI shape)
+- docs/DECISION_20260427_pcsg_redefinition.md (fleet expansion +
+  trace contract additions + chunked-write resume).
 """
 
 from __future__ import annotations
 
 import argparse
 import asyncio
+import inspect
 import json
 import os
 import sys
@@ -33,11 +50,16 @@ from src.r5a.contracts import AccessTier, ArticleRecord  # noqa: E402
 from src.r5a.fleet import ModelConfig, load_fleet  # noqa: E402
 from src.r5a.operators.p_logprob import (  # noqa: E402
     PLogprobOperator,
+    append_chunk_parquet,
+    consolidate_chunks,
+    existing_case_ids,
     trace_summary,
     write_summary_json,
-    write_traces_parquet,
 )
 from src.r5a.runtime import load_runtime  # noqa: E402
+
+DEFAULT_CHUNK_SIZE = 10  # write a chunk every N successful traces
+DEFAULT_HIDDEN_STATES_SUBSAMPLE = 30  # for WS6 prep on offline_hf paths
 
 
 def parse_args() -> argparse.Namespace:
@@ -53,15 +75,20 @@ def parse_args() -> argparse.Namespace:
     )
     p.add_argument(
         "--backend",
-        choices=["vllm", "offline_hf"],
-        default="vllm",
-        help="backend implementation",
+        choices=["vllm", "offline_hf", "auto"],
+        default="auto",
+        help="backend implementation; 'auto' resolves from fleet config",
     )
     p.add_argument("--vllm-url", default="http://localhost:8000", help="vLLM base URL")
     p.add_argument(
         "--served-model-name",
         default=None,
         help="vLLM --served-model-name; defaults to fleet model_id",
+    )
+    p.add_argument(
+        "--vllm-image-digest",
+        default=None,
+        help="Docker image SHA for the running vLLM container; recorded into trace",
     )
     p.add_argument(
         "--model-path",
@@ -78,6 +105,16 @@ def parse_args() -> argparse.Namespace:
         default="float16",
         help="dtype for offline_hf backend (float16/bfloat16/float32)",
     )
+    p.add_argument(
+        "--extract-hidden-states",
+        action="store_true",
+        help="WS6 prep: capture per-layer hidden states (offline_hf only)",
+    )
+    p.add_argument(
+        "--hidden-states-dir",
+        default=None,
+        help="output directory for .safetensors hidden-state files",
+    )
 
     g = p.add_mutually_exclusive_group(required=True)
     g.add_argument(
@@ -88,7 +125,7 @@ def parse_args() -> argparse.Namespace:
     g.add_argument(
         "--pilot",
         action="store_true",
-        help="use the frozen pilot manifest (WS4)",
+        help="use a frozen pilot manifest (WS4)",
     )
 
     p.add_argument(
@@ -97,9 +134,9 @@ def parse_args() -> argparse.Namespace:
         help="JSON fixture for --smoke",
     )
     p.add_argument(
-        "--manifest",
-        default="data/pilot/manifests/pilot_100_cases.json",
-        help="pilot manifest for --pilot",
+        "--pilot-articles",
+        default="data/pilot/manifests/pilot_100_articles.json",
+        help="JSON of ArticleRecord-shaped rows for --pilot",
     )
     p.add_argument(
         "--output-dir",
@@ -107,10 +144,21 @@ def parse_args() -> argparse.Namespace:
         help="parquet output directory",
     )
     p.add_argument(
+        "--chunk-size",
+        type=int,
+        default=DEFAULT_CHUNK_SIZE,
+        help="write a chunk every N successful traces (resume granularity)",
+    )
+    p.add_argument(
         "--max-concurrency",
         type=int,
         default=None,
         help="overrides runtime.providers.vllm.max_concurrency",
+    )
+    p.add_argument(
+        "--no-resume",
+        action="store_true",
+        help="ignore existing chunks and re-run all cases",
     )
     return p.parse_args()
 
@@ -123,40 +171,71 @@ def _resolve_white_box(model_id: str, fleet_path: str) -> ModelConfig:
             f"P_logprob runs on white-box only; {model_id} is "
             f"{cfg.access.value}. WS2 handles black-box models."
         )
-    if cfg.tokenizer_sha == "<TBD>" or cfg.hf_commit_sha == "<TBD>":
-        print(
-            f"WARNING: {model_id} has unpinned tokenizer_sha or "
-            f"hf_commit_sha; smoke runs are allowed but the pilot "
-            f"manifest must record real SHAs (plan §10.1).",
-            file=sys.stderr,
-        )
     return cfg
+
+
+def _check_pinning_for_pilot(cfg: ModelConfig, args: argparse.Namespace) -> None:
+    """Refuse `--pilot` if any provenance field is still <TBD>.
+
+    Smoke runs are explicitly allowed against a partially-pinned fleet
+    so we can iterate locally; the pilot artifact MUST be reproducible
+    so tighter checks apply. Per plan §10.1.
+    """
+    if not args.pilot:
+        return
+    placeholders = "<TBD>"
+    bad: list[str] = []
+    if cfg.tokenizer_sha == placeholders:
+        bad.append("tokenizer_sha")
+    if cfg.hf_commit_sha == placeholders:
+        bad.append("hf_commit_sha")
+    if bad:
+        raise SystemExit(
+            f"--pilot refused: {cfg.model_id} fleet entry still has "
+            f"placeholder values for: {', '.join(bad)}. Pin them in "
+            "config/fleet/r5a_fleet.yaml before running pilot."
+        )
+
+
+def _decide_backend(args: argparse.Namespace, cfg: ModelConfig) -> str:
+    """Resolve auto/vllm/offline_hf based on fleet `p_logprob` flags."""
+    if args.backend != "auto":
+        return args.backend
+    if cfg.p_logprob is None:
+        raise SystemExit(
+            f"{cfg.model_id} has no p_logprob block in the fleet config; "
+            f"cannot auto-resolve backend"
+        )
+    if cfg.p_logprob.echo_supported:
+        return "vllm"
+    if cfg.p_logprob.fallback == "offline_hf_scorer":
+        return "offline_hf"
+    raise SystemExit(
+        f"{cfg.model_id} echo_supported=False and no offline_hf fallback "
+        f"configured; cannot decide backend"
+    )
 
 
 def _load_articles(args: argparse.Namespace) -> list[ArticleRecord]:
     if args.smoke:
         path = Path(args.fixture)
-        payload = json.loads(path.read_text(encoding="utf-8"))
-        return [ArticleRecord(**row) for row in payload]
-    # --pilot: load the WS4 manifest. WS4 hasn't built it yet, so
-    # this branch will fail until then; keep the surface ready.
-    path = Path(args.manifest)
+    else:
+        path = Path(args.pilot_articles)
     if not path.exists():
+        raise SystemExit(f"article source not found: {path}")
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, list):
         raise SystemExit(
-            f"pilot manifest not found at {path}; "
-            f"WS4 builds it via scripts/sample_phase7_pilot.py"
+            f"{path} must be a JSON array of ArticleRecord-shaped objects"
         )
-    raise SystemExit(
-        "--pilot mode requires loading PilotManifest -> ArticleRecord, "
-        "which depends on the WS4 sampler. Run --smoke for now."
-    )
+    return [ArticleRecord(**row) for row in payload]
 
 
-def _build_backend(args: argparse.Namespace, cfg: ModelConfig):
-    if args.backend == "vllm":
-        # Force NO_PROXY / no_proxy for the vLLM URL; project memory
-        # `feedback_concurrency.md` records that the host proxy
-        # otherwise breaks localhost vLLM connectivity.
+def _build_backend(args: argparse.Namespace, cfg: ModelConfig, runtime, backend_kind: str):
+    timeout_s = runtime.runtime.timeout_seconds
+    retry_max = runtime.runtime.retry_max
+
+    if backend_kind == "vllm":
         for var in ("NO_PROXY", "no_proxy"):
             cur = os.environ.get(var, "")
             host_part = "localhost,127.0.0.1,host.docker.internal"
@@ -172,9 +251,13 @@ def _build_backend(args: argparse.Namespace, cfg: ModelConfig):
             tokenizer_family=cfg.tokenizer_family or "",
             tokenizer_sha=cfg.tokenizer_sha or "",
             hf_commit_sha=cfg.hf_commit_sha or "",
+            quant_scheme=cfg.quant_scheme or "fp16",
+            weight_dtype=None,
+            vllm_image_digest=args.vllm_image_digest,
+            timeout_seconds=timeout_s,
+            max_retries=retry_max,
         )
 
-    # offline_hf
     if not args.model_path:
         raise SystemExit("--backend offline_hf requires --model-path")
     from src.r5a.backends.offline_hf import OfflineHFBackend
@@ -185,58 +268,106 @@ def _build_backend(args: argparse.Namespace, cfg: ModelConfig):
         tokenizer_family=cfg.tokenizer_family or "",
         tokenizer_sha=cfg.tokenizer_sha or "",
         hf_commit_sha=cfg.hf_commit_sha or "",
+        quant_scheme=cfg.quant_scheme or "fp16",
+        weight_dtype=args.torch_dtype,
         device=args.device,
         torch_dtype=args.torch_dtype,
+        extract_hidden_states=args.extract_hidden_states,
+        hidden_states_dir=args.hidden_states_dir,
     )
 
 
 async def run(args: argparse.Namespace) -> int:
     cfg = _resolve_white_box(args.model, args.fleet)
+    _check_pinning_for_pilot(cfg, args)
     runtime = load_runtime(args.runtime)
     if args.max_concurrency is not None:
         max_conc = args.max_concurrency
     else:
-        provider = "vllm" if args.backend == "vllm" else "vllm"
-        max_conc = runtime.provider(provider).max_concurrency
+        max_conc = runtime.provider("vllm").max_concurrency
 
-    articles = _load_articles(args)
-    print(
-        f"model={cfg.model_id} backend={args.backend} "
-        f"n_articles={len(articles)} max_concurrency={max_conc}"
-    )
-
-    backend = _build_backend(args, cfg)
-
-    operator = PLogprobOperator(backend, max_concurrency=max_conc)
-
-    def _progress(done: int, total: int) -> None:
-        print(f"  [{done}/{total}]", end="\r", flush=True)
-
-    started = datetime.now(timezone.utc)
-    try:
-        traces = await operator.compute(articles, progress=_progress)
-    finally:
-        # vLLM backend exposes async close; HF backend has none
-        close = getattr(backend, "aclose", None)
-        if close is not None:
-            await close()
-    print()
+    articles_all = _load_articles(args)
+    backend_kind = _decide_backend(args, cfg)
+    mode_tag = "smoke" if args.smoke else "pilot"
 
     out_dir = Path(args.output_dir)
-    mode_tag = "smoke" if args.smoke else "pilot"
-    parquet_path = out_dir / f"{cfg.model_id}__{mode_tag}.parquet"
+    chunks_dir = out_dir / f"{cfg.model_id}__{mode_tag}__chunks"
+    final_path = out_dir / f"{cfg.model_id}__{mode_tag}.parquet"
     summary_path = out_dir / f"{cfg.model_id}__{mode_tag}.summary.json"
 
-    write_traces_parquet(traces, parquet_path)
-    summary = trace_summary(traces)
+    if args.no_resume:
+        already_done: set[str] = set()
+    else:
+        already_done = existing_case_ids(chunks_dir)
+
+    todo = [a for a in articles_all if a.case_id not in already_done]
+    skipped = len(articles_all) - len(todo)
+    print(
+        f"model={cfg.model_id} backend={backend_kind} mode={mode_tag} "
+        f"n_articles={len(articles_all)} resumed_done={skipped} "
+        f"to_run={len(todo)} max_concurrency={max_conc} "
+        f"chunk_size={args.chunk_size}"
+    )
+
+    if not todo:
+        print("nothing to do; all cases already in chunks. Consolidating.")
+        if (chunks_dir).exists():
+            consolidate_chunks(chunks_dir, final_path)
+            print(f"wrote consolidated {final_path}")
+        return 0
+
+    backend = _build_backend(args, cfg, runtime, backend_kind)
+    operator = PLogprobOperator(backend, max_concurrency=max_conc)
+
+    started = datetime.now(timezone.utc)
+    n_done_total = skipped
+    pending: list = []
+
+    def _progress(done: int, total: int) -> None:
+        # done is per-batch local; n_done_total is global
+        print(f"  batch [{done}/{total}]  global={n_done_total + done}", end="\r", flush=True)
+
+    try:
+        # Process in chunks so a crash mid-pilot only loses the in-flight batch.
+        chunk_size = max(1, args.chunk_size)
+        for start in range(0, len(todo), chunk_size):
+            batch = todo[start : start + chunk_size]
+            traces = await operator.compute(batch, progress=_progress)
+            print()
+            if traces:
+                path = append_chunk_parquet(traces, chunks_dir)
+                n_done_total += len(traces)
+                print(
+                    f"chunk written: {path.name}  "
+                    f"({len(traces)} traces, global={n_done_total}/{len(articles_all)})"
+                )
+                pending.extend(traces)
+    finally:
+        for closer in ("aclose", "close"):
+            fn = getattr(backend, closer, None)
+            if fn is None:
+                continue
+            try:
+                if inspect.iscoroutinefunction(fn):
+                    await fn()
+                else:
+                    fn()
+            except Exception as exc:  # pragma: no cover  (cleanup-best-effort)
+                print(f"backend {closer}() raised {exc!r}", file=sys.stderr)
+
+    # Consolidate all chunks into a single Parquet for downstream readers.
+    if (chunks_dir).exists():
+        consolidate_chunks(chunks_dir, final_path)
+        print(f"consolidated -> {final_path}")
+
+    summary = trace_summary(pending)
     summary["mode"] = mode_tag
     summary["started_at"] = started.isoformat()
     summary["finished_at"] = datetime.now(timezone.utc).isoformat()
+    summary["resumed_done"] = skipped
+    summary["written_this_run"] = len(pending)
     write_summary_json(summary, summary_path)
-
-    print(f"wrote {parquet_path}")
-    print(f"wrote {summary_path}")
-    print(json.dumps(summary, indent=2, default=str))
+    print(f"summary -> {summary_path}")
     return 0
 
 

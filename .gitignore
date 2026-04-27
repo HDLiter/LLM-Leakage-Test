@@ -25,6 +25,15 @@ __pycache__/
 # Large datasets
 data/cls_telegraph_raw/
 
+# Path-E cutoff probe fixtures (CLS-content-heavy; regenerable via
+# scripts/build_cutoff_probe_set.py against the local CLS corpus)
+data/pilot/cutoff_probe/probe_set_*.json
+data/pilot/cutoff_probe/traces/
+data/pilot/cutoff_probe/cutoff_observed.json
+
+# WS1 main pilot logprob traces (GPU-derived, regenerable)
+data/pilot/logprob_traces/
+
 # Related papers (PDFs are large and re-downloadable; INDEX.md is tracked)
 related papers/*.pdf
 

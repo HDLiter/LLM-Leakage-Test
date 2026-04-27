@@ -71,10 +71,12 @@ def report_fleet(fleet) -> None:
     print(f"yaml_sha256:   {fleet.raw_yaml_sha256[:12]}...")
     print(f"white_box ({len(white_box)}): {', '.join(white_box)}")
     print(f"black_box ({len(black_box)}): {', '.join(black_box)}")
-    if len(white_box) != 5 or len(black_box) != 4:
+    # Post-2026-04-27 expansion: 10 white-box (5 Qwen2.5 + 4 Qwen3 + 1 GLM)
+    # and 4 black-box. See docs/DECISION_20260427_pcsg_redefinition.md.
+    if len(white_box) != 10 or len(black_box) != 4:
         print(
-            "WARNING: fleet does not match the frozen 5+4 split "
-            "(R5A_FROZEN_SHORTLIST.md §1)",
+            "WARNING: fleet does not match the post-expansion 10+4 split "
+            "(docs/DECISION_20260427_pcsg_redefinition.md)",
             file=sys.stderr,
         )
 

@@ -1,29 +1,44 @@
 ---
-title: WS1 Cloud Execution Plan — P_logprob on AutoDL A6000
+title: WS1 Cloud Execution Plan — P_logprob on AutoDL RTX PRO 6000
 stage: Phase 7 / WS1
 date: 2026-04-26
-status: APPROVED — local Stage 0 implementation in progress
+last_amended: 2026-04-27
+status: APPROVED — Stage 0 in progress; revised for fleet expansion + GPU upgrade
 authority: plans/phase7-pilot-implementation.md §5.2 (WS1 spec)
 related_decisions:
   - docs/DECISION_20260426_phase7_interfaces.md (WS0 sign-off)
-gpu_decision: A6000 48GB single-card on AutoDL
+  - docs/DECISION_20260427_pcsg_redefinition.md (PCSG redefinition + fleet expansion + Path E + WS6 conditional)
+gpu_decision: RTX PRO 6000 (Blackwell, 96 GB) single-card on AutoDL
 quantization_decision:
-  qwen_family: AWQ-INT4 (official Qwen AWQ checkpoints)
-  glm_family:  fp16 (no official GLM-4-9B AWQ; AWQ run aborted)
-budget_cap_usd: 20
+  qwen2_5_family: AWQ-INT4 (5 sizes — official Qwen AWQ)
+  qwen3_family:   AWQ-INT4 (4 sizes — official Qwen AWQ; 1.7B not available officially, skipped)
+  glm_family:     fp16 (no official GLM-4-9B AWQ)
+budget_cap_usd: 30  # raised from 20 to accommodate 10-model + Path E run
 ---
 
 # WS1 Cloud Execution Plan
 
 ## 1. Goal
 
-Produce token-level `LogProbTrace` parquet artifacts for all 5 white-box
-fleet members on the Phase 7 pilot articles (baseline only, no
-perturbation), then derive `E_CTS` per-model and `E_PCSG` on the two
-tokenizer-matched temporal pairs. WS1 hands these to WS5 for confirmatory
-analysis. Successful WS1 closes plan §13 exit-gate item 3 ("`P_logprob`
-succeeds on all 5 white-box models with pinned tokenizer/checkpoint
-provenance").
+Produce token-level `LogProbTrace` parquet artifacts for all **10 white-box
+fleet members** (post-2026-04-27 expansion) on the Phase 7 pilot articles
+(baseline only, no perturbation), then derive:
+
+- `E_CTS` per model (absolute familiarity)
+- `E_PCSG` on the **cross-version Qwen pair** `(qwen2.5-7B, qwen3-8B)`
+  (primary confirmatory temporal contrast — see
+  `docs/DECISION_20260427_pcsg_redefinition.md`)
+- `E_PCSG_capacity_curve` (exploratory) on Qwen2.5 `[1.5, 3, 7, 14, 32]B`
+  and Qwen3 `[4, 8, 14, 32]B` capacity members
+
+WS1 also runs the **Path-E empirical cutoff probe** in the same cloud
+session, on the same instance, to localize `cutoff_observed` for each
+white-box model.
+
+WS1 hands these to WS5 for confirmatory analysis. Successful WS1 closes
+plan §13 exit-gate item 3 ("`P_logprob` succeeds on all 10 white-box
+models with pinned tokenizer/checkpoint provenance, and Path-E
+`cutoff_observed` published").
 
 ## 2. Platform
 
@@ -39,28 +54,34 @@ Anthropic exposes no logprobs). P_logprob requires direct vLLM access.
 
 | Decision | Value | Reason |
 |---|---|---|
-| GPU | A6000 48 GB single card | GLM-4-9B fp16 ≈ 18 GB weights + KV/activation overhead; 4090 24 GB is the OOM-risk knife edge. Differential cost is ~$1.5; not worth the swap-mid-pilot risk |
-| Qwen2.5/3 quant | AWQ-INT4 (official `Qwen/*-AWQ` checkpoints) | All four AWQ repos verified existent (2026-04-26 web check) |
-| GLM quant | fp16 (no official AWQ) | Search 2026-04-26 returned only GGUF and unofficial community AWQs; not worth the risk for a model that anchors no E_PCSG pair |
+| GPU | **RTX PRO 6000 (Blackwell, 96 GB) single card** on AutoDL | AutoDL availability check 2026-04-27 showed RTX PRO 6000 with 225/1580 free instances (highest availability; A6000 unavailable, 4090 zeroed). 96 GB lets us load Qwen2.5-32B / Qwen3-32B AWQ comfortably alongside hidden-state extraction headroom for WS6 prep. |
+| Qwen2.5 quant | AWQ-INT4 (5 sizes: 1.5B, 3B, 7B, 14B, 32B; all Alibaba-official) | HF verified 2026-04-27 |
+| Qwen3 quant | AWQ-INT4 (4 sizes: 4B, 8B, 14B, 32B; all Alibaba-official). **Qwen3-1.7B-AWQ does not exist as Alibaba-official; skipped** to avoid mixing precision within-family | HF verified 2026-04-27 |
+| GLM quant | fp16 (no official AWQ) | Same as before |
 
-**E_PCSG validity**: only matters that *within* a tokenizer pair, both
-models share the same quant scheme. Qwen2.5-7B and Qwen2.5-14B are both
-AWQ; Qwen3-8B and Qwen3-14B are both AWQ. GLM-4-9B is not part of any
-pair (different tokenizer family). E_CTS is per-model self-scaled, so
-mixed precision across the fleet is acceptable as long as quantization
-is recorded in the run manifest.
+**E_PCSG (cross-version) validity**: relies on the `Qwen2Tokenizer`
+class being shared between Qwen2.5 and Qwen3 with byte-identical core
+vocab IDs `0..151664`. AWQ-INT4 is identical across both families. Probe
+articles tokenizing to IDs in `[151665, 151668]` (the Qwen3 extension
+tokens) are excluded from PCSG (kept for E_CTS).
+
+**E_PCSG_capacity_curve validity**: each capacity pair holds tokenizer
++ cutoff + paradigm fixed, varies only parameter count. Qwen2.5 family
+gives 5 log-spaced points; Qwen3 gives 4. Both run as a single
+within-family OLS regression of paired logprob delta on `log₂(params)`.
 
 ## 4. Cost projection
 
 | Component | Estimate |
 |---|---|
-| A6000 instance @ ~¥3.5/hr × 7 hr | ~¥24.5 (~$3.5) |
-| 50 GB persistent data disk × 24 hr | ~¥12 (~$1.7) |
-| **Expected total** | **~$5** |
-| **Hard stop budget** | **$20** |
+| RTX PRO 6000 @ ~¥8/hr × 12 hr (10 models pilot + Path E + smoke + provisioning) | ~¥96 (~$13) |
+| 100 GB persistent data disk × 36 hr (extra room for 10 model checkpoints + Path E artifacts) | ~¥18 (~$2.5) |
+| **Expected total** | **~$15** |
+| **Hard stop budget** | **$30** |
 
-Stop and review if 80% of budget is consumed before all 5 models close
-their pilot loop. Same posture as plan §11.3.
+Stop and review if 80% of budget is consumed before all 10 models close
+their pilot loop. Path E shares the same instance — if budget is tight,
+defer Path E to a separate later run.
 
 ## 5. Stages
 
@@ -95,15 +116,25 @@ Stage 0 exit: pytest green; smoke fixture produces 30 valid records.
 3. Sanity: `nvidia-smi` confirms A6000; `vllm --version` matches the
    pinned image.
 
-### Stage 2 — Per-model loop (5-6 hr, sequential)
+### Stage 2 — Per-model loop (~9-10 hr, sequential)
 
-Same flow per model, in this order (low-risk first):
+Same flow per model, in this order (low-risk first, batch by family for warm checkpoint cache):
 
-1. `qwen2.5-7b` — already verified on local Thales container; confidence baseline
-2. `qwen2.5-14b` — same family, larger
-3. `qwen3-8b` — first verification of `enable_thinking=False` (irrelevant for completion endpoint, recorded as constant in trace)
-4. `qwen3-14b` — same as 3, larger
-5. `glm-4-9b` — first verification of vLLM `echo=True` support; if it fails, fall back to `offline_hf` backend with the same checkpoint SHA
+1. `qwen2.5-7b` — already verified on local Thales container; **smoke** + **pilot** (ground-truth anchor)
+2. `qwen2.5-3b` — same family, smaller; smoke + pilot
+3. `qwen2.5-1.5b` — same family, smallest Qwen2.5 capacity-curve point; smoke + pilot
+4. `qwen2.5-14b` — same family, larger; smoke + pilot
+5. `qwen2.5-32b` — same family, largest Qwen2.5; smoke + pilot
+6. `qwen3-8b` — first verification of `enable_thinking=False` (irrelevant for completion endpoint, recorded as constant in trace); smoke + pilot
+7. `qwen3-4b` — same family, smaller; smoke + pilot
+8. `qwen3-14b` — same family, larger; smoke + pilot
+9. `qwen3-32b` — same family, largest Qwen3; smoke + pilot
+10. `glm-4-9b` — first verification of vLLM `echo=True` support; if it fails, fall back to `offline_hf` backend with the same checkpoint SHA
+
+**Hidden-state extraction (WS6 prep)**: for each white-box model, additionally save
+per-layer hidden states for a **30-article subset** of the pilot manifest. This
+adds ~5 minutes per model (30 articles × layer-count × hidden-dim, fp16) and
+~2 GB disk per model. Total ~20 GB extra, well within 100 GB persistent disk.
 
 Per-model script:
 
@@ -136,21 +167,50 @@ Smoke gate per model:
 - `thinking_mode == "off"` written on every record
 - E_CTS, E_PCSG calculable end-to-end on the smoke set
 
-### Stage 3 — Local re-derivation (no GPU; 1 hr)
+### Stage 2.5 — Path E empirical cutoff probe (~1.5 hr, same instance)
 
-After all 5 traces are downloaded:
+Runs after the main per-model pilot loop, before instance teardown:
+
+```bash
+python scripts/build_cutoff_probe_set.py \
+  --source $CLS_RAW \
+  --months 2023-01..2025-12 \
+  --per-month 60 \
+  --output /data/probe/cutoff_probe_set.json
+
+python scripts/run_cutoff_probe.py \
+  --probe /data/probe/cutoff_probe_set.json \
+  --models qwen2.5-1.5b,...,glm-4-9b \
+  --vllm-url http://localhost:8000 \
+  --output /data/probe/month_stratified_scores.parquet
+```
+
+Reuses the same vLLM container per model; sequentially swaps through all
+10 white-box. Min-K% computed inline, P_extract via prompt invocation.
+Knee detection runs locally back home.
+
+### Stage 3 — Local re-derivation (no GPU; 2 hr)
+
+After all 10 traces and Path E artifacts are downloaded:
 
 ```bash
 python scripts/ws1_compute_metrics.py \
   --traces data/pilot/logprob_traces \
   --output data/pilot/analysis
+
+python scripts/ws1_compute_cutoff_observed.py \
+  --probe data/pilot/cutoff_probe/month_stratified_scores.parquet \
+  --output data/pilot/cutoff_probe/cutoff_observed.json
 ```
 
 Produces:
 - `data/pilot/analysis/e_cts.parquet` — per (case, model) Min-K% scores
-- `data/pilot/analysis/e_pcsg.parquet` — per (case, qwen pair) paired logprob gap
+- `data/pilot/analysis/e_pcsg_temporal.parquet` — per case, cross-version pair paired logprob delta
+- `data/pilot/analysis/e_pcsg_capacity_curve.parquet` — per (case, family, params) capacity-curve regression input
+- `data/pilot/cutoff_probe/cutoff_observed.json` — per-model empirical cutoff date + knee width
 
-Plan §5.2 exit: <1% un-recovered trace failures across the 5 models.
+Plan §5.2 exit: <1% un-recovered trace failures across the 10 models +
+`cutoff_observed` populated for every white-box model.
 
 ### Stage 4 — Teardown
 

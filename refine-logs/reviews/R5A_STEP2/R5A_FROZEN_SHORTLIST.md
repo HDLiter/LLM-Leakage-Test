@@ -2,10 +2,13 @@
 title: R5A Frozen Conceptual Shortlist
 stage: R5A Step 2 closure
 date: 2026-04-16
-status: FROZEN — conceptual scope locked; implementation scope determined at pilot
+last_amended: 2026-04-27
+status: FROZEN — conceptual scope locked; PCSG redefined per amendment; implementation scope determined at pilot
 author: Claude Code orchestrator + user design input
 supersedes: R5A_STEP2_SYNTHESIS.md §3 shortlist, MEASUREMENT_FRAMEWORK.md §9 partition
 depends_on: MEASUREMENT_FRAMEWORK.md (four-layer framework definitions)
+amendments:
+  - "2026-04-27 (docs/DECISION_20260427_pcsg_redefinition.md): E_PCSG redefined as cross-version Qwen pair on token-intersection vocab; E_PCSG_capacity_curve added as exploratory; fleet expanded to 10 white-box; cutoff dates flagged as operator-asserted pending Path-E empirical probe"
 session_decisions:
   - "P_schema: Continuation RESERVE (pilot-gated appendix), Cloze DEFER, QA DEFER"
   - "E_TDR: redefined as mixed-model interaction term (cutoff × dose), not standalone estimand"
@@ -34,10 +37,12 @@ Multiplicity control: Westfall-Young stepdown max-T across the 20-coefficient fa
 | Estimand | Operator | Perturbation | What it measures | Conditional? |
 |---|---|---|---|---|
 | **E_CMMD** | P_predict | — | Cutoff-monotone fleet disagreement on sentiment/alpha predictions | No |
-| **E_PCSG** | P_logprob | — | Paired cutoff surprise gap (late-model − early-model logprob, same tokenizer) | No |
+| **E_PCSG** | P_logprob | — | Paired cutoff surprise gap on the **cross-version Qwen pair `(qwen2.5-7B, qwen3-8B)`**, restricted to articles whose tokens stay in the Qwen2Tokenizer base vocab (`max_token_id ≤ 151664`). See amendment below. | No |
 | **E_CTS** | P_logprob | — | Calibrated tail surprise (Min-K++/CTS absolute familiarity) | No |
 | **E_FO** | P_predict | C_FO | False outcome resistance: does the model ignore visible counterfactual evidence? | Yes — C_FO quality gate |
 | **E_NoOp** | P_predict | C_NoOp | NoOp sensitivity: does irrelevant clutter change the prediction? | Yes — C_NoOp quality gate |
+
+> **Amendment 2026-04-27 (PCSG)**. The original same-tokenizer same-cutoff pairs `(qwen2.5-7B, qwen2.5-14B)` and `(qwen3-8B, qwen3-14B)` do not provide a cutoff-exposure differential — they share cutoff dates within-pair. The Stats lens of the WS0/WS1 code review identified this as a measurement-design defect. PCSG is therefore re-anchored on the cross-version Qwen pair, which (i) shares the `Qwen2Tokenizer` class with byte-identical core vocab `0..151664`, (ii) differs in cutoff (`2023-10-31` operator-asserted vs `2025-01-31` operator-asserted; both subject to Path-E empirical probe), and (iii) keeps the same dense topology and instruct paradigm. The same-cutoff within-version pairs are **not discarded** — they are repurposed as the `E_PCSG_capacity_curve` exploratory estimand (§3) measuring capacity-mediated memorization (Carlini 2021/2022). See `docs/DECISION_20260427_pcsg_redefinition.md`.
 
 ### 4 core factors (each estimand tested against all 4)
 
@@ -51,6 +56,8 @@ Multiplicity control: Westfall-Young stepdown max-T across the 20-coefficient fa
 ### E_CTS + E_PCSG co-presence rationale
 
 Both share P_logprob traces (zero marginal cost). E_CTS provides literature anchor (Min-K++, ICLR 2024/2025). E_PCSG provides the better-identified paired contrast. Pre-registered interpretation: report as progressive narrative ("absolute → paired"), not independent discoveries.
+
+The 2026-04-27 PCSG redefinition does **not** invalidate this rationale. The cross-version pair shares the same `Qwen2Tokenizer` class and the analysis restricts to common-vocab articles, so paired identification is preserved. The cost is one new caveat in pre-registration: E_PCSG now also reflects pretraining-recipe / training-data-composition differences between Qwen2.5 and Qwen3 in addition to cutoff exposure, which we control for through `E_PCSG_capacity_curve` and the Path-E empirical cutoff probe.
 
 ---
 
@@ -84,9 +91,11 @@ Both share P_logprob traces (zero marginal cost). E_CTS provides literature anch
 
 | Estimand | Operator | Perturbation | Status | Notes |
 |---|---|---|---|---|
+| **E_PCSG_capacity_curve** | P_logprob | — | Exploratory (added 2026-04-27) | log₂(params)-regression of paired logprob delta within-version (cutoff held fixed). Carlini-style capacity-memorization scaling. Members: Qwen2.5 `[1.5B, 3B, 7B, 14B, 32B]` (5 points) and Qwen3 `[4B, 8B, 14B, 32B]` (4 points). Reuses the same `LogProbTrace` artifacts as E_PCSG and E_CTS. |
 | **E_SR** | P_predict | C_SR | Exploratory | Secondary to E_FO within counterfactual family |
 | **E_EAD_t** | P_predict | C_anon (target) | Exploratory | Identity-keyed memory; C_anon multi-level gradient (L0-L4) enables dose-response analysis |
 | **E_EAD_nt** | P_predict | C_anon (non-target) | Exploratory | Competing-entity distraction |
+| **E_FO_mech** (DS / KL / patch) | P_logprob + offline-HF hidden states | C_FO | Exploratory, conditional (added 2026-04-27) | Layer-wise localization of memorization-vs-evidence override (Wang et al. 2025 methodology adapted). Triggered only if behavioral E_FO clears its quality gate (mean \|delta\| > 0 on ≥ 5/9 models). See `docs/DECISION_20260427_pcsg_redefinition.md` §2.5. |
 | **E_ADG** | P_predict | C_ADG + C_temporal | Reserve (see §4) | Temporal gate compliance |
 | **E_ADG_conflict** | P_predict | C_ADG | Diagnostic only | Prompt-date vs text-date conflict resolution pattern; never enters statistical model |
 | **E_TDR** | — | C_temporal | Not a standalone estimand | Redefined as cutoff × dose interaction term in mixed-effects model (see §5) |
@@ -176,10 +185,10 @@ Where:
 
 | ID | Operator | Access | Fleet | Status |
 |---|---|---|---|---|
-| P_logprob | Token tail surprise (Min-K++/CTS) | White-box | 5 models | Confirmed |
-| P_predict | Standardized sentiment/alpha prediction | Black-box sufficient | 9 models | Confirmed |
-| P_extract | Masked span completion | Black-box sufficient | 9 models | Confirmed |
-| P_schema | CLS prefix continuation | Black-box sufficient | 9 models | Candidate (reserve) |
+| P_logprob | Token tail surprise (Min-K++/CTS) + cross-version PCSG + capacity curve | White-box | **10 models** (post-2026-04-27 expansion: 5 Qwen2.5 + 4 Qwen3 + 1 GLM) | Confirmed |
+| P_predict | Standardized sentiment/alpha prediction | Black-box sufficient | **14 models** (10 white-box + 4 black-box) | Confirmed |
+| P_extract | Masked span completion | Black-box sufficient | **14 models** | Confirmed; also reused for Path-E empirical cutoff probe |
+| P_schema | CLS prefix continuation | Black-box sufficient | **14 models** | Candidate (reserve) |
 
 ### Perturbations (6 confirmed)
 

@@ -59,7 +59,7 @@ Phase 7 is **not** the main benchmark and not a license to revise the frozen sho
 | English expansion | No bilingual or English corpus work |
 | Non-financial negative control | `BL3` is stretch only; it is not a Phase 8 gate unless a low-cost corpus is already available |
 | Large UI product work | No bespoke labeling platform beyond a lightweight local review app and audit export tools |
-| Model-fleet changes | No changes to the frozen 9-model fleet unless a provider becomes unavailable and a separate `DECISION_20260417_*` memo is approved |
+| Model-fleet changes | The fleet was expanded on 2026-04-27 from 9 → 14 models (10 white-box + 4 black-box) per `docs/DECISION_20260427_pcsg_redefinition.md`. No further fleet changes within Phase 7 unless a provider becomes unavailable and a separate `DECISION_*` memo is approved. |
 
 ### 2.3 Why the default pilot size is 100
 
@@ -132,7 +132,7 @@ The ML Engineer feasibility gate should occur twice:
 |---|---|---|
 | code | `src/r5a/contracts.py`, `src/r5a/fleet.py`, `src/r5a/runtime.py` | typed contracts plus shared fleet/runtime loaders |
 | config | `config/fleet/r5a_fleet.yaml`, `config/runtime/r5a_runtime.yaml`, `config/pilot_sampling.yaml` | authoritative model/runtime/sampling registry |
-| doc | `docs/DECISION_20260417_phase7_interfaces.md` | signs off interface names and manifest fields before feature work |
+| doc | `docs/DECISION_20260426_phase7_interfaces.md` (signed 2026-04-26) | signs off interface names and manifest fields before feature work |
 
 ### Steps and decision points
 
@@ -158,7 +158,7 @@ Decision point: if the WS0 interface review reveals that `src/llm_client.py` can
 - Fleet and runtime manifests validate with no missing required fields.
 - Smoke harness completes at least one provider handshake for local vLLM and one API provider.
 - The WS0 feasibility gate records `>= 95%` strict-JSON parse success on the frozen zero-shot 20-case `P_predict` smoke set.
-- `docs/DECISION_20260417_phase7_interfaces.md` is signed before WS1-WS3 full coding starts.
+- `docs/DECISION_20260426_phase7_interfaces.md` is signed before WS1-WS3 full coding starts.
 
 ### Risks and mitigations
 
@@ -1215,7 +1215,7 @@ models:
     access: white_box
     provider: vllm
     cutoff_date: 2025-01-31
-    tokenizer_family: qwen
+    tokenizer_family: qwen3
     tokenizer_sha: <tokenizer-sha>
     hf_commit_sha: <model-sha>
     p_logprob:
@@ -1231,7 +1231,7 @@ models:
     access: white_box
     provider: vllm
     cutoff_date: 2025-01-31
-    tokenizer_family: qwen
+    tokenizer_family: qwen3
     tokenizer_sha: <tokenizer-sha>
     hf_commit_sha: <model-sha>
     p_logprob:

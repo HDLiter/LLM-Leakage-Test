@@ -51,7 +51,14 @@ class ModelConfig(BaseModel):
     access: AccessTier
     provider: str
     cutoff_date: date
+    cutoff_source: Literal[
+        "vendor_stated",
+        "community_paraphrase",
+        "operator_inferred",
+    ] = "operator_inferred"
     api_model_name: str | None = None  # explicit string passed to the provider
+    hf_repo: str | None = None  # for white-box; resolved by huggingface-cli download
+    quant_scheme: Literal["fp16", "bf16", "fp32", "AWQ-INT4", "GPTQ-INT4"] | None = None
     tokenizer_family: str | None = None
     tokenizer_sha: str | None = None
     hf_commit_sha: str | None = None
@@ -62,11 +69,31 @@ class ModelConfig(BaseModel):
         return self.access is AccessTier.WHITE_BOX
 
 
+class PCSGPair(BaseModel):
+    """One pair declaration for the PCSG analysis layer.
+
+    `temporal` pairs identify cutoff-exposure differential (primary
+    confirmatory PCSG signal). `capacity` pairs hold cutoff fixed and
+    vary parameter count (exploratory PCSG_capacity_curve).
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: str
+    role: Literal["temporal", "capacity"]
+    early: str | None = None  # required for `role=temporal`
+    late: str | None = None   # required for `role=temporal`
+    members: list[str] | None = None  # required for `role=capacity`
+    tokenizer_compat: str  # e.g. "qwen2_class" — backend-validated label
+    max_token_id_inclusive: int  # any article tokenizing to ID > this is rejected
+
+
 class FleetConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     fleet_version: str
     models: dict[str, ModelConfig]
+    pcsg_pairs: list[PCSGPair] = Field(default_factory=list)
     raw_yaml_sha256: str = Field(default="")  # populated by `load_fleet`
 
     def get(self, model_id: str) -> ModelConfig:
@@ -79,6 +106,12 @@ class FleetConfig(BaseModel):
 
     def black_box_ids(self) -> list[str]:
         return [mid for mid, m in self.models.items() if not m.is_white_box()]
+
+    def temporal_pairs(self) -> list[PCSGPair]:
+        return [p for p in self.pcsg_pairs if p.role == "temporal"]
+
+    def capacity_pairs(self) -> list[PCSGPair]:
+        return [p for p in self.pcsg_pairs if p.role == "capacity"]
 
 
 def _normalize_models(raw: dict) -> dict:
@@ -106,6 +139,7 @@ def load_fleet(path: str | Path) -> FleetConfig:
 __all__ = [
     "FleetConfig",
     "ModelConfig",
+    "PCSGPair",
     "PLogprobModelConfig",
     "PPredictModelConfig",
     "load_fleet",

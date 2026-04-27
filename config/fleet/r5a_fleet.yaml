@@ -1,28 +1,78 @@
-# R5A frozen 9-model fleet (plan v2.2 §14.2, operator schema §7).
+# R5A fleet — 10 white-box + 4 black-box (post-2026-04-27 expansion).
 #
 # Authority: this file is the single source of truth for per-model and
 # per-operator behavior. Adapters must read thinking control, prompt
 # overlay policy, route locks, echo support, and offline fallbacks from
 # here rather than duplicating them in code.
 #
+# Cutoff provenance: every `cutoff_date` carries a `cutoff_source` tag.
+# Almost no vendor states a precise cutoff; treat all `community_paraphrase`
+# and `operator_inferred` values as inputs to the path-E empirical cutoff
+# probe rather than ground truth. See
+# docs/DECISION_20260427_pcsg_redefinition.md and
+# refine-logs/reviews/PCSG_PAIR_HUNT/open_source_landscape.md.
+#
 # `<TBD>` placeholders are pinned at run time per plan §10.1 and recorded
 # in the run manifest. Do not commit a confirmatory run with `<TBD>`
 # values still in place.
 
-fleet_version: "r5a-v1.0-2026-04-26"
+fleet_version: "r5a-v2.0-2026-04-27"
 
 models:
 
-  # ---- White-box (5) -----------------------------------------------------
+  # ---- White-box: Qwen2.5 capacity curve (5 points: 1.5/3/7/14/32 B) ------
+
+  qwen2.5-1.5b:
+    family: qwen
+    access: white_box
+    provider: vllm
+    cutoff_date: 2023-10-31
+    cutoff_source: community_paraphrase  # HaoooWang/llm-knowledge-cutoff-dates
+    tokenizer_family: qwen
+    tokenizer_sha: <TBD>
+    hf_commit_sha: <TBD>
+    hf_repo: Qwen/Qwen2.5-1.5B-Instruct-AWQ
+    quant_scheme: AWQ-INT4
+    p_logprob:
+      thinking_control: default_off
+      prompt_overlay_policy: none
+      route_lock_required: hf_commit_sha
+      echo_supported: true
+    p_predict:
+      thinking_control: default_deployed
+      prompt_overlay_policy: baseline_only
+
+  qwen2.5-3b:
+    family: qwen
+    access: white_box
+    provider: vllm
+    cutoff_date: 2023-10-31
+    cutoff_source: community_paraphrase
+    tokenizer_family: qwen
+    tokenizer_sha: <TBD>
+    hf_commit_sha: <TBD>
+    hf_repo: Qwen/Qwen2.5-3B-Instruct-AWQ
+    quant_scheme: AWQ-INT4
+    p_logprob:
+      thinking_control: default_off
+      prompt_overlay_policy: none
+      route_lock_required: hf_commit_sha
+      echo_supported: true
+    p_predict:
+      thinking_control: default_deployed
+      prompt_overlay_policy: baseline_only
 
   qwen2.5-7b:
     family: qwen
     access: white_box
     provider: vllm
     cutoff_date: 2023-10-31
+    cutoff_source: community_paraphrase
     tokenizer_family: qwen
     tokenizer_sha: <TBD>
     hf_commit_sha: <TBD>
+    hf_repo: Qwen/Qwen2.5-7B-Instruct-AWQ
+    quant_scheme: AWQ-INT4
     p_logprob:
       thinking_control: default_off
       prompt_overlay_policy: none
@@ -37,11 +87,58 @@ models:
     access: white_box
     provider: vllm
     cutoff_date: 2023-10-31
+    cutoff_source: community_paraphrase
     tokenizer_family: qwen
     tokenizer_sha: <TBD>
     hf_commit_sha: <TBD>
+    hf_repo: Qwen/Qwen2.5-14B-Instruct-AWQ
+    quant_scheme: AWQ-INT4
     p_logprob:
       thinking_control: default_off
+      prompt_overlay_policy: none
+      route_lock_required: hf_commit_sha
+      echo_supported: true
+    p_predict:
+      thinking_control: default_deployed
+      prompt_overlay_policy: baseline_only
+
+  qwen2.5-32b:
+    family: qwen
+    access: white_box
+    provider: vllm
+    cutoff_date: 2023-10-31
+    cutoff_source: community_paraphrase
+    tokenizer_family: qwen
+    tokenizer_sha: <TBD>
+    hf_commit_sha: <TBD>
+    hf_repo: Qwen/Qwen2.5-32B-Instruct-AWQ
+    quant_scheme: AWQ-INT4
+    p_logprob:
+      thinking_control: default_off
+      prompt_overlay_policy: none
+      route_lock_required: hf_commit_sha
+      echo_supported: true
+    p_predict:
+      thinking_control: default_deployed
+      prompt_overlay_policy: baseline_only
+
+  # ---- White-box: Qwen3 capacity curve (4 points: 4/8/14/32 B) -----------
+  # Note: Qwen3-1.7B has no Alibaba-official AWQ; including it would mix
+  # quantization within-family and confound the capacity curve. Skipped.
+
+  qwen3-4b:
+    family: qwen
+    access: white_box
+    provider: vllm
+    cutoff_date: 2025-01-31
+    cutoff_source: operator_inferred
+    tokenizer_family: qwen3
+    tokenizer_sha: <TBD>
+    hf_commit_sha: <TBD>
+    hf_repo: Qwen/Qwen3-4B-AWQ
+    quant_scheme: AWQ-INT4
+    p_logprob:
+      thinking_control: append_no_think_sentinel
       prompt_overlay_policy: none
       route_lock_required: hf_commit_sha
       echo_supported: true
@@ -54,9 +151,12 @@ models:
     access: white_box
     provider: vllm
     cutoff_date: 2025-01-31
+    cutoff_source: operator_inferred
     tokenizer_family: qwen3
     tokenizer_sha: <TBD>
     hf_commit_sha: <TBD>
+    hf_repo: Qwen/Qwen3-8B-AWQ
+    quant_scheme: AWQ-INT4
     p_logprob:
       thinking_control: append_no_think_sentinel
       prompt_overlay_policy: none
@@ -71,9 +171,12 @@ models:
     access: white_box
     provider: vllm
     cutoff_date: 2025-01-31
+    cutoff_source: operator_inferred
     tokenizer_family: qwen3
     tokenizer_sha: <TBD>
     hf_commit_sha: <TBD>
+    hf_repo: Qwen/Qwen3-14B-AWQ
+    quant_scheme: AWQ-INT4
     p_logprob:
       thinking_control: append_no_think_sentinel
       prompt_overlay_policy: none
@@ -83,14 +186,39 @@ models:
       thinking_control: default_deployed
       prompt_overlay_policy: baseline_only
 
+  qwen3-32b:
+    family: qwen
+    access: white_box
+    provider: vllm
+    cutoff_date: 2025-01-31
+    cutoff_source: operator_inferred
+    tokenizer_family: qwen3
+    tokenizer_sha: <TBD>
+    hf_commit_sha: <TBD>
+    hf_repo: Qwen/Qwen3-32B-AWQ
+    quant_scheme: AWQ-INT4
+    p_logprob:
+      thinking_control: append_no_think_sentinel
+      prompt_overlay_policy: none
+      route_lock_required: hf_commit_sha
+      echo_supported: true
+    p_predict:
+      thinking_control: default_deployed
+      prompt_overlay_policy: baseline_only
+
+  # ---- White-box: GLM (singleton, no PCSG pair, fp16 because no AWQ) ----
+
   glm-4-9b:
     family: glm
     access: white_box
     provider: vllm
     cutoff_date: 2024-06-30
+    cutoff_source: operator_inferred  # GLM-4 (0520) pipeline hint, no vendor cutoff
     tokenizer_family: glm4
     tokenizer_sha: <TBD>
     hf_commit_sha: <TBD>
+    hf_repo: THUDM/glm-4-9b-chat
+    quant_scheme: fp16  # no Alibaba/Zhipu official AWQ for GLM-4-9B
     p_logprob:
       thinking_control: system_message_toggle
       prompt_overlay_policy: none
@@ -109,6 +237,7 @@ models:
     provider: deepseek
     api_model_name: deepseek-chat
     cutoff_date: 2024-07-31
+    cutoff_source: community_paraphrase
     p_predict:
       thinking_control: default_deployed
       prompt_overlay_policy: baseline_only
@@ -120,6 +249,7 @@ models:
     provider: openai
     api_model_name: gpt-4.1-2025-04-14
     cutoff_date: 2024-06-30
+    cutoff_source: community_paraphrase
     p_predict:
       thinking_control: default_deployed
       prompt_overlay_policy: baseline_only
@@ -131,6 +261,7 @@ models:
     provider: openai
     api_model_name: <TBD>
     cutoff_date: 2024-09-30
+    cutoff_source: operator_inferred
     p_predict:
       thinking_control: default_deployed
       prompt_overlay_policy: baseline_only
@@ -142,7 +273,42 @@ models:
     provider: anthropic
     api_model_name: <TBD>
     cutoff_date: 2025-08-31
+    cutoff_source: vendor_stated  # Anthropic published this in model card
     p_predict:
       thinking_control: extended_thinking_off
       prompt_overlay_policy: baseline_only
       route_lock_required: provider_model_id
+
+# ---- PCSG pair registry ------------------------------------------------
+#
+# Per docs/DECISION_20260427_pcsg_redefinition.md, PCSG is computed on
+# explicitly-declared pairs rather than inferred from tokenizer_family
+# equality. Each pair declares the role assignment and the vocab
+# intersection rule that compute_pcsg must enforce.
+#
+# `temporal` pairs identify the cutoff-exposure differential (primary
+# confirmatory PCSG signal). `capacity` pairs hold cutoff fixed and
+# vary parameter count (exploratory PCSG_capacity_curve).
+
+pcsg_pairs:
+
+  # Temporal (primary confirmatory)
+  - id: temporal_qwen_cross_version
+    role: temporal
+    early: qwen2.5-7b
+    late: qwen3-8b
+    tokenizer_compat: qwen2_class
+    max_token_id_inclusive: 151664   # Qwen2.5 vocab ceiling; reject articles tokenizing to >=151665
+
+  # Capacity (exploratory; same-cutoff within-family)
+  - id: capacity_qwen2_5
+    role: capacity
+    members: [qwen2.5-1.5b, qwen2.5-3b, qwen2.5-7b, qwen2.5-14b, qwen2.5-32b]
+    tokenizer_compat: qwen2_class
+    max_token_id_inclusive: 151664
+
+  - id: capacity_qwen3
+    role: capacity
+    members: [qwen3-4b, qwen3-8b, qwen3-14b, qwen3-32b]
+    tokenizer_compat: qwen2_class
+    max_token_id_inclusive: 151668

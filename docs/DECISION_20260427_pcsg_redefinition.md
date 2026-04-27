@@ -115,8 +115,12 @@ Hence Path E.
 Build a temporally-stratified dataset from CLS source corpus
 (`D:\GitRepos\Thales\datasets\cls_telegraph_raw`):
 
-- 60 articles per month × 24 months from 2023-Q1 to 2025-Q4
-- Total ~1,440 articles
+- 60 articles per month from 2023-01 (inclusive) to 2025-12 (inclusive)
+- 36 months × 60 = **2,160 articles** (the original "24 months / 1,440"
+  figure in the first draft of this memo was an arithmetic error;
+  2023-Q1..2025-Q4 spans 12 quarters = 36 months. The pipeline run on
+  2026-04-27 produced 2,160 cases against the local CLS corpus in
+  ≈7 seconds; logged as `data/pilot/cutoff_probe/probe_set_monthly60_36mo.json`.)
 - For each article, run **P_logprob** on all 10 white-box models +
   **P_extract** masked-span completion (we already have this operator
   in the legacy pipeline; lift the prompt verbatim, score on hit rate)

@@ -167,27 +167,42 @@ Smoke gate per model:
 - `thinking_mode == "off"` written on every record
 - E_CTS, E_PCSG calculable end-to-end on the smoke set
 
-### Stage 2.5 — Path E empirical cutoff probe (~1.5 hr, same instance)
+### Stage 2.5 — Path E empirical cutoff probe (~2 hr, same instance)
 
-Runs after the main per-model pilot loop, before instance teardown:
+Runs after the main per-model pilot loop, before instance teardown.
+2,160 articles (60/month × 36 months 2023-01..2025-12). Local pipeline
+verification 2026-04-27 produced the fixture in ~7 s.
 
 ```bash
+# 1. build the fixture (run once, ideally locally before scp-ing the
+#    JSON up to the cloud — avoids needing the full CLS corpus on cloud)
 python scripts/build_cutoff_probe_set.py \
-  --source $CLS_RAW \
-  --months 2023-01..2025-12 \
+  --source D:\GitRepos\Thales\datasets\cls_telegraph_raw \
+  --start 2023-01 --end 2025-12 \
   --per-month 60 \
-  --output /data/probe/cutoff_probe_set.json
+  --output data/pilot/cutoff_probe/probe_set_monthly60_36mo.json
 
-python scripts/run_cutoff_probe.py \
-  --probe /data/probe/cutoff_probe_set.json \
-  --models qwen2.5-1.5b,...,glm-4-9b \
+# 2. score with the same operator already used for the main pilot —
+#    just point --fixture at the probe set and write to a separate
+#    output dir so the main pilot traces stay clean
+python scripts/ws1_run_logprob.py \
+  --model qwen2.5-7b \
+  --smoke \
+  --fixture data/pilot/cutoff_probe/probe_set_monthly60_36mo.json \
   --vllm-url http://localhost:8000 \
-  --output /data/probe/month_stratified_scores.parquet
+  --output-dir data/pilot/cutoff_probe/traces
+
+# (repeat for each of the 10 white-box models)
+
+# 3. knee detect locally back home
+python scripts/run_cutoff_probe_analysis.py \
+  --probe-set data/pilot/cutoff_probe/probe_set_monthly60_36mo.json \
+  --traces-dir data/pilot/cutoff_probe/traces \
+  --output data/pilot/cutoff_probe/cutoff_observed.json
 ```
 
 Reuses the same vLLM container per model; sequentially swaps through all
-10 white-box. Min-K% computed inline, P_extract via prompt invocation.
-Knee detection runs locally back home.
+10 white-box. Min-K% computed locally from saved traces (no second GPU pass).
 
 ### Stage 3 — Local re-derivation (no GPU; 2 hr)
 

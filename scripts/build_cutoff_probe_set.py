@@ -39,13 +39,17 @@ from src.r5a.contracts import ArticleRecord, HostCategory  # noqa: E402
 
 DEFAULT_SOURCE = Path(r"D:\GitRepos\Thales\datasets\cls_telegraph_raw")
 DEFAULT_OUTPUT = (
-    REPO_ROOT / "data" / "pilot" / "cutoff_probe" / "probe_set_1440.json"
+    REPO_ROOT
+    / "data"
+    / "pilot"
+    / "cutoff_probe"
+    / "probe_set_monthly60_36mo.json"
 )
 DEFAULT_SEED = 20260427
 DEFAULT_PER_MONTH = 60
 DEFAULT_MIN_CHARS = 80
-DEFAULT_START = "2023-01"
-DEFAULT_END = "2025-12"
+DEFAULT_START = "2023-01"  # inclusive
+DEFAULT_END = "2025-12"  # inclusive — 36 months total at 60/month = 2,160 cases
 
 
 def parse_args() -> argparse.Namespace:

@@ -41,7 +41,7 @@ def parse_args() -> argparse.Namespace:
         / "data"
         / "pilot"
         / "cutoff_probe"
-        / "probe_set_1440.json",
+        / "probe_set_monthly60_36mo.json",
         help="JSON fixture used at scoring time (gives publish_date per case)",
     )
     p.add_argument(

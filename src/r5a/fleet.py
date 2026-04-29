@@ -11,12 +11,13 @@ Authority: plans/phase7-pilot-implementation.md §§5.1, 10.1, 14.2 (`A05`).
 from __future__ import annotations
 
 import hashlib
+import json
 from datetime import date
 from pathlib import Path
 from typing import Literal
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .contracts import AccessTier
 
@@ -63,10 +64,20 @@ class ModelConfig(BaseModel):
     tokenizer_sha: str | None = None
     hf_commit_sha: str | None = None
     p_logprob: PLogprobModelConfig | None = None
-    p_predict: PPredictModelConfig
+    # `p_predict` is Optional to express the P_logprob-only role
+    # (DECISION_20260429_llama_addition §2.2): Llama-3 / Llama-3.1
+    # entries omit `p_predict:` and are therefore excluded from
+    # P_predict-driven estimands (E_CMMD, E_FO, E_NoOp, E_extract).
+    p_predict: PPredictModelConfig | None = None
 
     def is_white_box(self) -> bool:
         return self.access is AccessTier.WHITE_BOX
+
+    def participates_in_p_predict(self) -> bool:
+        return self.p_predict is not None
+
+    def participates_in_p_logprob(self) -> bool:
+        return self.is_white_box() and self.p_logprob is not None
 
 
 class PCSGPair(BaseModel):
@@ -107,11 +118,98 @@ class FleetConfig(BaseModel):
     def black_box_ids(self) -> list[str]:
         return [mid for mid, m in self.models.items() if not m.is_white_box()]
 
+    def p_predict_eligible_ids(self) -> list[str]:
+        """Models that participate in P_predict (and therefore in
+        P_predict-derived estimands E_CMMD / E_FO / E_NoOp / E_extract).
+
+        Per DECISION_20260429_llama_addition §2.2 Llama is `p_predict:
+        null` and therefore excluded.
+        """
+        return [mid for mid, m in self.models.items() if m.participates_in_p_predict()]
+
+    def p_logprob_eligible_ids(self) -> list[str]:
+        """White-box models that produce token logprobs."""
+        return [mid for mid, m in self.models.items() if m.participates_in_p_logprob()]
+
     def temporal_pairs(self) -> list[PCSGPair]:
         return [p for p in self.pcsg_pairs if p.role == "temporal"]
 
     def capacity_pairs(self) -> list[PCSGPair]:
         return [p for p in self.pcsg_pairs if p.role == "capacity"]
+
+    def pcsg_pair_registry_hash(self) -> str:
+        """SHA256 of the canonicalized `pcsg_pairs` block.
+
+        Pinning the pair registry separately from the whole-fleet hash
+        means RunManifest can detect pair-set drift even if a non-pair
+        edit (e.g. retiring a stale `<TBD>` placeholder) changed
+        `fleet_config_hash`. Used by RunManifest.pcsg_pair_registry_hash.
+        """
+        canonical = [
+            {
+                "id": p.id,
+                "role": p.role,
+                "early": p.early,
+                "late": p.late,
+                "members": p.members,
+                "tokenizer_compat": p.tokenizer_compat,
+                "max_token_id_inclusive": p.max_token_id_inclusive,
+            }
+            for p in sorted(self.pcsg_pairs, key=lambda x: x.id)
+        ]
+        payload = json.dumps(canonical, sort_keys=True, separators=(",", ":"))
+        return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+    @model_validator(mode="after")
+    def _validate_pcsg_pairs(self) -> "FleetConfig":
+        """Per SYNTHESIS Coh#5 / Tier-0 #6: every `early`/`late`/`members`
+        reference must resolve to a `models:` key, pair ids must be
+        unique, and temporal pairs must point to P_logprob-eligible
+        white-box models.
+        """
+        seen: set[str] = set()
+        for pair in self.pcsg_pairs:
+            if pair.id in seen:
+                raise ValueError(f"duplicate PCSG pair id: {pair.id!r}")
+            seen.add(pair.id)
+
+            if pair.role == "temporal":
+                if not pair.early or not pair.late:
+                    raise ValueError(
+                        f"PCSG temporal pair {pair.id!r} requires both 'early' and 'late'"
+                    )
+                if pair.members:
+                    raise ValueError(
+                        f"PCSG temporal pair {pair.id!r} must not declare 'members'"
+                    )
+                refs = [pair.early, pair.late]
+            elif pair.role == "capacity":
+                if pair.early or pair.late:
+                    raise ValueError(
+                        f"PCSG capacity pair {pair.id!r} must not declare 'early'/'late'"
+                    )
+                if not pair.members or len(pair.members) < 2:
+                    raise ValueError(
+                        f"PCSG capacity pair {pair.id!r} requires >=2 members"
+                    )
+                refs = list(pair.members)
+            else:
+                raise ValueError(f"PCSG pair {pair.id!r} has unknown role {pair.role!r}")
+
+            for ref in refs:
+                if ref not in self.models:
+                    raise ValueError(
+                        f"PCSG pair {pair.id!r} references unknown model {ref!r}; "
+                        f"check `models:` keys in fleet YAML"
+                    )
+                m = self.models[ref]
+                if not m.participates_in_p_logprob():
+                    raise ValueError(
+                        f"PCSG pair {pair.id!r} member {ref!r} is not P_logprob-eligible "
+                        "(must be white-box with a `p_logprob:` block)"
+                    )
+
+        return self
 
 
 def _normalize_models(raw: dict) -> dict:

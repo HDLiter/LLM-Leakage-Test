@@ -67,16 +67,34 @@ def parse_args() -> argparse.Namespace:
 def report_fleet(fleet) -> None:
     white_box = fleet.white_box_ids()
     black_box = fleet.black_box_ids()
+    p_predict = fleet.p_predict_eligible_ids()
+    p_logprob = fleet.p_logprob_eligible_ids()
     print(f"fleet_version: {fleet.fleet_version}")
     print(f"yaml_sha256:   {fleet.raw_yaml_sha256[:12]}...")
     print(f"white_box ({len(white_box)}): {', '.join(white_box)}")
     print(f"black_box ({len(black_box)}): {', '.join(black_box)}")
-    # Post-2026-04-27 expansion: 10 white-box (5 Qwen2.5 + 4 Qwen3 + 1 GLM)
-    # and 4 black-box. See docs/DECISION_20260427_pcsg_redefinition.md.
-    if len(white_box) != 10 or len(black_box) != 4:
+    print(f"p_predict_eligible ({len(p_predict)}): {', '.join(p_predict)}")
+    print(f"p_logprob_eligible ({len(p_logprob)}): {', '.join(p_logprob)}")
+    # Post-2026-04-29 split-tier (DECISION_20260429_llama_addition §2.2):
+    # 12 white-box (10 full-operator + 2 Llama P_logprob-only) + 4 black-box,
+    # giving 14 P_predict-eligible and 12 P_logprob-eligible.
+    if len(white_box) != 12 or len(black_box) != 4:
         print(
-            "WARNING: fleet does not match the post-expansion 10+4 split "
-            "(docs/DECISION_20260427_pcsg_redefinition.md)",
+            "WARNING: fleet does not match the post-2026-04-29 12+4 split "
+            "(docs/DECISION_20260429_llama_addition.md §2.2)",
+            file=sys.stderr,
+        )
+    if len(p_predict) != 14 or len(p_logprob) != 12:
+        print(
+            f"WARNING: P_predict-eligible={len(p_predict)} (expected 14), "
+            f"P_logprob-eligible={len(p_logprob)} (expected 12)",
+            file=sys.stderr,
+        )
+    temporal = [p.id for p in fleet.temporal_pairs()]
+    print(f"pcsg.temporal_pairs ({len(temporal)}): {', '.join(temporal)}")
+    if "temporal_qwen_cross_version" not in temporal or "temporal_llama_cross_version" not in temporal:
+        print(
+            "WARNING: missing one of the two confirmatory PCSG temporal pairs",
             file=sys.stderr,
         )
 

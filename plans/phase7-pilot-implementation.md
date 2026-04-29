@@ -7,6 +7,7 @@ revision_date: 2026-04-29
 revision_basis: |
   v2.2 (2026-04-18): refine-logs/reviews/PHASE7_PILOT/SYNTHESIS.md + WS0.5 scope deferral (A09 softened).
   v2.3 (2026-04-29): Tier-0 batch from R5A_DESIGN_REVIEW_20260427 — fleet count sweep (5→10 white-box, 9→14 total per docs/DECISION_20260427_pcsg_redefinition.md); gate removal (docs/DECISION_20260429_gate_removal.md) collapses §7.1A to S20 only; WS6 unconditional via WS1 Stage 2.7 Path C; BL2 post-cutoff bucket 20→350 (Option I); pilot total N 100→430.
+  v2.4 (2026-04-29): Llama addition (docs/DECISION_20260429_llama_addition.md) — split-tier fleet 12 white-box (10 full-operator + 2 P_logprob-only Llama) + 4 black-box = 16 models. P_predict-eligible = 14 (Llama excluded), P_logprob-eligible = 12. Second confirmatory PCSG temporal pair `temporal_llama_cross_version`.
 status: FINAL for scope the plan actually commits to; pending items tracked in root `PENDING.md`
 open_decisions_resolved:
   - "OPEN 1: B (Phase 7b contingency)"
@@ -45,7 +46,7 @@ Phase 7 is **not** the main benchmark and not a license to revise the frozen sho
 
 | Area | Included in Phase 7 |
 |---|---|
-| Confirmatory operators | `P_logprob` on **10 white-box models** and `P_predict` on all **14 fleet models** (post-2026-04-27 expansion per `docs/DECISION_20260427_pcsg_redefinition.md`) |
+| Confirmatory operators | `P_logprob` on **12 P_logprob-eligible white-box models** (10 full-operator + 2 Llama P_logprob-only per `docs/DECISION_20260429_llama_addition.md`) and `P_predict` on all **14 P_predict-eligible models** (Llama excluded; total fleet is **16**) |
 | Confirmatory perturbations | `C_FO` and `C_NoOp`, including generation metadata and human audit. **Gate condition 3 removed 2026-04-29** (`docs/DECISION_20260429_gate_removal.md`); audit (condition 1) remains a per-artifact data-quality gate; coverage (condition 2) is descriptive only. |
 | Pilot execution | One default `N=430` pilot manifest from CLS-source Chinese financial news (80 pre-cutoff + 350 post-cutoff per BL2 Option I expansion 2026-04-29) |
 | Analysis | Pilot effect sizes, confirmatory-estimand correlation matrix, baseline-confidence sensitivity, post-cutoff negative control, simple baseline predictors, Stage 2 power simulation |
@@ -61,7 +62,7 @@ Phase 7 is **not** the main benchmark and not a license to revise the frozen sho
 | English expansion | No bilingual or English corpus work |
 | Non-financial negative control | `BL3` is stretch only; it is not a Phase 8 gate unless a low-cost corpus is already available |
 | Large UI product work | No bespoke labeling platform beyond a lightweight local review app and audit export tools |
-| Model-fleet changes | The fleet was expanded on 2026-04-27 from 9 → 14 models (10 white-box + 4 black-box) per `docs/DECISION_20260427_pcsg_redefinition.md`. No further fleet changes within Phase 7 unless a provider becomes unavailable and a separate `DECISION_*` memo is approved. |
+| Model-fleet changes | Fleet was expanded twice during Phase 7 design: 2026-04-27 from 9 → 14 models (10 white-box + 4 black-box) per `docs/DECISION_20260427_pcsg_redefinition.md`; then 2026-04-29 from 14 → 16 models with 2 Llama P_logprob-only additions per `docs/DECISION_20260429_llama_addition.md`. P_predict-eligible fleet remains 14 (Llama excluded). No further fleet changes within Phase 7 unless a provider becomes unavailable and a separate `DECISION_*` memo is approved. |
 
 ### 2.3 Why the default pilot size is 430 (80 pre-cutoff + 350 post-cutoff)
 
@@ -125,7 +126,7 @@ Every run should be determined by a case manifest, fleet manifest, runtime confi
 | WS0 | R5A scaffolding and manifests | `src/r5a/` skeleton, fleet/runtime configs, contracts, smoke-test harness | none | starts immediately |
 | WS0.5 | Thales alignment and factor pipelines (scope TBD; see Section 5.1A and `PENDING.md`) | decision memo + factor values deterministically computable; specifics deferred | WS0 contracts freeze | parallel with WS1/WS2/WS3; must close before WS4 |
 | WS1 | `P_logprob` pipeline | white-box logprob traces, `E_CTS`, `E_PCSG` tables | WS0 | parallel with WS0.5/WS2/WS3 after contracts freeze |
-| WS2 | `P_predict` pipeline | 9-model prediction records, parser, cache/fingerprint layer | WS0 | parallel with WS0.5/WS1/WS3 |
+| WS2 | `P_predict` pipeline | 14-model prediction records, parser, cache/fingerprint layer | WS0 | parallel with WS0.5/WS1/WS3 |
 | WS3 | `C_FO` + `C_NoOp` generation and audit | perturbation artifacts, audit app, adjudicated pass-rate tables | WS0; reads event-type labels from WS0.5 before C_FO rule schema freeze | parallel with WS0.5/WS1/WS2 |
 | WS4 | `N=100` pilot execution | frozen manifest, operator outputs, estimand tables, QC report | WS0.5, WS1, WS2, WS3 | limited; run orchestration depends on all four |
 | WS5 | Pilot statistics and pre-registration | power simulation, baseline ablations, Stage 1 sign-in, Stage 2 skeleton | WS4 data complete | mostly sequential |
@@ -270,7 +271,7 @@ Decision point: if prompt-logprob extraction through vLLM is incomplete or misal
 
 ### Exit criteria
 
-- All **10 white-box models** return valid prompt-side token logprobs on the 30-case smoke set.
+- All **12 P_logprob-eligible white-box models** (10 full-operator + 2 Llama P_logprob-only) return valid prompt-side token logprobs on the 30-case smoke set.
 - `article_token_count` matches the tokenizer-encoded length within a deterministic tolerance of at most one BOS/EOS handling difference, and the difference rule is documented.
 - Thinking mode is logged as `off` for 100% of traces.
 - `E_CTS`, `E_PCSG` (cross-version Qwen pair on common-vocab subset), and `E_PCSG_capacity_curve` (Qwen2.5 5-point + Qwen3 4-point) tables can be generated end-to-end for the smoke set with no missing rows on the temporal pair or capacity members.
@@ -577,7 +578,7 @@ safety gap after the latest core-fleet cutoff Claude Sonnet 4.6
 linearly from the original 20-case template). Because the post-cutoff
 bucket is for negative-control identification only (no perturbations,
 no audit), it does not enter the C_FO / C_NoOp eligibility funnel and
-adds only `P_predict` (14 models) + `P_logprob` (10 white-box) calls.
+adds only `P_predict` (14 P_predict-eligible models) + `P_logprob` (12 P_logprob-eligible white-box models, including 2 Llama P_logprob-only) calls.
 
 **Operational note (2026-04-29).** Sampling 350 articles from
 `>= 2026-02-01` requires extending the existing CLS extraction beyond
@@ -756,7 +757,7 @@ The confirmatory estimand contract should be frozen before any pilot inference:
 |---|---|---|---|
 | `E_CTS` | case × model | Min-K++ continuous score (bottom-`K%` average) | all 100 |
 | `E_PCSG` | case × tokenizer-matched pair | `logprob(late) - logprob(early)` on matched tokens | white-box same-tokenizer pairs only |
-| `E_CMMD` | case (fleet-aggregated) | cross-cutoff separation score across 9-model predictions | all 100 |
+| `E_CMMD` | case (fleet-aggregated) | cross-cutoff separation score across the 14 P_predict-eligible models | all 100 |
 | `E_FO` | case × model (`FO`-eligible) | signed-score non-compliance to visible false outcome | `C_FO`-eligible subset |
 | `E_NoOp` | case × model (`NoOp`-eligible) | `|signed_base - signed_noop|` absolute stability loss | `C_NoOp`-eligible subset |
 
@@ -919,7 +920,10 @@ Freeze at least three prior scenarios:
 For each scenario, and for each legal family state (`S20`, `S16a`, `S16b`, `S12`):
 
 1. Estimate the pilot coefficient vector `hat(beta)` and residual covariance `hat(Sigma)` for the retained confirmatory estimands.
-2. Simulate `B = 2000` main-run datasets at `N_case = 2560`, `N_model = 9`, preserving:
+2. Simulate `B = 2000` main-run datasets at `N_case = 2560`, with the
+   actual split-tier model count (14 P_predict-eligible / 12 P_logprob-eligible
+   per `docs/DECISION_20260429_llama_addition.md` §2.2; 2 confirmatory PCSG
+   temporal pairs per same memo §2.3), preserving:
    - case random-intercept variance where applicable;
    - model random-intercept variance where applicable;
    - observed missingness and eligibility masks by estimand;
@@ -1144,10 +1148,11 @@ Phase 7 should add `data/pilot/` as the authoritative artifact root, `data/refer
 
 | Component | Approximate runtime | Notes |
 |---|---|---|
-| `P_logprob` smoke (30 cases × 10 white-box) | 1-3 hours | depends on 32B throughput and batch size; capacity-curve sanity check included |
-| `P_logprob` full pilot (430 cases × 10 white-box) | 6-10 hours | 80 pre-cutoff + 350 post-cutoff (BL2 expansion); trace saving and per-model queuing included |
-| Hidden-state extraction (30 cases × 10 white-box, WS6 prep) | ~5 hours | offline_hf backend; WS1 cloud Stage 2.7 (Path C eager pre-compute) |
-| Path E cutoff probe (2,160 articles × 10 white-box) | ~2 hours | shares same instance, see WS1 cloud plan Stage 2.5 |
+| `P_logprob` smoke (30 cases × 12 P_logprob-eligible white-box) | 1-4 hours | depends on 32B throughput and batch size; capacity-curve sanity check included; +2 Llama bf16 models (2026-04-29) |
+| `P_logprob` full pilot (430 cases × 12 P_logprob-eligible white-box) | 7-12 hours | 80 pre-cutoff + 350 post-cutoff (BL2 expansion); trace saving and per-model queuing included; +2 Llama bf16 models (2026-04-29) |
+| Hidden-state extraction (30 cases × 12 P_logprob-eligible white-box, WS6 prep) | ~6 hours | offline_hf backend; WS1 cloud Stage 2.7 (Path C eager pre-compute) |
+| Path E cutoff probe (2,160 articles × 12 P_logprob-eligible white-box) | ~2.5 hours | shares same instance, see WS1 cloud plan Stage 2.5; Llama probes are sanity anchors per `docs/DECISION_20260429_llama_addition.md` §2.4 |
+| AWQ-vs-fp16 calibration audit (Qwen2.5-7B bf16 × 430 pilot cases) | ~3 hours | new Stage 2.8; closes Adversarial A3 per `docs/DECISION_20260429_llama_addition.md` §2.5 |
 | `P_predict` smoke (20 cases × 14 models) | 30-90 minutes | includes repair/retry overhead |
 | `P_predict` full pilot baseline + perturbations (430 cases × 14 models, perturbations on pre-cutoff only) | 8-14 hours | depends on provider latency and retry rate |
 | duplicate reruns | 1-2 hours | 5% diagnostic subset |
@@ -1195,13 +1200,13 @@ Phase 8 may start only if all of the following hold:
 
 1. `src/r5a/` operator and perturbation pipelines run end-to-end on the frozen pilot manifest.
 2. A signed Stage 1 preregistration exists and the Stage 2 skeleton is populated from pilot outputs only.
-3. `P_logprob` succeeds on all **10 white-box models** with pinned tokenizer/checkpoint provenance, **and Path E `cutoff_observed` is published for every white-box model** (per `docs/DECISION_20260427_pcsg_redefinition.md` §3.3).
+3. `P_logprob` succeeds on all **12 P_logprob-eligible white-box models** with pinned tokenizer/checkpoint provenance, **and Path E `cutoff_observed` (or rejected-with-CI) is published for every P_logprob-eligible white-box model** (per `docs/DECISION_20260427_pcsg_redefinition.md` §3.3 + `docs/DECISION_20260429_llama_addition.md` §2.4).
 4. `P_predict` succeeds on all **14 models** with fingerprint logging and acceptable parse rates.
 5. The effective sample-size matrix passes `min cell >= 15` on the 80 pre-cutoff cases (post-cutoff 350 enters BL2 only and does not require the same matrix).
 6. **Data-quality requirements** for `C_FO` and `C_NoOp` are complete: audit pass rate `>=85%` overall with no event type `<75%` (items failing audit removed before analysis); eligible case coverage reported per perturbation × event type as a methods-section descriptive metric. **Gate condition 3 (baseline delta non-degeneracy) is no longer evaluated** — removed 2026-04-29 per `docs/DECISION_20260429_gate_removal.md`. E_FO and E_NoOp remain unconditional confirmatory members of `S20`.
 7. `BL2` passes the Section 8.6 TOST equivalence rule **on `n_post = 350`** and the Section 8.6A same-cutoff early-warning ratio is documented; if the ratio exceeds `0.5`, the go/no-go memo must adopt strengthened caveat language rather than ignoring the warning.
 8. Correlation/regrouping trigger has been evaluated and documented.
-9. **WS6 hidden-state extraction is complete** (30-case subset across 10 white-box models, pre-computed in WS1 Stage 2.7). WS6 mechanistic analysis is unconditional (no behavioral trigger required); analysis can proceed in WS5 regardless of E_FO behavioral magnitude.
+9. **WS6 hidden-state extraction is complete** (30-case subset across 12 P_logprob-eligible white-box models — 10 full-operator + 2 Llama bf16, per `docs/DECISION_20260429_llama_addition.md` §3.4 — pre-computed in WS1 Stage 2.7). WS6 mechanistic analysis is unconditional (no behavioral trigger required); analysis can proceed in WS5 regardless of E_FO behavioral magnitude.
 10. Main-run power at `N=2560` is acceptable for the retained confirmatory family under the Section 8.8 scenario range. Automatic GO requires at least one temporal-route estimand (`E_CMMD` or `E_PCSG`) **and** one perturbation-route estimand (`E_FO` or `E_NoOp`) to simultaneously reach Westfall-Young-adjusted `80%` power for the primary cutoff-exposure coefficient; a single-channel success is insufficient.
 11. `docs/DECISION_20260417_phase8_go_no_go.md` records the retained family, risks, and run-day operational caps.
 
@@ -1239,16 +1244,25 @@ data/reference/model_capability_scores.csv
 
 ### 14.2 Config keys that should exist
 
-> **Note (added 2026-04-29).** The example below is the **historical
+> **Note (last updated 2026-04-29).** The example below is the **historical
 > 9-model schema** (5 white-box + 4 black-box). The current authoritative
-> fleet (post-2026-04-27) is **14 models** (10 white-box + 4 black-box) with
-> a top-level `pcsg_pairs` registry — see `config/fleet/r5a_fleet.yaml` for
-> the live source of truth. The example here is preserved as documentation
+> fleet is **16 models** total (12 white-box + 4 black-box), split-tier:
+>   * 10 full-operator white-box (5 Qwen2.5 + 4 Qwen3 + 1 GLM) +
+>     4 black-box = **14 P_predict-eligible**
+>   * +2 P_logprob-only Llama (Llama-3-8B + Llama-3.1-8B, both bf16) =
+>     **12 P_logprob-eligible**
+>   * 2 confirmatory PCSG temporal pairs (`temporal_qwen_cross_version`,
+>     `temporal_llama_cross_version`)
+>
+> See `config/fleet/r5a_fleet.yaml` for the live source of truth and
+> `docs/DECISION_20260427_pcsg_redefinition.md` + `docs/DECISION_20260429_llama_addition.md`
+> for the design memos. The example here is preserved as documentation
 > of the schema shape; for current member roster, `cutoff_source`,
 > `quant_scheme`, `hf_repo`, and `pcsg_pairs` keys consult the YAML
 > directly. PCSG eligibility is declared via `pcsg_pairs[].tokenizer_compat:
 > qwen2_class` plus `max_token_id_inclusive`, NOT inferred from
-> `tokenizer_family` equality.
+> `tokenizer_family` equality. P_logprob-only models (Llama-3.x family)
+> declare `p_predict: null` rather than a `p_predict:` block.
 
 `config/fleet/r5a_fleet.yaml` should minimally define a per-model × per-operator matrix:
 

@@ -1,15 +1,19 @@
 """Path-E analysis: read LogProbTrace Parquet outputs, compute
-month-stratified Min-K% per model, and detect the empirical cutoff.
+month-stratified Min-K% per model, and detect the empirical cutoff via
+piecewise-WLS with case-bootstrap CI (per Tier-0 #3 in
+`refine-logs/reviews/R5A_DESIGN_REVIEW_20260427/SYNTHESIS.md`).
 
 Run AFTER:
-  1. `scripts/build_cutoff_probe_set.py` produces a 1,440-case fixture
-  2. `scripts/ws1_run_logprob.py --smoke --fixture probe_set_1440.json`
-     has been run for every white-box model (or some subset)
+  1. `scripts/build_cutoff_probe_set.py` produces a 2,160-case fixture
+     (60 articles/month × 36 months 2023-01..2025-12).
+  2. `scripts/ws1_run_logprob.py --cutoff-probe` has been run for every
+     white-box model (or some subset).
 
 Output: `data/pilot/cutoff_probe/cutoff_observed.json` mapping each
-model_id to its detected cutoff date + drop magnitude + diagnostic
+model_id to its detected cutoff date + bootstrap CIs + acceptance
 notes. The run manifest cites this file for the `cutoff_observed`
-field used by §8.2 mixed-model regressions.
+field used by §8.2 mixed-model regressions; rejected estimates carry
+`cutoff_observed: null` and the model uses `cutoff_date_yaml` instead.
 """
 
 from __future__ import annotations
@@ -61,7 +65,7 @@ def parse_args() -> argparse.Namespace:
     )
     p.add_argument(
         "--trace-pattern",
-        default="{model}__smoke.parquet",
+        default="{model}__cutoff_probe.parquet",
         help="filename template; {model} is the substituted model_id",
     )
     p.add_argument(
@@ -77,16 +81,28 @@ def parse_args() -> argparse.Namespace:
         help="Min-K%% percentile",
     )
     p.add_argument(
-        "--smoothing-window",
+        "--min-side",
         type=int,
-        default=3,
-        help="moving-median smoothing window (months)",
+        default=6,
+        help="minimum number of months on each side of the breakpoint",
     )
     p.add_argument(
-        "--min-drop",
+        "--n-bootstrap",
+        type=int,
+        default=2000,
+        help="case-bootstrap replicates for κ̂ / δ̂ CIs",
+    )
+    p.add_argument(
+        "--max-ci-width-months",
+        type=int,
+        default=3,
+        help="reject `cutoff_observed` if 95%% CI width exceeds this",
+    )
+    p.add_argument(
+        "--drop-threshold",
         type=float,
         default=0.05,
-        help="reject knees with smaller drop magnitude",
+        help="bootstrap fraction P(δ > this) reported alongside the estimate",
     )
     return p.parse_args()
 
@@ -134,18 +150,29 @@ def main() -> int:
         est = detect_cutoff(
             by_month,
             model_id=model_id,
-            smoothing_window=args.smoothing_window,
-            min_drop_magnitude=args.min_drop,
+            min_side=args.min_side,
+            n_bootstrap=args.n_bootstrap,
+            drop_threshold=args.drop_threshold,
+            max_ci_width_months=args.max_ci_width_months,
         )
         summary[model_id] = {
             "cutoff_observed": (
                 est.cutoff_observed.isoformat() if est.cutoff_observed else None
             ),
+            "cutoff_ci_lower": (
+                est.cutoff_ci_lower.isoformat() if est.cutoff_ci_lower else None
+            ),
+            "cutoff_ci_upper": (
+                est.cutoff_ci_upper.isoformat() if est.cutoff_ci_upper else None
+            ),
+            "cutoff_ci_width_months": est.cutoff_ci_width_months,
             "drop_magnitude": est.drop_magnitude,
-            "pre_score_mean": est.pre_score_mean,
-            "post_score_mean": est.post_score_mean,
+            "drop_ci_lower": est.drop_ci_lower,
+            "drop_ci_upper": est.drop_ci_upper,
+            "p_drop_gt_005": est.p_drop_gt_005,
             "n_months": est.n_months,
-            "knee_index": est.knee_index,
+            "n_articles": est.n_articles,
+            "kappa_hat_index": est.kappa_hat_index,
             "notes": est.notes,
         }
         diagnostics[model_id] = {
@@ -161,8 +188,10 @@ def main() -> int:
         "diagnostics": diagnostics,
         "config": {
             "k_pct": args.k_pct,
-            "smoothing_window": args.smoothing_window,
-            "min_drop": args.min_drop,
+            "min_side": args.min_side,
+            "n_bootstrap": args.n_bootstrap,
+            "drop_threshold": args.drop_threshold,
+            "max_ci_width_months": args.max_ci_width_months,
             "probe_set": str(args.probe_set),
             "trace_pattern": args.trace_pattern,
         },

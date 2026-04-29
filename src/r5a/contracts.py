@@ -384,6 +384,35 @@ class RunStateRow(BaseModel):
 
 
 class RunManifest(BaseModel):
+    """Run-level provenance record (plan §10.4 + DECISION_20260427 §3.2 +
+    DECISION_20260429_gate_removal §2.6 + DECISION_20260429_llama_addition §3.2).
+
+    Six fields beyond the base provenance set were added 2026-04-29:
+
+    - `cutoff_observed`: per-model empirical cutoff dates produced by Path E
+      knee detection. None for models where the knee detector rejected the
+      fit (CI width > 3 months OR drop CI lower bound <= 0.05).
+    - `cutoff_date_yaml`: per-model `cutoff_date` values copied from the
+      fleet YAML at run time. Pairing with `cutoff_observed` lets downstream
+      analyses estimate exposure-misclassification when the two disagree.
+    - `quant_scheme`: per-model `quant_scheme` snapshot. Required for the
+      AWQ-vs-fp16 calibration audit (Stage 2.8) and for §8.2 random-effects
+      interpretation under cross-precision pooling.
+    - `pcsg_pair_registry_hash`: SHA256 of the canonicalized `pcsg_pairs`
+      block from the fleet YAML. Pinning the registry separately from the
+      whole-fleet hash means PCSG analysis can detect pair-set drift even
+      if a non-pair-related fleet edit changed `fleet_config_hash`.
+    - `hidden_state_subset_hash`: SHA256 over the sorted list of `case_id`s
+      used for WS1 Stage 2.7 hidden-state extraction. Lets WS6 detect that
+      the analysis layer is reading the same 30-case subset that was
+      written to disk.
+    - `quality_gate_thresholds`: realized strict-majority denominator
+      values per gate name (`e_extract_main_text`, `e_extract_confirmatory`,
+      etc.). Per `docs/DECISION_20260429_gate_removal.md` §2.6 the K is
+      derived from N at run time, so the manifest must record what K
+      ended up being.
+    """
+
     model_config = ConfigDict(extra="forbid")
 
     run_id: str
@@ -402,6 +431,24 @@ class RunManifest(BaseModel):
     article_manifest_hash: str
     perturbation_manifest_hash: str | None = None
     audit_manifest_hash: str | None = None
+
+    # Operational provenance (plan §10.1) — populated by ws1_pin_fleet
+    # and ws1_finalize_run_manifest. tokenizer_shas mirrors fleet YAML
+    # at run time for white-box models; vllm_image_digest is pinned per
+    # cloud session.
+    tokenizer_shas: dict[str, str] = Field(default_factory=dict)
+    vllm_image_digest: str | None = None
+    gpu_dtype: str | None = None  # e.g. "bf16", "fp16"; reflects backend launch flag
+    launch_env: dict[str, str] = Field(default_factory=dict)  # CUDA_VISIBLE_DEVICES, vLLM args, etc.
+
+    # 2026-04-29 Tier-0 additions (DECISION_20260427 §3.2 +
+    # DECISION_20260429_gate_removal §2.6).
+    cutoff_observed: dict[str, date | None] = Field(default_factory=dict)
+    cutoff_date_yaml: dict[str, date] = Field(default_factory=dict)
+    quant_scheme: dict[str, str] = Field(default_factory=dict)
+    pcsg_pair_registry_hash: str | None = None
+    hidden_state_subset_hash: str | None = None
+    quality_gate_thresholds: dict[str, int] = Field(default_factory=dict)
 
 
 __all__ = [

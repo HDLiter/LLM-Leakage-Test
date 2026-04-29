@@ -17,6 +17,16 @@ Per-model invocation pattern (pilot, after WS4 builds the manifest):
         --vllm-url http://localhost:8000 \
         --output-dir data/pilot/logprob_traces
 
+Per-model invocation pattern (Path E empirical cutoff probe; SYNTHESIS
+Tier-0 #5 — Path E no longer rides the `--smoke` flag, has its own
+output directory `data/pilot/cutoff_probe/traces/` and demands the
+2,160-case probe fixture):
+
+    python scripts/ws1_run_logprob.py \
+        --model qwen2.5-7b \
+        --cutoff-probe \
+        --vllm-url http://localhost:8000
+
 For the GLM fallback path (vLLM `echo=True` unsupported), pass
 `--backend offline_hf --model-path /data/models/glm-4-9b`. By default
 the backend is selected from `config/fleet/r5a_fleet.yaml`'s
@@ -29,6 +39,8 @@ Plan refs:
 - §14.3 (CLI shape)
 - docs/DECISION_20260427_pcsg_redefinition.md (fleet expansion +
   trace contract additions + chunked-write resume).
+- docs/DECISION_20260429_llama_addition.md (P_logprob-only models;
+  Llama-3 / 3.1 added with vendor-stated cutoffs).
 """
 
 from __future__ import annotations
@@ -127,6 +139,16 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="use a frozen pilot manifest (WS4)",
     )
+    g.add_argument(
+        "--cutoff-probe",
+        action="store_true",
+        help=(
+            "run Path E empirical cutoff probe on the 2,160-case "
+            "monthly-stratified fixture; writes to a distinct output "
+            "directory so Path E artifacts are never confused with "
+            "smoke traces (SYNTHESIS Tier-0 #5)."
+        ),
+    )
 
     p.add_argument(
         "--fixture",
@@ -139,9 +161,19 @@ def parse_args() -> argparse.Namespace:
         help="JSON of ArticleRecord-shaped rows for --pilot",
     )
     p.add_argument(
+        "--cutoff-probe-fixture",
+        default="data/pilot/cutoff_probe/probe_set_monthly60_36mo.json",
+        help="JSON of ArticleRecord-shaped rows for --cutoff-probe",
+    )
+    p.add_argument(
         "--output-dir",
         default="data/pilot/logprob_traces",
-        help="parquet output directory",
+        help="parquet output directory (overridden under --cutoff-probe)",
+    )
+    p.add_argument(
+        "--cutoff-probe-output-dir",
+        default="data/pilot/cutoff_probe/traces",
+        help="parquet output directory for --cutoff-probe runs",
     )
     p.add_argument(
         "--chunk-size",
@@ -175,25 +207,37 @@ def _resolve_white_box(model_id: str, fleet_path: str) -> ModelConfig:
 
 
 def _check_pinning_for_pilot(cfg: ModelConfig, args: argparse.Namespace) -> None:
-    """Refuse `--pilot` if any provenance field is still <TBD>.
+    """Refuse `--pilot` or `--cutoff-probe` if any provenance field is
+    still `<TBD>` or required Docker digest is missing.
 
-    Smoke runs are explicitly allowed against a partially-pinned fleet
-    so we can iterate locally; the pilot artifact MUST be reproducible
-    so tighter checks apply. Per plan §10.1.
+    Smoke runs are allowed against a partially-pinned fleet so we can
+    iterate locally; pilot AND Path E artifacts both feed the
+    RunManifest (Operational §6 / Tier-0 #4) and MUST be reproducible
+    so tighter checks apply (plan §10.1; SYNTHESIS Tier-0 #2).
     """
-    if not args.pilot:
+    requires_pinning = bool(getattr(args, "pilot", False) or getattr(args, "cutoff_probe", False))
+    if not requires_pinning:
         return
+    mode_label = "--pilot" if args.pilot else "--cutoff-probe"
     placeholders = "<TBD>"
     bad: list[str] = []
-    if cfg.tokenizer_sha == placeholders:
+    if cfg.tokenizer_sha is None or cfg.tokenizer_sha == placeholders:
         bad.append("tokenizer_sha")
-    if cfg.hf_commit_sha == placeholders:
+    if cfg.hf_commit_sha is None or cfg.hf_commit_sha == placeholders:
         bad.append("hf_commit_sha")
     if bad:
         raise SystemExit(
-            f"--pilot refused: {cfg.model_id} fleet entry still has "
-            f"placeholder values for: {', '.join(bad)}. Pin them in "
-            "config/fleet/r5a_fleet.yaml before running pilot."
+            f"{mode_label} refused: {cfg.model_id} fleet entry still has "
+            f"placeholder values for: {', '.join(bad)}. Run "
+            "scripts/ws1_pin_fleet.py to write back HF / tokenizer SHAs "
+            "before this mode."
+        )
+    if not args.vllm_image_digest:
+        raise SystemExit(
+            f"{mode_label} refused: --vllm-image-digest is required so "
+            "the trace records the Docker image SHA used. Inspect with "
+            "`docker image inspect <vllm_image> --format '{{.Id}}'` and "
+            "pass the resulting sha256:... value."
         )
 
 
@@ -219,6 +263,8 @@ def _decide_backend(args: argparse.Namespace, cfg: ModelConfig) -> str:
 def _load_articles(args: argparse.Namespace) -> list[ArticleRecord]:
     if args.smoke:
         path = Path(args.fixture)
+    elif args.cutoff_probe:
+        path = Path(args.cutoff_probe_fixture)
     else:
         path = Path(args.pilot_articles)
     if not path.exists():
@@ -229,6 +275,24 @@ def _load_articles(args: argparse.Namespace) -> list[ArticleRecord]:
             f"{path} must be a JSON array of ArticleRecord-shaped objects"
         )
     return [ArticleRecord(**row) for row in payload]
+
+
+def _resolve_output_paths(args: argparse.Namespace, model_id: str) -> tuple[Path, Path, Path, str]:
+    """Return (chunks_dir, final_path, summary_path, mode_tag) per run mode.
+
+    Path E uses a distinct directory tree per SYNTHESIS Tier-0 #5 so
+    cutoff-probe artifacts are never confused with smoke traces.
+    """
+    if args.cutoff_probe:
+        out_dir = Path(args.cutoff_probe_output_dir)
+        mode_tag = "cutoff_probe"
+    else:
+        out_dir = Path(args.output_dir)
+        mode_tag = "smoke" if args.smoke else "pilot"
+    chunks_dir = out_dir / f"{model_id}__{mode_tag}__chunks"
+    final_path = out_dir / f"{model_id}__{mode_tag}.parquet"
+    summary_path = out_dir / f"{model_id}__{mode_tag}.summary.json"
+    return chunks_dir, final_path, summary_path, mode_tag
 
 
 def _build_backend(args: argparse.Namespace, cfg: ModelConfig, runtime, backend_kind: str):
@@ -288,12 +352,10 @@ async def run(args: argparse.Namespace) -> int:
 
     articles_all = _load_articles(args)
     backend_kind = _decide_backend(args, cfg)
-    mode_tag = "smoke" if args.smoke else "pilot"
 
-    out_dir = Path(args.output_dir)
-    chunks_dir = out_dir / f"{cfg.model_id}__{mode_tag}__chunks"
-    final_path = out_dir / f"{cfg.model_id}__{mode_tag}.parquet"
-    summary_path = out_dir / f"{cfg.model_id}__{mode_tag}.summary.json"
+    chunks_dir, final_path, summary_path, mode_tag = _resolve_output_paths(
+        args, cfg.model_id
+    )
 
     if args.no_resume:
         already_done: set[str] = set()

@@ -141,15 +141,15 @@ is application to Chinese financial news with minute-resolution
 timestamps.
 
 **Implementation**:
-- `scripts/build_cutoff_probe_set.py` — sample 1,440 articles
+- `scripts/build_cutoff_probe_set.py` — sample **2,160 articles** (60/month × 36 months 2023-01..2025-12; the 1,440 figure in this memo's first draft was an arithmetic error preserved in §2.4 and corrected here on 2026-04-29)
 - `scripts/run_cutoff_probe.py` — call P_logprob and P_extract
 - `data/pilot/cutoff_probe/month_stratified_scores.parquet` — output
-- `src/r5a/analysis/cutoff_probe.py` — knee detection on the curve
+- `src/r5a/analysis/cutoff_probe.py` — knee detection on the curve (current threshold-based detector to be replaced by piecewise WLS + bootstrap CI; tracked as Tier-0 implementation item per `refine-logs/reviews/R5A_DESIGN_REVIEW_20260427/SYNTHESIS.md` §5)
 
 Path E runs alongside the main WS1 pilot on the same cloud instance;
 estimated +1.5h GPU time, +1 day engineering.
 
-### 2.5 WS6 conditional — mechanistic memorization localization
+### 2.5 WS6 — mechanistic memorization localization (made unconditional 2026-04-29)
 
 Adapted from Wang et al. 2025 "When Truth Is Overridden" (arxiv
 2508.02087). The sycophancy paper's methodology — Decision Score
@@ -158,18 +158,30 @@ directly to our `C_FO` setup: when the article contains a fake
 outcome that contradicts the model's memorized real outcome, where
 in the network does the override happen?
 
-**Conditional trigger**: WS6 is opened only if behavioral E_FO
-(plan §1 confirmatory) shows resistance signal in pilot — concretely,
-`mean |delta| > 0` on `>= 5/9` models per the frozen quality gate
-(plan §13 item 6). If not, mechanism analysis is moot.
+**Trigger** (amended 2026-04-29 by `docs/DECISION_20260429_gate_removal.md` §2.4):
+**No conditional trigger.** WS6 is an unconditional exploratory
+follow-up; analysis runs regardless of behavioral E_FO outcomes.
+Hidden states are eagerly pre-computed in WS1 cloud Stage 2.7 (Path C);
+analysis time is researcher-time, not GPU spend.
 
-**Pre-pilot prep (must do now to avoid GPU rerun)**:
-- `src/r5a/backends/offline_hf.py` adds optional `return_hidden_states=True`
-- `src/r5a/contracts.py` `LogProbTrace` adds `hidden_states_uri: str | None`
+The original conditional trigger (`mean |delta| > 0` on `>= 5/9`
+models) was removed alongside the §2 quality gate that produced it —
+the gate was an anti-pattern that conditioned analysis of X on the
+magnitude of X. Under any E_FO regime (high override / no override /
+mixed), WS6 yields a publishable finding; see DECISION_20260429 §2.4
+for the per-regime interpretation.
+
+**Eager pre-compute (WS1 Stage 2.7)**:
+- `src/r5a/backends/offline_hf.py` provides `return_hidden_states=True`
+- `src/r5a/contracts.py` `LogProbTrace` carries `hidden_states_uri: str | None`
   pointing to a `.safetensors` file containing per-layer hidden states
-- During WS1 cloud pilot, **subsample 30 articles** for hidden-state
-  extraction across all 10 white-box models. The other 70 articles
-  remain logprob-only (~25× cheaper in disk).
+- WS1 cloud Stage 2.7 runs offline_hf on a **30-article subset** across
+  all 10 white-box models (~5 hr GPU = ~40 RMB). The other pilot
+  articles are logprob-only (~25× cheaper in disk).
+- Subset selection: `fo_slotable=true` filter + event-type
+  stratification + same 30 case_ids across all 10 models (for
+  activation-patching cross-model alignment). Manifest hash recorded
+  in `RunManifest.hidden_state_subset_hash`.
 
 **Predicted layer windows** (scaled from Wang et al. results):
 

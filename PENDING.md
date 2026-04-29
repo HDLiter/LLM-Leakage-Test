@@ -6,7 +6,7 @@
 >
 > **Update rule**: when an item resolves, move it to `## Recently closed` at the bottom (keep for ~30 days), then delete. Do not silently remove — the history matters.
 >
-> **Last updated**: 2026-04-27
+> **Last updated**: 2026-04-29
 
 ---
 
@@ -27,18 +27,26 @@
 - **Target resolution date**: this week.
 
 ### Path E — empirical cutoff probe data sourcing
-- **Context**: `docs/DECISION_20260427_pcsg_redefinition.md` §2.4 specifies a 1,440-article temporally-stratified probe from CLS source corpus.
-- **External action needed**: confirm read access to `D:\GitRepos\Thales\datasets\cls_telegraph_raw` from the cloud instance, OR build the probe-set locally and rsync up.
+- **Context**: `docs/DECISION_20260427_pcsg_redefinition.md` §2.4 specifies a 2,160-article temporally-stratified probe (60/month × 36 months 2023-01..2025-12) from CLS source corpus. Local fixture already produced 2026-04-27 (`data/pilot/cutoff_probe/probe_set_monthly60_36mo.json`).
+- **External action needed**: confirm read access to `D:\GitRepos\Thales\datasets\cls_telegraph_raw` from the cloud instance, OR ship the probe-set JSON to cloud (already built locally, ~2.5 MB — easier path).
 - **Blocking**: Path E execution (Stage 2.5 of WS1 cloud plan).
 - **Owner**: user (data access) + Claude Code (sampling script).
 - **Target resolution date**: before WS1 cloud Stage 2.5.
 
-### WS6 — mechanistic conditional trigger evaluation
-- **Context**: `docs/DECISION_20260427_pcsg_redefinition.md` §2.5 makes WS6 conditional on behavioral E_FO clearing the §2 quality gate (mean |delta| > 0 on ≥ 5/9 models; here updated to ≥ 5/14 models given the 14-model fleet).
-- **Investigation needed**: after WS3 + WS4, evaluate the trigger; if positive, scope WS6 implementation (DS / KL / activation patching) with budget.
-- **Blocking**: dormant until WS4 pilot data lands.
-- **Owner**: post-pilot session.
-- **Target resolution date**: post-WS5.
+### BL2 post-cutoff sample expansion — CLS extraction beyond 2026-02
+- **Context**: `docs/DECISION_20260429_gate_removal.md` §3.3 + plan §6.2 expanded BL2 post-cutoff bucket from 20 → 350 cases, sampled from `>= 2026-02-01`. The original 20-case sampling pool is insufficient for this volume.
+- **External action needed**: extract additional CLS articles published `>= 2026-02-01` to support 350-case sampling with category quotas (policy / corporate / industry / macro). User to trigger CLS scrape; Claude Code to flag this when WS4 sampling step is reached.
+- **Blocking**: WS4 pilot manifest freeze (the 350-case post-cutoff bucket cannot be sampled without expanded corpus).
+- **Owner**: user (data extraction) + Claude Code (sampling script + reminder hook at WS4).
+- **Target resolution date**: before WS4 pilot manifest freeze.
+- **Notes**: Implementation must NOT silently fall back to fewer than 350 articles without a memo. Tracked as Tier-0 reminder per session.
+
+### WS6 — mechanistic analysis (now unconditional, eager pre-compute)
+- **Context**: `docs/DECISION_20260429_gate_removal.md` §2.4 / §3.2 made WS6 unconditional; hidden states pre-computed in WS1 cloud Stage 2.7 (Path C, ~5 hr GPU). The earlier conditional trigger (`>= 5/9` then `>= 5/14`) is retired alongside the gate that produced it.
+- **Investigation needed**: after WS1 Stage 2.7 hidden states are downloaded, scope WS6 analysis modules (DS via logit-lens, layer-wise KL, activation patching) for WS5. No GPU rerun required since hidden states are pre-computed.
+- **Blocking**: dormant until WS1 Stage 2.7 artifacts land locally.
+- **Owner**: post-WS1 session.
+- **Target resolution date**: WS5 timeline.
 
 ### OPEN 4 — Phase 7 audit staffing
 - **Context**: `plans/phase7-pilot-implementation.md` §9.1 default staffing assumes 2 reviewer + 1 adjudicator + 1 stats merge; project is single-operator by default.

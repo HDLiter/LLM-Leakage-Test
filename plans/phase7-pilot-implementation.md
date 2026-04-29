@@ -2,9 +2,11 @@
 title: Phase 7 Pilot Implementation Plan / Phase 7 试运行实施计划
 stage: Phase 7
 date: 2026-04-17
-revision: v2.2
-revision_date: 2026-04-18
-revision_basis: refine-logs/reviews/PHASE7_PILOT/SYNTHESIS.md + WS0.5 scope deferral (A09 softened)
+revision: v2.3
+revision_date: 2026-04-29
+revision_basis: |
+  v2.2 (2026-04-18): refine-logs/reviews/PHASE7_PILOT/SYNTHESIS.md + WS0.5 scope deferral (A09 softened).
+  v2.3 (2026-04-29): Tier-0 batch from R5A_DESIGN_REVIEW_20260427 — fleet count sweep (5→10 white-box, 9→14 total per docs/DECISION_20260427_pcsg_redefinition.md); gate removal (docs/DECISION_20260429_gate_removal.md) collapses §7.1A to S20 only; WS6 unconditional via WS1 Stage 2.7 Path C; BL2 post-cutoff bucket 20→350 (Option I); pilot total N 100→430.
 status: FINAL for scope the plan actually commits to; pending items tracked in root `PENDING.md`
 open_decisions_resolved:
   - "OPEN 1: B (Phase 7b contingency)"
@@ -43,9 +45,9 @@ Phase 7 is **not** the main benchmark and not a license to revise the frozen sho
 
 | Area | Included in Phase 7 |
 |---|---|
-| Confirmatory operators | `P_logprob` on 5 white-box models and `P_predict` on all 9 fleet models |
-| Confirmatory perturbations | `C_FO` and `C_NoOp`, including generation metadata, human audit, and quality gates |
-| Pilot execution | One default `N=100` pilot manifest from CLS-source Chinese financial news |
+| Confirmatory operators | `P_logprob` on **10 white-box models** and `P_predict` on all **14 fleet models** (post-2026-04-27 expansion per `docs/DECISION_20260427_pcsg_redefinition.md`) |
+| Confirmatory perturbations | `C_FO` and `C_NoOp`, including generation metadata and human audit. **Gate condition 3 removed 2026-04-29** (`docs/DECISION_20260429_gate_removal.md`); audit (condition 1) remains a per-artifact data-quality gate; coverage (condition 2) is descriptive only. |
+| Pilot execution | One default `N=430` pilot manifest from CLS-source Chinese financial news (80 pre-cutoff + 350 post-cutoff per BL2 Option I expansion 2026-04-29) |
 | Analysis | Pilot effect sizes, confirmatory-estimand correlation matrix, baseline-confidence sensitivity, post-cutoff negative control, simple baseline predictors, Stage 2 power simulation |
 | Reproducibility | model/version pinning, API fingerprint logging, seed/cache policy, manifest hashing, per-provider concurrency caps |
 | Documentation | Stage 1 pre-registration, Stage 2 pre-registration skeleton, decision memos required by pilot triggers |
@@ -61,16 +63,31 @@ Phase 7 is **not** the main benchmark and not a license to revise the frozen sho
 | Large UI product work | No bespoke labeling platform beyond a lightweight local review app and audit export tools |
 | Model-fleet changes | The fleet was expanded on 2026-04-27 from 9 → 14 models (10 white-box + 4 black-box) per `docs/DECISION_20260427_pcsg_redefinition.md`. No further fleet changes within Phase 7 unless a provider becomes unavailable and a separate `DECISION_*` memo is approved. |
 
-### 2.3 Why the default pilot size is 100
+### 2.3 Why the default pilot size is 430 (80 pre-cutoff + 350 post-cutoff)
 
-`N=100` is the default arbitration point because it balances four constraints at once:
+The pre-cutoff allocation (80 cases) is the original "default 100" arbitration
+point with the post-cutoff bucket separated, retaining the four constraints:
 
-1. It is large enough to estimate variance and cross-estimand correlation rather than only surfacing obvious bugs.
-2. It keeps full `C_FO` and `C_NoOp` human audit feasible, including double review and adjudication, within one sprint.
-3. It limits black-box API spend and rerun overhead while still covering the 9-model fleet and both perturbations.
-4. It can satisfy the pilot effective sample-size requirement `min cell >= 15` after pre-specified bin collapsing for each confirmatory estimand × factor × model check.
+1. The 80 pre-cutoff cases are large enough to estimate variance and cross-estimand correlation rather than only surfacing obvious bugs.
+2. They keep full `C_FO` and `C_NoOp` human audit feasible, including double review and adjudication, within one sprint.
+3. They limit black-box API spend and rerun overhead while still covering the 14-model fleet and both perturbations.
+4. They can satisfy the pilot effective sample-size requirement `min cell >= 15` after pre-specified bin collapsing for each confirmatory estimand × factor × model check.
 
-If the candidate pool cannot satisfy the sample-size matrix at `N=100`, the first remedy is **not** to expand to 150 automatically. The first remedy is to rebalance the pilot manifest while preserving the total size. Only if rebalancing fails should the team open a decision memo on pilot expansion.
+The post-cutoff allocation (350 cases) is sized to make the BL2 TOST
+equivalence test mathematically achievable at SESOI = 0.15
+(`docs/DECISION_20260429_gate_removal.md` §3.3 + Section 8.6). At
+n_post = 350, TOST power at true effect = 0 is approximately 60%; at n_post
+= 700 it is approximately 96%. The 350 figure is the conservative GO size; if
+Stage 2 power simulation shows 60% TOST is insufficient for the negative
+control's evidentiary role, expansion to 700 is allowed without a memo
+under the same Option I sample-size rebalance.
+
+If the candidate pool cannot satisfy the pre-cutoff sample-size matrix at
+`N_pre = 80`, the first remedy is **not** to expand pre-cutoff. The first
+remedy is to rebalance the pre-cutoff bucket internally while preserving
+the total. Only if rebalancing fails should the team open a decision memo
+on pilot expansion. The post-cutoff 350 figure is independent of the
+pre-cutoff rebalance rule.
 
 ## 3. Implementation Principles
 
@@ -207,9 +224,10 @@ WS0.5 must close before pilot manifest freeze (Section 6) and before Section 14.
 
 | Type | Path | Purpose |
 |---|---|---|
-| code | `src/r5a/operators/p_logprob.py`, `src/r5a/backends/vllm_logprob.py`, `src/r5a/analysis/logprob_metrics.py` | operator, backend, and `E_CTS`/`E_PCSG` calculations |
-| config | `config/models/*.yaml` for the 5 white-box checkpoints | white-box checkpoint pinning |
+| code | `src/r5a/operators/p_logprob.py`, `src/r5a/backends/vllm_logprob.py`, `src/r5a/analysis/logprob_metrics.py` | operator, backend, and `E_CTS`/`E_PCSG`/`E_PCSG_capacity_curve` calculations |
+| config | `config/fleet/r5a_fleet.yaml` (white-box section, 10 checkpoints) | white-box checkpoint pinning per `docs/DECISION_20260427_pcsg_redefinition.md` |
 | data | `data/pilot/logprob_traces/*.parquet` | token-level traces |
+| data | `data/pilot/hidden_states/<model_id>/<case_id>.safetensors` | per-(model,case) layer activations for 30-article WS6 subset (added 2026-04-29; see Section 5.2A and `plans/ws1-cloud-execution.md` Stage 2.7) |
 
 ### Required implementation shape
 
@@ -252,11 +270,12 @@ Decision point: if prompt-logprob extraction through vLLM is incomplete or misal
 
 ### Exit criteria
 
-- All 5 white-box models return valid prompt-side token logprobs on the 30-case smoke set.
+- All **10 white-box models** return valid prompt-side token logprobs on the 30-case smoke set.
 - `article_token_count` matches the tokenizer-encoded length within a deterministic tolerance of at most one BOS/EOS handling difference, and the difference rule is documented.
 - Thinking mode is logged as `off` for 100% of traces.
-- `E_CTS` and `E_PCSG` tables can be generated end-to-end for the smoke set with no missing pair rows on the two temporal Qwen pairs.
+- `E_CTS`, `E_PCSG` (cross-version Qwen pair on common-vocab subset), and `E_PCSG_capacity_curve` (Qwen2.5 5-point + Qwen3 4-point) tables can be generated end-to-end for the smoke set with no missing rows on the temporal pair or capacity members.
 - Full pilot run later yields less than 1% un-recovered trace failures after retries.
+- Path E `cutoff_observed` is published for every white-box model.
 
 ### Risks and mitigations
 
@@ -535,13 +554,13 @@ The script should pull from:
 
 ### 6.2 Proposed manifest composition
 
-The default 100-case pilot manifest should target:
+The default `N=430` pilot manifest should target:
 
 | Bucket | Count | Rationale |
 |---|---|---|
 | Pre-cutoff, verified-outcome, perturbation-rich | 60 | supports `C_FO` eligibility, `C_NoOp`, and main temporal analyses |
 | Pre-cutoff, factor-coverage supplement | 20 | broadens factor range without forcing all cases into `C_FO` |
-| Post-cutoff negative controls | 20 | supports `BL2` and sanity-checks false temporal signal |
+| **Post-cutoff negative controls** | **350** | supports `BL2` TOST equivalence test at SESOI = 0.15 (~60% power at true effect = 0); expanded from 20 on 2026-04-29 per `docs/DECISION_20260429_gate_removal.md` §3.3 because the original n=20 was mathematically incapable of satisfying the TOST rule |
 
 Within the 80 pre-cutoff cases, date windows should be balanced as follows:
 
@@ -550,9 +569,24 @@ Within the 80 pre-cutoff cases, date windows should be balanced as follows:
 | `<= 2023-10-31` | 20 | before the earliest Qwen temporal-pair cutoff; low expected temporal advantage |
 | `2023-11-01` to `2024-06-30` | 30 | between early Qwen2.5 and mid-2024 models; supports monotone exposure contrasts |
 | `2024-07-01` to `2025-01-31` | 30 | between mid-2024 and Qwen3 cutoffs; critical for temporal-pair A/B |
-| `>= 2026-02-01` | 20 | post-cutoff negative controls with at least a 6-month safety gap after the latest approximate core-fleet cutoff (`Claude Sonnet 4.6 ~ 2025-08`) |
 
-These windows ensure enough “between-cutoff” cases for temporal contrasts, enough “before all” cases for low-signal anchors, and enough “after all” cases for negative controls.
+The post-cutoff 350 cases are sampled from `>= 2026-02-01` (≥ 6-month
+safety gap after the latest core-fleet cutoff Claude Sonnet 4.6
+~ 2025-08). They preserve the same broad category mix
+(policy / corporate / industry / macro per Section 6.3 quotas, scaled
+linearly from the original 20-case template). Because the post-cutoff
+bucket is for negative-control identification only (no perturbations,
+no audit), it does not enter the C_FO / C_NoOp eligibility funnel and
+adds only `P_predict` (14 models) + `P_logprob` (10 white-box) calls.
+
+**Operational note (2026-04-29).** Sampling 350 articles from
+`>= 2026-02-01` requires extending the existing CLS extraction beyond
+what the original 20-case bucket needed. This extraction is tracked as
+a separate operational task to be triggered when WS4 reaches the
+sampling step. Implementation must NOT silently fall back to fewer
+than 350 articles without a memo.
+
+These windows ensure enough "between-cutoff" cases for temporal contrasts, enough "before all" cases for low-signal anchors, and the post-cutoff 350 give the BL2 negative control statistical authority.
 
 ### 6.3 Factor and event-type quotas
 
@@ -611,25 +645,45 @@ The `15` threshold is a lower-bound stability rule for pilot mixed-model estimat
 
 Stage 1 should state plainly that the pilot does **not** answer the main paper question. It estimates effect size, operational stability, and admissibility.
 
-The perturbation quality-gate language should quote the frozen shortlist conditions verbatim:
+The perturbation data-quality language should quote the frozen shortlist
+requirements verbatim (note: gate condition 3 was removed 2026-04-29; see
+`docs/DECISION_20260429_gate_removal.md`):
 
-| Estimand | Condition 1 | Condition 2 | Condition 3 |
-|---|---|---|---|
-| `E_FO` | audit pass rate `>= 85%` overall, no event type `< 75%` | eligible case coverage `>= 60%` of pre-cutoff cases | baseline delta non-degeneracy: `mean |delta| > 0` on `>= 5/9` models |
-| `E_NoOp` | audit pass rate `>= 85%` overall, no event type `< 75%` | eligible case coverage `>= 60%` of pre-cutoff cases | baseline delta non-degeneracy: `mean |delta| > 0` on `>= 5/9` models |
+| Estimand | Requirement 1 (gate) | Requirement 2 (descriptive) |
+|---|---|---|
+| `E_FO` | audit pass rate `>= 85%` overall, no event type `< 75%` — items failing audit are removed from the eligible pool | eligible case coverage reported per perturbation × event type; coverage `< 60%` becomes a methods-section caveat (no demotion) |
+| `E_NoOp` | audit pass rate `>= 85%` overall, no event type `< 75%` — items failing audit are removed from the eligible pool | eligible case coverage reported per perturbation × event type; coverage `< 60%` becomes a methods-section caveat (no demotion) |
 
-### 7.1A Stage 2 family-state table
+E_FO and E_NoOp remain unconditional confirmatory members of the
+20-coefficient family; the demotion ladder is retired (see Section 7.1A).
 
-Stage 1 should freeze the legal Stage 2 confirmatory family states as follows:
+### 7.1A Stage 2 family state (collapsed to S20 only as of 2026-04-29)
+
+Stage 1 freezes the single legal Stage 2 confirmatory family state:
 
 | state id | family size | trigger | alpha split |
 |---|---|---|---|
-| `S20` | 20 coefficients | `E_FO` and `E_NoOp` both pass quality gate | Westfall-Young family-wise `alpha = 0.05` over 20 |
-| `S16a` | 16 coefficients | `E_FO` is demoted because the `C_FO` gate fails | Westfall-Young family-wise `alpha = 0.05` over 16 |
-| `S16b` | 16 coefficients | `E_NoOp` is demoted because the `C_NoOp` gate fails | Westfall-Young family-wise `alpha = 0.05` over 16 |
-| `S12` | 12 coefficients | `E_FO` and `E_NoOp` are both demoted | Westfall-Young family-wise `alpha = 0.05` over 12 |
+| `S20` | 20 coefficients (5 estimands × 4 factors) | default and only state | Westfall-Young family-wise `alpha = 0.05` over 20 |
 
-Any state outside `S20`, `S16a`, `S16b`, and `S12` requires a new decision memo and is not part of the default preregistered path. Pilot cases **MUST** be excluded from all Stage 2 confirmatory analyses regardless of which legal family state is selected.
+**Demotion ladder retired (`docs/DECISION_20260429_gate_removal.md`).**
+The previous states `S16a` / `S16b` / `S12` were defined for the case
+where E_FO or E_NoOp failed quality gate condition 3. Condition 3 was
+removed as a methodological anti-pattern (it gated measurement of X on
+the magnitude of X), so the demotion mechanism no longer fires. E_FO
+and E_NoOp are unconditional confirmatory members; the family is
+always 20 coefficients.
+
+**Estimand readiness failure** (separate from gates): if a confirmatory
+estimand has fewer than `n_eff = 15` cells per the Section 6.4
+matrix — for example, if PCSG common-vocab eligibility collapses for
+all probe articles, or if `C_FO` produces zero `fo_slotable=true`
+cases — that is an estimand-implementation failure requiring a new
+decision memo before pre-registration freeze. This is a data-availability
+check, not a gate, and is rare. It must not be confused with the
+retired demotion ladder.
+
+Pilot cases **MUST** be excluded from all Stage 2 confirmatory analyses
+under `S20`.
 
 ### 7.1B Evidence package
 
@@ -797,7 +851,11 @@ Grouped cross-validation must split on the **case** as the grouping unit, not on
 
 ### 8.6 Post-cutoff negative control (`BL2`)
 
-For the 20 post-cutoff controls, rerun the same `E_CMMD` and `E_PCSG` analysis logic. The expected outcome is near-zero temporal signal because all relevant models should lack exposure. `BL2` should use a preregistered equivalence test rather than the old attenuation heuristic.
+For the **350 post-cutoff controls** (per Section 6.2 expansion 2026-04-29),
+rerun the same `E_CMMD`, `E_PCSG`, and `E_CTS` analysis logic. The expected
+outcome is near-zero temporal signal because all relevant models should
+lack exposure. `BL2` should use a preregistered equivalence test rather
+than the old attenuation heuristic.
 
 Use case-cluster bootstrap resampling with `n_boot = 2000` to estimate the post-cutoff effect interval on a standardized effect scale. Standardization should use the pre-cutoff pilot standard deviation of the corresponding estimand score so the post-cutoff and pre-cutoff magnitudes live on the same scale.
 
@@ -805,7 +863,21 @@ Freeze the equivalence rule as:
 
 - SESOI (Smallest Effect Size Of Interest) `= 0.15` standardized effect units
 - `BL2` passes only if the 95% post-cutoff bootstrap confidence interval lies fully inside `[-0.15, +0.15]`
-- failure to establish equivalence blocks automatic Phase 8 GO and requires explicit design review
+- TOST power calibration: at `n_post = 350`, simulated TOST power at
+  true effect = 0 is approximately 60%; at `n_post = 700` it is
+  approximately 96%. The 350 figure is the conservative GO size; if
+  Stage 2 power simulation flags 60% as inadequate for the negative
+  control's evidentiary role, expand to 700 under the same Option I
+  rebalance without a memo.
+- Failure to establish equivalence blocks automatic Phase 8 GO and requires explicit design review.
+
+**Why n=350 rather than the original n=20.** R5A_DESIGN_REVIEW_20260427
+Statistical lens computed that at `n_post = 20`, even when the true
+effect is exactly 0, the 95% CI half-width is ~0.44 — about 3× the
+SESOI of 0.15. The probability that the 95% CI falls fully inside
+`[-0.15, +0.15]` is approximately 0%. The TOST rule was therefore
+mathematically impossible to satisfy at the original sample size. See
+`docs/DECISION_20260429_gate_removal.md` §3.3 for the full audit.
 
 ### 8.6A Same-cutoff early-warning ratio
 
@@ -1035,13 +1107,20 @@ Each pilot run should emit `data/pilot/manifests/run_{timestamp}.json` containin
 - config hashes;
 - prompt versions;
 - model fingerprints;
-- white-box checkpoint SHAs;
+- white-box checkpoint SHAs (per `cutoff_source`, `tokenizer_sha`, `hf_commit_sha`, `quant_scheme`);
+- vLLM image tag and digest; GPU dtype; launch command and environment variables;
 - runtime caps;
 - seed policy;
 - request-lineage database path and hash;
 - article manifest hash;
 - perturbation manifest hash;
-- audit manifest hash.
+- audit manifest hash;
+- **`cutoff_observed: dict[str, date]`** — per-model empirical cutoff from Path E (added 2026-04-27);
+- **`cutoff_date_yaml: dict[str, date]`** — per-model declared cutoff from fleet YAML, for robustness comparison (added 2026-04-27);
+- **`quant_scheme: dict[str, str]`** — per-model precision regime (added 2026-04-27);
+- **`pcsg_pair_registry_hash: str`** — canonicalized hash of the `pcsg_pairs` block (added 2026-04-27);
+- **`hidden_state_subset_hash: str`** — SHA256 of the WS6 30-case subset selection JSON (added 2026-04-29);
+- **`quality_gate_thresholds: dict[str, int]`** — per-rule K values resolved from the strict-majority formula at run time (added 2026-04-29).
 
 ### 10.5 Recommended repository additions
 
@@ -1065,12 +1144,14 @@ Phase 7 should add `data/pilot/` as the authoritative artifact root, `data/refer
 
 | Component | Approximate runtime | Notes |
 |---|---|---|
-| `P_logprob` smoke (30 cases x 5 models) | 30-90 minutes | depends on 14B throughput and batch size |
-| `P_logprob` full pilot (100 cases x 5 models) | 2-4 hours | trace saving and per-model queuing included |
-| `P_predict` smoke (20 cases x 9 models) | 30-90 minutes | includes repair/retry overhead |
-| `P_predict` full pilot baseline + perturbations | 4-8 hours | depends on provider latency and retry rate |
-| duplicate reruns | 30-60 minutes | 5% diagnostic subset |
-| full human audit | 6-10 reviewer-hours | feasible within one day across four reviewers |
+| `P_logprob` smoke (30 cases × 10 white-box) | 1-3 hours | depends on 32B throughput and batch size; capacity-curve sanity check included |
+| `P_logprob` full pilot (430 cases × 10 white-box) | 6-10 hours | 80 pre-cutoff + 350 post-cutoff (BL2 expansion); trace saving and per-model queuing included |
+| Hidden-state extraction (30 cases × 10 white-box, WS6 prep) | ~5 hours | offline_hf backend; WS1 cloud Stage 2.7 (Path C eager pre-compute) |
+| Path E cutoff probe (2,160 articles × 10 white-box) | ~2 hours | shares same instance, see WS1 cloud plan Stage 2.5 |
+| `P_predict` smoke (20 cases × 14 models) | 30-90 minutes | includes repair/retry overhead |
+| `P_predict` full pilot baseline + perturbations (430 cases × 14 models, perturbations on pre-cutoff only) | 8-14 hours | depends on provider latency and retry rate |
+| duplicate reruns | 1-2 hours | 5% diagnostic subset |
+| full human audit | 6-10 reviewer-hours | unchanged — perturbations only generated on the 80 pre-cutoff cases |
 | pilot analysis + power simulation | 2-6 hours compute | mostly CPU, simulation scales with `B` |
 
 ### 11.3 API and token budget
@@ -1114,14 +1195,15 @@ Phase 8 may start only if all of the following hold:
 
 1. `src/r5a/` operator and perturbation pipelines run end-to-end on the frozen pilot manifest.
 2. A signed Stage 1 preregistration exists and the Stage 2 skeleton is populated from pilot outputs only.
-3. `P_logprob` succeeds on all 5 white-box models with pinned tokenizer/checkpoint provenance.
-4. `P_predict` succeeds on all 9 models with fingerprint logging and acceptable parse rates.
-5. The effective sample-size matrix passes `min cell >= 15`.
-6. Quality-gate adjudication for `C_FO` and `C_NoOp` is complete and any demotions are explicitly carried into Stage 2, using the frozen three-condition thresholds: audit pass rate `>=85%` overall with no event type `<75%`, eligible case coverage `>=60%` of pre-cutoff cases, and baseline delta non-degeneracy `mean |delta| > 0` on `>=5/9` models.
-7. `BL2` passes the Section 8.6 TOST equivalence rule and the Section 8.6A same-cutoff early-warning ratio is documented; if the ratio exceeds `0.5`, the go/no-go memo must adopt strengthened caveat language rather than ignoring the warning.
+3. `P_logprob` succeeds on all **10 white-box models** with pinned tokenizer/checkpoint provenance, **and Path E `cutoff_observed` is published for every white-box model** (per `docs/DECISION_20260427_pcsg_redefinition.md` §3.3).
+4. `P_predict` succeeds on all **14 models** with fingerprint logging and acceptable parse rates.
+5. The effective sample-size matrix passes `min cell >= 15` on the 80 pre-cutoff cases (post-cutoff 350 enters BL2 only and does not require the same matrix).
+6. **Data-quality requirements** for `C_FO` and `C_NoOp` are complete: audit pass rate `>=85%` overall with no event type `<75%` (items failing audit removed before analysis); eligible case coverage reported per perturbation × event type as a methods-section descriptive metric. **Gate condition 3 (baseline delta non-degeneracy) is no longer evaluated** — removed 2026-04-29 per `docs/DECISION_20260429_gate_removal.md`. E_FO and E_NoOp remain unconditional confirmatory members of `S20`.
+7. `BL2` passes the Section 8.6 TOST equivalence rule **on `n_post = 350`** and the Section 8.6A same-cutoff early-warning ratio is documented; if the ratio exceeds `0.5`, the go/no-go memo must adopt strengthened caveat language rather than ignoring the warning.
 8. Correlation/regrouping trigger has been evaluated and documented.
-9. Main-run power at `N=2560` is acceptable for the retained confirmatory family under the Section 8.8 scenario range. Automatic GO requires at least one temporal-route estimand (`E_CMMD` or `E_PCSG`) **and** one perturbation-route estimand (`E_FO` or `E_NoOp`) to simultaneously reach Westfall-Young-adjusted `80%` power for the primary cutoff-exposure coefficient; a single-channel success is insufficient.
-10. `docs/DECISION_20260417_phase8_go_no_go.md` records the retained family, risks, and run-day operational caps.
+9. **WS6 hidden-state extraction is complete** (30-case subset across 10 white-box models, pre-computed in WS1 Stage 2.7). WS6 mechanistic analysis is unconditional (no behavioral trigger required); analysis can proceed in WS5 regardless of E_FO behavioral magnitude.
+10. Main-run power at `N=2560` is acceptable for the retained confirmatory family under the Section 8.8 scenario range. Automatic GO requires at least one temporal-route estimand (`E_CMMD` or `E_PCSG`) **and** one perturbation-route estimand (`E_FO` or `E_NoOp`) to simultaneously reach Westfall-Young-adjusted `80%` power for the primary cutoff-exposure coefficient; a single-channel success is insufficient.
+11. `docs/DECISION_20260417_phase8_go_no_go.md` records the retained family, risks, and run-day operational caps.
 
 The Phase 8 gate is about measurement readiness, not about obtaining a “positive” pilot. Null pilot findings are allowed; unidentified or unstable pilot findings are not.
 
@@ -1156,6 +1238,17 @@ data/reference/model_capability_scores.csv
 ```
 
 ### 14.2 Config keys that should exist
+
+> **Note (added 2026-04-29).** The example below is the **historical
+> 9-model schema** (5 white-box + 4 black-box). The current authoritative
+> fleet (post-2026-04-27) is **14 models** (10 white-box + 4 black-box) with
+> a top-level `pcsg_pairs` registry — see `config/fleet/r5a_fleet.yaml` for
+> the live source of truth. The example here is preserved as documentation
+> of the schema shape; for current member roster, `cutoff_source`,
+> `quant_scheme`, `hf_repo`, and `pcsg_pairs` keys consult the YAML
+> directly. PCSG eligibility is declared via `pcsg_pairs[].tokenizer_compat:
+> qwen2_class` plus `max_token_id_inclusive`, NOT inferred from
+> `tokenizer_family` equality.
 
 `config/fleet/r5a_fleet.yaml` should minimally define a per-model × per-operator matrix:
 

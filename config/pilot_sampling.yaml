@@ -1,31 +1,35 @@
-# Pilot case-sampling specification (plan v2.2 §6).
+# Pilot case-sampling specification (plan v2.3 §6, amended 2026-04-29).
 #
 # Consumed by scripts/sample_phase7_pilot.py (WS4) to build
-# data/pilot/manifests/pilot_100_cases.json. The factor schema
+# data/pilot/manifests/pilot_430_cases.json. The factor schema
 # referenced by `factor_schema_path` is produced by WS0.5 and is not
 # yet authored — this file is structural; numeric quotas come straight
-# from the plan and are pilot-iterable only via the rebalance rule
-# (preserve N=100 first; only escalate to a memo if rebalance fails).
+# from the plan.
+#
+# 2026-04-29 amendment per docs/DECISION_20260429_gate_removal.md §3.3:
+#   post_cutoff_negative_control 20 -> 350 (BL2 Option I expansion)
+#   total_cases 100 -> 430
 
-manifest_id: phase7-pilot-100
-total_cases: 100
+manifest_id: phase7-pilot-430
+total_cases: 430
 
 source:
   primary: cls_v3
   fallback_seed: data/seed/test_cases_v3.json
 
-# Bucket composition (plan §6.2)
+# Bucket composition (plan §6.2, post-2026-04-29)
 buckets:
   pre_cutoff_verified_outcome: 60
   pre_cutoff_factor_supplement: 20
-  post_cutoff_negative_control: 20
+  post_cutoff_negative_control: 350  # expanded from 20 for BL2 TOST
 
-# Date-window targets within the 80 pre-cutoff cases (plan §6.2)
+# Date-window targets within the 80 pre-cutoff cases (plan §6.2);
+# the 350 post-cutoff cases are the >= 2026-02-01 bucket separately
 date_windows:
   - { range: "<= 2023-10-31",          target: 20 }
   - { range: "2023-11-01..2024-06-30", target: 30 }
   - { range: "2024-07-01..2025-01-31", target: 30 }
-  - { range: ">= 2026-02-01",          target: 20 }
+  - { range: ">= 2026-02-01",          target: 350 }  # BL2 negative control
 
 # Quotas (plan §6.3)
 category_min_per_top_level: 15  # policy / corporate / industry / macro

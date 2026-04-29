@@ -2,18 +2,19 @@
 title: WS1 Cloud Execution Plan — P_logprob on AutoDL RTX PRO 6000
 stage: Phase 7 / WS1
 date: 2026-04-26
-last_amended: 2026-04-27
-status: APPROVED — Stage 0 in progress; revised for fleet expansion + GPU upgrade
+last_amended: 2026-04-29
+status: APPROVED — Stage 0 in progress; revised for fleet expansion + GPU upgrade + Stage 2.7 (WS6 Path C eager pre-compute)
 authority: plans/phase7-pilot-implementation.md §5.2 (WS1 spec)
 related_decisions:
-  - docs/DECISION_20260426_phase7_interfaces.md (WS0 sign-off)
-  - docs/DECISION_20260427_pcsg_redefinition.md (PCSG redefinition + fleet expansion + Path E + WS6 conditional)
+  - docs/DECISION_20260426_phase7_interfaces.md (WS0 sign-off; partly superseded by 0427+0429)
+  - docs/DECISION_20260427_pcsg_redefinition.md (PCSG redefinition + fleet expansion + Path E)
+  - docs/DECISION_20260429_gate_removal.md (gate removal + WS6 unconditional via Stage 2.7 Path C eager pre-compute + BL2 n_post 350)
 gpu_decision: RTX PRO 6000 (Blackwell, 96 GB) single-card on AutoDL
 quantization_decision:
   qwen2_5_family: AWQ-INT4 (5 sizes — official Qwen AWQ)
   qwen3_family:   AWQ-INT4 (4 sizes — official Qwen AWQ; 1.7B not available officially, skipped)
   glm_family:     fp16 (no official GLM-4-9B AWQ)
-budget_cap_usd: 30  # raised from 20 to accommodate 10-model + Path E run
+budget_cap_usd: 35  # raised to accommodate Stage 2.7 hidden-state extraction (~5 hr extra GPU = ~40 RMB)
 ---
 
 # WS1 Cloud Execution Plan
@@ -75,13 +76,15 @@ within-family OLS regression of paired logprob delta on `log₂(params)`.
 | Component | Estimate |
 |---|---|
 | RTX PRO 6000 @ ~¥8/hr × 12 hr (10 models pilot + Path E + smoke + provisioning) | ~¥96 (~$13) |
-| 100 GB persistent data disk × 36 hr (extra room for 10 model checkpoints + Path E artifacts) | ~¥18 (~$2.5) |
-| **Expected total** | **~$15** |
-| **Hard stop budget** | **$30** |
+| **Stage 2.7 hidden-state extraction (~5 hr offline_hf, 10 models × 30 cases)** | **~¥40 (~$5.5)** |
+| 100 GB persistent data disk × 36 hr (room for 10 checkpoints + Path E + 25-60 GB hidden states) | ~¥18 (~$2.5) |
+| **Expected total** | **~$21** |
+| **Hard stop budget** | **$35** |
 
 Stop and review if 80% of budget is consumed before all 10 models close
-their pilot loop. Path E shares the same instance — if budget is tight,
-defer Path E to a separate later run.
+their pilot loop. Path E and Stage 2.7 share the same instance — if
+budget is tight, defer Stage 2.7 (the ~$5 hidden-state extraction) before
+Path E since Path E is a hard exit-gate item per plan §13 #3.
 
 ## 5. Stages
 
@@ -166,6 +169,60 @@ Smoke gate per model:
 - 30/30 cases return non-empty token logprobs of equal length to token IDs
 - `thinking_mode == "off"` written on every record
 - E_CTS, E_PCSG calculable end-to-end on the smoke set
+
+### Stage 2.7 — Hidden-state extraction for WS6 (~5 hr, same instance)
+
+Added 2026-04-29 per `docs/DECISION_20260429_gate_removal.md` §3.2.
+WS6 (mechanistic memorization localization, Wang et al. 2025-style
+DS / KL / activation patching) is now an **unconditional** exploratory
+follow-up. Hidden states are eagerly pre-computed in this stage so
+WS6 has its data regardless of behavioral E_FO outcomes.
+
+**Subset selection** (run locally before cloud, commit to manifest):
+
+```bash
+# Build the 30-case subset from the pilot manifest:
+#   - eligibility: fo_slotable=true (so the same articles support
+#     WS6 false-outcome mechanism analysis)
+#   - stratification: equal allocation across the pilot event-type
+#     taxonomy (e.g. 5 super-types × 6 articles, or 4 × 7-8)
+#   - cross-model alignment: same 30 case_ids for ALL 10 white-box
+#     models so activation-patching can compare layer representations
+#     across cases
+python scripts/ws1_select_hidden_state_subset.py \
+  --pilot-manifest data/pilot/manifests/pilot_430_cases.json \
+  --output data/pilot/manifests/hidden_state_subset_30.json
+```
+
+**Per-model loop** (after Stage 2 vLLM is fully done, before Stage 2.5
+Path E starts; model checkpoints already on local disk so reload is fast):
+
+```bash
+for model_id in qwen2.5-{1.5b,3b,7b,14b,32b} qwen3-{4b,8b,14b,32b} glm-4-9b; do
+  docker stop $(docker ps -q --filter ancestor=vllm/vllm-openai) 2>/dev/null || true
+  python scripts/ws1_run_logprob.py \
+    --model "$model_id" \
+    --backend offline_hf \
+    --hidden-states-subset data/pilot/manifests/hidden_state_subset_30.json \
+    --output-dir data/pilot/hidden_states
+done
+```
+
+**Pack and transfer** (compressed shipment back to local for analysis):
+
+```bash
+bash scripts/ws1_pack_hidden_states.sh \
+  --input-dir data/pilot/hidden_states \
+  --output data/pilot/hidden_states.tar.zst
+# Estimated 25-60 GB raw -> 30-50 GB compressed; ~40-60 min download at AutoDL 100 Mbps
+```
+
+**Disk budget**: 25-60 GB on the 100 GB persistent disk. Within capacity.
+
+**Smoke gate**: each per-(model, case) `.safetensors` must contain
+`layer_0..layer_N` keys with shapes consistent with model card metadata
+(layer count and hidden dim verified against `config.json`). The
+`hidden_state_subset_hash` from the manifest must match.
 
 ### Stage 2.5 — Path E empirical cutoff probe (~2 hr, same instance)
 
@@ -261,6 +318,8 @@ Plan §5.2 exit: <1% un-recovered trace failures across the 10 models +
 - [ ] Stage 0 smoke fixture committed
 - [ ] AutoDL account ready
 - [ ] Stage 1 instance reserved
-- [ ] Run manifest fields populated for each model
-- [ ] Trace failure rate < 1% across the 5 models
+- [ ] Run manifest fields populated for each of the **10 white-box models** (incl. `cutoff_observed`, `quant_scheme`, `pcsg_pair_registry_hash`, `hidden_state_subset_hash`, `quality_gate_thresholds` per plan §10.4)
+- [ ] Trace failure rate < 1% across the **10 white-box models**
+- [ ] Stage 2.7 hidden-state extraction complete (30 cases × 10 models, packed and downloaded)
+- [ ] Path E `cutoff_observed.json` produced and joined into RunManifest
 - [ ] Instance + data disk torn down

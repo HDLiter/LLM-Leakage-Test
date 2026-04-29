@@ -3,10 +3,29 @@ title: Phase 7 WS0 Interface Sign-off
 date: 2026-04-26
 phase: Phase 7 — Pilot
 workstream: WS0
-status: SIGNED — interfaces frozen for WS1/WS2/WS3 implementation
+status: SIGNED — interfaces frozen for WS1/WS2/WS3 implementation; partly superseded by 0427 + 0429 (see banner below)
 authority: plans/phase7-pilot-implementation.md §5.1
 supersedes: none
+superseded_in_part_by:
+  - docs/DECISION_20260427_pcsg_redefinition.md (fleet roster: 5 white-box → 10 white-box; PCSG pair definition: same-tokenizer same-cutoff pairs → cross-version Qwen pair on common-vocab subset; RunManifest additions: cutoff_observed, quant_scheme, pcsg_pair_registry_hash)
+  - docs/DECISION_20260429_gate_removal.md (E_FO/E_NoOp gate removal; Stage 2 family states collapsed to S20; WS6 unconditional; BL2 n_post 20→350; RunManifest additions: hidden_state_subset_hash, quality_gate_thresholds)
 ---
+
+> **Supersession banner (added 2026-04-29).** This memo is preserved for
+> historical record and for the parts that remain in force (R5A namespace
+> layout, runtime schema, Pydantic contract names, smoke harness wiring).
+> The fleet roster table in §2.1, the PCSG temporal-pair definition, and
+> the RunManifest field set listed in §3 are **partly superseded** by the
+> two memos linked above. For the current authoritative state consult:
+> - **Fleet roster + PCSG pairs**: `config/fleet/r5a_fleet.yaml`
+> - **RunManifest field set**: `plans/phase7-pilot-implementation.md` §10.4
+>   (full enumerated list, including 2026-04-27 + 2026-04-29 additions)
+> - **E_FO / E_NoOp gate status**: removed; see DECISION_20260429
+> - **WS6 trigger**: unconditional; see DECISION_20260429 §2.4
+>
+> Do not rewrite the historical content below. New facts go in the two
+> superseding memos.
+
 
 # Phase 7 WS0 — Interface Sign-off
 

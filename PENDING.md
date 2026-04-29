@@ -33,6 +33,13 @@
 - **Owner**: user (data access) + Claude Code (sampling script).
 - **Target resolution date**: before WS1 cloud Stage 2.5.
 
+### Llama fleet addition — Meta HF gating pre-flight
+- **Context**: `docs/DECISION_20260429_llama_addition.md` adds `meta-llama/Meta-Llama-3-8B-Instruct` and `meta-llama/Meta-Llama-3.1-8B-Instruct` as P_logprob-only fleet members. Both are HF-gated; `hf-mirror.com` does NOT bypass Meta gating (verified 2026-04-29).
+- **External action needed**: user clicks through Meta license at `https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct` and `https://huggingface.co/meta-llama/Meta-Llama-3.1-8B-Instruct`; verifies HF fine-grained read-only token includes access via `huggingface-cli whoami` then `huggingface-cli download meta-llama/Meta-Llama-3-8B-Instruct --include "*.json"` test pull.
+- **Blocking**: WS1 cloud Stage 1 (provisioning); does NOT block Tier-0 implementation work that does not require HF download.
+- **Owner**: user (license click-through) + Claude Code (verification script in Stage 1).
+- **Target resolution date**: before WS1 cloud spend.
+
 ### BL2 post-cutoff sample expansion — CLS extraction beyond 2026-02
 - **Context**: `docs/DECISION_20260429_gate_removal.md` §3.3 + plan §6.2 expanded BL2 post-cutoff bucket from 20 → 350 cases, sampled from `>= 2026-02-01`. The original 20-case sampling pool is insufficient for this volume.
 - **External action needed**: extract additional CLS articles published `>= 2026-02-01` to support 350-case sampling with category quotas (policy / corporate / industry / macro). User to trigger CLS scrape; Claude Code to flag this when WS4 sampling step is reached.

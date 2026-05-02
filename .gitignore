@@ -25,11 +25,16 @@ __pycache__/
 # Large datasets
 data/cls_telegraph_raw/
 
-# Path-E cutoff probe fixtures (CLS-content-heavy; regenerable via
-# scripts/build_cutoff_probe_set.py against the local CLS corpus)
-data/pilot/cutoff_probe/probe_set_*.json
-data/pilot/cutoff_probe/traces/
-data/pilot/cutoff_probe/cutoff_observed.json
+# Path-E exposure-horizon probe fixtures (CLS-content-heavy; regenerable
+# via scripts/build_cutoff_probe_set.py against the local CLS corpus;
+# renamed 2026-04-30 per DECISIONS.md decision #5)
+data/pilot/exposure_horizon/probe_set_*.json
+data/pilot/exposure_horizon/traces/
+data/pilot/exposure_horizon/horizon_observed.json
+# Legacy pre-rename Path-E dir; left ignored so leftover local artifacts
+# from the old `data/pilot/cutoff_probe/` location are not accidentally
+# staged by the Tier-R2-0 consolidated commit.
+data/pilot/cutoff_probe/
 
 # WS1 main pilot logprob traces (GPU-derived, regenerable)
 data/pilot/logprob_traces/

@@ -10,23 +10,38 @@ writes them back into `config/fleet/r5a_fleet.yaml`.
 Discovery sources (precedence: explicit overrides > HF cache > leave
 as-is):
 
-  1. `--pin-json PATH` — JSON map `{model_id: {hf_commit_sha, tokenizer_sha}}`
-     for cases where auto-discovery fails (e.g., no HF cache available
-     because models are pre-baked into the Docker image).
+  1. `--pin-json PATH` — JSON map `{model_id: {hf_commit_sha,
+     tokenizer_sha, [revision]}}` for cases where auto-discovery fails
+     (e.g., no HF cache available because models are pre-baked into the
+     Docker image). Unknown model_ids in the JSON are rejected so a
+     typo cannot silently no-op a confirmatory pinning run.
 
-  2. `--hf-cache DIR` — HuggingFace hub cache root (defaults to
-     `$HF_HOME/hub` or `~/.cache/huggingface/hub`). Each model's
-     snapshot is at `models--<owner>--<repo>/snapshots/<sha>/`. The
-     tokenizer SHA is computed as the git-blob SHA1 of
-     `tokenizer.json` (matches HF's own blob-store filename, but works
-     on Windows where the blobs/ symlinks become real files).
+  2. `--hf-cache DIR` — HuggingFace hub cache root (default precedence:
+     `$HF_HUB_CACHE` env var, then `$HF_HOME/hub`, then
+     `~/.cache/huggingface/hub`). Each model's snapshot is at
+     `models--<owner>--<repo>/snapshots/<sha>/`. The tokenizer SHA is
+     the SHA-256 of `tokenizer.json` byte content as resolved at load
+     time (DECISIONS.md decision #4). NOTE this matches HF's blob-store
+     filename ONLY for LFS-tracked tokenizers; non-LFS tokenizers are
+     stored under their git-blob SHA1 in the HF cache. Do NOT use
+     `tokenizer_sha` as a cache lookup key.
+
+When the HF cache contains multiple snapshots for one repo (typical
+after retried downloads on AutoDL bring-up), the pinner refuses to
+silently pick the newest mtime — the operator MUST disambiguate via
+`--pin-json` `revision` field so the pinned `hf_commit_sha` is the one
+that was actually loaded.
 
 The script is purely textual on the YAML file: it walks the model
 section line-by-line, locates `<TBD>` values for the chosen model, and
 replaces them in place. This preserves the file's leading comments and
 PCSG pair registry (which is the SHA-256 input for
 `pcsg_pair_registry_hash` so a careless round-trip would silently
-invalidate prior RunManifests).
+invalidate prior RunManifests). The file is replaced atomically via
+`os.replace` so a crash mid-write cannot leave a half-written fleet
+YAML on disk; the pinning log append is best-effort post-fleet, so if
+you ever see fleet changes without a corresponding log entry, add the
+entry by hand.
 
 Usage:
 
@@ -41,10 +56,9 @@ Usage:
 
 The `--vllm-image-digest` value is NOT written into the fleet YAML
 (it's a per-run, not per-model, field; recorded in RunManifest by
-`scripts/ws1_finalize_run_manifest.py`). It is required here only to
-record alongside the pinning so the operator has a single source of
-truth for what was running when SHAs were captured; the value is
-echoed into `data/pilot/.fleet_pinning_log.json`.
+`scripts/ws1_finalize_run_manifest.py`). It is required for non-`--check`
+runs and must match the regex `sha256:<64-hex>`; recorded into
+`data/pilot/.fleet_pinning_log.json`.
 """
 
 from __future__ import annotations
@@ -55,6 +69,7 @@ import json
 import os
 import re
 import sys
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -66,6 +81,7 @@ from src.r5a.fleet import ModelConfig, load_fleet  # noqa: E402
 
 
 PLACEHOLDER = "<TBD>"
+VLLM_IMAGE_DIGEST_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
 
 
 def parse_args() -> argparse.Namespace:
@@ -85,19 +101,25 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help=(
             "HuggingFace hub cache root; default = "
-            "$HF_HOME/hub or ~/.cache/huggingface/hub"
+            "$HF_HUB_CACHE, then $HF_HOME/hub, then ~/.cache/huggingface/hub"
         ),
     )
     p.add_argument(
         "--pin-json",
         default=None,
-        help="JSON file with explicit per-model overrides",
+        help=(
+            "JSON file with explicit per-model overrides; unknown model_ids "
+            "are rejected with a non-zero exit"
+        ),
     )
     p.add_argument(
         "--vllm-image-digest",
         required=False,
         default=None,
-        help="Docker image digest used during pinning; recorded in pinning log",
+        help=(
+            "Docker image digest used during pinning; required for non-check "
+            "runs (must match sha256:<64-hex>); recorded in pinning log"
+        ),
     )
     p.add_argument(
         "--bump-version",
@@ -117,21 +139,22 @@ def parse_args() -> argparse.Namespace:
     return p.parse_args()
 
 
-def _git_blob_sha1(content: bytes) -> str:
-    """Compute git's `blob` SHA1: `sha1("blob <size>\\0" + content)`.
+def _sha256_file_content(content: bytes) -> str:
+    """SHA-256 of `tokenizer.json` byte content as resolved at load time.
 
-    Matches the filename used by the HF hub cache `blobs/` store, which
-    is the git-blob SHA1 of each file. Works on Windows even when the
-    cache copied the file (no symlinks) because the hash is content-
-    addressed.
+    Matches HF cache `blobs/<hash>` filename for LFS-tracked tokenizers
+    but NOT for git-tracked ones (HF uses git-blob SHA1 for non-LFS).
+    Do NOT use this value as a cache lookup key.
     """
-    h = hashlib.sha1()
-    h.update(f"blob {len(content)}\0".encode("ascii"))
-    h.update(content)
-    return h.hexdigest()
+    return hashlib.sha256(content).hexdigest()
 
 
 def _default_hf_cache() -> Path | None:
+    env_cache = os.environ.get("HF_HUB_CACHE")
+    if env_cache:
+        candidate = Path(env_cache)
+        if candidate.exists():
+            return candidate
     hf_home = os.environ.get("HF_HOME")
     if hf_home:
         candidate = Path(hf_home) / "hub"
@@ -149,20 +172,52 @@ def _hf_cache_repo_dir(cache: Path, hf_repo: str) -> Path:
     return cache / name
 
 
-def _pick_snapshot(repo_dir: Path) -> Path | None:
+def _pick_snapshot(
+    repo_dir: Path,
+    model_id: str,
+    *,
+    requested_revision: str | None,
+) -> Path | None:
+    """Return the snapshot directory for `model_id`.
+
+    Refuses to silently choose between multiple snapshots — when the HF
+    cache has more than one (typical after retried `huggingface-cli
+    download` on AutoDL bring-up), the operator MUST pass the desired
+    `hf_commit_sha` via `--pin-json` `revision` field. This eliminates
+    the "wrong-snapshot-pinned" hazard (R2-C5 #2 / Lens A major #5).
+    """
     snaps = repo_dir / "snapshots"
     if not snaps.exists():
         return None
     candidates = [p for p in snaps.iterdir() if p.is_dir()]
     if not candidates:
         return None
+
+    if requested_revision is not None:
+        target = snaps / requested_revision
+        if not target.exists():
+            raise SystemExit(
+                f"{model_id}: --pin-json revision {requested_revision!r} "
+                f"not found under {snaps}; have {[c.name for c in candidates]}"
+            )
+        return target
+
     if len(candidates) == 1:
         return candidates[0]
-    return max(candidates, key=lambda p: p.stat().st_mtime)
+
+    raise SystemExit(
+        f"{model_id}: HF cache has multiple snapshots {[c.name for c in candidates]} "
+        f"under {snaps}; refusing to silently pick newest. Pass "
+        f"--pin-json with `\"{model_id}\": {{\"revision\": \"<commit_sha>\"}}` "
+        "to disambiguate."
+    )
 
 
 def _discover_from_cache(
-    cfg: ModelConfig, cache: Path
+    cfg: ModelConfig,
+    cache: Path,
+    *,
+    requested_revision: str | None,
 ) -> tuple[str | None, str | None, str]:
     """Return (hf_commit_sha, tokenizer_sha, note)."""
     if not cfg.hf_repo:
@@ -170,21 +225,59 @@ def _discover_from_cache(
     repo_dir = _hf_cache_repo_dir(cache, cfg.hf_repo)
     if not repo_dir.exists():
         return None, None, f"cache miss: {repo_dir} not found"
-    snapshot = _pick_snapshot(repo_dir)
+    snapshot = _pick_snapshot(
+        repo_dir, cfg.model_id, requested_revision=requested_revision
+    )
     if snapshot is None:
         return None, None, f"no snapshot under {repo_dir}/snapshots"
     commit_sha = snapshot.name
     tok_path = snapshot / "tokenizer.json"
     if not tok_path.exists():
         return commit_sha, None, f"snapshot at {snapshot} has no tokenizer.json"
-    # Resolve symlink target on Linux; read content directly otherwise
     real = tok_path.resolve()
     try:
         content = real.read_bytes()
     except OSError as exc:  # pragma: no cover
         return commit_sha, None, f"failed reading {real}: {exc!r}"
-    tok_sha = _git_blob_sha1(content)
+    tok_sha = _sha256_file_content(content)
     return commit_sha, tok_sha, "ok"
+
+
+# ----------------------------------------------------------------------
+# Atomic write helpers (B.23)
+# ----------------------------------------------------------------------
+
+
+def _atomic_write_text(path: Path, text: str) -> None:
+    """Write `text` to `path` via tempfile + os.replace.
+
+    Avoids leaving a half-written file on disk if the process crashes
+    mid-write (Windows `Path.write_text` is non-atomic). The temp file
+    lives in the same directory as `path` so `os.replace` is a same-
+    filesystem rename across both POSIX and Windows.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp_str = tempfile.mkstemp(
+        prefix=path.name + ".", suffix=".tmp", dir=str(path.parent)
+    )
+    tmp = Path(tmp_str)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8", newline="") as f:
+            f.write(text)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, path)
+    except Exception:
+        try:
+            tmp.unlink()
+        except FileNotFoundError:
+            pass
+        raise
+
+
+def _atomic_write_json(path: Path, payload: object) -> None:
+    text = json.dumps(payload, indent=2, ensure_ascii=False) + "\n"
+    _atomic_write_text(path, text)
 
 
 # ----------------------------------------------------------------------
@@ -208,7 +301,10 @@ def _patch_model_block(
 
     Implementation: find the `model_id:` header at indent 2, then walk
     forward until the next 2-space-indent key (next model or pcsg_pairs
-    section). Within that span, replace the targeted lines.
+    section). Within that span, replace the targeted lines. Both the
+    raw `<TBD>` placeholder and a quoted `"<TBD>"` are accepted as
+    "needs pinning" so YAML files that quoted the placeholder for
+    portability still get patched on first run (R2-C5 #4).
     """
     lines = yaml_text.splitlines(keepends=True)
     n = len(lines)
@@ -221,12 +317,10 @@ def _patch_model_block(
                 start = i + 1
                 continue
             if start is not None and not line.startswith("    "):
-                # Could be next model header at same indent; stop the block
                 if line.strip() and not line.lstrip().startswith("#"):
                     end = i
                     break
         if start is not None and not line.startswith("  "):
-            # Top-level key (e.g. `pcsg_pairs:`); end of models section
             if line.strip() and not line.lstrip().startswith("#"):
                 end = i
                 break
@@ -241,6 +335,7 @@ def _patch_model_block(
         ("tokenizer_sha", tokenizer_sha),
         ("hf_commit_sha", hf_commit_sha),
     )
+    quoted_placeholder = f'"{PLACEHOLDER}"'
     for j in range(start, end):
         line = lines[j].rstrip("\n")
         for key, new_value in field_pairs:
@@ -250,11 +345,13 @@ def _patch_model_block(
             if not mm:
                 continue
             current = mm.group(2).strip()
-            if current == PLACEHOLDER or current == new_value:
+            if (
+                current == PLACEHOLDER
+                or current == quoted_placeholder
+                or current == new_value
+            ):
                 if current == new_value:
                     continue
-                # Quote unconditionally to avoid YAML interpreting hex
-                # values as numbers/floats by accident.
                 replacement = f'{mm.group(1)}"{new_value}"{mm.group(3)}'
                 lines[j] = replacement + ("\n" if lines[j].endswith("\n") else "")
                 changes.append(f"{model_id}.{key}: {PLACEHOLDER} -> {new_value}")
@@ -279,6 +376,18 @@ def _bump_fleet_version(yaml_text: str, new_version: str) -> tuple[str, str | No
 
 def main() -> int:
     args = parse_args()
+
+    if not args.check:
+        if not args.vllm_image_digest:
+            raise SystemExit(
+                "--vllm-image-digest is required for non-check pinning runs"
+            )
+        if not VLLM_IMAGE_DIGEST_RE.match(args.vllm_image_digest):
+            raise SystemExit(
+                f"--vllm-image-digest must match sha256:<64-hex>; "
+                f"got {args.vllm_image_digest!r}"
+            )
+
     fleet_path = Path(args.fleet)
     if not fleet_path.exists():
         raise SystemExit(f"fleet YAML not found: {fleet_path}")
@@ -288,6 +397,12 @@ def main() -> int:
     overrides: dict[str, dict[str, str]] = {}
     if args.pin_json:
         overrides = json.loads(Path(args.pin_json).read_text(encoding="utf-8"))
+        unknown = sorted(set(overrides) - set(fleet.models))
+        if unknown:
+            raise SystemExit(
+                f"--pin-json contains model IDs not in fleet: {unknown}; "
+                "check config/fleet/r5a_fleet.yaml `models:` keys"
+            )
 
     cache: Path | None = None
     if args.hf_cache:
@@ -300,19 +415,21 @@ def main() -> int:
     all_changes: list[str] = []
     pinned_records: dict[str, dict[str, str]] = {}
 
-    # Iterate in YAML order; only act on white-box models with hf_repo.
     for model_id, cfg in fleet.models.items():
         if not cfg.is_white_box() or not cfg.hf_repo:
             continue
         ovr = overrides.get(model_id, {})
         commit_sha = ovr.get("hf_commit_sha")
         tok_sha = ovr.get("tokenizer_sha")
+        revision = ovr.get("revision")
         note = "override"
         if (commit_sha is None or tok_sha is None) and cache is not None:
-            disc_commit, disc_tok, disc_note = _discover_from_cache(cfg, cache)
+            disc_commit, disc_tok, disc_note = _discover_from_cache(
+                cfg, cache, requested_revision=revision
+            )
             commit_sha = commit_sha or disc_commit
             tok_sha = tok_sha or disc_tok
-            note = f"override+cache" if ovr else f"cache:{disc_note}"
+            note = "override+cache" if ovr else f"cache:{disc_note}"
         if commit_sha is None and tok_sha is None:
             all_changes.append(f"{model_id}: NO PINNING — no override, no cache hit")
             continue
@@ -329,22 +446,33 @@ def main() -> int:
             "source": note,
         }
 
-    # Bump fleet_version unless explicitly told not to.
-    new_version: str = fleet.fleet_version  # default for --check / log
+    new_version: str = fleet.fleet_version
+    any_field_changed = any(
+        ("->" in c)
+        and not c.startswith("fleet_version:")
+        and "SKIP" not in c
+        for c in all_changes
+    )
+
     if not args.check:
         if args.bump_version:
             new_version = args.bump_version
-        else:
+            yaml_text, old_version = _bump_fleet_version(yaml_text, new_version)
+            if old_version is not None:
+                all_changes.append(f"fleet_version: {old_version} -> {new_version}")
+            else:
+                all_changes.append("fleet_version: pattern not matched; not bumped")
+        elif any_field_changed:
             now = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
             new_version = f"{fleet.fleet_version}+pinned-{now}"
-        yaml_text, old_version = _bump_fleet_version(yaml_text, new_version)
-        if old_version is not None:
-            all_changes.append(f"fleet_version: {old_version} -> {new_version}")
+            yaml_text, old_version = _bump_fleet_version(yaml_text, new_version)
+            if old_version is not None:
+                all_changes.append(f"fleet_version: {old_version} -> {new_version}")
+            else:
+                all_changes.append("fleet_version: pattern not matched; not bumped")
         else:
-            all_changes.append("fleet_version: pattern not matched; not bumped")
+            all_changes.append("fleet_version: no field changes; not bumped")
 
-    # Re-validate by parsing the patched YAML through pydantic before
-    # writing — refuses to commit a malformed result.
     if not args.check:
         from io import StringIO
 
@@ -362,7 +490,7 @@ def main() -> int:
             )
 
         out_path = Path(args.output) if args.output else fleet_path
-        out_path.write_text(yaml_text, encoding="utf-8")
+        _atomic_write_text(out_path, yaml_text)
         print(f"wrote {out_path}")
 
     print("changes:")
@@ -371,7 +499,6 @@ def main() -> int:
 
     if not args.check:
         log_path = Path(args.log_path)
-        log_path.parent.mkdir(parents=True, exist_ok=True)
         log_entry = {
             "ts": datetime.now(timezone.utc).isoformat(),
             "fleet_version_old": fleet.fleet_version,
@@ -384,13 +511,18 @@ def main() -> int:
         if log_path.exists():
             try:
                 prior = json.loads(log_path.read_text(encoding="utf-8"))
-            except json.JSONDecodeError:
-                prior = []
+            except json.JSONDecodeError as exc:
+                raise SystemExit(
+                    f"existing pinning log {log_path} is corrupt: {exc!r}; "
+                    "operator must inspect and either fix or move it aside"
+                )
+            if not isinstance(prior, list):
+                raise SystemExit(
+                    f"existing pinning log {log_path} is not a JSON array; "
+                    "operator must inspect and either fix or move it aside"
+                )
         prior.append(log_entry)
-        log_path.write_text(
-            json.dumps(prior, indent=2, ensure_ascii=False),
-            encoding="utf-8",
-        )
+        _atomic_write_json(log_path, prior)
         print(f"appended pinning log -> {log_path}")
 
     return 0

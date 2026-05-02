@@ -67,7 +67,7 @@ class ModelConfig(BaseModel):
     # `p_predict` is Optional to express the P_logprob-only role
     # (DECISION_20260429_llama_addition §2.2): Llama-3 / Llama-3.1
     # entries omit `p_predict:` and are therefore excluded from
-    # P_predict-driven estimands (E_CMMD, E_FO, E_NoOp, E_extract).
+    # P_predict-driven estimands (E_CMMD, E_OR, E_NoOp, E_extract).
     p_predict: PPredictModelConfig | None = None
 
     def is_white_box(self) -> bool:
@@ -120,7 +120,7 @@ class FleetConfig(BaseModel):
 
     def p_predict_eligible_ids(self) -> list[str]:
         """Models that participate in P_predict (and therefore in
-        P_predict-derived estimands E_CMMD / E_FO / E_NoOp / E_extract).
+        P_predict-derived estimands E_CMMD / E_OR / E_NoOp / E_extract).
 
         Per DECISION_20260429_llama_addition §2.2 Llama is `p_predict:
         null` and therefore excluded.
@@ -195,6 +195,12 @@ class FleetConfig(BaseModel):
                 refs = list(pair.members)
             else:
                 raise ValueError(f"PCSG pair {pair.id!r} has unknown role {pair.role!r}")
+
+            if len(set(refs)) != len(refs):
+                raise ValueError(
+                    f"PCSG pair {pair.id!r} has duplicate members in {refs!r}; "
+                    "members must be distinct"
+                )
 
             for ref in refs:
                 if ref not in self.models:

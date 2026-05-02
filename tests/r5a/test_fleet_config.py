@@ -12,6 +12,7 @@ from pathlib import Path
 
 import pytest
 import yaml
+from pydantic import ValidationError
 
 from src.r5a.fleet import FleetConfig, load_fleet
 
@@ -120,7 +121,7 @@ def test_pcsg_pair_validator_rejects_duplicate_id(tmp_path: Path):
 def test_pcsg_pair_validator_rejects_temporal_with_members(tmp_path: Path):
     payload = _base_yaml()
     payload["pcsg_pairs"][0]["members"] = ["qwen2.5-7b", "qwen3-8b"]
-    with pytest.raises(Exception):
+    with pytest.raises(ValidationError, match="must not declare 'members'"):
         _write_and_load(tmp_path, payload)
 
 
@@ -134,7 +135,7 @@ def test_pcsg_pair_validator_rejects_capacity_without_members(tmp_path: Path):
             "max_token_id_inclusive": 151664,
         }
     ]
-    with pytest.raises(Exception):
+    with pytest.raises(ValidationError, match="requires >=2 members"):
         _write_and_load(tmp_path, payload)
 
 
@@ -188,3 +189,73 @@ def test_pcsg_pair_registry_hash_changes_on_pair_edit(tmp_path: Path):
     payload["pcsg_pairs"][0]["max_token_id_inclusive"] = 151000
     fleet2 = _write_and_load(tmp_path, payload)
     assert fleet1.pcsg_pair_registry_hash() != fleet2.pcsg_pair_registry_hash()
+
+
+def test_pcsg_capacity_pair_rejects_duplicate_members(tmp_path: Path):
+    payload = _base_yaml()
+    payload["pcsg_pairs"] = [
+        {
+            "id": "capacity_dup",
+            "role": "capacity",
+            "members": ["qwen2.5-7b", "qwen2.5-7b"],
+            "tokenizer_compat": "qwen2_class",
+            "max_token_id_inclusive": 151664,
+        }
+    ]
+    with pytest.raises(ValidationError, match="duplicate members"):
+        _write_and_load(tmp_path, payload)
+
+
+def test_pcsg_temporal_pair_rejects_self_pair(tmp_path: Path):
+    payload = _base_yaml()
+    payload["pcsg_pairs"][0]["early"] = "qwen2.5-7b"
+    payload["pcsg_pairs"][0]["late"] = "qwen2.5-7b"
+    with pytest.raises(ValidationError, match="duplicate members"):
+        _write_and_load(tmp_path, payload)
+
+
+def test_pcsg_pair_registry_hash_payload_field_coverage():
+    """If PCSGPair declares a new field, pcsg_pair_registry_hash() must
+    update the canonical-payload dict in src/r5a/fleet.py to include it.
+    """
+    import inspect
+    from src.r5a.fleet import FleetConfig, PCSGPair
+    src = inspect.getsource(FleetConfig.pcsg_pair_registry_hash)
+    for field in PCSGPair.model_fields:
+        assert f'"{field}"' in src, (
+            f"PCSGPair.{field!r} declared but not in canonical hash "
+            f"payload — update FleetConfig.pcsg_pair_registry_hash()."
+        )
+
+
+def test_model_participation_predicates_direct(tmp_path: Path):
+    """Direct unit-test of ModelConfig.participates_in_p_predict /
+    participates_in_p_logprob across the three role shapes:
+    full-operator white-box, P_logprob-only white-box, black-box.
+    """
+    payload = _base_yaml()
+    payload["models"]["llama-3-8b-instruct"] = {
+        "family": "llama",
+        "access": "white_box",
+        "provider": "vllm",
+        "cutoff_date": "2023-03-01",
+        "tokenizer_family": "llama3",
+        "hf_repo": "meta-llama/Meta-Llama-3-8B-Instruct",
+        "quant_scheme": "bf16",
+        "p_logprob": {
+            "thinking_control": "default_off",
+            "prompt_overlay_policy": "none",
+            "route_lock_required": "hf_commit_sha",
+            "echo_supported": True,
+        },
+    }
+    fleet = _write_and_load(tmp_path, payload)
+    qwen = fleet.get("qwen2.5-7b")
+    assert qwen.participates_in_p_predict() is True
+    assert qwen.participates_in_p_logprob() is True
+    llama = fleet.get("llama-3-8b-instruct")
+    assert llama.participates_in_p_predict() is False
+    assert llama.participates_in_p_logprob() is True
+    deepseek = fleet.get("deepseek-v3")
+    assert deepseek.participates_in_p_predict() is True
+    assert deepseek.participates_in_p_logprob() is False

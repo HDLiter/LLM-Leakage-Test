@@ -26,11 +26,19 @@
 # refine-logs/reviews/PCSG_PAIR_HUNT/llama_family_verification_20260429.md).
 # Their Chinese-finance instruction-following is too weak for confirmatory
 # P_predict (verification §6), so they carry `p_predict: null` and are
-# excluded from E_CMMD / E_FO / E_NoOp / E_extract.
+# excluded from E_CMMD / E_OR / E_NoOp / E_extract.
 #
 # `<TBD>` placeholders are pinned at run time per plan §10.1 and recorded
 # in the run manifest. Do not commit a confirmatory run with `<TBD>`
 # values still in place.
+#
+# tokenizer_sha (per DECISIONS.md decision #4, 2026-04-30): SHA-256 of
+# `tokenizer.json` byte content as resolved at load time. This matches
+# HF's blob-store filename for LFS-tracked tokenizers but NOT for git-
+# tracked ones (HF uses git-blob SHA1 for non-LFS); the divergence is
+# intentional, and `tokenizer_sha` MUST NOT be used as a cache lookup
+# key. The pinner (scripts/ws1_pin_fleet.py) computes it via
+# `_sha256_file_content` after resolving any HF-cache symlink.
 
 fleet_version: "r5a-v2.1-2026-04-29"
 

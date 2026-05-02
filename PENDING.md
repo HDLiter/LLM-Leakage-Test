@@ -12,6 +12,13 @@
 
 ## Active open items
 
+### Phase 8 MC simulation — post-pilot calibration
+- **Context**: `scripts/planning_power_calculator.py` is the closed-form planning power calculator (renamed 2026-04-30 from `simulate_phase8_power.py`); the §8.8 Monte-Carlo simulator is a separate tool that has not yet been written. Per DECISIONS.md decision #3 ("two-tool model") the MC simulator must be calibrated from pilot `hat(beta)` and `hat(Sigma)` and is the prereg-grade power source.
+- **External action needed**: implement the §8.8 MC simulator after pilot data lands. See `plans/phase7-pilot-implementation.md` §8.8 (Tier-R2-1 adds the two-tool-model paragraph).
+- **Blocking**: PREREG_STAGE1 power claims.
+- **Owner**: post-pilot analyst.
+- **Target resolution date**: post-pilot.
+
 ### WS1 — model/tokenizer/image provenance pinning
 - **Context**: `config/fleet/r5a_fleet.yaml` carries `<TBD>` for `tokenizer_sha`, `hf_commit_sha` on all 10 white-box entries plus `api_model_name` for `gpt-5.1` / `claude-sonnet-4.6`. Plan §10.1 forbids confirmatory runs with `<TBD>` placeholders.
 - **External action needed**: on AutoDL Stage 1, after `huggingface-cli download` completes for each white-box model, compute git-blob-SHA of `tokenizer.json` and read `hf_commit_sha` from snapshot metadata; write back into `config/fleet/r5a_fleet.yaml` and rebump `fleet_version`. Resolve `gpt-5.1` and `claude-sonnet-4.6` `api_model_name` after vendor catalog check.

@@ -39,7 +39,7 @@ class OperatorId(str, Enum):
 
 class PerturbationVariant(str, Enum):
     BASELINE = "baseline"
-    C_FO = "c_fo"
+    C_CO = "c_co"
     C_NOOP = "c_noop"
     C_NOOP_PLACEBO = "c_noop_placebo"
     C_SR = "c_sr"
@@ -151,7 +151,7 @@ class SpanEdit(BaseModel):
 
 
 class PerturbationArtifact(BaseModel):
-    """Output of C_FO / C_NoOp generators. Audited rows feed P_predict on
+    """Output of C_CO / C_NoOp generators. Audited rows feed P_predict on
     perturbed text. Reserved metadata keys are listed in plan §5.4A."""
 
     model_config = ConfigDict(extra="forbid")
@@ -411,6 +411,24 @@ class RunManifest(BaseModel):
       etc.). Per `docs/DECISION_20260429_gate_removal.md` §2.6 the K is
       derived from N at run time, so the manifest must record what K
       ended up being.
+
+    2026-04-30 R2 amendments (cross-ref
+    `refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/DECISIONS.md`):
+
+    - decision #1 — `mode: Literal["confirmatory", "dev"]` field added.
+      Confirmatory finalize enforces an 8-clause hard-fail framework in
+      `scripts/ws1_finalize_run_manifest.py`; dev mode (set via the
+      finalizer's `--allow-tbd` flag) skips the framework.
+    - decision #2 — split-tier roster fields `fleet_p_predict_eligible`
+      and `fleet_p_logprob_eligible` record the realized eligibility sets
+      so downstream analysis can detect drift from the YAML view.
+    - decision #5 — `cutoff_observed` renamed to
+      `exposure_horizon_observed`. The field carries Path-E empirical
+      exposure-horizon dates (knee-detector output); `cutoff_date_yaml`
+      keeps its name as it mirrors the operator-declared YAML value.
+    - decision #11 — `pcsg_pair_registry_hash` is now required (no
+      default); WS6 quality_gate_thresholds keys are dropped at the
+      finalizer (`scripts/ws1_finalize_run_manifest.py`), not the schema.
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -436,19 +454,32 @@ class RunManifest(BaseModel):
     # and ws1_finalize_run_manifest. tokenizer_shas mirrors fleet YAML
     # at run time for white-box models; vllm_image_digest is pinned per
     # cloud session.
+    #
+    # tokenizer_sha is defined per DECISIONS.md decision #4 as the
+    # SHA-256 of `tokenizer.json` byte content as resolved at load
+    # time. This matches HF's blob-store filename for LFS-tracked
+    # tokenizers but NOT for git-tracked ones (HF uses git-blob SHA1
+    # for non-LFS); the divergence is intentional, and `tokenizer_sha`
+    # MUST NOT be used as a cache lookup key.
     tokenizer_shas: dict[str, str] = Field(default_factory=dict)
     vllm_image_digest: str | None = None
     gpu_dtype: str | None = None  # e.g. "bf16", "fp16"; reflects backend launch flag
     launch_env: dict[str, str] = Field(default_factory=dict)  # CUDA_VISIBLE_DEVICES, vLLM args, etc.
 
     # 2026-04-29 Tier-0 additions (DECISION_20260427 §3.2 +
-    # DECISION_20260429_gate_removal §2.6).
-    cutoff_observed: dict[str, date | None] = Field(default_factory=dict)
+    # DECISION_20260429_gate_removal §2.6); 2026-04-30 R2 amendments
+    # (DECISIONS.md decisions #1, #2, #5, #11) renamed `cutoff_observed`
+    # to `exposure_horizon_observed`, tightened `pcsg_pair_registry_hash`
+    # to required, and added `mode` + the two split-tier roster fields.
+    exposure_horizon_observed: dict[str, date | None] = Field(default_factory=dict)
     cutoff_date_yaml: dict[str, date] = Field(default_factory=dict)
     quant_scheme: dict[str, str] = Field(default_factory=dict)
-    pcsg_pair_registry_hash: str | None = None
+    pcsg_pair_registry_hash: str
     hidden_state_subset_hash: str | None = None
     quality_gate_thresholds: dict[str, int] = Field(default_factory=dict)
+    mode: Literal["confirmatory", "dev"] = "confirmatory"
+    fleet_p_predict_eligible: list[str] = Field(default_factory=list)
+    fleet_p_logprob_eligible: list[str] = Field(default_factory=list)
 
 
 __all__ = [

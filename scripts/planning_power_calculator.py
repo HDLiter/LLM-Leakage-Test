@@ -1,10 +1,19 @@
-"""Phase 8 power simulation for the post-2026-04-29 split-tier fleet.
+"""Closed-form Phase 8 *planning* power calculator (NOT the §8.8 simulation).
+
+This is a closed-form planner for design-time scenario sweep, NOT the
+§8.8 Monte-Carlo simulation. For prereg-grade power claims see the
+§8.8 MC simulator (deferred to post-pilot; needs pilot `hat(beta)` +
+`hat(Sigma)` to calibrate). Per
+`refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/DECISIONS.md`
+decision #3 (the "two-tool model"): keep this calculator closed-form
+and pin the post-pilot MC simulator separately so the two cannot be
+confused. Cross-reference: plan §8.8.
 
 Per Tier-0 #10 (`refine-logs/reviews/R5A_DESIGN_REVIEW_20260427/SYNTHESIS.md`)
 + Statistical lens §1: the prior simulation hard-coded `N_model = 9` and
 must be updated to the actual design:
 
-  * 14 P_predict-eligible models (E_CMMD / E_FO / E_NoOp)
+  * 14 P_predict-eligible models (E_CMMD / E_OR / E_NoOp)
   * 12 P_logprob-eligible models (E_CTS, capacity curves)
   * 2 confirmatory PCSG temporal pairs (Qwen + Llama, both 1 pair each)
   * Model-family random intercepts (Qwen2.5 / Qwen3 / GLM / Llama / API)
@@ -12,11 +21,11 @@ must be updated to the actual design:
     lens §5: real CLS Chinese financial news rarely contains Qwen3
     tool-use tokens; original 50-90% prior was wrong).
 
-The simulation is a *coarse* power estimator. It does not refit the
-full §8.2 mixed model on each replicate — that requires statsmodels
-and would dominate runtime. Instead it computes pooled standard errors
-under the planning prior and applies a 2.8-z Westfall-Young-effective
-critical value (per Statistical lens §1).
+The calculator computes pooled standard errors under the planning prior
+and applies a 2.8-z Westfall-Young-effective critical value (per
+Statistical lens §1). All SEs are closed-form: this script does NOT
+run a Monte-Carlo loop; the §8.8 simulator does. The `--b-outer` flag
+is retained for caller compatibility but is informational only.
 
 Outputs a power table per (scenario, family-state, effect-size,
 PCSG-eligibility) cell. Family-state was previously {S20, S16a, S16b,
@@ -27,13 +36,8 @@ parameter is retained for dial-back compatibility but defaults to
 
 Usage:
 
-    python scripts/simulate_phase8_power.py \\
-        --output data/pilot/analysis/phase8_power.json \\
-        --b-outer 2000
-
-CLI args control bootstrap count (`--b-outer`), random seed
-(`--seed`), and scenario specifications (`--scenarios`). Defaults
-mirror the SYNTHESIS §6 + Statistical §1 recommendations.
+    python scripts/planning_power_calculator.py \\
+        --output data/pilot/analysis/phase8_planning.json
 """
 
 from __future__ import annotations
@@ -44,8 +48,6 @@ import math
 import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
-
-import numpy as np
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
@@ -184,18 +186,23 @@ def _scenario_multiplier(scenario: str, beta: float) -> float:
 
 
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Phase 8 power simulation (R5A v2.1)")
+    p = argparse.ArgumentParser(
+        description="Phase 8 closed-form planning power calculator (R5A v2.1)"
+    )
     p.add_argument(
         "--output",
-        default="data/pilot/analysis/phase8_power.json",
+        default="data/pilot/analysis/phase8_planning.json",
         help="JSON output path",
     )
     p.add_argument(
         "--b-outer",
         type=int,
         default=2000,
-        help="Monte Carlo replicates per cell (informational; not used in"
-        " closed-form SE path)",
+        help=(
+            "informational only; closed-form planner does not run a "
+            "Monte Carlo loop. The §8.8 post-pilot MC simulator (separate "
+            "tool) is the place to spend MC replicates."
+        ),
     )
     p.add_argument("--seed", type=int, default=20260417)
     p.add_argument(
@@ -214,7 +221,7 @@ def parse_args() -> argparse.Namespace:
         "--n-case-main-total",
         type=int,
         default=2560,
-        help="total main-run case count (E_CMMD / E_FO / E_NoOp)",
+        help="total main-run case count (E_CMMD / E_OR / E_NoOp)",
     )
     p.add_argument(
         "--n-case-bl2-post",
@@ -263,35 +270,30 @@ def parse_args() -> argparse.Namespace:
 
 def _simulate_estimand_powers(args: argparse.Namespace) -> list[dict]:
     fleet = _fleet_summary()
-    rng = np.random.default_rng(args.seed)
     rows: list[dict] = []
     for scenario in args.scenarios:
         for family_state in args.family_states:
             for beta in args.effects:
                 effect_eff = _scenario_multiplier(scenario, beta)
-                # E_CMMD: pooled over 14 P_predict models, with
-                # family random intercepts ({Qwen2.5, Qwen3, GLM, API}).
+                # E_CMMD: fleet-aggregated case-level (per plan §8.2 /
+                # §8.1A). Closed-form case-level SE under iid-case
+                # assumption: this is the analytic limit of a case-
+                # cluster bootstrap when within-case correlation is
+                # absorbed by fleet aggregation — E_CMMD averages over
+                # 14 P_predict models per case BEFORE the regression,
+                # so the residual lives at case level. For non-iid or
+                # heavy-tailed pilot residuals, the §8.8 post-pilot MC
+                # simulator runs an actual case-cluster bootstrap; this
+                # planning calculator stays closed-form by design
+                # (DECISIONS.md decision #3 "two-tool model";
+                # PENDING.md tracks the post-pilot MC implementation).
                 for cmmd_inflation in args.cmmd_inflation:
-                    sigma_within = 1.0  # standardized
-                    sigma_model = 0.35 * cmmd_inflation
-                    sigma_family = 0.20 * cmmd_inflation
-                    n_models = fleet.n_p_predict
-                    n_families = len(fleet.family_p_predict)
-                    se_pilot = _se_with_family_intercepts(
-                        n_case=args.n_case_pilot + args.n_case_bl2_post,
-                        n_models=n_models,
-                        sigma_within=sigma_within,
-                        sigma_model=sigma_model,
-                        sigma_family=sigma_family,
-                        n_families=n_families,
+                    sigma_case_aggregate = 1.0 * cmmd_inflation
+                    se_pilot = sigma_case_aggregate / math.sqrt(
+                        max(args.n_case_pilot + args.n_case_bl2_post, 1)
                     )
-                    se_main = _se_with_family_intercepts(
-                        n_case=args.n_case_main_total,
-                        n_models=n_models,
-                        sigma_within=sigma_within,
-                        sigma_model=sigma_model,
-                        sigma_family=sigma_family,
-                        n_families=n_families,
+                    se_main = sigma_case_aggregate / math.sqrt(
+                        max(args.n_case_main_total, 1)
                     )
                     rows.append(
                         {
@@ -307,8 +309,6 @@ def _simulate_estimand_powers(args: argparse.Namespace) -> list[dict]:
                             "se_main": se_main,
                             "power_pilot": _wy_power(effect_eff, se_pilot),
                             "power_main": _wy_power(effect_eff, se_main),
-                            "n_models": n_models,
-                            "n_families": n_families,
                         }
                     )
 
@@ -352,11 +352,11 @@ def _simulate_estimand_powers(args: argparse.Namespace) -> list[dict]:
                         }
                     )
 
-                # E_FO / E_NoOp: pooled over 14 P_predict models with
+                # E_OR / E_NoOp: pooled over 14 P_predict models with
                 # eligibility mask. We treat eligibility as a multiplier
                 # on n_case (Statistical §1 simulation parameters).
                 for fo_eligibility in (0.5, 0.7, 0.9):
-                    sigma_within = 1.1  # FO outcomes coarser than CMMD
+                    sigma_within = 1.1  # OR outcomes coarser than CMMD
                     sigma_model = 0.40
                     sigma_family = 0.20
                     n_models = fleet.n_p_predict
@@ -384,7 +384,7 @@ def _simulate_estimand_powers(args: argparse.Namespace) -> list[dict]:
                     )
                     rows.append(
                         {
-                            "estimand": "E_FO_E_NoOp_beta_cutoff",
+                            "estimand": "E_OR_E_NoOp_beta_cutoff",
                             "scenario": scenario,
                             "family_state": family_state,
                             "beta_planning": beta,
@@ -401,18 +401,6 @@ def _simulate_estimand_powers(args: argparse.Namespace) -> list[dict]:
                         }
                     )
 
-    # Add a small Monte Carlo perturbation around each closed-form SE
-    # so the output captures the inherent estimation variance. This
-    # honors `--b-outer` even though the SEs are closed-form.
-    for r in rows:
-        for key in ("power_pilot", "power_main"):
-            p = r[key]
-            mc_se = math.sqrt(p * (1 - p) / max(args.b_outer, 1))
-            r[f"{key}_mc_se"] = mc_se
-            r[f"{key}_ci95_low"] = max(0.0, p - 1.96 * mc_se)
-            r[f"{key}_ci95_high"] = min(1.0, p + 1.96 * mc_se)
-    # Avoid an unused-rng diagnostic
-    _ = rng.standard_normal(1)
     return rows
 
 
@@ -423,7 +411,6 @@ def main() -> int:
     out = {
         "fleet_summary": asdict(fleet),
         "config": {
-            "b_outer": args.b_outer,
             "seed": args.seed,
             "n_case_pilot": args.n_case_pilot,
             "n_case_main_pre": args.n_case_main_pre,

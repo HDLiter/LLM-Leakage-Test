@@ -1,10 +1,13 @@
-"""Path-E empirical cutoff probe — analysis helpers.
+"""Path-E empirical exposure-horizon probe — analysis helpers.
 
-Per `docs/DECISION_20260427_pcsg_redefinition.md` §2.4 + Tier-0 #3
+Per `refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/DECISIONS.md`
+decision #5 (rename of `cutoff_observed` → `exposure_horizon_observed`,
+2026-04-30) and the original detector spec in
+`docs/DECISION_20260427_pcsg_redefinition.md` §2.4 + Tier-0 #3
 remediation in `refine-logs/reviews/R5A_DESIGN_REVIEW_20260427/SYNTHESIS.md`
 (C1 / Statistical §3): take a temporally-stratified Min-K%++ score and
 locate the breakpoint where the model's familiarity drops off sharply.
-The breakpoint is the model's empirical training-data horizon.
+The breakpoint is the model's empirical training-data exposure horizon.
 
 Method (replaces 2026-04-27 threshold-only detection per SYNTHESIS C1
 remediation; threshold-only had 21-59% false-positive rate under
@@ -31,10 +34,10 @@ For each model:
 
   4. Report κ̂, δ̂, 95% CIs, P(δ > 0.05) from bootstrap, and CI widths.
 
-  5. Accept `cutoff_observed = months_sorted[κ̂]` only if both:
-       * cutoff CI width ≤ 3 months, AND
+  5. Accept `horizon_observed = months_sorted[κ̂]` only if both:
+       * horizon CI width ≤ 3 months, AND
        * drop CI lower bound > 0.05
-     Otherwise mark cutoff uncertain (cutoff_observed = None) — the
+     Otherwise mark horizon uncertain (horizon_observed = None) — the
      downstream §8.2 mixed model uses `cutoff_date_yaml` and simulates
      exposure misclassification per DECISION_20260427 §3.2 readback.
 
@@ -56,20 +59,20 @@ from .logprob_metrics import compute_mink_pct
 
 
 @dataclass(frozen=True)
-class CutoffEstimate:
+class ExposureHorizonEstimate:
     """Path E knee-detection result.
 
-    `cutoff_observed` is `None` when the run failed the acceptance rule
+    `horizon_observed` is `None` when the run failed the acceptance rule
     (CI width > 3 months OR drop CI lower bound <= 0.05). Downstream code
-    must treat `cutoff_observed=None` as "exposure horizon uncertain"
+    must treat `horizon_observed=None` as "exposure horizon uncertain"
     and fall back to `cutoff_date_yaml` for analysis.
     """
 
     model_id: str
-    cutoff_observed: date | None
-    cutoff_ci_lower: date | None
-    cutoff_ci_upper: date | None
-    cutoff_ci_width_months: int | None
+    horizon_observed: date | None
+    horizon_ci_lower: date | None
+    horizon_ci_upper: date | None
+    horizon_ci_width_months: int | None
     drop_magnitude: float  # δ̂ point estimate (positive = expected direction)
     drop_ci_lower: float | None
     drop_ci_upper: float | None
@@ -273,7 +276,7 @@ def _bootstrap_kappa(
     return kappas, drops
 
 
-def detect_cutoff(
+def detect_exposure_horizon(
     by_month: dict[str, list[float]],
     *,
     model_id: str,
@@ -283,23 +286,23 @@ def detect_cutoff(
     drop_threshold: float = 0.05,
     max_ci_width_months: int = 3,
     seed: int = 20260417,
-) -> CutoffEstimate:
+) -> ExposureHorizonEstimate:
     """Piecewise-WLS knee detection with bootstrap CI.
 
-    Returns a `CutoffEstimate` with `cutoff_observed` populated only
-    when CI width <= `max_ci_width_months` AND drop CI lower bound
+    Returns an `ExposureHorizonEstimate` with `horizon_observed` populated
+    only when CI width <= `max_ci_width_months` AND drop CI lower bound
     > `drop_threshold`. All other CI / point-estimate fields are
     populated whenever a fit was possible (so callers can publish the
     uncertain estimate as a caveat).
     """
     months_sorted = sorted(by_month)
     if not months_sorted:
-        return CutoffEstimate(
+        return ExposureHorizonEstimate(
             model_id=model_id,
-            cutoff_observed=None,
-            cutoff_ci_lower=None,
-            cutoff_ci_upper=None,
-            cutoff_ci_width_months=None,
+            horizon_observed=None,
+            horizon_ci_lower=None,
+            horizon_ci_upper=None,
+            horizon_ci_width_months=None,
             drop_magnitude=0.0,
             drop_ci_lower=None,
             drop_ci_upper=None,
@@ -313,12 +316,12 @@ def detect_cutoff(
     n_months = len(months_sorted)
     n_articles = sum(len(by_month[m]) for m in months_sorted)
     if n_months < 2 * min_side:
-        return CutoffEstimate(
+        return ExposureHorizonEstimate(
             model_id=model_id,
-            cutoff_observed=None,
-            cutoff_ci_lower=None,
-            cutoff_ci_upper=None,
-            cutoff_ci_width_months=None,
+            horizon_observed=None,
+            horizon_ci_lower=None,
+            horizon_ci_upper=None,
+            horizon_ci_width_months=None,
             drop_magnitude=0.0,
             drop_ci_lower=None,
             drop_ci_upper=None,
@@ -334,12 +337,12 @@ def detect_cutoff(
 
     t, y, w = _aggregate(by_month, months_sorted, aggregator)
     if not np.all(np.isfinite(y)):
-        return CutoffEstimate(
+        return ExposureHorizonEstimate(
             model_id=model_id,
-            cutoff_observed=None,
-            cutoff_ci_lower=None,
-            cutoff_ci_upper=None,
-            cutoff_ci_width_months=None,
+            horizon_observed=None,
+            horizon_ci_lower=None,
+            horizon_ci_upper=None,
+            horizon_ci_width_months=None,
             drop_magnitude=0.0,
             drop_ci_lower=None,
             drop_ci_upper=None,
@@ -352,12 +355,12 @@ def detect_cutoff(
 
     kappa_hat, _wss, beta_hat = _grid_search_kappa(t, y, w, min_side=min_side)
     if kappa_hat < 0:
-        return CutoffEstimate(
+        return ExposureHorizonEstimate(
             model_id=model_id,
-            cutoff_observed=None,
-            cutoff_ci_lower=None,
-            cutoff_ci_upper=None,
-            cutoff_ci_width_months=None,
+            horizon_observed=None,
+            horizon_ci_lower=None,
+            horizon_ci_upper=None,
+            horizon_ci_width_months=None,
             drop_magnitude=0.0,
             drop_ci_lower=None,
             drop_ci_upper=None,
@@ -381,12 +384,12 @@ def detect_cutoff(
     )
     valid = kappa_boots >= 0
     if valid.sum() < max(50, n_bootstrap // 20):
-        return CutoffEstimate(
+        return ExposureHorizonEstimate(
             model_id=model_id,
-            cutoff_observed=None,
-            cutoff_ci_lower=None,
-            cutoff_ci_upper=None,
-            cutoff_ci_width_months=None,
+            horizon_observed=None,
+            horizon_ci_lower=None,
+            horizon_ci_upper=None,
+            horizon_ci_width_months=None,
             drop_magnitude=drop_hat,
             drop_ci_lower=None,
             drop_ci_upper=None,
@@ -409,20 +412,20 @@ def detect_cutoff(
     p_drop = float(np.mean(drop_v > drop_threshold))
     ci_width = k_hi - k_lo
 
-    cutoff_lower = _month_str_to_last_day(months_sorted[max(0, k_lo)])
-    cutoff_upper = _month_str_to_last_day(
+    horizon_lower = _month_str_to_last_day(months_sorted[max(0, k_lo)])
+    horizon_upper = _month_str_to_last_day(
         months_sorted[min(n_months - 1, k_hi)]
     )
     kappa_date = _month_str_to_last_day(months_sorted[int(kappa_hat)])
 
     accept = (ci_width <= max_ci_width_months) and (drop_lo > drop_threshold)
     if accept:
-        return CutoffEstimate(
+        return ExposureHorizonEstimate(
             model_id=model_id,
-            cutoff_observed=kappa_date,
-            cutoff_ci_lower=cutoff_lower,
-            cutoff_ci_upper=cutoff_upper,
-            cutoff_ci_width_months=ci_width,
+            horizon_observed=kappa_date,
+            horizon_ci_lower=horizon_lower,
+            horizon_ci_upper=horizon_upper,
+            horizon_ci_width_months=ci_width,
             drop_magnitude=drop_hat,
             drop_ci_lower=drop_lo,
             drop_ci_upper=drop_hi,
@@ -441,12 +444,12 @@ def detect_cutoff(
         reasons.append(
             f"drop CI lower {drop_lo:.4f} <= {drop_threshold}"
         )
-    return CutoffEstimate(
+    return ExposureHorizonEstimate(
         model_id=model_id,
-        cutoff_observed=None,
-        cutoff_ci_lower=cutoff_lower,
-        cutoff_ci_upper=cutoff_upper,
-        cutoff_ci_width_months=ci_width,
+        horizon_observed=None,
+        horizon_ci_lower=horizon_lower,
+        horizon_ci_upper=horizon_upper,
+        horizon_ci_width_months=ci_width,
         drop_magnitude=drop_hat,
         drop_ci_lower=drop_lo,
         drop_ci_upper=drop_hi,
@@ -459,7 +462,7 @@ def detect_cutoff(
 
 
 __all__ = [
-    "CutoffEstimate",
-    "detect_cutoff",
+    "ExposureHorizonEstimate",
+    "detect_exposure_horizon",
     "month_stratified_mink",
 ]

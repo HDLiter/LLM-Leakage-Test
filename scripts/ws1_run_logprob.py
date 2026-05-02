@@ -17,14 +17,15 @@ Per-model invocation pattern (pilot, after WS4 builds the manifest):
         --vllm-url http://localhost:8000 \
         --output-dir data/pilot/logprob_traces
 
-Per-model invocation pattern (Path E empirical cutoff probe; SYNTHESIS
-Tier-0 #5 — Path E no longer rides the `--smoke` flag, has its own
-output directory `data/pilot/cutoff_probe/traces/` and demands the
+Per-model invocation pattern (Path E empirical exposure-horizon probe;
+per `refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/DECISIONS.md`
+decision #5 — Path E no longer rides the `--smoke` flag, has its own
+output directory `data/pilot/exposure_horizon/traces/` and demands the
 2,160-case probe fixture):
 
     python scripts/ws1_run_logprob.py \
         --model qwen2.5-7b \
-        --cutoff-probe \
+        --exposure-horizon-probe \
         --vllm-url http://localhost:8000
 
 For the GLM fallback path (vLLM `echo=True` unsupported), pass
@@ -50,6 +51,7 @@ import asyncio
 import inspect
 import json
 import os
+import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -140,13 +142,13 @@ def parse_args() -> argparse.Namespace:
         help="use a frozen pilot manifest (WS4)",
     )
     g.add_argument(
-        "--cutoff-probe",
+        "--exposure-horizon-probe",
         action="store_true",
         help=(
-            "run Path E empirical cutoff probe on the 2,160-case "
+            "run Path E empirical exposure-horizon probe on the 2,160-case "
             "monthly-stratified fixture; writes to a distinct output "
             "directory so Path E artifacts are never confused with "
-            "smoke traces (SYNTHESIS Tier-0 #5)."
+            "smoke traces (DECISIONS.md decision #5)."
         ),
     )
 
@@ -161,19 +163,19 @@ def parse_args() -> argparse.Namespace:
         help="JSON of ArticleRecord-shaped rows for --pilot",
     )
     p.add_argument(
-        "--cutoff-probe-fixture",
-        default="data/pilot/cutoff_probe/probe_set_monthly60_36mo.json",
-        help="JSON of ArticleRecord-shaped rows for --cutoff-probe",
+        "--exposure-horizon-fixture",
+        default="data/pilot/exposure_horizon/probe_set_monthly60_36mo.json",
+        help="JSON of ArticleRecord-shaped rows for --exposure-horizon-probe",
     )
     p.add_argument(
         "--output-dir",
         default="data/pilot/logprob_traces",
-        help="parquet output directory (overridden under --cutoff-probe)",
+        help="parquet output directory (overridden under --exposure-horizon-probe)",
     )
     p.add_argument(
-        "--cutoff-probe-output-dir",
-        default="data/pilot/cutoff_probe/traces",
-        help="parquet output directory for --cutoff-probe runs",
+        "--exposure-horizon-output-dir",
+        default="data/pilot/exposure_horizon/traces",
+        help="parquet output directory for --exposure-horizon-probe runs",
     )
     p.add_argument(
         "--chunk-size",
@@ -206,25 +208,35 @@ def _resolve_white_box(model_id: str, fleet_path: str) -> ModelConfig:
     return cfg
 
 
+_VLLM_IMAGE_DIGEST_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
+
+
 def _check_pinning_for_pilot(cfg: ModelConfig, args: argparse.Namespace) -> None:
-    """Refuse `--pilot` or `--cutoff-probe` if any provenance field is
-    still `<TBD>` or required Docker digest is missing.
+    """Refuse `--pilot` or `--exposure-horizon-probe` if any provenance
+    field is still `<TBD>` or required Docker digest is missing.
 
     Smoke runs are allowed against a partially-pinned fleet so we can
     iterate locally; pilot AND Path E artifacts both feed the
     RunManifest (Operational §6 / Tier-0 #4) and MUST be reproducible
-    so tighter checks apply (plan §10.1; SYNTHESIS Tier-0 #2).
+    so tighter checks apply (plan §10.1; SYNTHESIS Tier-0 #2 + R2-U3 +
+    R2-U4).
     """
-    requires_pinning = bool(getattr(args, "pilot", False) or getattr(args, "cutoff_probe", False))
+    requires_pinning = bool(
+        getattr(args, "pilot", False) or getattr(args, "exposure_horizon_probe", False)
+    )
     if not requires_pinning:
         return
-    mode_label = "--pilot" if args.pilot else "--cutoff-probe"
+    mode_label = "--pilot" if args.pilot else "--exposure-horizon-probe"
     placeholders = "<TBD>"
     bad: list[str] = []
     if cfg.tokenizer_sha is None or cfg.tokenizer_sha == placeholders:
         bad.append("tokenizer_sha")
     if cfg.hf_commit_sha is None or cfg.hf_commit_sha == placeholders:
         bad.append("hf_commit_sha")
+    if cfg.tokenizer_family is None or cfg.tokenizer_family == placeholders:
+        bad.append("tokenizer_family")
+    if cfg.quant_scheme is None or cfg.quant_scheme == placeholders:
+        bad.append("quant_scheme")
     if bad:
         raise SystemExit(
             f"{mode_label} refused: {cfg.model_id} fleet entry still has "
@@ -232,12 +244,15 @@ def _check_pinning_for_pilot(cfg: ModelConfig, args: argparse.Namespace) -> None
             "scripts/ws1_pin_fleet.py to write back HF / tokenizer SHAs "
             "before this mode."
         )
-    if not args.vllm_image_digest:
+    if not args.vllm_image_digest or not _VLLM_IMAGE_DIGEST_RE.match(
+        args.vllm_image_digest
+    ):
         raise SystemExit(
-            f"{mode_label} refused: --vllm-image-digest is required so "
-            "the trace records the Docker image SHA used. Inspect with "
+            f"{mode_label} refused: --vllm-image-digest must match "
+            "sha256:<64-hex>. Inspect with "
             "`docker image inspect <vllm_image> --format '{{.Id}}'` and "
-            "pass the resulting sha256:... value."
+            f"pass the resulting sha256:... value (got "
+            f"{args.vllm_image_digest!r})."
         )
 
 
@@ -263,8 +278,8 @@ def _decide_backend(args: argparse.Namespace, cfg: ModelConfig) -> str:
 def _load_articles(args: argparse.Namespace) -> list[ArticleRecord]:
     if args.smoke:
         path = Path(args.fixture)
-    elif args.cutoff_probe:
-        path = Path(args.cutoff_probe_fixture)
+    elif args.exposure_horizon_probe:
+        path = Path(args.exposure_horizon_fixture)
     else:
         path = Path(args.pilot_articles)
     if not path.exists():
@@ -280,12 +295,15 @@ def _load_articles(args: argparse.Namespace) -> list[ArticleRecord]:
 def _resolve_output_paths(args: argparse.Namespace, model_id: str) -> tuple[Path, Path, Path, str]:
     """Return (chunks_dir, final_path, summary_path, mode_tag) per run mode.
 
-    Path E uses a distinct directory tree per SYNTHESIS Tier-0 #5 so
-    cutoff-probe artifacts are never confused with smoke traces.
+    Path E uses a distinct directory tree per DECISIONS.md decision #5
+    so exposure-horizon-probe artifacts are never confused with smoke
+    traces. The output filename suffix `__exposure_horizon.parquet`
+    must match the default `--trace-pattern` of
+    `scripts/run_exposure_horizon_analysis.py`.
     """
-    if args.cutoff_probe:
-        out_dir = Path(args.cutoff_probe_output_dir)
-        mode_tag = "cutoff_probe"
+    if args.exposure_horizon_probe:
+        out_dir = Path(args.exposure_horizon_output_dir)
+        mode_tag = "exposure_horizon"
     else:
         out_dir = Path(args.output_dir)
         mode_tag = "smoke" if args.smoke else "pilot"

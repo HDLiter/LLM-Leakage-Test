@@ -278,3 +278,66 @@ def test_capacity_curve_rejects_missing_params():
             },
             params_by_model={},  # empty
         )
+
+
+# ---------------------------------------------------------------------------
+# LogProbTrace validators (R2 Tier-0 Block F.37)
+# ---------------------------------------------------------------------------
+
+
+def test_logprob_trace_rejects_prefix_longer_than_article():
+    """`prefix_token_count > article_token_count` violates the integrity
+    invariant from `_check_consistency` (the model-injected prefix
+    cannot exceed the article body it is prepended to)."""
+    from pydantic import ValidationError
+
+    with pytest.raises(ValidationError, match="prefix_token_count"):
+        LogProbTrace(
+            case_id="c1",
+            model_id="qwen2.5-7b",
+            tokenizer_family="qwen",
+            tokenizer_sha="tok",
+            hf_commit_sha="hf",
+            quant_scheme="AWQ-INT4",
+            article_token_count=3,
+            raw_token_ids=[1, 2, 3],
+            token_logprobs=[-1.0, -2.0, -3.0],
+            prefix_token_count=5,  # > article_token_count
+            thinking_mode="off",
+            backend="vllm_completion",
+            fingerprint=RequestFingerprint(
+                provider="vllm",
+                model_id="qwen2.5-7b",
+                ts=datetime.now(timezone.utc),
+                seed_supported=SeedSupport.YES,
+            ),
+        )
+
+
+def test_logprob_trace_rejects_top_alt_outer_length_mismatch():
+    """`top_alternative_logprobs` must align position-by-position with
+    `raw_token_ids` per the LogProbTrace integrity validator."""
+    from pydantic import ValidationError
+
+    with pytest.raises(ValidationError, match="top_alternative_logprobs"):
+        LogProbTrace(
+            case_id="c1",
+            model_id="qwen2.5-7b",
+            tokenizer_family="qwen",
+            tokenizer_sha="tok",
+            hf_commit_sha="hf",
+            quant_scheme="AWQ-INT4",
+            article_token_count=3,
+            raw_token_ids=[1, 2, 3],
+            token_logprobs=[-1.0, -2.0, -3.0],
+            top_alternative_logprobs=[[-1.5, -2.5], [-2.5, -3.5]],  # outer=2, expected=3
+            top_logprobs_k=2,
+            thinking_mode="off",
+            backend="vllm_completion",
+            fingerprint=RequestFingerprint(
+                provider="vllm",
+                model_id="qwen2.5-7b",
+                ts=datetime.now(timezone.utc),
+                seed_supported=SeedSupport.YES,
+            ),
+        )

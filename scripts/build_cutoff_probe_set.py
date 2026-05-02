@@ -4,8 +4,8 @@ Per `docs/DECISION_20260427_pcsg_redefinition.md` §2.4: 60 articles per
 month × 24 months across 2023-Q1..2025-Q4 (≈1,440 articles total).
 Output is a smoke-fixture-shaped JSON of `ArticleRecord` dicts, runnable
 through `scripts/ws1_run_logprob.py --smoke --fixture <output>` to obtain
-LogProbTraces. Knee detection + cutoff_observed extraction happens in
-`scripts/run_cutoff_probe_analysis.py`.
+LogProbTraces. Knee detection + exposure-horizon extraction happens in
+`scripts/run_exposure_horizon_analysis.py`.
 
 The CLS source layout (per project memory `infra_capabilities.md` and
 the Thales companion repo) is daily-partitioned JSON:
@@ -42,7 +42,7 @@ DEFAULT_OUTPUT = (
     REPO_ROOT
     / "data"
     / "pilot"
-    / "cutoff_probe"
+    / "exposure_horizon"
     / "probe_set_monthly60_36mo.json"
 )
 DEFAULT_SEED = 20260427

@@ -9,9 +9,11 @@ review_inputs:
 plan_review_inputs:
   - .scratch/codex_prompts_plan_review/SYNTHESIS.md (cross-lens plan review, 5 Codex xhigh threads)
   - .scratch/codex_prompts_plan_review/REPORT_{sequencing,scope,file_accuracy,tests,risk}.md
-status: post-review v2; single operator; one consolidated commit
-estimated_time: 9-13 hours (8-11 base + 1-2 hr from plan-review amendments, mostly tests)
+status: post-review v3 (post-simplification pass); single operator; one consolidated commit
+estimated_time: 5-7 hours (after simplification cuts; v2 was 9-13 hr)
 shell_environment: Git Bash (Windows). Where commands are PowerShell-incompatible the plan flags it inline; default to Git Bash unless told otherwise.
+simplification_inputs:
+  - .scratch/simplification_proposal.md (first-principles pass; 5 cuts approved + 2 withdrawn + 7 open Qs resolved)
 ---
 
 # Summary
@@ -33,15 +35,42 @@ commit on `main` and pushed to `origin/main`. After this commit lands, only
 user-side actions (HF Meta license click-through; CLS post-2026-02 corpus
 extraction) remain before WS1 cloud Stage 0 commit.
 
-**This is post-review v2.** The original plan was reviewed by 5 parallel Codex
-`xhigh` threads (sequencing, scope, file-accuracy, tests, risk). Findings
-folded back: Block C reordered (helpers first, then framework); Block B/C
-"validate after each substep" advice removed (tests don't exist until Block F);
-new Step D.10 for `.gitignore`; new Step C.18 for two decision-#11 memo edits;
-extended `E_FO` → `E_OR` source-side sweep; `gpu_dtype` added to confirmatory
-hard-fail; Block F substantially strengthened; Windows / PowerShell hazards
-flagged; rollback plan split into soft / mid / hard tiers. Full review trail
-in `.scratch/codex_prompts_plan_review/SYNTHESIS.md`.
+**This is post-review v3 (post-simplification pass).** v2 was reviewed by
+5 parallel Codex `xhigh` threads. v3 then ran a first-principles
+simplification pass against the actual single-operator + pre-cloud-spend +
+paper-driven threat model and absorbed 5 approved cuts:
+
+- **C.1**: Step B.23 keeps only `tempfile + os.replace` atomic rename;
+  cross-platform file-locking primitive + sentinel `.lock` + stale-lock
+  recovery + Codex MCP design-help escalation cut (single-operator manual
+  pinner has no concurrency).
+- **C.2**: Block F test density 50-56 → ~25-30. F.35's 9 per-clause hard-fail
+  tests collapse into 1 multi-clause integration test + 1 happy-path test
+  (better tests the multi-line-collection contract from Decision #1).
+- **C.3**: Step C.16 (canonical-JSON `_hash_strings`) cut; case_id is
+  programmatically generated ASCII identifiers, no newline collision risk.
+- **C.4**: Step C.14 realized-N keys cut; clause #6 already enforces
+  realized == eligible in confirmatory mode, dev-mode is marked by
+  `mode="dev"` field.
+- **C.5**: Step C.18 (two decision-#11 memo edits) pushed to Tier-R2-1
+  Block G doc sweep (those memo files are heavily edited there for other
+  reasons).
+- **Q4**: Step B.25 (post-patch equality assertion) cut + F.34 #10;
+  pin-field domain is hex-only, the YAML round-trip-quirk scenario is
+  structurally impossible.
+- **Q7**: F.39 `test_pcsg_pairs_empty_lists_and_hash` cut; production
+  path never hits empty pcsg_pairs.
+
+C.6 (output-key rename push) and C.7 (subprocess mandate cut) were
+withdrawn after walkthrough exposed two anti-patterns: (1) "no downstream
+consumer" doesn't imply "deferring is cheaper" — bundling at the open file
+wins; (2) when the plan already says what you'd recommend, your "cut" is
+no-op rewording. v2's prior amendments (Block C reordering, Block B/C
+"validate after each substep" advice removal, Step D.10 `.gitignore`,
+extended `E_FO`→`E_OR` source-side sweep, `gpu_dtype` clause 8, Windows
+hazard flags, soft/mid/hard rollback tiers) all survive into v3. Full
+trail in `.scratch/codex_prompts_plan_review/SYNTHESIS.md` (v2 review)
+and `.scratch/simplification_proposal.md` (v3 simplification).
 
 # Step 0 — Pre-flight
 
@@ -438,7 +467,7 @@ renamed dir.
 
 ---
 
-# Block C — Finalizer hardening (~2-2.5 hr; HIGH-RISK SURFACE)
+# Block C — Finalizer hardening (~1.5-2 hr; HIGH-RISK SURFACE; v3 reduced from v2 2-2.5 hr after C.14 / C.16 / C.18 cuts)
 
 **Risk flag**: this block has the highest regression risk in Tier-R2-0. The
 finalizer is the one artifact joining "fleet + traces + Path E + provenance".
@@ -509,7 +538,16 @@ Edits:
 
 1. **Line 105-110 `--allow-tbd` argparse**: keep the flag as-is; update help text to document it sets `mode="dev"`.
 2. **In `main()`** (after `args = parse_args()` and the existing fleet/runtime loading): compute `mode: Literal["confirmatory", "dev"] = "dev" if args.allow_tbd else "confirmatory"`. Pass this through to the `RunManifest(...)` constructor at the bottom.
-3. **Implement `_confirmatory_hard_fail(args, fleet, traces, exposure_horizon, launch_env, sampling_config) -> None`** which raises `SystemExit` with a multi-line error message listing every failed clause. Eight clauses (decision #1's seven plus `gpu_dtype` per Lens A major #8 / plan §10.4):
+3. **Implement `_confirmatory_hard_fail(args, fleet, traces, exposure_horizon, launch_env, sampling_config) -> None`** which raises `SystemExit` with a multi-line error message listing every failed clause. **Each failed clause MUST be prefixed with `[clause N]`** (N = 1..8) on its own line in the SystemExit message. This format is required for (a) unambiguous test assertion in F.35 #1 (substring "git" or "trace" would risk coincidental matches; "[clause 3]" cannot collide), and (b) operator readability when the finalizer rejects a real run. Example multi-line error:
+
+   ```
+   fleet not ready for confirmatory finalize:
+     [clause 1] git_commit_sha is all-zero (run from a non-git checkout?)
+     [clause 3] tokenizer_sha is "<TBD>" for qwen2.5-7b — run scripts/ws1_pin_fleet.py
+     [clause 8] --gpu-dtype is required in confirmatory mode
+   ```
+
+   Eight clauses (decision #1's seven plus `gpu_dtype` per Lens A major #8 / plan §10.4):
    - **Clause 1**: `_git_commit_sha()` MUST NOT return `"0" * 40`. Modify `_git_commit_sha()` (line 114-121) to detect the failure case and raise from inside the helper when called in confirmatory mode (cleanest: add a `mode` parameter; or split into `_git_commit_sha_strict()` for confirmatory).
    - **Clause 2**: `args.vllm_image_digest` matches regex `^sha256:[0-9a-f]{64}$`. Add helper `_validate_image_digest(digest: str)` that raises if mismatch. Make `--vllm-image-digest` required when mode is confirmatory.
    - **Clause 3**: every `fleet.p_logprob_eligible_ids()` model is present in both `tokenizer_shas` (built from fleet YAML pinned values) and `white_box_checkpoint_shas`, both non-empty and not equal to `<TBD>`.
@@ -523,7 +561,7 @@ Edits:
 
 4. **In RunManifest construction (line 352-379)**: add `mode=mode` and rename `cutoff_observed=cutoff_observed` → `exposure_horizon_observed=exposure_horizon`. Use the local variable names produced by C.10 and C.11.
 
-**Acceptance criterion**: passing `--allow-tbd` yields a manifest with `mode="dev"` and skips the 8-clause check. Running without `--allow-tbd` against a fleet/inputs with any failure raises `SystemExit` listing the failed clauses. Test outlines at Step F.35 (one test per clause).
+**Acceptance criterion**: passing `--allow-tbd` yields a manifest with `mode="dev"` and skips the 8-clause check. Running without `--allow-tbd` against a fleet/inputs with any failure raises `SystemExit` with a multi-line message listing every failed clause. Test outline at Step F.35 #1 (multi-clause integration test directly verifies the multi-line collection contract).
 
 **Reference**: Decision #1; R2-C2 (multiple finalizer gaps); Lens A critical #2 + major #8.
 
@@ -543,6 +581,16 @@ Edits:
        *,
        mode: Literal["confirmatory", "dev"],
    ) -> tuple[str | None, int]:
+       """Hash the WS6 hidden-state subset.
+
+       On-disk layout `{hidden_states_dir}/{case_id}__{model_id}.safetensors`
+       is COUPLED to `OfflineHFBackend._save_hidden_states`
+       (`src/r5a/backends/offline_hf.py` line ~260). If the layout
+       convention is ever updated, both this function AND the backend
+       writer MUST change together — F.35 #7 fixture is constructed
+       directly (does not exercise the backend) and will not catch
+       drift between writer and reader.
+       """
    ```
    New logic (per Lens C C.17 + decision #1 clause):
    - If dir missing or empty AND mode=dev: return `(None, 0)`.
@@ -555,49 +603,38 @@ Edits:
    - Verify: every model has exactly `expected_case_count` cases AND every
      model has the same case set. In confirmatory mode, raise `SystemExit`
      listing per-model missing case_ids.
-   - Hash: canonical JSON of the sorted case_id list (per Step C.16 below).
+   - Hash: `_hash_strings(sorted(case_ids))` (the existing `\n`-join helper; v3 keeps it per simplification C.3 — case_id values are programmatically generated ASCII identifiers without newlines).
 
 2. **In `main()` (line 294-300)**: pass `fleet.p_logprob_eligible_ids()` as `expected_models` and `mode` from the variable computed in Step C.12.
 
-**Acceptance criterion**: smoke run with a fixture dir holding the expected_models with `expected_case_count` cases each returns a stable canonical-JSON-derived hash; missing model or case_count mismatch raises in confirmatory mode; the same partial dir returns `(None, 0)` in dev mode (Step F.35 covers both).
+**Acceptance criterion**: smoke run with a fixture dir holding the expected_models with `expected_case_count` cases each returns a stable hash; missing model or case_count mismatch raises in confirmatory mode; the same partial dir returns `(None, 0)` in dev mode (Step F.35 #7 covers fixture).
 
 **Note for Step F.35 fixture authors**: the test should pass `expected_models=["m1", "m2"]` and a `expected_case_count` matching the fixture, NOT the production 12-model / 30-case values — the fixture controls what `expected_models` is for the test invocation.
 
 **Reference**: R2-C2 #3, Lens C C.17, Lens A critical #4.
 
-## Step C.14 — Compute realized-N alongside eligible-N + rename `e_fo_*` keys to `e_or_*`
+## Step C.14 — Drop ws6 keys + rename `e_fo_*` keys to `e_or_*`
 
 **File:** `scripts/ws1_finalize_run_manifest.py`
 
+**v3 simplification**: realized-N keys cut per `.scratch/simplification_proposal.md` C.4. Confirmatory hard-fail clause #6 already enforces realized == eligible at the framework level; dev mode is marked by `mode="dev"` field. Recording realized-N alongside eligible-N is structural redundancy — plan v2 itself acknowledged in sub-step 5 that "if not yet derivable, set equal to eligible". Function signature stays at `(n_p_predict, n_p_logprob)` two arguments.
+
 Edits:
 
-1. **`_quality_gate_thresholds` (line 196-217)**: keep the eligible-N inputs but add realized counts to the output dict:
-   ```python
-   def _quality_gate_thresholds(
-       n_p_predict_eligible: int,
-       n_p_predict_realized: int,
-       n_p_logprob_eligible: int,
-       n_p_logprob_realized: int,
-   ) -> dict[str, int]:
-   ```
-   Output dict keys (final, after rename + ws6 drop + realized-N additions):
-   - `e_extract_main_text_promotion_n_p_predict` (eligible)
-   - `e_extract_main_text_realized_n_p_predict` (NEW — realized)
-   - `e_extract_main_text_threshold` (`_one_third_minimum(eligible)`)
-   - `e_extract_confirmatory_promotion_n_p_predict` (eligible)
-   - `e_extract_confirmatory_realized_n_p_predict` (NEW — realized)
-   - `e_extract_confirmatory_threshold` (`_strict_majority(eligible)`)
+1. **`_quality_gate_thresholds` (line 196-217)**: keep the existing 2-argument signature. Output dict keys (final, after ws6 drop + e_fo→e_or rename):
+   - `e_extract_main_text_promotion_n_p_predict`
+   - `e_extract_main_text_threshold` (`_one_third_minimum(n_p_predict)`)
+   - `e_extract_confirmatory_promotion_n_p_predict`
+   - `e_extract_confirmatory_threshold` (`_strict_majority(n_p_predict)`)
    - `e_or_e_noop_informational_n_p_predict` (renamed from `e_fo_e_noop_*` per decision #10 source-side)
-   - `e_or_e_noop_informational_realized_n_p_predict` (NEW — realized)
    - `e_or_e_noop_informational_threshold` (renamed from `e_fo_e_noop_*`)
 2. **Drop ws6 fields** per decision #11: remove `ws6_mechanistic_n_white_box` and `ws6_mechanistic_threshold` from the returned dict.
 3. **Rename `e_fo_e_noop_*` keys to `e_or_e_noop_*`** per decision #10 source-side. The old keys `e_fo_e_noop_informational_n_p_predict` and `e_fo_e_noop_informational_threshold` MUST NOT appear in the output. Update the in-code comment "Behavioral E_FO / E_NoOp gate condition 3 has been REMOVED" → "Behavioral E_OR / E_NoOp gate condition 3 has been REMOVED" (line 211).
 4. **Module docstring `--perturbation-manifest` line 17**: rename `(optional) C_FO/C_NoOp output manifest` → `(optional) C_CO/C_NoOp output manifest` per decision #10.
-5. **In `main()`**: compute `n_p_predict_realized` from the article-manifest intersect (or, if not yet derivable, set equal to eligible at this stage — single-operator pilot uses one fleet, partial-runs are prevented by clause 6); compute `n_p_logprob_realized` from the `--traces-dir` realized set returned by **Step C.10** (the renumbered traces-dir helper). Pass all four to `_quality_gate_thresholds`.
 
-**Acceptance criterion**: realized fleet matches eligible at clean-run time (`thresholds["e_extract_confirmatory_realized_n_p_predict"] == 14`); a partial hidden-state dir or partial traces dir is rejected at clauses 5/6 before manifest construction; ws6 keys do NOT appear in the output dict; **no key in the dict starts with `e_fo_`** (R2-U on Lens E enum-rename completeness — verified by grep on the output JSON or by the F.35 test).
+**Acceptance criterion**: a partial hidden-state dir or partial traces dir is rejected at clauses 5/6 before manifest construction; ws6 keys do NOT appear in the output dict; **no key in the dict starts with `e_fo_`**; final dict has exactly 6 keys (3 gates × 2 entries each: promotion-N + threshold).
 
-**Reference**: R2-C2 #7; Lens C C.19; decision #11; decision #10 source-side (Lens 3 file_accuracy: dict keys must rename now since no downstream consumer exists pre-cloud-spend).
+**Reference**: Lens C C.19 (mooted by C.4 cut); decision #11; decision #10 source-side; v3 simplification C.4.
 
 ## Step C.15 — Replace article-manifest hash misuse for `sampling_config_hash`
 
@@ -618,23 +655,9 @@ real run; missing sampling config raises in confirmatory mode.
 
 **Reference**: R2-C2 #5, Lens A major #7.
 
-## Step C.16 — Canonical-JSON hash for string sets (replace `_hash_strings`)
+## Step C.16 — [CUT v3]
 
-**File:** `scripts/ws1_finalize_run_manifest.py`
-
-Edits:
-
-1. **Replace `_hash_strings` (line 136-139)**:
-   ```python
-   def _hash_strings(items: list[str]) -> str:
-       payload = json.dumps(sorted(items), separators=(",", ":"), ensure_ascii=False)
-       return hashlib.sha256(payload.encode("utf-8")).hexdigest()
-   ```
-   Removes the newline-collision risk for case_ids that may contain `\n`.
-
-**Acceptance criterion**: a unit test (Step F.35 #17) verifies `_hash_strings(["a\nb", "c"])` differs from `_hash_strings(["a", "b\nc"])` (newline-bearing strings now produce distinct hashes). Both inputs must produce the same length 64-char hex.
-
-**Reference**: R2-U10, Lens C C.16.
+**v3 simplification (cut per `.scratch/simplification_proposal.md` C.3)**: the canonical-JSON `_hash_strings` rewrite defended against case_id values containing `\n` causing hash collision. case_id is programmatically generated as `cls_<YYYY>_<MM>_<DD>_<seq>`-style ASCII identifiers with no whitespace; the collision input domain doesn't exist in this project. Keep the existing `"\n".join(sorted(items))` form. F.35 #17 (newline-collision test) also cut.
 
 ## Step C.17 — Populate split-tier roster fields (decision #2)
 
@@ -650,42 +673,19 @@ Edits:
 
 **Acceptance criterion**: a finalized manifest's two roster fields exactly match `fleet.p_predict_eligible_ids()` / `fleet.p_logprob_eligible_ids()`; the `mode` field equals `"confirmatory"` for non-`--allow-tbd` runs.
 
-## Step C.18 — Decision #11 memo cleanup edits (the two non-manifest cleanup actions)
+## Step C.18 — [CUT v3, pushed to Tier-R2-1]
 
-DECISIONS.md decision #11 lists THREE cleanup actions: (1) memo edit on
-`docs/DECISION_20260429_llama_addition.md` §2.6, (2) drop ws6 fields from
-`_quality_gate_thresholds()` (covered in Step C.14), (3) supersession note in
-`docs/DECISION_20260427_pcsg_redefinition.md` §2.5. Actions 1 + 3 are added to
-Tier-R2-0 here per Lens 2 (scope) finding "Decision #11 partial: only manifest
-field deletion done; the two memo cleanup actions are missing".
+**v3 simplification (cut per `.scratch/simplification_proposal.md` C.5)**: pushed to Tier-R2-1 Block G doc sweep. Both memo files (`docs/DECISION_20260429_llama_addition.md`, `docs/DECISION_20260427_pcsg_redefinition.md`) are heavily edited in Tier-R2-1 Block G for other reasons (cross-link headers, stale "10 white-box" residue, related_docs front-matter, §3.x text fixes). Bundling these two edits there is strictly cheaper than re-opening the files in Tier-R2-0 just for this. Tier-R2-0 commit no longer touches `docs/DECISION_20260427_*` or `docs/DECISION_20260429_llama_addition*`.
 
-**Edit 1**: `docs/DECISION_20260429_llama_addition.md` §2.6 (around the WS6 row
-in the gate-rescaling table). Replace the row content (or paragraph) with
-DECISIONS.md decision #11's literal text:
+**Tier-R2-1 picks up** (DECISIONS.md §G.6 + §G.7 already enumerate these):
+- `docs/DECISION_20260429_llama_addition.md` §2.6 WS6 row rewrite
+- `docs/DECISION_20260427_pcsg_redefinition.md` §2.5 supersession note
 
-> WS6 mechanistic analysis is **unconditional** per
-> `docs/DECISION_20260429_gate_removal.md` §2.4. There is no behavioral
-> trigger for WS6 — adding Llama hidden-state extraction (12 white-box) does
-> not introduce or rescale a trigger threshold. (Earlier draft of this memo
-> retained a 7/12 line copied from the threshold-rescaling table; it is
-> superseded.)
-
-**Edit 2**: `docs/DECISION_20260427_pcsg_redefinition.md` §2.5 — add a
-supersession note at the top (or end) of §2.5:
-
-> **Superseded 2026-04-29**: per `docs/DECISION_20260429_gate_removal.md` §2.4,
-> WS6 is now unconditional. The "conditional on E_FO threshold" language in
-> this memo was the original 2026-04-27 design; it no longer applies.
-
-**Acceptance criterion**: `grep -n "7/12\|7 of 12" docs/DECISION_20260429_llama_addition.md` returns no matches in §2.6 (the WS6 row); `grep -n "Superseded 2026-04-29" docs/DECISION_20260427_pcsg_redefinition.md` returns at least one match in §2.5.
-
-**Note**: this is the ONLY doc edit in Tier-R2-0 (PENDING.md gets a one-line entry in Step E.33; everything else under `docs/`, `plans/`, `refine-logs/` is Tier-R2-1 doc sweep). Be careful not to creep additional doc edits into this step — bigger memo body sweeps are explicitly Tier-R2-1.
-
-**Reference**: Decision #11 actions 1 + 3; Lens 2 (scope) "Decision #11 partial".
+Both edit bodies retained verbatim in `.scratch/simplification_proposal.md` C.5.
 
 ---
 
-# Block B — Pin-fleet hardening (~2-3 hr; HIGH-RISK SURFACE)
+# Block B — Pin-fleet hardening (~1-1.5 hr; HIGH-RISK SURFACE; v3 reduced from v2 2-3 hr after B.23 lock cut + B.25 cut)
 
 **Risk flag**: file locking + atomic rename + scalar serialization is
 fiddly. Many of these edits change error semantics (`SystemExit` instead of
@@ -816,16 +816,11 @@ idempotency test).
 
 **Reference**: R2-C5 #5, Lens C silent #2.
 
-## Step B.23 — File locking + atomic rename for fleet YAML and pinning log
+## Step B.23 — Atomic rename for fleet YAML and pinning log
 
 **File:** `scripts/ws1_pin_fleet.py`
 
-**⚠ Codex MCP design help recommended for this step**: cross-platform locking
-+ atomic-write + stale-lock recovery is subtle. Per Lens 5 (risk) finding:
-"the primitives are sound but mitigations as written are weak". Before
-implementing, consider asking Codex MCP (`xhigh`) to design the lock /
-unlock / recovery sequence. Treat this as the one Tier-R2-0 step where the
-"no Codex needed" claim does not hold.
+**v3 simplification (cut per `.scratch/simplification_proposal.md` C.1)**: cross-platform file locking + sentinel `.lock` + retry-with-backoff + stale-lock recovery message + Codex MCP design escalation all cut. The lock defended against concurrent pinner invocations; the pinner is fired once manually after `huggingface-cli download` completes on the AutoDL instance, with no scheduler / daemon / parallel CI / second operator. Concurrency scenario doesn't exist in this threat model. Atomic rename via `tempfile + os.replace` is preserved because `out_path.write_text(...)` is non-atomic on Windows under crash — that defense IS real.
 
 Edits:
 
@@ -834,21 +829,13 @@ Edits:
    - `os.fsync` on the file descriptor.
    - `os.replace(tmp, path)` for atomic rename (works on both POSIX and Windows for same-directory replacement).
    - On any exception during write, attempt to delete the `.tmp` file in `finally`.
-2. **For locking**: acquire a sentinel-file lock on `<fleet_path>.lock` and `<log_path>.lock`:
-   - Sentinel pattern: `os.open(lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)` with retry-with-backoff (5 attempts, 200 ms each). On final failure, `SystemExit` with a clear message naming the lock path AND telling the operator to delete the lock if no other pinner is running.
-   - Cross-platform considerations: avoid `fcntl` (POSIX-only) and `msvcrt` (Windows-only) — sentinel-file with `O_EXCL` works on both NTFS and ext4 for the cooperating-process case.
-3. **Replace `out_path.write_text(...)` (line 365)** with `_atomic_write_text(out_path, yaml_text)`.
-4. **Replace `log_path.write_text(...)` (line 390-393)** with `_atomic_write_json(log_path, prior)`.
-5. **Wrap fleet patch + log append in a `try/finally`** that releases both locks (i.e., `os.remove(lock_path)`). If lock acquisition fails after retries, `SystemExit` with: `"another pinner appears to be running (lock at <path>); if no pinner is active, delete the lock file manually and retry"`.
-6. **Transactional ordering note**: the fleet write and log append are NOT a single transaction. If the process crashes between the fleet write and log append, the fleet has new pins but the log has no entry. Document this in the function docstring: "log append is best-effort post-fleet; if you see fleet changes without a corresponding log entry, the operator must add an entry manually." The single-operator confirmatory pilot is unlikely to hit this; the documentation is for forensic clarity.
+2. **Replace `out_path.write_text(...)` (line 365)** with `_atomic_write_text(out_path, yaml_text)`.
+3. **Replace `log_path.write_text(...)` (line 390-393)** with `_atomic_write_json(log_path, prior)`.
+4. **Transactional ordering note**: the fleet write and log append are NOT a single transaction. If the process crashes between the fleet write and log append, the fleet has new pins but the log has no entry. Document this in the function docstring: "log append is best-effort post-fleet; if you see fleet changes without a corresponding log entry, the operator must add an entry manually." Single-operator pilot is unlikely to hit this; documentation is for forensic clarity.
 
-**Required tests in Step F.34** (per Lens 4 finding "B.23 weak coverage"):
-- `test_pin_fleet_lock_pre_existing_blocks_run`: pre-create `<fleet>.lock`, expect retry-then-`SystemExit`.
-- `test_pin_fleet_atomic_write_replaces_target_no_tmp_residue`: after a successful run, the target file has new content AND no `.tmp` file remains in the directory.
+**Acceptance criterion**: successful run leaves no `.tmp` residue in either target dir. Steady-state single-operator path is unchanged. (No lock-related tests; F.34 #13 / #14 cut per C.1.)
 
-**Acceptance criterion**: pre-existing `.lock` triggers clear failure; successful run leaves no `.tmp` residue; concurrent runs (one waits for the other) eventually succeed in series. Steady-state single-operator path is unchanged.
-
-**Reference**: R2-C5 #6; Lens C A.7; Lens 5 (risk) "B.23 mitigations weak".
+**Reference**: R2-C5 #6 (atomic-rename portion only); Lens C A.7; v3 simplification C.1.
 
 ## Step B.24 — Refuse multi-snapshot HF cache without explicit `--revision`
 
@@ -871,28 +858,9 @@ clear error when no `--revision` is given; passing the right revision succeeds.
 
 **Reference**: R2-C5 #2, Lens A major #5, Lens C A.10.
 
-## Step B.25 — Post-patch validation: assert exact field equality
+## Step B.25 — [CUT v3]
 
-**File:** `scripts/ws1_pin_fleet.py`
-
-Edits:
-
-1. **After re-validation at line 346-362**, before writing, parse the patched
-   YAML and assert that every requested pin (per `pinned_records`) appears
-   exactly in the parsed `FleetConfig`:
-   ```python
-   for mid, recorded in pinned_records.items():
-       cfg = FleetConfig.model_validate(_normalize_models(parsed)).get(mid)
-       if recorded.get("hf_commit_sha") and cfg.hf_commit_sha != recorded["hf_commit_sha"]:
-           raise SystemExit(f"post-patch mismatch for {mid}.hf_commit_sha")
-       if recorded.get("tokenizer_sha") and cfg.tokenizer_sha != recorded["tokenizer_sha"]:
-           raise SystemExit(f"post-patch mismatch for {mid}.tokenizer_sha")
-   ```
-
-**Acceptance criterion**: a YAML scalar serialization quirk (a backslash escape
-that re-parses to a different string) is caught BEFORE writing.
-
-**Reference**: R2-C5 #1, Lens C A.4 / A.8.
+**v3 simplification (cut per `.scratch/simplification_proposal.md` Q4)**: pin-field domain is hex-only (SHA-1 `hf_commit_sha`, SHA-256 `tokenizer_sha`); no YAML special characters can occur in pin values, so the round-trip-quirk scenario is structurally impossible. Existing defenses cover residual risk: Pydantic re-validation (lines 346-362, already present) catches malformed YAML; F.34 #4 idempotency test catches any round-trip drift transitively. F.34 #10 (post-patch equality test) also cut. If a future pin field domain expands to non-hex values, add B.25 then.
 
 ## Step B.26 — Respect `HF_HUB_CACHE` env var
 
@@ -1077,11 +1045,19 @@ Edits (small Tier-R2-0 doc-side touch; the larger doc sweep is Tier-R2-1):
 
 ---
 
-# Block F — Tests (~3-4 hr)
+# Block F — Tests (~1.5-2 hr; v3 reduced from v2 3-4 hr after test density 50-56 → ~25-30)
 
-Per Lens D §B.16-B.20 + suggested outlines, expanded by Lens 4 (test
-adequacy) findings. Block F was substantially strengthened over the original
-plan to close 22 hardening surfaces flagged with no Block F coverage.
+Per Lens D §B.16-B.20 + suggested outlines, originally expanded by Lens 4 (test
+adequacy) findings to close 22 hardening surfaces. **v3 simplification then
+cut roughly half the Lens-4-driven additions** per `.scratch/simplification_proposal.md`
+C.2 + Q1-Q7: F.34 14 → 9 (cut lock + HF_HUB_CACHE + post-patch + merged digest);
+F.35 23 → 10 (8-clause per-clause tests collapsed to 1 multi-clause integration
++ 1 happy-path; redundant edge cases dropped); F.36 unchanged (5); F.37 unchanged
+(2); F.38 simplified mutational sentinel to 5-line source-inspection (1);
+F.39 6 → 1 (kept only the detector numerical anchor; empty-pcsg-pairs cut).
+Total new tests: ~50-56 → ~28 (28 in Block F: 9+10+5+2+1+1=28; plus 5 in
+Block A: 2 contract + 3 fleet validator = 33 net new tests at the file level,
+or ~28 if we count per-test-function additions to existing files).
 
 **General test-style guidance** (per Lens 4 + Lens 5 findings):
 - **Prefer import-based tests over `subprocess.run`**. `subprocess.run` is reserved for genuine end-to-end smoke; for unit assertions on internal helpers, import them directly (e.g., `from scripts.ws1_pin_fleet import _patch_model_block, main`) or run `main()` after `monkeypatch.setattr(sys, "argv", [...])`. Subprocess tests are flaky on Windows due to cwd / quoting / path separators.
@@ -1097,24 +1073,25 @@ plan to close 22 hardening surfaces flagged with no Block F coverage.
 - `_run_pin_fleet_cli(tmp_path, *args, **env)`: helper that calls `main()` after `monkeypatch.setattr(sys, "argv", ["ws1_pin_fleet.py", ...args])`. Returns `(returncode, stdout, stderr)`. Use `capsys` for stdout/stderr capture, `pytest.raises(SystemExit)` for non-zero exit.
 - `MOCK_HF_CACHE` factory: builds a `tmp_path/hf_cache/models--<owner>--<repo>/snapshots/<sha>/tokenizer.json` layout for tests that exercise discovery.
 
-Tests (one per Lens 4 hardening surface):
+Tests (v3 simplified per `.scratch/simplification_proposal.md` C.2 + Q1 + Q4; 14 → 9):
 
 1. `test_patch_model_block_pins_only_target_model` — Lens D verbatim. Uses `_patch_model_block` import directly (NOT subprocess).
 2. `test_pin_json_unknown_model_is_rejected` — uses `_run_pin_fleet_cli` (import-based); covers Step B.19. Pin-json with `{"not-in-fleet": {"hf_commit_sha": "x"}}` → `SystemExit` containing `"not-in-fleet"`.
 3. `test_pin_fleet_check_mode_does_not_write` — `--check` against a TBD fleet leaves the file byte-identical.
-4. `test_pin_fleet_validates_hash_invariant_and_idempotency` — Step B.22; second pin run with same input is byte-identical to first run output.
+4. `test_pin_fleet_validates_hash_invariant_and_idempotency` — Step B.22; second pin run with same input is byte-identical to first run output. (Transitively guards round-trip drift, replaces cut B.25 #10.)
 5. `test_pin_fleet_quoted_tbd_is_patched` — Step B.21; `tokenizer_sha: "<TBD>"` (quoted) is replaced on first run.
 6. `test_pin_fleet_sha256_file_content` — Step B.18; `_sha256_file_content(b"abc")` equals the known SHA-256 (`ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad`).
-7. `test_pin_fleet_image_digest_required_non_check` — Step B.20; non-`--check` invocation without `--vllm-image-digest` raises `SystemExit`.
-8. `test_pin_fleet_image_digest_regex_rejects_malformed` — Step B.20; `--vllm-image-digest <TBD>` and `--vllm-image-digest sha256:short` both raise `SystemExit` (regex requires 64 hex).
-9. `test_pin_fleet_multi_snapshot_rejected_without_revision` — Step B.24; HF cache fixture with two snapshot subdirs and no `--revision`, raises `SystemExit` mentioning the model ID.
-10. `test_pin_fleet_post_patch_equality_assert` — Step B.25; pin-json value `{"hf_commit_sha": "abc\\ndef"}` (backslash-n) — if YAML re-parse yields a different value, the post-patch equality check raises `SystemExit`.
-11. `test_pin_fleet_hf_hub_cache_env_var_precedence` — Step B.26; with `HF_HUB_CACHE` env var set to a fixture path, discovery returns that path before consulting `HF_HOME` or `~/.cache`.
-12. `test_pin_fleet_corrupt_log_rejected` — Step B.27; pre-create `data/pilot/.fleet_pinning_log.json` with invalid JSON or with a non-list root, raises `SystemExit` instead of silently truncating.
-13. `test_pin_fleet_lock_pre_existing_blocks_run` — Step B.23; pre-create `<fleet>.lock` sentinel file, run pinner, expect retry-then-`SystemExit` with stale-lock recovery message.
-14. `test_pin_fleet_atomic_write_replaces_target_no_tmp_residue` — Step B.23; after a successful run, target has new content AND no `<path>.tmp` exists in the directory.
+7. `test_pin_fleet_image_digest_validation` — Step B.20; parameterized over (a) non-`--check` without `--vllm-image-digest` → SystemExit, (b) `--vllm-image-digest <TBD>` → SystemExit (regex), (c) `--vllm-image-digest sha256:short` → SystemExit (regex requires 64 hex). (Merged from v2 #7 + #8.)
+8. `test_pin_fleet_multi_snapshot_rejected_without_revision` — Step B.24; HF cache fixture with two snapshot subdirs and no `--revision`, raises `SystemExit` mentioning the model ID. (Per Q1: AutoDL bring-up may produce multiple snapshots after retries; without B.24 the pinner silently picks newest, a real silent-wrong-result hazard.)
+9. `test_pin_fleet_corrupt_log_rejected` — Step B.27; pre-create `data/pilot/.fleet_pinning_log.json` with invalid JSON or with a non-list root, raises `SystemExit` instead of silently truncating.
 
-**Acceptance criterion**: `pytest tests/r5a/test_pin_fleet.py -q` green; 14 tests pass.
+**v3 cuts**:
+- v2 #10 `test_pin_fleet_post_patch_equality_assert` — cut per Q4 (B.25 cut; hex-only pin domain).
+- v2 #11 `test_pin_fleet_hf_hub_cache_env_var_precedence` — cut per C.2 (B.26 is a 1-line code change; near-zero regression risk).
+- v2 #13 `test_pin_fleet_lock_pre_existing_blocks_run` — cut per C.1 (lock mechanism cut).
+- v2 #14 `test_pin_fleet_atomic_write_replaces_target_no_tmp_residue` — cut per C.1 (tests stdlib `os.replace`; trivial value).
+
+**Acceptance criterion**: `pytest tests/r5a/test_pin_fleet.py -q` green; 9 tests pass.
 
 ## Step F.35 — Write `tests/r5a/test_finalize_run_manifest.py` (NEW)
 
@@ -1124,42 +1101,45 @@ Tests (one per Lens 4 hardening surface):
 - `MINIMAL_RUN_FIXTURE(tmp_path)`: builds a tmp_path-scoped directory containing a small fleet YAML, runtime YAML, article manifest JSON, exposure_horizon JSON, traces dir with `.parquet` files matching the fleet's p_logprob members, hidden-states dir with flat `{case_id}__{model_id}.safetensors` layout, sampling config YAML, launch_env JSON. Return paths.
 - `_run_finalize_cli(tmp_path, mode, **overrides)`: helper that calls `main()` via `monkeypatch.setattr(sys, "argv", [...])` against the fixture; allows overriding individual paths or omitting fields.
 
-Tests (one per hardening surface; many added per Lens 4):
+Tests (v3 simplified per `.scratch/simplification_proposal.md` C.2 + C.3 + C.4 + Q2; 23 → 10):
 
-**Coverage of Step C.12's 8-clause hard-fail (one test per clause)**:
-1. `test_finalize_clause_1_git_sha_zero_rejected_in_confirmatory` — monkeypatch `_git_commit_sha` to return `"0" * 40`; confirmatory finalize raises mentioning `git`.
-2. `test_finalize_clause_2_image_digest_required_in_confirmatory` — without `--vllm-image-digest`, confirmatory finalize raises with `image-digest` in stderr.
-3. `test_finalize_clause_2_image_digest_regex_rejects_malformed` — `--vllm-image-digest <TBD>` raises in confirmatory mode.
-4. `test_finalize_clause_3_white_box_provenance_complete` — fleet fixture with one P_logprob model lacking `tokenizer_sha`; confirmatory raises naming the model.
-5. `test_finalize_clause_4_black_box_api_name_required` — fleet fixture with one black-box `api_model_name` left as `<TBD>`; confirmatory raises naming the model.
-6. `test_finalize_clause_5_horizon_keys_must_match_fleet` — exposure_horizon JSON with an extra model key OR a missing model key raises.
-7. `test_finalize_clause_6_traces_dir_must_match_p_logprob` — traces dir missing one P_logprob model's parquet raises.
-8. `test_finalize_clause_7_launch_env_required_keys` — launch_env JSON missing `CUDA_VISIBLE_DEVICES` or `VLLM_VERSION` raises.
-9. `test_finalize_clause_8_gpu_dtype_required_in_confirmatory` — without `--gpu-dtype`, confirmatory raises.
+**8-clause hard-fail framework (collapse: 9 per-clause tests → 2 multi-clause tests)**:
+
+The collapse tests directly verify the Decision #1 contract that the framework must "raise `SystemExit` with a multi-line error message listing every failed clause" (i.e., collect-and-report, not fail-fast). Per-clause tests in v2 verified each clause individually but did NOT verify the multi-line collection behavior.
+
+1. `test_finalize_confirmatory_lists_all_clause_violations` — build a fixture that simultaneously violates all 8 clauses (zero git SHA via monkeypatch, missing `--vllm-image-digest`, `<TBD>` tokenizer_sha on one P_logprob model, `<TBD>` api_model_name on one black-box, exposure_horizon JSON with one missing model + one extra model, traces dir missing one model's parquet, launch_env JSON missing `CUDA_VISIBLE_DEVICES`, missing `--gpu-dtype`). Run finalizer in confirmatory mode. Assert `SystemExit` raised AND error message contains the literal prefix substrings `"[clause 1]"` through `"[clause 8]"` (one per failed clause). The `[clause N]` format is enforced by `_confirmatory_hard_fail` in Step C.12 — using clause numbers (rather than substring keywords like `"git"` or `"trace"`) prevents coincidental substring matches in unrelated parts of the error message and keeps the assertion list trivially correct as clauses are added/removed.
+2. `test_finalize_confirmatory_happy_path_all_clauses_satisfied` — build a fixture that satisfies all 8 clauses; run finalizer in confirmatory mode; assert manifest file is written, `mode == "confirmatory"`, all required fields populated; reload JSON and validate via `RunManifest.model_validate`.
 
 **Mode behavior**:
-10. `test_finalize_dev_mode_skips_hard_fail` — `--allow-tbd` against the same fleet/inputs that would fail in confirmatory mode → succeeds with `mode="dev"`.
-11. `test_finalize_rejects_tbd_without_allow_tbd` — Lens D outline verbatim.
 
-**Helpers**:
-12. `test_validate_traces_dir_dev_tolerates_partial` — Step C.10; dev mode with missing parquet returns the partial mapping without raising.
-13. `test_validate_traces_dir_confirmatory_lists_missing_and_extras` — Step C.10; confirmatory mode raises listing BOTH missing and unexpected files.
-14. `test_read_exposure_horizon_invalid_date_raises_in_confirmatory` — Step C.11; horizon JSON with `"horizon_observed": "not-a-date"` raises `SystemExit` mentioning the model_id.
-15. `test_finalize_hidden_state_subset_hash_fixture_two_models` — Step C.13; build flat-layout fixture with 2 models × 30 cases; assert canonical-JSON hash; assert `expected_models=["m1", "m2"]` parameter is honored (not `fleet.p_logprob_eligible_ids()`).
-16. `test_finalize_hidden_state_subset_hash_rejects_partial_in_confirmatory` — Step C.13; missing one model's case → `SystemExit` in confirmatory; returns `(None, 0)` in dev.
-17. `test_finalize_canonical_json_hash_distinct_for_newline` — Step C.16; `_hash_strings(["a\nb", "c"]) != _hash_strings(["a", "b\nc"])`.
+3. `test_finalize_dev_mode_skips_hard_fail` — `--allow-tbd` against the same fixture as #1 (8 simultaneous violations) → succeeds with `mode="dev"`. Manifest written with placeholders preserved.
 
-**Realized-N + threshold dict (Steps C.14, C.17)**:
-18. `test_finalize_quality_gate_thresholds_actual_fleet` — assert all expected keys present AND have expected values (eligible 14, 12; threshold 8, 7, 5, 5); assert `ws6_mechanistic_*` NOT present; assert keys starting with `e_or_` (NOT `e_fo_`) present.
-19. `test_finalize_quality_gate_thresholds_realized_keys_present` — Lens 4 conceptual-weakness fix; assert all `*_realized_n_p_predict` keys exist with values matching eligible at clean-run time.
-20. `test_finalize_roster_fields_match_fleet` — Step C.17; finalized manifest's `fleet_p_predict_eligible` and `fleet_p_logprob_eligible` exactly equal `fleet.p_predict_eligible_ids()` and `fleet.p_logprob_eligible_ids()`.
-21. `test_finalize_sampling_config_hash_separate_from_article` — Step C.15; manifest's `sampling_config_hash != article_manifest_hash`.
+**Helper-level unit tests (per Q2 keep — covers paths integration test doesn't reach)**:
 
-**End-to-end**:
-22. `test_finalize_manifest_file_roundtrip_confirmatory` — full confirmatory finalize against a complete fixture; reload JSON and validate via `RunManifest.model_validate`; assert `mode == "confirmatory"`, `pcsg_pair_registry_hash` is 64-char hex, `exposure_horizon_observed` populated, both roster fields populated.
-23. `test_finalize_manifest_file_roundtrip_dev` — Lens 4 fix; the original "dev mode roundtrip" test does NOT prove confirmatory clauses; this test is renamed to scope-clarify and only asserts dev mode preserves placeholders.
+4. `test_validate_traces_dir_dev_tolerates_partial` — Step C.10; dev mode with missing parquet returns the partial mapping without raising. (Integration test only exercises confirmatory; this guards dev-mode helper behavior.)
+5. `test_validate_traces_dir_confirmatory_lists_missing_and_extras` — Step C.10; confirmatory mode raises listing BOTH missing and unexpected files. (Integration asserts clause 6 fires; this asserts the "missing AND extras" granularity in the message.)
+6. `test_read_exposure_horizon_invalid_date_raises_in_confirmatory` — Step C.11; horizon JSON with `"horizon_observed": "not-a-date"` raises `SystemExit` mentioning the `model_id`. (Integration triggers clause 5 via key mismatch only; this covers the invalid-date sub-path.)
 
-**Acceptance criterion**: `pytest tests/r5a/test_finalize_run_manifest.py -q` green; 23 tests pass; the test file's import surface is `from scripts.ws1_finalize_run_manifest import ...` (NOT subprocess for the unit tests).
+**Hidden-state hash fixture**:
+
+7. `test_finalize_hidden_state_subset_hash_fixture_two_models` — Step C.13; build flat-layout fixture with 2 models × 30 cases; assert canonical-JSON hash; assert `expected_models=["m1", "m2"]` parameter is honored (not `fleet.p_logprob_eligible_ids()`).
+
+**Threshold dict + roster + sampling-config**:
+
+8. `test_finalize_quality_gate_thresholds_actual_fleet` — assert all 6 expected keys present AND have expected values (eligible 14, 12; thresholds via `_one_third_minimum(14)`, `_strict_majority(14)`, `_strict_majority(14)`); assert `ws6_mechanistic_*` NOT present; assert keys starting with `e_or_` (NOT `e_fo_`) present; assert no `*_realized_n_p_predict` keys (per C.4).
+9. `test_finalize_roster_fields_match_fleet` — Step C.17; finalized manifest's `fleet_p_predict_eligible` and `fleet_p_logprob_eligible` exactly equal `fleet.p_predict_eligible_ids()` and `fleet.p_logprob_eligible_ids()`.
+10. `test_finalize_sampling_config_hash_separate_from_article` — Step C.15; manifest's `sampling_config_hash != article_manifest_hash`.
+
+**v3 cuts**:
+- v2 #1-#9 per-clause hard-fail tests → collapsed into v3 #1+#2 per C.2 (multi-line collection contract from Decision #1 is now directly tested; v2's per-clause tests didn't verify collection).
+- v2 #11 `test_finalize_rejects_tbd_without_allow_tbd` — redundant with v3 #1 (covered by clause-3 substring).
+- v2 #16 `test_finalize_hidden_state_subset_hash_rejects_partial_in_confirmatory` — covered by v3 #1's all-clauses fixture transitively.
+- v2 #17 `test_finalize_canonical_json_hash_distinct_for_newline` — cut per C.3 (case_id has no newlines).
+- v2 #19 `test_finalize_quality_gate_thresholds_realized_keys_present` — cut per C.4 (realized-N keys removed).
+- v2 #22 `test_finalize_manifest_file_roundtrip_confirmatory` — covered by v3 #2 (happy-path roundtrip is part of the integration test).
+- v2 #23 `test_finalize_manifest_file_roundtrip_dev` — redundant with v3 #3.
+
+**Acceptance criterion**: `pytest tests/r5a/test_finalize_run_manifest.py -q` green; 10 tests pass; the test file's import surface is `from scripts.ws1_finalize_run_manifest import ...` (NOT subprocess for the unit tests).
 
 ## Step F.36 — Write `tests/r5a/test_planning_power_calculator.py` (NEW)
 
@@ -1246,80 +1226,45 @@ file regresses.
 
 **File:** `tests/r5a/test_fleet_config.py` (existing — extend)
 
-Add per R2-U11 / Lens D B.18 / Lens C C.20. Lens 4 (test adequacy) flagged
-the original sample as conceptually weak (sentinel loop unfinished + a
-non-existent function name `canonicalize()`). Concrete implementation:
+**v3 simplification (per `.scratch/simplification_proposal.md` C.2 F.38)**: replace v2's mutational sentinel loop with a direct source-inspection check. The drift we want to catch is: "if `PCSGPair` gains a new field, `pcsg_pair_registry_hash()` must be updated to include it in the canonical payload." Source inspection catches this directly without per-field type handling.
 
 ```python
-def test_pcsg_pair_registry_hash_payload_field_coverage(tmp_path):
-    """Hash payload must reference every PCSGPair field. Future PCSGPair
-    fields must be added to the canonical-payload dict in
-    pcsg_pair_registry_hash() (src/r5a/fleet.py inside FleetConfig method,
-    lines around the dict comprehension over self.pcsg_pairs) explicitly.
+def test_pcsg_pair_registry_hash_payload_field_coverage():
+    """If PCSGPair declares a new field, pcsg_pair_registry_hash() must
+    update the canonical-payload dict in src/r5a/fleet.py to include it.
     """
-    from src.r5a.fleet import PCSGPair, load_fleet
-    # All PCSGPair declared fields must be in the hash payload.
-    expected_fields = set(PCSGPair.model_fields.keys())  # NB: model_config is class-level, not in model_fields
-
-    # Mutational sentinel: for each field, change its value on the
-    # temporal pair, reload, and assert hash differs.
-    payload = _base_yaml()
-    base = _write_and_load(tmp_path, payload)
-    base_hash = base.pcsg_pair_registry_hash()
-    for field in expected_fields:
-        if field == "id":
-            continue  # sorting key; handled by `_changes_on_pair_edit` test
-        mutated = _base_yaml()
-        # Mutate field on temporal pair[0] to a clearly different value
-        if field in ("early", "late"):
-            # both must be valid p_logprob members; use the OTHER white-box
-            mutated["pcsg_pairs"][0][field] = "qwen3-8b" if mutated["pcsg_pairs"][0][field] == "qwen2.5-7b" else "qwen2.5-7b"
-        elif field == "members":
-            continue  # temporal pair[0] has members=None; mutating to a list would change role-shape
-        elif field == "role":
-            continue  # changing role would require restructuring (capacity needs members)
-        elif field == "tokenizer_compat":
-            mutated["pcsg_pairs"][0][field] = "different_class"
-        elif field == "max_token_id_inclusive":
-            mutated["pcsg_pairs"][0][field] = 99999
-        else:
-            continue  # skip unknown future fields (test will fail-loudly via expected_fields assertion)
-        new_hash = (tmp_path_unique := tmp_path / f"mut_{field}.yaml")
-        # use a fresh tmp filename so loaders don't cache
-        tmp_path_unique.write_text(yaml.safe_dump(mutated), encoding="utf-8")
-        assert load_fleet(tmp_path_unique).pcsg_pair_registry_hash() != base_hash, \
-            f"PCSGPair field {field!r} mutation did not change registry hash"
+    import inspect
+    from src.r5a.fleet import FleetConfig, PCSGPair
+    src = inspect.getsource(FleetConfig.pcsg_pair_registry_hash)
+    for field in PCSGPair.model_fields:
+        assert f'"{field}"' in src, (
+            f"PCSGPair.{field!r} declared but not in canonical hash "
+            f"payload — update FleetConfig.pcsg_pair_registry_hash()."
+        )
 ```
 
-If a brittle edge is hit, the operator can split into two simpler tests:
-(a) one that asserts each known field name is present as a substring of the
-canonicalized payload JSON, (b) one that mutates `max_token_id_inclusive`
-specifically (already covered by an existing test). The above is the
-preferred form.
+**Acceptance criterion**: `pytest tests/r5a/test_fleet_config.py::test_pcsg_pair_registry_hash_payload_field_coverage -q` green. Adding a new field to `PCSGPair` without updating `pcsg_pair_registry_hash()` makes this test red with the field name in the failure message.
 
-**Acceptance criterion**: `pytest tests/r5a/test_fleet_config.py::test_pcsg_pair_registry_hash_payload_field_coverage -q` green.
-
-## Step F.39 — Add Lens D outlines for exposure-horizon tests
+## Step F.39 — Add detector numerical anchor in `test_exposure_horizon.py`
 
 **File:** `tests/r5a/test_exposure_horizon.py` (renamed from `test_cutoff_probe.py` in Step D.6)
 
-Per Lens D §A.15 + R2-U13 + Lens 4 finding "6 Lens D outlines not captured":
-add the missing test outlines. Use the Lens D suggested outlines verbatim
-(adapted for the renamed `detect_exposure_horizon` function and `horizon_*`
-field names).
+**v3 simplification (per `.scratch/simplification_proposal.md` C.2 F.39 + Q7; 6 → 1)**: the 7 renamed existing tests in test_exposure_horizon.py already cover the detector's happy path, edge inputs, and rejection logic. The Lens D outlines are "if you want extra rigor, here are some" — not Tier-R2-0 hardening of new code. Keep one numerical anchor; drop the rest.
 
-Tests to add (after the renamed existing tests):
+Test to add (after the renamed existing tests):
 
-1. `test_detect_exposure_horizon_clean_step_exact_ci_bounds` — Lens D outline; asserts EXACT CI bound dates and approximate `drop_ci_lower`. Replaces the loose acceptance assertion.
-2. `test_detect_exposure_horizon_min_side_exact_boundary_rejected` — Lens D outline; covers `n_months == 2 * min_side - 1` boundary case.
-3. `test_detect_exposure_horizon_bootstrap_invalid_guard` — Lens D outline; uses `monkeypatch.setattr(exposure_horizon, "_bootstrap_kappa", lambda *a, **k: (np.full(100, -1), np.zeros(100)))` to force all bootstrap replicates invalid; assert `horizon_observed is None` and `notes` contains `"bootstrap valid in 0/100"`.
-4. `test_detect_exposure_horizon_aggregator_mean_vs_median` — Lens D outline; same fixture, two calls with different aggregators; assert different `drop_magnitude`.
-5. `test_detect_exposure_horizon_high_noise_rejection_pinned` — Lens D outline (R2-U13 fix); asserts EXACT `horizon_ci_width_months == 8` and `drop_ci_lower ≈ -0.5653` for the high-noise fixture (fixed seed). This replaces the old loose "rejects" assertion.
-6. `test_pcsg_pairs_empty_lists_and_hash` (in `test_fleet_config.py`, NOT this file) — Lens D outline; asserts `temporal_pairs() == []` and `capacity_pairs() == []` for empty `pcsg_pairs:`; hash is still 64-char hex. Add this to `test_fleet_config.py` rather than here.
+1. `test_detect_exposure_horizon_clean_step_exact_ci_bounds` — Lens D outline; asserts EXACT CI bound dates and approximate `drop_ci_lower` for a clean-step fixture. Replaces the loose acceptance assertion in the renamed file. This is the numerical anchor for the piecewise-WLS detector after the rename.
 
-**Acceptance criterion**: `pytest tests/r5a/test_exposure_horizon.py tests/r5a/test_fleet_config.py -q` green; all 5 new exposure-horizon tests + 1 new fleet test pass.
+**v3 cuts (Lens D outlines deferred / dropped)**:
+- v2 #2 `test_detect_exposure_horizon_min_side_exact_boundary_rejected` — boundary case the detector handles fine; no in-flight regression risk.
+- v2 #3 `test_detect_exposure_horizon_bootstrap_invalid_guard` — defers paper-time rigor for a not-yet-cloud-spent detector.
+- v2 #4 `test_detect_exposure_horizon_aggregator_mean_vs_median` — covered by the renamed existing tests' aggregator usage.
+- v2 #5 `test_detect_exposure_horizon_high_noise_rejection_pinned` — the renamed `test_detect_high_noise_rejects` (existing) covers the rejection path; pinning exact `drop_ci_lower` is paper-time work.
+- v2 #6 `test_pcsg_pairs_empty_lists_and_hash` (in test_fleet_config.py) — cut per Q7 (production path never hits empty pcsg_pairs; helper behavior on empty input is stdlib-stable).
 
-**Reference**: Lens 4 finding "6 Lens D outlines not captured by Block F"; Lens D `Suggested test additions` outlines verbatim.
+**Acceptance criterion**: `pytest tests/r5a/test_exposure_horizon.py -q` green; 1 new test passes alongside the 7 renamed existing tests.
+
+**Reference**: Lens D `Suggested test additions`; v3 simplification C.2 F.39 + Q7.
 
 ---
 
@@ -1408,7 +1353,8 @@ Sources: refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/
   - DECISIONS.md (12 user-confirmed resolutions + Tier-R2-0/R2-1 breakdown)
   - .scratch/codex_prompts_plan_review/SYNTHESIS.md (post-plan review)
 
-Decisions implemented (full rationale in DECISIONS.md):
+Decisions implemented (full rationale in DECISIONS.md;
+v3 simplification cuts in .scratch/simplification_proposal.md):
   #1 mode field + 8-clause confirmatory hard-fail (added gpu_dtype
      per Lens A major #8)
   #2 fleet_p_predict_eligible / fleet_p_logprob_eligible roster fields
@@ -1425,7 +1371,19 @@ Decisions implemented (full rationale in DECISIONS.md):
       doc / WS3 spec body sweep is Tier-R2-1
   #11 drop ws6 fields from quality_gate_thresholds; two memo cleanup
       edits (DECISION_20260429_llama_addition.md §2.6 +
-      DECISION_20260427_pcsg_redefinition.md §2.5)
+      DECISION_20260427_pcsg_redefinition.md §2.5) pushed to Tier-R2-1
+      Block G doc sweep per simplification C.5
+
+v3 simplification cuts (versus v2):
+  - B.23 file locking + sentinel .lock + Codex MCP escalation cut
+    (single-operator manual pinner, no concurrency)
+  - B.25 post-patch equality assertion cut (pin domain is hex-only)
+  - C.16 canonical-JSON _hash_strings cut (case_id has no newlines)
+  - C.14 realized-N keys cut (clause #6 enforces realized==eligible)
+  - C.18 two memo edits pushed to Tier-R2-1 doc sweep
+  - F-block test density 50-56 -> ~25-30 (per-clause hard-fail
+    collapsed to multi-clause integration; redundant edge-case
+    tests dropped)
 
 Files (renames via git mv preserve history):
   src/r5a/contracts.py, src/r5a/fleet.py, src/r5a/estimands/__init__.py,
@@ -1440,9 +1398,12 @@ Files (renames via git mv preserve history):
     test_pin_fleet.py [new],
     test_finalize_run_manifest.py [new],
     test_planning_power_calculator.py [new]},
-  config/fleet/r5a_fleet.yaml, .gitignore, PENDING.md,
-  docs/DECISION_20260429_llama_addition.md,
-  docs/DECISION_20260427_pcsg_redefinition.md
+  config/fleet/r5a_fleet.yaml, .gitignore, PENDING.md
+
+(v3: docs/DECISION_20260427_pcsg_redefinition.md and
+docs/DECISION_20260429_llama_addition.md no longer touched in
+Tier-R2-0; their edits are bundled into the larger Tier-R2-1 doc
+sweep instead.)
 
 After this commit lands, cloud-spend gate is closed on the
 implementation side; only HF Meta license click-through and CLS
@@ -1484,18 +1445,18 @@ push needed (Tier-R2-0 is a fast-forward from `8350d9e`).
 
 | # | Risk | Why | Mitigation |
 |---|---|---|---|
-| 1 | **Finalizer over-restriction** breaks dev/smoke runs | Block C adds an 8-clause hard-fail; if any fires inappropriately for `--allow-tbd` mode, smoke finalization breaks | Each clause MUST be guarded by `mode == "confirmatory"`. F.35 has one test per clause (Steps F.35 #1-9) plus a `test_finalize_dev_mode_skips_hard_fail` test. Run `pytest tests/r5a/test_finalize_run_manifest.py -q` at end of Block C + Block F. |
-| 2 | **Pin-fleet atomic-rename + locking on Windows** | Step B.23 uses `os.replace` + sentinel `.lock` file; primitives are sound but stale-lock recovery and NTFS open-handle behavior are subtle | Codex MCP design help recommended for B.23 (the one Tier-R2-0 step where "no Codex needed" doesn't hold). F.34 tests #13-14 cover lock contention + no-tmp-residue. Document stale-lock recovery in the `SystemExit` message itself. |
+| 1 | **Finalizer over-restriction** breaks dev/smoke runs | Block C adds an 8-clause hard-fail; if any fires inappropriately for `--allow-tbd` mode, smoke finalization breaks | Each clause MUST be guarded by `mode == "confirmatory"`. F.35 has the multi-clause integration test (Step F.35 #1) + happy-path (#2) + dev-mode-skip (#3). Run `pytest tests/r5a/test_finalize_run_manifest.py -q` at end of Block C + Block F. |
+| 2 | [CUT v3] | — | — Lock mechanism cut per simplification C.1; only atomic rename via `tempfile + os.replace` retained, which is stdlib-level and doesn't need its own risk entry. |
 | 3 | **Path E rename has cross-cutting surface** in 8 Python files + 3 config/data dirs + `.gitignore` | A missed reference leaves the script suite inconsistent; missing `.gitignore` rename risks staging large generated artifacts | After each step in Block D, run `grep -rn "cutoff_observed\|cutoff_probe" src/ scripts/ tests/ config/ .gitignore`. The `cutoff_date` and `cutoff_source` fleet YAML fields are intentionally NOT renamed (decision #5). Step D.10 covers `.gitignore` per Lens 1 finding. |
-| 4 | **Enum string-value rename** (`"c_fo"` → `"c_co"`, output dict key `e_fo_*` → `e_or_*`, JSON row label `"E_FO_E_NoOp_*"` → `"E_OR_E_NoOp_*"`) | Pickled / persisted artifacts holding the old literal would fail Pydantic validation or downstream key lookup | Tier-R2-0 is pre-cloud-spend (no committed fixtures use these values). Confirm before commit: `grep -rn '"c_fo"\|e_fo_e_noop\|E_FO_E_NoOp' . --exclude-dir=.scratch --exclude-dir=refine-logs --exclude-dir=archive --exclude-dir=docs --exclude-dir=plans` returns zero hits in modified files. Hits in `refine-logs/`, `archive/`, `docs/`, `plans/` are Tier-R2-1 doc sweep territory. |
+| 4 | **Enum string-value rename** (`"c_fo"` → `"c_co"`, output dict key `e_fo_*` → `e_or_*`, JSON row label `"E_FO_E_NoOp_*"` → `"E_OR_E_NoOp_*"`) | Pickled / persisted artifacts holding the old literal would fail Pydantic validation or downstream key lookup | Tier-R2-0 is pre-cloud-spend (no committed fixtures use these values). Confirm before commit: `grep -rn '"c_fo"\|e_fo_e_noop\|E_FO_E_NoOp' . --exclude-dir=.scratch --exclude-dir=refine-logs --exclude-dir=archive --exclude-dir=docs --exclude-dir=plans` returns zero hits in modified files. Hits in `refine-logs/`, `archive/`, `docs/`, `plans/` are Tier-R2-1 doc sweep territory. (v3 note: full scope retained per C.6 withdrawal — bundling now is cheaper than push to R2-1 because files are open in Block C/E anyway.) |
 | 5 | **`pcsg_pair_registry_hash` tightened from `str \| None` to `str`** | Existing dev manifests with `pcsg_pair_registry_hash=None` will fail to load | Contract test pin (Step A.3) catches this. No checked-in run manifest exists; the only risk is in-flight artifacts on the operator's disk that must be re-finalized after Tier-R2-0. |
 | 6 | **Default trace dir mismatch between runner (D.8) and analyzer (D.7)** would silently re-open R2-C1 | If an operator updates D.7 to the new dir but skips D.8 (or vice versa), `--exposure-horizon-probe` writes to one place and the analyzer reads the other → "no traces matched" | Block G smoke step (G.42 + G.43) checks both `--help` outputs include the renamed paths; Block D acceptance criteria explicitly enforce path-string equality. |
-| 7 | **PowerShell vs Git Bash invocation mismatch** (Lens 5 finding, NEW) | Step 0 / G / 44 originally used Bash idioms (`grep`, HEREDOC) that fail in PowerShell. Plan now uses Git Bash by default with PowerShell equivalents inline. | Operator must use Git Bash for all sub-steps unless told otherwise. Step 44 uses `git commit -F file` to avoid HEREDOC entirely (Lens 5 finding P11). |
+| 7 | **PowerShell vs Git Bash invocation mismatch** (Lens 5 finding) | Step 0 / G / 44 originally used Bash idioms (`grep`, HEREDOC) that fail in PowerShell. Plan now uses Git Bash by default with PowerShell equivalents inline. | Operator must use Git Bash for all sub-steps unless told otherwise. Step 44 uses `git commit -F file` to avoid HEREDOC entirely (Lens 5 finding P11). |
 | 8 | **Test coverage during transition**: A.1 → A.3, A.1 → C.12, D.5 → D.6 are RED windows where pytest fails mid-batch (Lens 1 finding) | Looks alarming if the operator runs pytest at the wrong moment | Plan now flags each transition as an "atomic pair" with explicit "do NOT run pytest between these substeps" notes. The transitions resolve at the matching pair-end; full Block A green is required before proceeding to Block D, etc. |
-| 9 | **Subprocess-based tests on Windows** (Lens 4 + Lens 5 finding, NEW) | `subprocess.run([sys.executable, ...])` tests are flaky due to cwd / quoting / path separators / `/tmp` portability | Plan now uses `tmp_path` fixture for all test I/O and prefers import-based tests (`monkeypatch.setattr(sys, "argv", ...)` + `main()`) over subprocess. Subprocess reserved for genuine end-to-end smoke. |
-| 10 | **Stale `.lock` files after a crash** (Lens 5 finding, NEW) | If `ws1_pin_fleet.py` crashes between lock acquisition and release, the `.lock` file remains, blocking the next run | Step B.23 `SystemExit` message explicitly tells the operator: "if no pinner is running, delete `<lock_path>` manually and retry". F.34 test #13 covers the pre-existing-lock case. |
-| 11 | **Codex MCP for B.23**: original plan claimed "no Codex needed in any sub-step" — this is wrong specifically for B.23 (Lens 5 finding) | Cross-platform locking + atomic-write semantics are subtle | Plan now flags B.23 as "Codex MCP design help recommended"; operator may invoke Codex MCP `xhigh` to design the lock / unlock / recovery sequence before implementing. |
-| 12 | **Memo edits in C.18 may scope-creep** (Lens 2 finding, NEW) | Decision #11 actions 1+3 are in Tier-R2-0; everything else under `docs/` is Tier-R2-1. Operator may be tempted to also fix surrounding stale text | C.18 has explicit "do NOT creep additional doc edits" note. The two memo edits are minimal — replace one paragraph in each file. Larger memo body sweep is Tier-R2-1. |
+| 9 | **Subprocess-based tests on Windows** (Lens 4 + Lens 5 finding) | `subprocess.run([sys.executable, ...])` tests can be flaky due to cwd / quoting / path separators / `/tmp` portability in some environments | Plan uses `tmp_path` fixture for all test I/O and prefers import-based tests (`monkeypatch.setattr(sys, "argv", ...)` + `main()`) over subprocess. Subprocess reserved for genuine end-to-end smoke. (v3 note: this operator's Git Bash environment has not exhibited the flakiness in practice; mandate kept anyway because import-based tests are also faster + diagnostically better.) |
+| 10 | [CUT v3] | — | — Lock mechanism cut per C.1; stale `.lock` scenario doesn't exist when there is no `.lock`. |
+| 11 | [CUT v3] | — | — Codex MCP escalation for B.23 cut per C.1; lock design no longer needed. |
+| 12 | [CUT v3] | — | — C.18 cut per simplification C.5; memo edits pushed to Tier-R2-1, no scope-creep risk in Tier-R2-0 commit. |
 
 ---
 
@@ -1578,13 +1539,16 @@ treat it as Tier 2 territory.
 
 For reference; do NOT implement in this batch:
 
-- **Doc body sweeps** (Lens 2 confirms these are correctly Tier-R2-1):
+- **Doc body sweeps** (Lens 2 confirms these are correctly Tier-R2-1; v3 adds C.18 + output-key items per simplification):
   - `PENDING.md` body — reorganize Recently-closed / Active / Tier-1 entries (Step E.33 adds ONE line; the rest is Tier-R2-1).
   - `plans/phase7-pilot-implementation.md` residue — `pilot_100_cases` references, "9-model" / "5 white-box" residue, S16a/S16b/S12 retired-state residue, demotion-risk language, plan §8.8 two-tool model paragraph (decision #3 doc-side), plan §8.1A capacity-curve formula spec (decision #9), plan §8.2 `E_OR` analysis spec (decision #10).
   - `plans/ws1-cloud-execution.md` — Stage 1.5 mini-audit gate insertion (decision #7), Stage 2.7 hidden-state count update, Stage 2.8 GREEN/YELLOW/RED revision, budget cap update.
   - `refine-logs/reviews/R5A_STEP2/R5A_FROZEN_SHORTLIST.md` — Llama amendment, `E_PCSG` two-pair definition, `E_FO/E_OR` rename, P_logprob roster 10→12.
   - `refine-logs/reviews/R5A_STEP2/MEASUREMENT_FRAMEWORK.md` + `docs/TIMELINE.md` — supersession banners.
-  - Decision memo body fixes beyond the two C.18 edits (cross-link `related_docs` headers; stale "10 white-box" residue in §3.x; etc.).
+  - Decision memo body fixes:
+    - `docs/DECISION_20260429_llama_addition.md` §2.6 WS6 row rewrite (per simplification C.5; was C.18 Edit 1 in v2).
+    - `docs/DECISION_20260427_pcsg_redefinition.md` §2.5 supersession note (per simplification C.5; was C.18 Edit 2 in v2).
+    - Cross-link `related_docs` headers, stale "10 white-box" residue in §3.x, etc.
 
 - **New analysis scripts**:
   - `scripts/ws1_quant_calibration_audit.py` (decision #7 — Stage 1.5 mini-audit gate + Stage 2.8 conditional)

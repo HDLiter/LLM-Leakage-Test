@@ -102,7 +102,10 @@ def parse_args() -> argparse.Namespace:
     p.add_argument(
         "--vllm-image-digest",
         default=None,
-        help="Docker image SHA for the running vLLM container; recorded into trace",
+        help=(
+            "Docker image digest for the running vLLM container, "
+            "sha256:<64-hex>; recorded into trace"
+        ),
     )
     p.add_argument(
         "--model-path",

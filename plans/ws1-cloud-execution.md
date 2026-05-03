@@ -118,11 +118,14 @@ Deliverables:
 | `src/r5a/operators/p_logprob.py` | Operator + trace persistence (Parquet) |
 | `scripts/ws1_run_logprob.py` | CLI: `--smoke` / `--pilot`, `--model`, `--vllm-url` |
 | `scripts/ws1_build_smoke_fixture.py` | Builds `data/pilot/fixtures/smoke_30.json` from seed |
+| `scripts/smoke_provider_slugs.py` | Local black-box credential/model-route smoke; DeepSeek official direct, GPT/Claude direct or OpenRouter fallback |
 | `scripts/ws1_provision_autodl.sh` | AutoDL bring-up (HF mirror, model SHA pull, vLLM start) |
 | `tests/r5a/test_logprob_metrics.py` | Min-K% / PCSG correctness |
 | `tests/r5a/test_p_logprob_serialization.py` | Parquet roundtrip |
 
-Stage 0 exit: pytest green; smoke fixture produces 30 valid records.
+Stage 0 exit: pytest green; smoke fixture produces 30 valid records;
+black-box provider credential smoke either passes or has a documented
+credential-side blocker in `PENDING.md`.
 
 ### Stage 1 — AutoDL bring-up (1 hr)
 

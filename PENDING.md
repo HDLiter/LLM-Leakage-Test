@@ -27,11 +27,20 @@
 - **Target resolution date**: before WS1 pilot run.
 
 ### Llama fleet addition — Meta HF gating pre-flight
-- **Context**: `docs/DECISION_20260429_llama_addition.md` adds `meta-llama/Meta-Llama-3-8B-Instruct` and `meta-llama/Meta-Llama-3.1-8B-Instruct` as P_logprob-only fleet members. Both are HF-gated; `hf-mirror.com` does NOT bypass Meta gating (verified 2026-04-29).
-- **External action needed**: user clicks through Meta license at `https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct` and `https://huggingface.co/meta-llama/Meta-Llama-3.1-8B-Instruct`; verifies HF fine-grained read-only token includes access via `huggingface-cli whoami` then `huggingface-cli download meta-llama/Meta-Llama-3-8B-Instruct --include "*.json"` test pull.
+- **Context**: `docs/DECISION_20260429_llama_addition.md` adds `meta-llama/Meta-Llama-3-8B-Instruct` and `meta-llama/Llama-3.1-8B-Instruct` as P_logprob-only fleet members. Both are HF-gated; `hf-mirror.com` does NOT bypass Meta gating (verified 2026-04-29).
+- **Status**: blocked on Meta gated-repo approval. Verified 2026-05-03: `HF_TOKEN` authenticates as `HDLiter`, but both Llama `config.json` HEAD checks return HTTP 403 because the account is not on the authorized list.
+- **External action needed**: user clicks through Meta license at `https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct` and `https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct`; after Meta approval, verify the HF fine-grained read-only token includes access via `huggingface-cli whoami` then `huggingface-cli download meta-llama/Meta-Llama-3-8B-Instruct --include "*.json"` test pull.
 - **Blocking**: WS1 cloud Stage 1 (provisioning); does NOT block Tier-0 implementation work that does not require HF download.
 - **Owner**: user (license click-through) + Claude Code (verification script in Stage 1).
 - **Target resolution date**: before WS1 cloud spend.
+
+### Black-box provider credential smoke — OpenRouter auth
+- **Context**: `scripts/smoke_provider_slugs.py` verifies black-box provider authentication and route/model slug liveness with one low-token request per model. DeepSeek uses the official DeepSeek API; GPT/Claude use direct OpenAI/Anthropic keys if present, otherwise OpenRouter fallback routing.
+- **Status**: partially blocked. Verified 2026-05-03: DeepSeek official `deepseek-v4-pro` catalog and 1-token completion smoke pass. OpenRouter catalog contains `openai/gpt-4.1`, `openai/gpt-5.1`, and `anthropic/claude-sonnet-4.6`, but the current `OPENROUTER_API_KEY` returns HTTP 401 `User not found` on `/api/v1/auth/key`, `/api/v1/credits`, and completion calls.
+- **External action needed**: replace/fix `OPENROUTER_API_KEY`, or provide direct `OPENAI_API_KEY` and `ANTHROPIC_API_KEY` in `.env`; then rerun `python scripts/smoke_provider_slugs.py --max-tokens 1`.
+- **Blocking**: GPT/Claude black-box Stage 0 credential smoke; later P_predict provider runs unless direct provider keys are supplied.
+- **Owner**: user (credential provisioning) + Codex/Claude Code (rerun smoke).
+- **Target resolution date**: before black-box P_predict pilot execution.
 
 ### BL2 post-cutoff sample expansion — CLS extraction beyond 2026-02
 - **Context**: `docs/DECISION_20260429_gate_removal.md` §3.3 + plan §6.2 expanded BL2 post-cutoff bucket from 20 → 350 cases, sampled from `>= 2026-02-01`. The original 20-case sampling pool is insufficient for this volume.

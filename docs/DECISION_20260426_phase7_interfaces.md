@@ -126,10 +126,13 @@ Frozen fleet members (5 white-box + 4 black-box = 9):
 | qwen3-8b            | vllm      | 2025-01-31  | qwen3            |
 | qwen3-14b           | vllm      | 2025-01-31  | qwen3            |
 | glm-4-9b            | vllm      | 2024-06-30  | glm4             |
-| deepseek-v3-0324    | deepseek  | 2024-07-31  | —                |
-| gpt-4.1             | openai    | 2024-06-30  | —                |
+| deepseek-v4-pro     | deepseek  | 2026-04-24  | —                |
+| gpt-4.1             | openai    | 2024-06-01  | —                |
 | gpt-5.1             | openai    | 2024-09-30  | —                |
 | claude-sonnet-4.6   | anthropic | 2025-08-31  | —                |
+
+2026-05-03 supersession: black-box slugs and cutoff provenance are
+refreshed in `docs/DECISION_20260503_blackbox_refresh.md`.
 
 Tokenizer-matched temporal pairs for E_PCSG: `(qwen2.5-7b, qwen2.5-14b)`
 on the qwen tokenizer; `(qwen3-8b, qwen3-14b)` on the qwen3 tokenizer
@@ -221,7 +224,7 @@ $ conda run -n rag_finance python scripts/smoke_phase7.py --check-config
 == fleet ==
 fleet_version: r5a-v1.0-2026-04-26
 white_box (5): qwen2.5-7b, qwen2.5-14b, qwen3-8b, qwen3-14b, glm-4-9b
-black_box (4): deepseek-v3-0324, gpt-4.1, gpt-5.1, claude-sonnet-4.6
+black_box (4): deepseek-v4-pro, gpt-4.1, gpt-5.1, claude-sonnet-4.6
 == runtime ==
 providers.deepseek: max_concurrency=20 trust_env=False proxy=none
 providers.vllm:     max_concurrency=16 trust_env=False proxy=none

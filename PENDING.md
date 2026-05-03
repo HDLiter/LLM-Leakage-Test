@@ -6,7 +6,7 @@
 >
 > **Update rule**: when an item resolves, move it to `## Recently closed` at the bottom (keep for ~30 days), then delete. Do not silently remove — the history matters.
 >
-> **Last updated**: 2026-05-02
+> **Last updated**: 2026-05-03
 
 ---
 
@@ -24,13 +24,6 @@
 - **External action needed**: on AutoDL Stage 1, after `huggingface-cli download` completes for each white-box model, run `python scripts/ws1_pin_fleet.py --hf-cache <path> --vllm-image-digest sha256:<64-hex>` to discover the loaded HF snapshot commit and SHA-256 tokenizer content hash, write them into `config/fleet/r5a_fleet.yaml`, append the pinning log, and rebump `fleet_version`.
 - **Blocking**: WS1 cloud run final commit. Smoke runs allowed pre-pin.
 - **Owner**: cloud-run operator (Claude Code on AutoDL session).
-- **Target resolution date**: before WS1 pilot run.
-
-### WS1 black-box `api_model_name` resolution
-- **Context**: `config/fleet/r5a_fleet.yaml` still carries `<TBD>` for black-box `api_model_name` on `gpt-5.1` and `claude-sonnet-4.6`.
-- **External action needed**: manually check the vendor/OpenRouter catalog at fleet-freeze time, choose the exact provider model slugs for `gpt-5.1` and `claude-sonnet-4.6`, write them into the fleet YAML, and rebump `fleet_version`.
-- **Blocking**: WS1 cloud run final commit. Smoke runs allowed pre-resolution.
-- **Owner**: cloud-run operator.
 - **Target resolution date**: before WS1 pilot run.
 
 ### Phase 7 orchestration writer — runstate DB contract
@@ -124,7 +117,8 @@
 
 ## Recently closed
 
-*(empty — populate as items resolve)*
+### WS1 black-box `api_model_name` resolution
+- **Resolved 2026-05-03**: `docs/DECISION_20260503_blackbox_refresh.md` refreshes the 4-model black-box roster; `config/fleet/r5a_fleet.yaml` now has concrete provider slugs for DeepSeek V4 Pro, GPT-4.1, GPT-5.1, and Claude Sonnet 4.6.
 
 ---
 

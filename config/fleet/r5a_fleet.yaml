@@ -1,4 +1,4 @@
-# R5A fleet — 12 white-box + 4 black-box (post-2026-04-29 Llama addition).
+# R5A fleet — 12 white-box + 4 black-box (post-2026-05-03 black-box refresh).
 #
 # Tier breakdown (DECISION_20260429_llama_addition §2.2 split-tier):
 #   * Full-operator coverage (P_logprob + P_predict + P_extract):
@@ -39,8 +39,13 @@
 # intentional, and `tokenizer_sha` MUST NOT be used as a cache lookup
 # key. The pinner (scripts/ws1_pin_fleet.py) computes it via
 # `_sha256_file_content` after resolving any HF-cache symlink.
+#
+# Black-box refresh (DECISION_20260503_blackbox_refresh): DeepSeek direct
+# API moved from mutable `deepseek-chat` to explicit `deepseek-v4-pro`;
+# OpenAI GPT snapshots are pinned to dated IDs; Anthropic Sonnet 4.6 uses
+# the versioned Claude API ID `claude-sonnet-4-6`.
 
-fleet_version: "r5a-v2.1-2026-04-29"
+fleet_version: "r5a-v2.2-2026-05-03"
 
 models:
 
@@ -298,13 +303,13 @@ models:
 
   # ---- Black-box (4) -----------------------------------------------------
 
-  deepseek-v3-0324:
+  deepseek-v4-pro:
     family: deepseek
     access: black_box
     provider: deepseek
-    api_model_name: deepseek-chat
-    cutoff_date: 2024-07-31
-    cutoff_source: community_paraphrase
+    api_model_name: deepseek-v4-pro
+    cutoff_date: 2026-04-24
+    cutoff_source: operator_inferred  # no vendor cutoff; release-date upper-bound proxy
     p_predict:
       thinking_control: default_deployed
       prompt_overlay_policy: baseline_only
@@ -315,8 +320,8 @@ models:
     access: black_box
     provider: openai
     api_model_name: gpt-4.1-2025-04-14
-    cutoff_date: 2024-06-30
-    cutoff_source: community_paraphrase
+    cutoff_date: 2024-06-01
+    cutoff_source: vendor_stated
     p_predict:
       thinking_control: default_deployed
       prompt_overlay_policy: baseline_only
@@ -326,9 +331,9 @@ models:
     family: openai
     access: black_box
     provider: openai
-    api_model_name: <TBD>
+    api_model_name: gpt-5.1-2025-11-13
     cutoff_date: 2024-09-30
-    cutoff_source: operator_inferred
+    cutoff_source: vendor_stated
     p_predict:
       thinking_control: default_deployed
       prompt_overlay_policy: baseline_only
@@ -338,9 +343,9 @@ models:
     family: anthropic
     access: black_box
     provider: anthropic
-    api_model_name: <TBD>
+    api_model_name: claude-sonnet-4-6
     cutoff_date: 2025-08-31
-    cutoff_source: vendor_stated  # Anthropic published this in model card
+    cutoff_source: vendor_stated  # reliable knowledge cutoff; training cutoff is 2026-01
     p_predict:
       thinking_control: extended_thinking_off
       prompt_overlay_policy: baseline_only

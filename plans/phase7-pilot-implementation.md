@@ -1349,11 +1349,13 @@ models:
     p_predict:
       thinking_control: default_deployed
       prompt_overlay_policy: baseline_only
-  deepseek-v3-0324:
+  deepseek-v4-pro:
     family: deepseek
     access: black_box
     provider: deepseek
-    cutoff_date: 2024-07-31
+    api_model_name: deepseek-v4-pro
+    cutoff_date: 2026-04-24
+    cutoff_source: operator_inferred
     p_predict:
       thinking_control: default_deployed
       prompt_overlay_policy: baseline_only
@@ -1362,7 +1364,9 @@ models:
     family: openai
     access: black_box
     provider: openai
-    cutoff_date: 2024-06-30
+    api_model_name: gpt-4.1-2025-04-14
+    cutoff_date: 2024-06-01
+    cutoff_source: vendor_stated
     p_predict:
       thinking_control: default_deployed
       prompt_overlay_policy: baseline_only
@@ -1371,7 +1375,9 @@ models:
     family: openai
     access: black_box
     provider: openai
+    api_model_name: gpt-5.1-2025-11-13
     cutoff_date: 2024-09-30
+    cutoff_source: vendor_stated
     p_predict:
       thinking_control: default_deployed
       prompt_overlay_policy: baseline_only
@@ -1380,9 +1386,11 @@ models:
     family: anthropic
     access: black_box
     provider: anthropic
+    api_model_name: claude-sonnet-4-6
     cutoff_date: 2025-08-31
+    cutoff_source: vendor_stated
     p_predict:
-      thinking_control: default_deployed
+      thinking_control: extended_thinking_off
       prompt_overlay_policy: baseline_only
       route_lock_required: provider_model_id
 ```

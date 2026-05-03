@@ -422,7 +422,7 @@ Per-model API configuration lives in `config/fleet/r5a_fleet.yaml`; adapters mus
 | Qwen3 AWQ white-box | qwen3-4b, qwen3-8b, qwen3-14b, qwen3-32b | P_logprob, P_predict, P_extract, P_schema(reserve) | local vLLM; P_logprob uses the fleet's no-think policy; prompt-based JSON + parser for structured operators |
 | Llama bf16 white-box | llama-3-8b-instruct, llama-3.1-8b-instruct | P_logprob only | local vLLM; excluded from P_predict / P_extract / P_schema because `p_predict` is absent |
 | GLM white-box | glm-4-9b | P_logprob, P_predict, P_extract, P_schema(reserve) | local vLLM with offline-HF fallback for P_logprob when echo is unsupported |
-| Black-box providers | deepseek-v3-0324, gpt-4.1, gpt-5.1, claude-sonnet-4.6 | P_predict, P_extract, P_schema(reserve) | provider model IDs must be pinned in fleet YAML; provider routing locked at run time |
+| Black-box providers | deepseek-v4-pro, gpt-4.1, gpt-5.1, claude-sonnet-4.6 | P_predict, P_extract, P_schema(reserve) | provider model IDs must be pinned in fleet YAML; provider routing locked at run time |
 
 **Critical constraint (per `R5A_FROZEN_SHORTLIST.md` and `MEASUREMENT_FRAMEWORK.md` §4):** P_logprob requires thinking/off-prompt-overlay controls on all 12 P_logprob white-box models. Mixing thinking-mode states across the white-box fleet would render E_CTS and E_PCSG uninterpretable.
 

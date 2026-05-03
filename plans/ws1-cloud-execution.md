@@ -419,7 +419,7 @@ decision memo before publishing PCSG results).
 - [x] HF fine-grained read-only token created (user, 2026-04-26)
 - [x] **HF Meta license click-through complete for both Llama-3-8B-Instruct and Llama-3.1-8B-Instruct** (verified 2026-05-03 via authenticated `config.json` HEAD checks for `meta-llama/Meta-Llama-3-8B-Instruct` and `meta-llama/Llama-3.1-8B-Instruct`; no weight files downloaded).
 - [ ] Stage 0 modules + tests merged
-- [ ] Stage 0 smoke fixture committed
+- [x] Stage 0 smoke fixture committed (`data/pilot/fixtures/smoke_30.json`, 30 cases, sha256 `1862e4e7a6286a6b49a635f246366120d4f5a51b3143725cdb4eedc0fbdf1576`)
 - [ ] AutoDL account ready
 - [ ] Stage 1 instance reserved
 - [ ] **`scripts/ws1_pin_fleet.py` run**: fleet YAML carries no `<TBD>` for any of the 12 white-box `tokenizer_sha` / `hf_commit_sha` (Tier-0 #2)

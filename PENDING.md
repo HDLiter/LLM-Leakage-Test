@@ -26,14 +26,6 @@
 - **Owner**: cloud-run operator (Claude Code on AutoDL session).
 - **Target resolution date**: before WS1 pilot run.
 
-### Llama fleet addition — Meta HF gating pre-flight
-- **Context**: `docs/DECISION_20260429_llama_addition.md` adds `meta-llama/Meta-Llama-3-8B-Instruct` and `meta-llama/Llama-3.1-8B-Instruct` as P_logprob-only fleet members. Both are HF-gated; `hf-mirror.com` does NOT bypass Meta gating (verified 2026-04-29).
-- **Status**: blocked on Meta gated-repo approval. Verified 2026-05-03: `HF_TOKEN` authenticates as `HDLiter`, but both Llama `config.json` HEAD checks return HTTP 403 because the account is not on the authorized list.
-- **External action needed**: user clicks through Meta license at `https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct` and `https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct`; after Meta approval, verify the HF fine-grained read-only token includes access via `huggingface-cli whoami` then `huggingface-cli download meta-llama/Meta-Llama-3-8B-Instruct --include "*.json"` test pull.
-- **Blocking**: WS1 cloud Stage 1 (provisioning); does NOT block Tier-0 implementation work that does not require HF download.
-- **Owner**: user (license click-through) + Claude Code (verification script in Stage 1).
-- **Target resolution date**: before WS1 cloud spend.
-
 ### BL2 post-cutoff sample expansion — CLS extraction beyond 2026-02
 - **Context**: `docs/DECISION_20260429_gate_removal.md` §3.3 + plan §6.2 expanded BL2 post-cutoff bucket from 20 → 350 cases, sampled from `>= 2026-02-01`. The original 20-case sampling pool is insufficient for this volume.
 - **External action needed**: extract additional CLS articles published `>= 2026-02-01` to support 350-case sampling with category quotas (policy / corporate / industry / macro). User to trigger CLS scrape; Claude Code to flag this when WS4 sampling step is reached.
@@ -111,6 +103,9 @@
 
 ### Black-box provider credential smoke — OpenRouter auth
 - **Resolved 2026-05-03**: user replaced the expired `OPENROUTER_API_KEY`; `/api/v1/auth/key` and `/api/v1/credits` now return HTTP 200, and `python scripts/smoke_provider_slugs.py --max-tokens 16` passes for DeepSeek official `deepseek-v4-pro` plus OpenRouter routes `openai/gpt-4.1`, `openai/gpt-5.1`, and `anthropic/claude-sonnet-4.6`.
+
+### Llama fleet addition — Meta HF gating pre-flight
+- **Resolved 2026-05-03**: user completed Meta gated-repo approval; `HF_TOKEN` authenticates as `HDLiter`, and authenticated HEAD checks to `config.json` return HTTP 200 for `meta-llama/Meta-Llama-3-8B-Instruct` and `meta-llama/Llama-3.1-8B-Instruct`. `config/fleet/r5a_fleet.yaml` was canonicalized to the non-redirect Llama-3.1 repo id.
 
 ---
 

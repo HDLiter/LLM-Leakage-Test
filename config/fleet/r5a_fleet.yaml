@@ -44,8 +44,12 @@
 # API moved from mutable `deepseek-chat` to explicit `deepseek-v4-pro`;
 # OpenAI GPT snapshots are pinned to dated IDs; Anthropic Sonnet 4.6 uses
 # the versioned Claude API ID `claude-sonnet-4-6`.
+#
+# HF gated-access preflight (2026-05-03): Llama access was verified with
+# authenticated HEAD requests to `config.json`; Llama-3.1 uses the
+# canonical HF repo id `meta-llama/Llama-3.1-8B-Instruct`.
 
-fleet_version: "r5a-v2.2-2026-05-03"
+fleet_version: "r5a-v2.3-2026-05-03"
 
 models:
 
@@ -269,7 +273,7 @@ models:
     tokenizer_family: llama3
     tokenizer_sha: <TBD>
     hf_commit_sha: <TBD>
-    hf_repo: meta-llama/Meta-Llama-3.1-8B-Instruct
+    hf_repo: meta-llama/Llama-3.1-8B-Instruct
     quant_scheme: bf16
     p_logprob:
       thinking_control: default_off

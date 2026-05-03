@@ -417,7 +417,7 @@ decision memo before publishing PCSG results).
 - [x] GLM AWQ unavailable → fp16 path locked
 - [x] RTX PRO 6000 chosen, budget approved (raised to $45 on 2026-04-29)
 - [x] HF fine-grained read-only token created (user, 2026-04-26)
-- [ ] **HF Meta license click-through complete for both Llama-3-8B-Instruct and Llama-3.1-8B-Instruct** (user; tracked in PENDING.md as "Llama fleet addition — Meta HF gating pre-flight"). Verify with `huggingface-cli download meta-llama/Meta-Llama-3-8B-Instruct --include "*.json"` test pull. Required before Stage 1.
+- [x] **HF Meta license click-through complete for both Llama-3-8B-Instruct and Llama-3.1-8B-Instruct** (verified 2026-05-03 via authenticated `config.json` HEAD checks for `meta-llama/Meta-Llama-3-8B-Instruct` and `meta-llama/Llama-3.1-8B-Instruct`; no weight files downloaded).
 - [ ] Stage 0 modules + tests merged
 - [ ] Stage 0 smoke fixture committed
 - [ ] AutoDL account ready

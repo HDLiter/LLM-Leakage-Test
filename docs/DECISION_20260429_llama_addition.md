@@ -72,7 +72,7 @@ addition:
 | `model_id` | HF repo | Quant | Role |
 |---|---|---|---|
 | `llama-3-8b-instruct` | `meta-llama/Meta-Llama-3-8B-Instruct` | **bf16** | P_logprob-only |
-| `llama-3.1-8b-instruct` | `meta-llama/Meta-Llama-3.1-8B-Instruct` | **bf16** | P_logprob-only |
+| `llama-3.1-8b-instruct` | `meta-llama/Llama-3.1-8B-Instruct` | **bf16** | P_logprob-only |
 
 `cutoff_source = vendor_stated` for both. The vendor_stated fraction
 of the fleet rises from 1/14 (Claude only) to 3/16. This is the
@@ -273,12 +273,15 @@ Meta repos are gated. Before WS1 cloud spend:
 
 - User must accept `meta-llama/Meta-Llama-3-8B-Instruct` license at
   `https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct`.
-- User must accept `meta-llama/Meta-Llama-3.1-8B-Instruct` license at
-  `https://huggingface.co/meta-llama/Meta-Llama-3.1-8B-Instruct`.
+- User must accept `meta-llama/Llama-3.1-8B-Instruct` license at
+  `https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct`.
 - HF fine-grained read-only token must include access to gated Meta
   repos (verified via `huggingface-cli whoami` after acceptance).
 - `hf-mirror.com` does NOT bypass Meta gating (verified 2026-04-29);
   authenticated `huggingface-cli download` is required.
+
+Update 2026-05-03: access for both repos was verified with authenticated
+`config.json` HEAD checks; no weight files were downloaded.
 
 This is tracked as a PENDING.md operational item alongside the
 existing CLS post-cutoff extraction reminder.

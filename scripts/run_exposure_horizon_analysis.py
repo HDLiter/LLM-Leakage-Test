@@ -172,6 +172,22 @@ def main() -> int:
             continue
         trace_shas[model_id] = hashlib.sha256(path.read_bytes()).hexdigest()
         traces = read_traces_parquet(path)
+        # Trace coverage assert (MED-1 / Tier-R2-0 PR1 step 13):
+        # `month_stratified_mink` silently skips any case_id missing from
+        # `publish_dates`; if the trace parquet contains case_ids not in
+        # the probe set, the analyzer would silently drop them and the
+        # resulting per-month counts would lie about the input. Surface
+        # such mismatch loudly so the operator can rebuild the trace
+        # against the right probe set.
+        trace_case_ids = {t.case_id for t in traces}
+        probe_case_ids = set(publish_dates)
+        unexpected = sorted(trace_case_ids - probe_case_ids)
+        if unexpected:
+            raise SystemExit(
+                f"trace parquet {path} contains {len(unexpected)} case_id(s) "
+                f"not in the probe set {args.probe_set}: "
+                f"{unexpected[:5]}{'...' if len(unexpected) > 5 else ''}"
+            )
         by_month = month_stratified_mink(
             traces, publish_dates, k_pct=args.k_pct
         )

@@ -69,7 +69,6 @@ import json
 import os
 import re
 import sys
-import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -78,6 +77,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from src.r5a.fleet import ModelConfig, load_fleet  # noqa: E402
+from src.r5a.io_utils import atomic_write_json, atomic_write_text  # noqa: E402
 
 
 PLACEHOLDER = "<TBD>"
@@ -150,11 +150,23 @@ def _sha256_file_content(content: bytes) -> str:
 
 
 def _default_hf_cache() -> Path | None:
+    """Resolve the HF cache directory from env and standard locations.
+
+    Per `MED-4` (Tier-R2-0 PR1 step 11): when ``HF_HUB_CACHE`` is
+    explicitly set but the path does not exist, fail loudly rather
+    than silently falling through to the next candidate (which would
+    lead to a cache-miss "no snapshot" diagnostic far from the real
+    misconfiguration). Only the unset case falls back.
+    """
     env_cache = os.environ.get("HF_HUB_CACHE")
-    if env_cache:
+    if env_cache is not None:
         candidate = Path(env_cache)
-        if candidate.exists():
-            return candidate
+        if not candidate.exists():
+            raise SystemExit(
+                f"HF_HUB_CACHE={env_cache!r} is set but the directory does "
+                "not exist; unset the env var or fix the path."
+            )
+        return candidate
     hf_home = os.environ.get("HF_HOME")
     if hf_home:
         candidate = Path(hf_home) / "hub"
@@ -239,45 +251,20 @@ def _discover_from_cache(
         content = real.read_bytes()
     except OSError as exc:  # pragma: no cover
         return commit_sha, None, f"failed reading {real}: {exc!r}"
+    # tokenizer.json content-validity check (#6 D / Tier-R2-0 PR1 step
+    # 12): a corrupt or partial download is silently SHA-hashable but
+    # not loadable; rejecting non-JSON here surfaces the error at pin
+    # time rather than at first vLLM launch.
+    try:
+        json.loads(content)
+    except json.JSONDecodeError as exc:
+        return (
+            commit_sha,
+            None,
+            f"tokenizer.json at {real} is not valid JSON: {exc!s}",
+        )
     tok_sha = _sha256_file_content(content)
     return commit_sha, tok_sha, "ok"
-
-
-# ----------------------------------------------------------------------
-# Atomic write helpers (B.23)
-# ----------------------------------------------------------------------
-
-
-def _atomic_write_text(path: Path, text: str) -> None:
-    """Write `text` to `path` via tempfile + os.replace.
-
-    Avoids leaving a half-written file on disk if the process crashes
-    mid-write (Windows `Path.write_text` is non-atomic). The temp file
-    lives in the same directory as `path` so `os.replace` is a same-
-    filesystem rename across both POSIX and Windows.
-    """
-    path.parent.mkdir(parents=True, exist_ok=True)
-    fd, tmp_str = tempfile.mkstemp(
-        prefix=path.name + ".", suffix=".tmp", dir=str(path.parent)
-    )
-    tmp = Path(tmp_str)
-    try:
-        with os.fdopen(fd, "w", encoding="utf-8", newline="") as f:
-            f.write(text)
-            f.flush()
-            os.fsync(f.fileno())
-        os.replace(tmp, path)
-    except Exception:
-        try:
-            tmp.unlink()
-        except FileNotFoundError:
-            pass
-        raise
-
-
-def _atomic_write_json(path: Path, payload: object) -> None:
-    text = json.dumps(payload, indent=2, ensure_ascii=False) + "\n"
-    _atomic_write_text(path, text)
 
 
 # ----------------------------------------------------------------------
@@ -344,14 +331,31 @@ def _patch_model_block(
             mm = field_re(key).match(line)
             if not mm:
                 continue
-            current = mm.group(2).strip()
+            raw_current = mm.group(2).strip()
+            # Strip surrounding quotes before equality check (LOW-1).
+            # Without this an idempotent rerun against a YAML that
+            # quoted the SHA (e.g. `"abc..."`) reports a misleading
+            # SKIP "already pinned with conflicting" instead of a no-op.
+            if (
+                len(raw_current) >= 2
+                and raw_current[0] == raw_current[-1]
+                and raw_current[0] in ('"', "'")
+            ):
+                current = raw_current[1:-1]
+            else:
+                current = raw_current
             if (
                 current == PLACEHOLDER
-                or current == quoted_placeholder
                 or current == new_value
             ):
                 if current == new_value:
                     continue
+                replacement = f'{mm.group(1)}"{new_value}"{mm.group(3)}'
+                lines[j] = replacement + ("\n" if lines[j].endswith("\n") else "")
+                changes.append(f"{model_id}.{key}: {PLACEHOLDER} -> {new_value}")
+            elif raw_current == quoted_placeholder:
+                # Defensive: pre-strip equality already covers this, but
+                # keep an explicit branch for clarity.
                 replacement = f'{mm.group(1)}"{new_value}"{mm.group(3)}'
                 lines[j] = replacement + ("\n" if lines[j].endswith("\n") else "")
                 changes.append(f"{model_id}.{key}: {PLACEHOLDER} -> {new_value}")
@@ -412,8 +416,31 @@ def main() -> int:
     else:
         cache = _default_hf_cache()
 
+    # Pre-validate the existing pinning log BEFORE any fleet mutation
+    # (#5 A / Tier-R2-0 PR1 step 8): a corrupt or wrong-shape log must
+    # fail the run so the operator can reconcile it; otherwise the
+    # fleet would be silently rewritten while the audit trail breaks.
+    log_path = Path(args.log_path)
+    prior_log: list = []
+    if not args.check and log_path.exists():
+        try:
+            prior_log = json.loads(log_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            raise SystemExit(
+                f"existing pinning log {log_path} is corrupt: {exc!r}; "
+                "operator must inspect and either fix or move it aside "
+                "before re-running pinner. Fleet file unchanged."
+            )
+        if not isinstance(prior_log, list):
+            raise SystemExit(
+                f"existing pinning log {log_path} is not a JSON array; "
+                "operator must inspect and either fix or move it aside "
+                "before re-running pinner. Fleet file unchanged."
+            )
+
     all_changes: list[str] = []
     pinned_records: dict[str, dict[str, str]] = {}
+    skipped_records: dict[str, dict[str, str]] = {}
 
     for model_id, cfg in fleet.models.items():
         if not cfg.is_white_box() or not cfg.hf_repo:
@@ -440,11 +467,28 @@ def main() -> int:
             tokenizer_sha=tok_sha,
         )
         all_changes.extend(changes)
-        pinned_records[model_id] = {
+        # Split semantics (MED-5 / Tier-R2-0 PR1 step 10): a model is
+        # "pinned" only if the patch actually replaced a `<TBD>`
+        # placeholder for at least one field; SKIP'd entries (existing
+        # value differs from override and is not a placeholder) go to
+        # `models_skipped` so the log does not falsely claim the run
+        # changed bytes that it left untouched.
+        record = {
             "hf_commit_sha": commit_sha or "",
             "tokenizer_sha": tok_sha or "",
             "source": note,
         }
+        replaced = any(
+            c.startswith(f"{model_id}.") and "->" in c and "SKIP" not in c
+            for c in changes
+        )
+        skipped = any(
+            c.startswith(f"{model_id}.") and "SKIP" in c for c in changes
+        )
+        if replaced:
+            pinned_records[model_id] = record
+        if skipped:
+            skipped_records[model_id] = record
 
     new_version: str = fleet.fleet_version
     any_field_changed = any(
@@ -490,7 +534,7 @@ def main() -> int:
             )
 
         out_path = Path(args.output) if args.output else fleet_path
-        _atomic_write_text(out_path, yaml_text)
+        atomic_write_text(out_path, yaml_text)
         print(f"wrote {out_path}")
 
     print("changes:")
@@ -498,31 +542,17 @@ def main() -> int:
         print(f"  {c}")
 
     if not args.check:
-        log_path = Path(args.log_path)
         log_entry = {
             "ts": datetime.now(timezone.utc).isoformat(),
             "fleet_version_old": fleet.fleet_version,
             "fleet_version_new": new_version,
             "vllm_image_digest": args.vllm_image_digest,
             "models_pinned": pinned_records,
+            "models_skipped": skipped_records,
             "changes": all_changes,
         }
-        prior: list = []
-        if log_path.exists():
-            try:
-                prior = json.loads(log_path.read_text(encoding="utf-8"))
-            except json.JSONDecodeError as exc:
-                raise SystemExit(
-                    f"existing pinning log {log_path} is corrupt: {exc!r}; "
-                    "operator must inspect and either fix or move it aside"
-                )
-            if not isinstance(prior, list):
-                raise SystemExit(
-                    f"existing pinning log {log_path} is not a JSON array; "
-                    "operator must inspect and either fix or move it aside"
-                )
-        prior.append(log_entry)
-        _atomic_write_json(log_path, prior)
+        prior_log.append(log_entry)
+        atomic_write_json(log_path, prior_log)
         print(f"appended pinning log -> {log_path}")
 
     return 0

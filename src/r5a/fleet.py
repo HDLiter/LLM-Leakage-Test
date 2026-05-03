@@ -14,12 +14,24 @@ import hashlib
 import json
 from datetime import date
 from pathlib import Path
-from typing import Literal
+from typing import Annotated, Literal
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
 
 from .contracts import AccessTier
+
+
+# `<TBD>` is the canonical unpinned-fleet placeholder per
+# plans/tier-r2-0-implementation.md §10.1; admitting it lets the
+# unpinned fleet load while still rejecting malformed SHAs at YAML
+# load time. Confirmatory mode hard-fails on `<TBD>` separately
+# (see _confirmatory_hard_fail clause for placeholder rejection).
+_HF_COMMIT_SHA_PATTERN = r"^([a-f0-9]{40}|<TBD>)$"
+_TOKENIZER_SHA_PATTERN = r"^([a-f0-9]{64}|<TBD>)$"
+
+HFCommitSha = Annotated[str, StringConstraints(pattern=_HF_COMMIT_SHA_PATTERN)]
+TokenizerSha = Annotated[str, StringConstraints(pattern=_TOKENIZER_SHA_PATTERN)]
 
 
 class PLogprobModelConfig(BaseModel):
@@ -61,8 +73,8 @@ class ModelConfig(BaseModel):
     hf_repo: str | None = None  # for white-box; resolved by huggingface-cli download
     quant_scheme: Literal["fp16", "bf16", "fp32", "AWQ-INT4", "GPTQ-INT4"] | None = None
     tokenizer_family: str | None = None
-    tokenizer_sha: str | None = None
-    hf_commit_sha: str | None = None
+    tokenizer_sha: TokenizerSha | None = None
+    hf_commit_sha: HFCommitSha | None = None
     p_logprob: PLogprobModelConfig | None = None
     # `p_predict` is Optional to express the P_logprob-only role
     # (DECISION_20260429_llama_addition §2.2): Llama-3 / Llama-3.1

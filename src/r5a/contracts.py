@@ -15,7 +15,7 @@ from __future__ import annotations
 import math
 from datetime import date, datetime
 from enum import Enum
-from typing import Any, Literal
+from typing import Any, Final, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -378,6 +378,25 @@ class RunStateRow(BaseModel):
     ts_end: datetime | None = None
 
 
+RUNSTATE_TABLE_NAME: Final[str] = "request_runstate"
+"""SQLite table name for the runstate DB.
+
+Forward-declared contract: the Phase 7 orchestration writer (see
+`plans/phase7-pilot-implementation.md` §5.5A) must create the
+``data/pilot/runstate.db`` table by this name with columns matching
+``RunStateRow`` fields plus the seed-triplet columns
+(``seed_requested``, ``seed_supported``, ``seed_effective``).
+
+Used by:
+- ``scripts/ws1_finalize_run_manifest.py`` confirmatory hard-fail
+  (read-only sqlite check for orphan ``pending`` / ``retryable`` rows).
+
+Defining the name here lets the gate ship before the writer exists;
+when the writer lands it must conform to this constant rather than
+introduce a new table-naming branch.
+"""
+
+
 # ---------------------------------------------------------------------------
 # Run manifest (plan §10.4)
 # ---------------------------------------------------------------------------
@@ -481,6 +500,17 @@ class RunManifest(BaseModel):
     fleet_p_predict_eligible: list[str] = Field(default_factory=list)
     fleet_p_logprob_eligible: list[str] = Field(default_factory=list)
 
+    # Tier-R2-0 PR1 (refine-logs/reviews/R5A_TIER_R2_0_IMPL_REVIEW_20260502
+    # IMPLEMENTATION_NOTE.md §PR1 step 3): SHA-256 of analyzer JSON consumed
+    # via `--exposure-horizon` and SHA-256 per `*__pilot.parquet` byte
+    # content. Together they bind Path-E provenance end-to-end:
+    # finalizer → analyzer JSON → per-model trace parquet. `| None` /
+    # empty default supports dev / `--allow-tbd` mode where Path-E is
+    # absent; confirmatory hard-fail rejects None / empty for the
+    # P_logprob roster.
+    exposure_horizon_source_sha256: str | None = None
+    pilot_trace_shas: dict[str, str] = Field(default_factory=dict)
+
 
 __all__ = [
     "AccessTier",
@@ -499,6 +529,7 @@ __all__ = [
     "PilotManifest",
     "PredictRecord",
     "RequestFingerprint",
+    "RUNSTATE_TABLE_NAME",
     "RequestStatus",
     "RunManifest",
     "RunStateRow",

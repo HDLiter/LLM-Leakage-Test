@@ -275,3 +275,37 @@ def test_pin_fleet_corrupt_log_rejected(tmp_path: Path, monkeypatch):
             "--log-path", str(log_path),
         )
     assert "corrupt" in str(exc.value).lower()
+
+
+def test_pin_fleet_corrupt_log_leaves_fleet_unchanged(tmp_path: Path, monkeypatch):
+    """#5 A / Tier-R2-0 PR1 step 8: log validation must run BEFORE the
+    fleet is rewritten, so a corrupt log fails the run with the fleet
+    file byte-identical to its pre-run state.
+    """
+    fleet_path = _write_minimal_fleet(tmp_path)
+    fleet_before = fleet_path.read_bytes()
+    log_path = tmp_path / "pin_log.json"
+    log_path.write_text("{not valid json", encoding="utf-8")
+    pin_json = tmp_path / "pin.json"
+    pin_json.write_text(
+        json.dumps(
+            {
+                "qwen2.5-7b": {
+                    "hf_commit_sha": "a" * 40,
+                    "tokenizer_sha": "b" * 64,
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(SystemExit):
+        _run_pin_fleet_cli(
+            monkeypatch,
+            "--fleet", str(fleet_path),
+            "--pin-json", str(pin_json),
+            "--vllm-image-digest", _digest("f"),
+            "--log-path", str(log_path),
+        )
+    assert fleet_path.read_bytes() == fleet_before, (
+        "fleet YAML must not be mutated when the existing log is corrupt"
+    )

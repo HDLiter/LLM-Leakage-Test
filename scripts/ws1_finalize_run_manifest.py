@@ -24,6 +24,14 @@ script writes that artifact (`RunManifest`).
   - decision #11 — `quality_gate_thresholds` no longer carries the
     WS6 mechanistic keys (mooted by gate removal).
 
+Pilot trace row-count invariant (Tier-R2-0 PR1, IMPLEMENTATION_NOTE.md
+§PR1 step 4 / S5): every per-model `*__pilot.parquet` must contain
+exactly `len(--article-manifest)` rows (one row per article × case).
+The article manifest is required to be a JSON list of
+`ArticleRecord`-shaped entries; mismatch (or 0-byte / corrupt parquet)
+raises `SystemExit` in confirmatory mode and is also enforced for any
+parquet that exists in dev mode.
+
 Inputs (file paths; missing optional inputs are recorded as `None`):
 
   --fleet              pinned fleet YAML (no `<TBD>` allowed)
@@ -74,6 +82,7 @@ import hashlib
 import json
 import math
 import re
+import sqlite3
 import subprocess
 import sys
 import uuid
@@ -81,12 +90,15 @@ from datetime import date as Date, datetime, timezone
 from pathlib import Path
 from typing import Literal
 
+import pyarrow.parquet as pq
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from src.r5a.contracts import RunManifest  # noqa: E402
+from src.r5a.contracts import RUNSTATE_TABLE_NAME, RunManifest  # noqa: E402
 from src.r5a.fleet import FleetConfig, load_fleet  # noqa: E402
+from src.r5a.io_utils import atomic_write_text  # noqa: E402
 from src.r5a.runtime import load_runtime  # noqa: E402
 
 
@@ -174,11 +186,25 @@ def _hash_strings(items: list[str]) -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
+def _parquet_rowcount_or_error(path: Path) -> int | str:
+    """Return parquet row count, or a string describing the open / read error.
+
+    Uses `pyarrow.parquet.read_metadata` so the file is not fully loaded.
+    Wraps 0-byte / truncated / corrupt files into the same diagnostic
+    surface as a row-count mismatch (Tier-R2-0 PR1 step 4).
+    """
+    try:
+        return pq.read_metadata(str(path)).num_rows
+    except Exception as exc:  # pragma: no cover - exact error class is libarrow-version-dependent
+        return f"failed to read parquet metadata: {exc!r}"
+
+
 def _validate_traces_dir(
     traces_dir: Path,
     expected_models: list[str],
     *,
     mode: Literal["confirmatory", "dev"],
+    expected_n_articles: int | None = None,
 ) -> dict[str, str]:
     """Return mapping `model_id -> trace_path` for the realized set.
 
@@ -190,6 +216,12 @@ def _validate_traces_dir(
     In `confirmatory` mode every `expected_models` entry must exist on
     disk AND no extra `*__pilot.parquet` files may be present; both
     classes are reported in a single multi-line `SystemExit`.
+
+    Row-count gate (Tier-R2-0 PR1 step 4 / S5): when
+    `expected_n_articles` is provided, every parquet that resolves to
+    an `expected_models` entry is opened via
+    `pyarrow.parquet.read_metadata` and its row count compared to
+    `expected_n_articles`. Mismatch / 0-byte / corrupt parquet → fail.
     """
     expected_set = set(expected_models)
     out: dict[str, str] = {}
@@ -208,10 +240,32 @@ def _validate_traces_dir(
         model_id = parquet.name[: -len("__pilot.parquet")]
         on_disk[model_id] = parquet
 
+    rowcount_problems: list[str] = []
+
+    def _check_rowcount(model_id: str, parquet_path: Path) -> None:
+        if expected_n_articles is None:
+            return
+        result = _parquet_rowcount_or_error(parquet_path)
+        if isinstance(result, str):
+            rowcount_problems.append(
+                f"  {model_id} ({parquet_path.name}): {result}"
+            )
+        elif result != expected_n_articles:
+            rowcount_problems.append(
+                f"  {model_id} ({parquet_path.name}): row count {result} "
+                f"!= expected {expected_n_articles}"
+            )
+
     if mode == "dev":
         for mid, path in on_disk.items():
             if mid in expected_set:
                 out[mid] = str(path)
+                _check_rowcount(mid, path)
+        if rowcount_problems:
+            raise SystemExit(
+                "pilot trace row count does not match article-manifest:\n"
+                + "\n".join(rowcount_problems)
+            )
         return out
 
     missing = sorted(expected_set - set(on_disk))
@@ -228,7 +282,117 @@ def _validate_traces_dir(
 
     for mid in sorted(expected_set):
         out[mid] = str(on_disk[mid])
+        _check_rowcount(mid, on_disk[mid])
+
+    if rowcount_problems:
+        raise SystemExit(
+            "pilot trace row count does not match article-manifest "
+            f"(expected {expected_n_articles} per model):\n"
+            + "\n".join(rowcount_problems)
+        )
     return out
+
+
+def _pilot_trace_shas(traces: dict[str, str]) -> dict[str, str]:
+    """Compute SHA-256 of each pilot trace parquet's byte content.
+
+    Populates `RunManifest.pilot_trace_shas` (Tier-R2-0 PR1 #9 E SHA
+    half). Paired with `_validate_traces_dir`'s row-count gate this
+    closes the half-written / 0-byte / wrong-N / mix-batch parquet hole.
+    """
+    return {mid: _sha256_file(Path(path)) for mid, path in traces.items()}
+
+
+_SHA256_RE = re.compile(r"^[a-f0-9]{64}$")
+
+
+def _validate_exposure_horizon_payload(
+    payload: object,
+    path: Path,
+    fleet: FleetConfig,
+) -> None:
+    """Path-E source-JSON shape gate (Tier-R2-0 PR1 step 5).
+
+    Enforces that the analyzer JSON binds analyzer-side trace SHAs and
+    probe-set SHA into the finalizer's view, so a stale or malformed
+    file cannot silently masquerade as a valid Path-E result.
+
+    Required at the top level:
+      - ``trace_shas``: ``dict[str, str]`` whose keys equal the fleet
+        ``p_logprob_eligible_ids()`` set and whose values are non-empty
+        lower-case 64-hex SHA-256 digests.
+      - ``probe_set_sha256``: a non-empty lower-case 64-hex SHA-256.
+
+    Any deviation (missing key, wrong type, empty value, malformed hex,
+    or roster mismatch) raises ``SystemExit`` with a single multi-line
+    message naming each violation.
+    """
+    if not isinstance(payload, dict):
+        raise SystemExit(
+            f"--exposure-horizon {path} top-level JSON is "
+            f"{type(payload).__name__}; expected object."
+        )
+
+    failures: list[str] = []
+
+    # trace_shas
+    if "trace_shas" not in payload:
+        failures.append(
+            "--exposure-horizon JSON is missing 'trace_shas' "
+            "(produced by run_exposure_horizon_analysis.py)."
+        )
+    else:
+        trace_shas = payload["trace_shas"]
+        if not isinstance(trace_shas, dict):
+            failures.append(
+                f"--exposure-horizon 'trace_shas' is "
+                f"{type(trace_shas).__name__}; expected object."
+            )
+        else:
+            expected_roster = set(fleet.p_logprob_eligible_ids())
+            actual_roster = set(trace_shas)
+            if actual_roster != expected_roster:
+                missing = sorted(expected_roster - actual_roster)
+                extras = sorted(actual_roster - expected_roster)
+                failures.append(
+                    "--exposure-horizon 'trace_shas' roster does not match "
+                    f"P_logprob fleet (missing={missing}, unexpected={extras})."
+                )
+            for mid, sha in trace_shas.items():
+                if not isinstance(sha, str) or not sha:
+                    failures.append(
+                        f"--exposure-horizon 'trace_shas[{mid}]' is empty "
+                        f"or non-string ({sha!r})."
+                    )
+                elif not _SHA256_RE.match(sha):
+                    failures.append(
+                        f"--exposure-horizon 'trace_shas[{mid}]'={sha!r} "
+                        "does not match SHA-256 lower-hex pattern."
+                    )
+
+    # probe_set_sha256
+    if "probe_set_sha256" not in payload:
+        failures.append(
+            "--exposure-horizon JSON is missing 'probe_set_sha256'."
+        )
+    else:
+        probe_sha = payload["probe_set_sha256"]
+        if not isinstance(probe_sha, str) or not probe_sha:
+            failures.append(
+                f"--exposure-horizon 'probe_set_sha256' is empty or "
+                f"non-string ({probe_sha!r})."
+            )
+        elif not _SHA256_RE.match(probe_sha):
+            failures.append(
+                f"--exposure-horizon 'probe_set_sha256'={probe_sha!r} "
+                "does not match SHA-256 lower-hex pattern."
+            )
+
+    if failures:
+        raise SystemExit(
+            f"Path-E source JSON shape verification failed for {path}:\n  "
+            + "\n  ".join(failures)
+        )
 
 
 def _read_exposure_horizon(
@@ -246,13 +410,30 @@ def _read_exposure_horizon(
     and an invalid date string raises `SystemExit`. In `dev` mode an
     invalid date silently becomes `None` so iteration on the analyzer
     is not blocked.
+
+    Top-level shape (`trace_shas`, `probe_set_sha256`) is validated
+    via :func:`_validate_exposure_horizon_payload` regardless of mode
+    (Tier-R2-0 PR1 step 5).
     """
     payload = json.loads(path.read_text(encoding="utf-8"))
+    _validate_exposure_horizon_payload(payload, path, fleet)
     summary = payload.get("summary", {}) if isinstance(payload, dict) else {}
     out: dict[str, Date | None] = {}
     msgs: list[str] = []
     for model_id, row in summary.items():
-        co = row.get("horizon_observed")
+        # Schema-strict parse (Tier-R2-0 PR1 step 6, #4 A): a row without
+        # `horizon_observed` is malformed regardless of mode and is not
+        # equivalent to `horizon_observed: null` (which is "knee detector
+        # rejected the fit"). Mode does not soften this — a stale or
+        # truncated analyzer run must not silently land as "rejected
+        # horizon" for every model.
+        if "horizon_observed" not in row:
+            raise SystemExit(
+                f"--exposure-horizon {path} summary[{model_id!r}] is missing "
+                f"'horizon_observed' key (got keys {sorted(row)!r}). "
+                "Re-run scripts/run_exposure_horizon_analysis.py."
+            )
+        co = row["horizon_observed"]
         if co is None:
             out[model_id] = None
             msgs.append(f"  {model_id}: horizon rejected ({row.get('notes')})")
@@ -439,21 +620,36 @@ def _confirmatory_hard_fail(
     exposure_horizon: dict[str, Date | None],
     launch_env: dict[str, str],
     sampling_config_path: Path,
+    runstate_db_path: str | None,
 ) -> None:
-    """8-clause confirmatory-mode hard-fail (decision #1 + Lens A major #8).
+    """11-clause confirmatory-mode hard-fail (decision #1 + Lens A major #8;
+    Tier-R2-0 PR1 step 7 added hidden-states-dir + runstate clauses and
+    renumbered end-to-end so each check has a unique ``[clause N]``).
 
-    Raises a single `SystemExit` carrying a multi-line message; each failed
-    clause is on its own line, prefixed with `[clause N]` so the operator
-    sees every failure (not just the first) and tests can assert on the
-    exact clause set without coincidental substring matches in unrelated
-    text.
+    Raises a single ``SystemExit`` carrying a multi-line message; each
+    failed clause is on its own line, prefixed with ``[clause N]`` so
+    the operator sees every failure (not just the first) and tests can
+    assert on the exact clause set without coincidental substring
+    matches in unrelated text.
 
-    Clauses 5 (exposure_horizon roster) and 6 (traces roster) are normally
-    enforced inside `_read_exposure_horizon` / `_validate_traces_dir`
-    respectively; both are re-checked here so that any future caller
-    that bypasses those helpers still sees the same gate.
+    Two clauses are normally enforced inside helpers that run **before**
+    this collector (so the failure surfaces at the call site, not here):
+
+    - the exposure-horizon-roster check is enforced inside
+      :func:`_read_exposure_horizon`;
+    - the trace-roster + per-parquet row-count checks are enforced
+      inside :func:`_validate_traces_dir`.
+
+    Both are re-checked here so that any future caller that bypasses
+    those helpers still sees the same gate. Tests asserting on those
+    failure modes (the exposure-horizon-roster check or the trace-roster
+    check) must call the helper directly; the multi-line collector
+    here is reachable only when the helper is bypassed. Clause numbers
+    can shift across releases, so this docstring deliberately avoids
+    naming them — see the in-body comments for current numbering.
     """
     failures: list[str] = []
+    placeholder_set = {None, "", "<TBD>"}
 
     # Clause 1 — git_commit_sha must be a real SHA, not the all-zero fallback.
     git_sha = _git_commit_sha()
@@ -475,77 +671,138 @@ def _confirmatory_hard_fail(
             "sha256:<64-hex>."
         )
 
-    # Clause 3 — every P_logprob model has non-placeholder tokenizer_sha and
+    # Clause 3 — sampling-config path must exist.
+    if not sampling_config_path.exists():
+        failures.append(
+            f"[clause 3] --sampling-config {sampling_config_path} does not exist; "
+            "confirmatory finalize cannot hash it into sampling_config_hash."
+        )
+
+    # Clause 4 — every P_logprob model has non-placeholder tokenizer_sha and
     # white-box checkpoint sha.
-    placeholder_set = {None, "", "<TBD>"}
     p_logprob_ids = fleet.p_logprob_eligible_ids()
     for mid in p_logprob_ids:
         cfg = fleet.get(mid)
         if cfg.tokenizer_sha in placeholder_set:
             failures.append(
-                f"[clause 3] tokenizer_sha is {cfg.tokenizer_sha!r} for {mid} — "
+                f"[clause 4] tokenizer_sha is {cfg.tokenizer_sha!r} for {mid} — "
                 "run scripts/ws1_pin_fleet.py."
             )
         if cfg.hf_commit_sha in placeholder_set:
             failures.append(
-                f"[clause 3] hf_commit_sha is {cfg.hf_commit_sha!r} for {mid} — "
+                f"[clause 4] hf_commit_sha is {cfg.hf_commit_sha!r} for {mid} — "
                 "run scripts/ws1_pin_fleet.py."
             )
 
-    # Clause 4 — every black-box has a non-placeholder api_model_name.
+    # Clause 5 — every black-box has a non-placeholder api_model_name.
     for mid in fleet.black_box_ids():
         cfg = fleet.get(mid)
         if cfg.api_model_name in placeholder_set:
             failures.append(
-                f"[clause 4] api_model_name is {cfg.api_model_name!r} for "
+                f"[clause 5] api_model_name is {cfg.api_model_name!r} for "
                 f"black-box {mid}."
             )
 
-    # Clause 5 — exposure_horizon keys must equal the P_logprob fleet roster.
+    # Clause 6 — exposure_horizon keys must equal the P_logprob fleet roster.
+    # Normally short-circuited inside _read_exposure_horizon; mirrored here
+    # so a caller that bypasses the helper still sees the gate.
     expected = set(p_logprob_ids)
     eh_keys = set(exposure_horizon)
     if eh_keys != expected:
         missing = sorted(expected - eh_keys)
         extras = sorted(eh_keys - expected)
         failures.append(
-            "[clause 5] exposure_horizon roster mismatch "
+            "[clause 6] exposure_horizon roster mismatch "
             f"(missing={missing}, unexpected={extras})."
         )
 
-    # Clause 6 — traces dir mapping must cover every P_logprob model.
+    # Clause 7 — traces dir mapping must cover every P_logprob model.
+    # Normally short-circuited inside _validate_traces_dir; mirrored here.
     trace_keys = set(traces)
     if trace_keys != expected:
         missing = sorted(expected - trace_keys)
         extras = sorted(trace_keys - expected)
         failures.append(
-            "[clause 6] traces-dir roster mismatch "
+            "[clause 7] traces-dir roster mismatch "
             f"(missing={missing}, unexpected={extras})."
         )
 
-    # Clause 7 — launch_env must record CUDA_VISIBLE_DEVICES and VLLM_VERSION.
+    # Clause 8 — launch_env must record CUDA_VISIBLE_DEVICES and VLLM_VERSION.
     for required_key in ("CUDA_VISIBLE_DEVICES", "VLLM_VERSION"):
         if required_key not in launch_env:
             failures.append(
-                f"[clause 7] launch_env is missing required key {required_key!r}; "
+                f"[clause 8] launch_env is missing required key {required_key!r}; "
                 "supply it via --launch-env JSON."
             )
 
-    # Clause 8 — gpu_dtype must be set (e.g. "bf16").
+    # Clause 9 — gpu_dtype must be set (e.g. "bf16").
     if args.gpu_dtype in placeholder_set:
         failures.append(
-            f"[clause 8] --gpu-dtype is {args.gpu_dtype!r}; required in "
+            f"[clause 9] --gpu-dtype is {args.gpu_dtype!r}; required in "
             "confirmatory mode (e.g. \"bf16\", \"fp16\")."
         )
 
-    # Sampling-config path must exist (R2-C2 #5; reuses clause 2 reporting style
-    # but is recorded separately as a sampling-config gate). Treated under
-    # clause 2's bracket-N style for the same reason.
-    if not sampling_config_path.exists():
+    # Clause 10 — --hidden-states-dir must be supplied (PR1 step 7 / #1 B).
+    # The directory's contents (subset hash) are checked inside
+    # _hidden_state_subset_hash; this clause guards the upstream "operator
+    # forgot the flag entirely" case so it does not silently degrade to
+    # `hidden_state_subset_hash=None` in the manifest.
+    if args.hidden_states_dir is None:
         failures.append(
-            f"[clause 2] --sampling-config {sampling_config_path} does not exist; "
-            "confirmatory finalize cannot hash it into "
-            "sampling_config_hash."
+            "[clause 10] --hidden-states-dir is required in confirmatory mode; "
+            "WS6 subset hash cannot be computed without it."
         )
+
+    # Clause 11 — runstate.db must be initialized and have no orphan
+    # `pending` / `retryable` rows (PR1 step 7 / MED-2 + S2 forward-
+    # declared RUNSTATE_TABLE_NAME contract). Read-only `mode=ro&immutable=1`
+    # so a missing file does not silently get created.
+    if runstate_db_path is None:
+        failures.append(
+            "[clause 11] runstate.db path is empty; runtime.runstate_db or "
+            "--runstate-db must point at the orchestration database."
+        )
+    else:
+        rs_path = Path(runstate_db_path)
+        try:
+            conn = sqlite3.connect(
+                f"file:{rs_path.as_posix()}?mode=ro&immutable=1", uri=True
+            )
+        except sqlite3.OperationalError:
+            failures.append(
+                f"[clause 11] runstate.db at {rs_path} not initialized; "
+                "Phase 7 orchestration must run before confirmatory finalize."
+            )
+        else:
+            try:
+                with conn:
+                    try:
+                        cur = conn.execute(
+                            f"SELECT COUNT(*), GROUP_CONCAT("
+                            f"case_id || ':' || model_id, '; ') "
+                            f"FROM {RUNSTATE_TABLE_NAME} "
+                            f"WHERE status IN ('pending', 'retryable')"
+                        )
+                        count, sample = cur.fetchone()
+                    except sqlite3.OperationalError as exc:
+                        failures.append(
+                            f"[clause 11] runstate.db at {rs_path} is missing "
+                            f"table {RUNSTATE_TABLE_NAME!r} or expected columns "
+                            f"({exc!s}); Phase 7 orchestration writer must "
+                            "create it per RUNSTATE_TABLE_NAME contract."
+                        )
+                    else:
+                        if count and count > 0:
+                            sample_str = sample or ""
+                            truncated = sample_str[:200] + (
+                                "..." if len(sample_str) > 200 else ""
+                            )
+                            failures.append(
+                                f"[clause 11] runstate has {count} orphan "
+                                f"pending/retryable rows: {truncated}"
+                            )
+            finally:
+                conn.close()
 
     if failures:
         raise SystemExit(
@@ -563,6 +820,20 @@ def main() -> int:
 
     article_manifest_path = Path(args.article_manifest)
     article_manifest_hash = _sha256_file(article_manifest_path)
+
+    # S5 (IMPLEMENTATION_NOTE.md): pilot trace row count must equal article
+    # manifest entry count, per model. Read with shape assertion so a
+    # malformed manifest cannot silently masquerade as the empty list.
+    manifest_payload = json.loads(
+        article_manifest_path.read_text(encoding="utf-8")
+    )
+    if not isinstance(manifest_payload, list):
+        raise SystemExit(
+            f"--article-manifest {article_manifest_path} is not a JSON list "
+            f"(got {type(manifest_payload).__name__}); expected list of "
+            f"ArticleRecord-shaped entries."
+        )
+    expected_n_articles = len(manifest_payload)
 
     sampling_config_path = Path(args.sampling_config)
     if sampling_config_path.exists():
@@ -608,8 +879,16 @@ def main() -> int:
     n_p_logprob = len(p_logprob_ids)
 
     traces = _validate_traces_dir(
-        Path(args.traces_dir), p_logprob_ids, mode=mode
+        Path(args.traces_dir),
+        p_logprob_ids,
+        mode=mode,
+        expected_n_articles=expected_n_articles,
     )
+    pilot_trace_shas = _pilot_trace_shas(traces)
+
+    exposure_horizon_source_sha256: str | None = None
+    if args.exposure_horizon:
+        exposure_horizon_source_sha256 = _sha256_file(Path(args.exposure_horizon))
 
     hs_hash, hs_n = (None, 0)
     if args.hidden_states_dir:
@@ -679,6 +958,7 @@ def main() -> int:
             exposure_horizon=exposure_horizon,
             launch_env=launch_env,
             sampling_config_path=sampling_config_path,
+            runstate_db_path=runstate_db_path,
         )
 
     manifest = RunManifest(
@@ -711,14 +991,19 @@ def main() -> int:
         mode=mode,
         fleet_p_predict_eligible=p_predict_ids,
         fleet_p_logprob_eligible=p_logprob_ids,
+        exposure_horizon_source_sha256=exposure_horizon_source_sha256,
+        pilot_trace_shas=pilot_trace_shas,
     )
 
     out_path = Path(args.output)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     payload = manifest.model_dump(mode="json")
-    out_path.write_text(
+    # Atomic write (MED-3 / Tier-R2-0 PR1 step 14): a crash mid-write
+    # would otherwise leave a half-written manifest that downstream
+    # readers might still try to parse.
+    atomic_write_text(
+        out_path,
         json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=True),
-        encoding="utf-8",
     )
     print(f"\nwrote {out_path}")
     print(f"  mode                   = {mode}")

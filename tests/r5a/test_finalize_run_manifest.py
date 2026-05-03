@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import importlib
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -137,6 +138,60 @@ def _write(tmp_path: Path, name: str, content: str | dict | list) -> Path:
     return p
 
 
+def _write_parquet(path: Path, n_rows: int) -> Path:
+    """Write a tiny 1-column parquet with `n_rows` rows.
+
+    Used by finalizer fixtures to satisfy the row-count gate
+    (Tier-R2-0 PR1 step 4 / S5: pilot trace row count must equal
+    article-manifest entry count, per model).
+    """
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+
+    table = pa.table({"case_id": [f"case_{i:03d}" for i in range(n_rows)]})
+    pq.write_table(table, str(path))
+    return path
+
+
+def _build_runstate_db(
+    path: Path,
+    *,
+    statuses: list[str] | None = None,
+    table_name: str = "request_runstate",
+) -> Path:
+    """Construct a minimal runstate sqlite with one row per status.
+
+    Used by finalizer fixtures to satisfy / violate the runstate
+    confirmatory clause (Tier-R2-0 PR1 step 7 / MED-2 / S2 forward-
+    declared RUNSTATE_TABLE_NAME contract). When ``statuses`` is None,
+    seeds two ``success`` rows so the gate passes; pass ``["pending"]``
+    or ``["retryable"]`` to violate.
+    """
+    import sqlite3
+
+    if statuses is None:
+        statuses = ["success", "success"]
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if path.exists():
+        path.unlink()
+    conn = sqlite3.connect(str(path))
+    try:
+        with conn:
+            conn.execute(
+                f"CREATE TABLE {table_name} ("
+                "case_id TEXT, model_id TEXT, status TEXT)"
+            )
+            for i, st in enumerate(statuses):
+                conn.execute(
+                    f"INSERT INTO {table_name} (case_id, model_id, status) "
+                    "VALUES (?, ?, ?)",
+                    (f"c{i}", "qwen2.5-7b", st),
+                )
+    finally:
+        conn.close()
+    return path
+
+
 def _build_happy_fixture(tmp_path: Path) -> dict[str, Path]:
     """All 8 clauses satisfied. Returns a dict of paths/values to feed
     to the finalizer CLI."""
@@ -168,15 +223,24 @@ def _build_happy_fixture(tmp_path: Path) -> dict[str, Path]:
                     "horizon_observed": None,
                     "notes": "rejected",
                 },
-            }
+            },
+            # Path-E source-JSON shape gate (Tier-R2-0 PR1 step 5):
+            # trace_shas roster must equal P_logprob fleet, values are
+            # 64-hex SHA-256; probe_set_sha256 same shape.
+            "trace_shas": {
+                "qwen2.5-7b": "a" * 64,
+                "qwen3-8b": "b" * 64,
+            },
+            "probe_set_sha256": "c" * 64,
         },
     )
 
-    # Traces dir with both expected models
+    # Traces dir with both expected models. Row count must match the
+    # 1-entry article manifest above (Tier-R2-0 PR1 row-count gate).
     traces_dir = tmp_path / "traces"
     traces_dir.mkdir()
-    (traces_dir / "qwen2.5-7b__pilot.parquet").write_bytes(b"PAR1")
-    (traces_dir / "qwen3-8b__pilot.parquet").write_bytes(b"PAR1")
+    _write_parquet(traces_dir / "qwen2.5-7b__pilot.parquet", n_rows=1)
+    _write_parquet(traces_dir / "qwen3-8b__pilot.parquet", n_rows=1)
 
     # Hidden states with 30 cases per model (matches production default
     # for `_hidden_state_subset_hash`), identical case set per model.
@@ -192,6 +256,8 @@ def _build_happy_fixture(tmp_path: Path) -> dict[str, Path]:
         {"CUDA_VISIBLE_DEVICES": "0", "VLLM_VERSION": "0.9.0"},
     )
 
+    runstate_db = _build_runstate_db(tmp_path / "runstate.db")
+
     output = tmp_path / "manifest.json"
 
     return {
@@ -203,6 +269,7 @@ def _build_happy_fixture(tmp_path: Path) -> dict[str, Path]:
         "traces_dir": traces_dir,
         "hidden_states_dir": hs_dir,
         "launch_env": launch_env,
+        "runstate_db": runstate_db,
         "output": output,
     }
 
@@ -225,11 +292,13 @@ def _run_finalize(monkeypatch, fixture: dict[str, Path], **overrides) -> None:
         "--sampling-config", str(fixture["sampling_config"]),
         "--traces-dir", str(fixture["traces_dir"]),
         "--exposure-horizon", str(fixture["exposure_horizon"]),
-        "--hidden-states-dir", str(fixture["hidden_states_dir"]),
         "--launch-env", str(fixture["launch_env"]),
+        "--runstate-db", str(fixture["runstate_db"]),
         "--output", str(fixture["output"]),
         "--run-id", "run-test",
     ]
+    if "hidden_states_dir" not in omit:
+        args.extend(["--hidden-states-dir", str(fixture["hidden_states_dir"])])
     if "vllm_image_digest" not in omit and digest is not None:
         args.extend(["--vllm-image-digest", digest])
     if "gpu_dtype" not in omit and gpu_dtype is not None:
@@ -242,7 +311,7 @@ def _run_finalize(monkeypatch, fixture: dict[str, Path], **overrides) -> None:
 
 
 # ----------------------------------------------------------------------
-# 8-clause hard-fail framework — 2 collapsed integration tests
+# 11-clause hard-fail framework — 2 collapsed integration tests
 # ----------------------------------------------------------------------
 
 
@@ -252,46 +321,53 @@ def test_finalize_confirmatory_lists_all_clause_violations(tmp_path: Path, monke
     failed clause is reported with its `[clause N]` prefix in a single
     SystemExit message.
 
-    Notes on coverage: clauses 5 (exposure_horizon roster) and 6
+    Notes on coverage: clauses 6 (exposure_horizon roster) and 7
     (traces-dir roster) are normally short-circuited inside
     `_read_exposure_horizon` and `_validate_traces_dir` BEFORE the
     framework runs, so they never reach the multi-line collector via
     `main()`. Helper-level coverage of those two short-circuits lives in
     `test_validate_traces_dir_confirmatory_lists_missing_and_extras` and
     `test_read_exposure_horizon_invalid_date_raises_in_confirmatory`.
-    Here we exercise the six framework-owned clauses (1, 2, 3, 4, 7, 8)
-    plus the sampling-config gate, all of which must coexist in one
-    multi-line SystemExit per Decision #1's collect-and-report contract.
+    Here we exercise the nine framework-owned clauses (1, 2, 3, 4, 5,
+    8, 9, 10, 11), all of which must coexist in one multi-line
+    SystemExit per Decision #1's collect-and-report contract.
     """
     fixture = _build_happy_fixture(tmp_path)
 
     # Clause 1: force git_commit_sha to return all-zero.
     monkeypatch.setattr(finalize, "_git_commit_sha", lambda: "0" * 40)
 
-    # Clauses 3 + 4: TBD on a P_logprob white-box and on a black-box.
+    # Clause 3: --sampling-config points at a non-existent path.
+    fixture["sampling_config"].unlink()
+
+    # Clauses 4 + 5: TBD on a P_logprob white-box and on a black-box.
     fleet_dict = json.loads(json.dumps(_FLEET_DICT))  # deep copy
     fleet_dict["models"]["qwen2.5-7b"]["tokenizer_sha"] = "<TBD>"
     fleet_dict["models"]["deepseek-v3"]["api_model_name"] = "<TBD>"
     fixture["fleet"].write_text(yaml.safe_dump(fleet_dict), encoding="utf-8")
 
-    # Clause 7: launch_env missing CUDA_VISIBLE_DEVICES.
+    # Clause 8: launch_env missing CUDA_VISIBLE_DEVICES.
     fixture["launch_env"].write_text(
         json.dumps({"VLLM_VERSION": "0.9.0"}), encoding="utf-8"
     )
+
+    # Clause 11: runstate.db has an orphan retryable row.
+    _build_runstate_db(fixture["runstate_db"], statuses=["retryable"])
 
     with pytest.raises(SystemExit) as exc:
         _run_finalize(
             monkeypatch,
             fixture,
             # Clause 2: missing --vllm-image-digest.
-            # Clause 8: missing --gpu-dtype.
-            omit={"vllm_image_digest", "gpu_dtype"},
+            # Clause 9: missing --gpu-dtype.
+            # Clause 10: missing --hidden-states-dir.
+            omit={"vllm_image_digest", "gpu_dtype", "hidden_states_dir"},
         )
     msg = str(exc.value)
-    for n in (1, 2, 3, 4, 7, 8):
+    for n in (1, 2, 3, 4, 5, 8, 9, 10, 11):
         assert f"[clause {n}]" in msg, f"missing [clause {n}] in: {msg}"
     # Multi-line: at least one newline between failures.
-    assert msg.count("\n") >= 5
+    assert msg.count("\n") >= 8
 
 
 def test_finalize_confirmatory_happy_path_all_clauses_satisfied(tmp_path: Path, monkeypatch):
@@ -320,13 +396,20 @@ def test_finalize_dev_mode_skips_hard_fail(tmp_path: Path, monkeypatch):
     fleet_dict["models"]["qwen2.5-7b"]["tokenizer_sha"] = "<TBD>"
     fleet_dict["models"]["deepseek-v3"]["api_model_name"] = "<TBD>"
     fixture["fleet"].write_text(yaml.safe_dump(fleet_dict), encoding="utf-8")
-    # exposure_horizon partial (qwen3-8b missing) — dev tolerates.
+    # exposure_horizon partial (qwen3-8b missing summary) — dev tolerates,
+    # but the Path-E shape gate (PR1 step 5) still requires trace_shas /
+    # probe_set_sha256 with the full P_logprob roster regardless of mode.
     fixture["exposure_horizon"].write_text(
         json.dumps(
             {
                 "summary": {
                     "qwen2.5-7b": {"horizon_observed": "2023-10-31", "notes": "ok"}
-                }
+                },
+                "trace_shas": {
+                    "qwen2.5-7b": "a" * 64,
+                    "qwen3-8b": "b" * 64,
+                },
+                "probe_set_sha256": "c" * 64,
             }
         ),
         encoding="utf-8",
@@ -386,7 +469,12 @@ def test_read_exposure_horizon_invalid_date_raises_in_confirmatory(tmp_path: Pat
             "summary": {
                 "qwen2.5-7b": {"horizon_observed": "not-a-date", "notes": "ok"},
                 "qwen3-8b": {"horizon_observed": None, "notes": "rejected"},
-            }
+            },
+            "trace_shas": {
+                "qwen2.5-7b": "a" * 64,
+                "qwen3-8b": "b" * 64,
+            },
+            "probe_set_sha256": "c" * 64,
         },
     )
     with pytest.raises(SystemExit) as exc:
@@ -465,3 +553,417 @@ def test_finalize_sampling_config_hash_separate_from_article(tmp_path: Path, mon
     assert payload["sampling_config_hash"] != payload["article_manifest_hash"]
     # Sampling-config hash is the SHA-256 of the sampling YAML file.
     assert payload["sampling_config_hash"] == finalize._sha256_file(fixture["sampling_config"])
+
+
+# ----------------------------------------------------------------------
+# Analyzer -> finalizer end-to-end (Tier-R2-0 PR1 step 16 / MED-7)
+# ----------------------------------------------------------------------
+
+
+def _build_logprob_trace_parquet(
+    path: Path, case_ids: list[str], model_id: str
+) -> Path:
+    """Write a minimal but real LogProbTrace parquet for one model.
+
+    The shape is what `read_traces_parquet` consumes via `_row_to_trace`
+    (see src/r5a/operators/p_logprob.py); short SHAs are tolerated here
+    because LogProbTrace itself does not run the fleet-side pattern
+    validator.
+    """
+    from datetime import datetime, timezone
+
+    from src.r5a.contracts import LogProbTrace, RequestFingerprint, SeedSupport
+    from src.r5a.operators.p_logprob import write_traces_parquet
+
+    traces = []
+    for cid in case_ids:
+        traces.append(
+            LogProbTrace(
+                case_id=cid,
+                model_id=model_id,
+                tokenizer_family="qwen",
+                tokenizer_sha="tok-x",
+                hf_commit_sha="hf-x",
+                quant_scheme="AWQ-INT4",
+                article_token_count=4,
+                raw_token_ids=[101, 102, 103, 104],
+                token_logprobs=[-1.0, -1.5, -2.0, -2.5],
+                thinking_mode="off",
+                backend="vllm_completion",
+                fingerprint=RequestFingerprint(
+                    provider="vllm",
+                    model_id=model_id,
+                    ts=datetime.now(timezone.utc),
+                    seed_supported=SeedSupport.YES,
+                ),
+            )
+        )
+    write_traces_parquet(traces, path)
+    return path
+
+
+def _e2e_fixture(tmp_path: Path) -> dict[str, Path]:
+    """Build a fixture for the analyzer -> finalizer end-to-end test.
+
+    Differs from `_build_happy_fixture` in two ways:
+    - the article manifest doubles as the analyzer's `--probe-set`,
+    - per-model trace parquets are real LogProbTrace files (not 1-row
+      `case_id` placeholders) so the analyzer can read them.
+    """
+    fleet_path = _write(tmp_path, "fleet.yaml", _FLEET_DICT)
+    runtime_path = _write(tmp_path, "runtime.yaml", _RUNTIME_DICT)
+
+    case_ids = [f"c{i:02d}" for i in range(6)]
+    article_records = [
+        {
+            "case_id": cid,
+            "text": "x",
+            "target": "t",
+            "target_type": "company",
+            "publish_date": "2024-01-01",
+            "event_type": "earnings",
+            "host_category": "policy",
+        }
+        for cid in case_ids
+    ]
+    article_manifest = _write(tmp_path, "article_manifest.json", article_records)
+    sampling_config = _write(tmp_path, "sampling.yaml", {"strategy": "stratified"})
+
+    traces_dir = tmp_path / "traces"
+    traces_dir.mkdir()
+    for mid in ("qwen2.5-7b", "qwen3-8b"):
+        _build_logprob_trace_parquet(
+            traces_dir / f"{mid}__pilot.parquet", case_ids, mid
+        )
+
+    hs_dir = tmp_path / "hidden_states"
+    hs_dir.mkdir()
+    for i in range(30):
+        case = f"case_{i:03d}"
+        for mid in ("qwen2.5-7b", "qwen3-8b"):
+            (hs_dir / f"{case}__{mid}.safetensors").write_bytes(b"HS")
+
+    launch_env = _write(
+        tmp_path, "launch_env.json",
+        {"CUDA_VISIBLE_DEVICES": "0", "VLLM_VERSION": "0.9.0"},
+    )
+    runstate_db = _build_runstate_db(tmp_path / "runstate.db")
+    horizon_path = tmp_path / "horizon.json"
+    output = tmp_path / "manifest.json"
+
+    return {
+        "fleet": fleet_path,
+        "runtime": runtime_path,
+        "article_manifest": article_manifest,
+        "sampling_config": sampling_config,
+        "traces_dir": traces_dir,
+        "hidden_states_dir": hs_dir,
+        "launch_env": launch_env,
+        "runstate_db": runstate_db,
+        "exposure_horizon": horizon_path,
+        "output": output,
+    }
+
+
+def _run_analyzer(monkeypatch, fixture: dict[str, Path]) -> None:
+    """Invoke `run_exposure_horizon_analysis.main()` against the fixture."""
+    analyzer = importlib.import_module("scripts.run_exposure_horizon_analysis")
+    args = [
+        "run_exposure_horizon_analysis.py",
+        "--fleet", str(fixture["fleet"]),
+        "--probe-set", str(fixture["article_manifest"]),
+        "--traces-dir", str(fixture["traces_dir"]),
+        "--trace-pattern", "{model}__pilot.parquet",
+        "--output", str(fixture["exposure_horizon"]),
+    ]
+    monkeypatch.setattr(sys, "argv", args)
+    rc = analyzer.main()
+    assert rc == 0
+
+
+def test_analyzer_finalizer_e2e_pins_path_e_provenance(tmp_path: Path, monkeypatch):
+    """End-to-end: run the analyzer, feed its JSON to the finalizer,
+    and assert the manifest's `exposure_horizon_source_sha256` equals
+    the analyzer file's SHA-256 and that per-model `pilot_trace_shas`
+    equal the on-disk parquet SHA-256s (Tier-R2-0 PR1 step 16; tightened
+    equality assertions per IMPLEMENTATION_NOTE.md v3 / v4).
+    """
+    fixture = _e2e_fixture(tmp_path)
+    monkeypatch.setattr(finalize, "_git_commit_sha", lambda: "f" * 40)
+
+    _run_analyzer(monkeypatch, fixture)
+    horizon_sha = finalize._sha256_file(fixture["exposure_horizon"])
+    per_model_shas = {
+        mid: finalize._sha256_file(
+            fixture["traces_dir"] / f"{mid}__pilot.parquet"
+        )
+        for mid in ("qwen2.5-7b", "qwen3-8b")
+    }
+
+    _run_finalize(monkeypatch, fixture)
+    payload = json.loads(fixture["output"].read_text(encoding="utf-8"))
+
+    assert payload["exposure_horizon_source_sha256"] == horizon_sha
+    assert payload["pilot_trace_shas"] == per_model_shas
+
+
+def test_finalizer_rejects_analyzer_json_missing_trace_shas(tmp_path: Path, monkeypatch):
+    """Negative test for the Path-E source-JSON shape gate (Tier-R2-0
+    PR1 step 5): mutate the analyzer output to drop `trace_shas`,
+    confirm the finalizer raises with a clear shape-verification
+    message.
+    """
+    fixture = _e2e_fixture(tmp_path)
+    monkeypatch.setattr(finalize, "_git_commit_sha", lambda: "f" * 40)
+    _run_analyzer(monkeypatch, fixture)
+
+    payload = json.loads(fixture["exposure_horizon"].read_text(encoding="utf-8"))
+    payload.pop("trace_shas")
+    fixture["exposure_horizon"].write_text(
+        json.dumps(payload), encoding="utf-8"
+    )
+
+    with pytest.raises(SystemExit) as exc:
+        _run_finalize(monkeypatch, fixture)
+    msg = str(exc.value)
+    assert "Path-E source JSON shape verification failed" in msg
+    assert "trace_shas" in msg
+
+
+def test_finalizer_rejects_analyzer_json_missing_probe_set_sha(tmp_path: Path, monkeypatch):
+    """Mirror of the trace_shas negative: drop `probe_set_sha256`."""
+    fixture = _e2e_fixture(tmp_path)
+    monkeypatch.setattr(finalize, "_git_commit_sha", lambda: "f" * 40)
+    _run_analyzer(monkeypatch, fixture)
+
+    payload = json.loads(fixture["exposure_horizon"].read_text(encoding="utf-8"))
+    payload.pop("probe_set_sha256")
+    fixture["exposure_horizon"].write_text(
+        json.dumps(payload), encoding="utf-8"
+    )
+
+    with pytest.raises(SystemExit) as exc:
+        _run_finalize(monkeypatch, fixture)
+    msg = str(exc.value)
+    assert "probe_set_sha256" in msg
+
+
+# ----------------------------------------------------------------------
+# Path-E shape negatives (4 trace_shas + 2 probe_set_sha256)
+# ----------------------------------------------------------------------
+
+
+def _shape_fixture_for_validate(tmp_path: Path):
+    from src.r5a.fleet import load_fleet
+
+    fleet_path = _write(tmp_path, "fleet.yaml", _FLEET_DICT)
+    return load_fleet(fleet_path), tmp_path / "horizon.json"
+
+
+def _good_payload() -> dict:
+    return {
+        "summary": {
+            "qwen2.5-7b": {"horizon_observed": "2023-10-31", "notes": "ok"},
+            "qwen3-8b": {"horizon_observed": None, "notes": "rejected"},
+        },
+        "trace_shas": {
+            "qwen2.5-7b": "a" * 64,
+            "qwen3-8b": "b" * 64,
+        },
+        "probe_set_sha256": "c" * 64,
+    }
+
+
+def test_shape_gate_trace_shas_empty_dict(tmp_path: Path):
+    fleet, path = _shape_fixture_for_validate(tmp_path)
+    payload = _good_payload()
+    payload["trace_shas"] = {}
+    with pytest.raises(SystemExit) as exc:
+        finalize._validate_exposure_horizon_payload(payload, path, fleet)
+    assert "roster does not match" in str(exc.value)
+
+
+def test_shape_gate_trace_shas_non_hex_value(tmp_path: Path):
+    fleet, path = _shape_fixture_for_validate(tmp_path)
+    payload = _good_payload()
+    payload["trace_shas"]["qwen2.5-7b"] = "not-a-sha"
+    with pytest.raises(SystemExit) as exc:
+        finalize._validate_exposure_horizon_payload(payload, path, fleet)
+    assert "lower-hex" in str(exc.value)
+
+
+def test_shape_gate_trace_shas_roster_mismatch(tmp_path: Path):
+    fleet, path = _shape_fixture_for_validate(tmp_path)
+    payload = _good_payload()
+    payload["trace_shas"] = {"stranger-7b": "a" * 64, "qwen3-8b": "b" * 64}
+    with pytest.raises(SystemExit) as exc:
+        finalize._validate_exposure_horizon_payload(payload, path, fleet)
+    msg = str(exc.value)
+    assert "roster does not match" in msg
+    assert "stranger-7b" in msg
+
+
+def test_shape_gate_probe_set_sha_non_hex(tmp_path: Path):
+    fleet, path = _shape_fixture_for_validate(tmp_path)
+    payload = _good_payload()
+    payload["probe_set_sha256"] = "still-not-hex"
+    with pytest.raises(SystemExit) as exc:
+        finalize._validate_exposure_horizon_payload(payload, path, fleet)
+    assert "probe_set_sha256" in str(exc.value)
+
+
+# ----------------------------------------------------------------------
+# Schema-strict horizon_observed key parse (#4 A / step 6)
+# ----------------------------------------------------------------------
+
+
+def test_read_exposure_horizon_missing_key_raises(tmp_path: Path):
+    from src.r5a.fleet import load_fleet
+
+    fleet_path = _write(tmp_path, "fleet.yaml", _FLEET_DICT)
+    fleet = load_fleet(fleet_path)
+    horizon_path = _write(
+        tmp_path, "horizon.json",
+        {
+            "summary": {
+                # `horizon_observed` is missing — distinct from null.
+                "qwen2.5-7b": {"notes": "fitter never wrote the key"},
+                "qwen3-8b": {"horizon_observed": None, "notes": "ok"},
+            },
+            "trace_shas": {
+                "qwen2.5-7b": "a" * 64,
+                "qwen3-8b": "b" * 64,
+            },
+            "probe_set_sha256": "c" * 64,
+        },
+    )
+    with pytest.raises(SystemExit) as exc:
+        finalize._read_exposure_horizon(horizon_path, fleet, mode="confirmatory")
+    msg = str(exc.value)
+    assert "horizon_observed" in msg
+    assert "qwen2.5-7b" in msg
+
+
+# ----------------------------------------------------------------------
+# Pilot parquet row-count gate (#9 E / step 4)
+# ----------------------------------------------------------------------
+
+
+def test_validate_traces_dir_zero_byte_parquet_fails(tmp_path: Path):
+    traces = tmp_path / "traces"
+    traces.mkdir()
+    (traces / "qwen2.5-7b__pilot.parquet").write_bytes(b"")
+    _write_parquet(traces / "qwen3-8b__pilot.parquet", n_rows=1)
+    with pytest.raises(SystemExit) as exc:
+        finalize._validate_traces_dir(
+            traces,
+            ["qwen2.5-7b", "qwen3-8b"],
+            mode="confirmatory",
+            expected_n_articles=1,
+        )
+    assert "row count" in str(exc.value)
+    assert "qwen2.5-7b" in str(exc.value)
+
+
+def test_validate_traces_dir_wrong_row_count_fails(tmp_path: Path):
+    traces = tmp_path / "traces"
+    traces.mkdir()
+    _write_parquet(traces / "qwen2.5-7b__pilot.parquet", n_rows=3)
+    _write_parquet(traces / "qwen3-8b__pilot.parquet", n_rows=5)
+    with pytest.raises(SystemExit) as exc:
+        finalize._validate_traces_dir(
+            traces,
+            ["qwen2.5-7b", "qwen3-8b"],
+            mode="confirmatory",
+            expected_n_articles=5,
+        )
+    msg = str(exc.value)
+    assert "row count 3" in msg
+    assert "expected 5" in msg
+
+
+# ----------------------------------------------------------------------
+# Hidden-states + runstate clauses (helper-isolated)
+# ----------------------------------------------------------------------
+
+
+def test_confirmatory_hard_fail_hidden_states_dir_absent(tmp_path: Path, monkeypatch):
+    fixture = _build_happy_fixture(tmp_path)
+    monkeypatch.setattr(finalize, "_git_commit_sha", lambda: "f" * 40)
+    with pytest.raises(SystemExit) as exc:
+        _run_finalize(monkeypatch, fixture, omit={"hidden_states_dir"})
+    assert "[clause 10]" in str(exc.value)
+    assert "--hidden-states-dir" in str(exc.value)
+
+
+def test_confirmatory_hard_fail_runstate_orphan_pending(tmp_path: Path, monkeypatch):
+    fixture = _build_happy_fixture(tmp_path)
+    monkeypatch.setattr(finalize, "_git_commit_sha", lambda: "f" * 40)
+    _build_runstate_db(fixture["runstate_db"], statuses=["pending", "success"])
+    with pytest.raises(SystemExit) as exc:
+        _run_finalize(monkeypatch, fixture)
+    msg = str(exc.value)
+    assert "[clause 11]" in msg
+    assert "orphan" in msg
+
+
+# ----------------------------------------------------------------------
+# Clause-number uniqueness (LOW-3 / step 7)
+# ----------------------------------------------------------------------
+
+
+def test_confirmatory_hard_fail_clause_numbers_are_dense_and_complete():
+    """Static guard: the set of `[clause N]` numbers used in the
+    production `_confirmatory_hard_fail` body is exactly the dense
+    sequence {1..max}. Catches both a future copy/paste collision
+    where one number serves two distinct gates (LOW-3 regression) and
+    a renumbering gap that would silently retire a clause without
+    updating the docstring count. Multiple literal occurrences of the
+    SAME clause number are expected (e.g., one `[clause 4]` per
+    placeholder field) and not penalized.
+    """
+    finalize_path = finalize.__file__
+    assert finalize_path is not None
+    src = Path(finalize_path).read_text(encoding="utf-8")
+    body = src.split("def _confirmatory_hard_fail")[1].split("\ndef ")[0]
+    matches = [int(n) for n in re.findall(r"\[clause (\d+)\]", body)]
+    assert matches, "no [clause N] strings found in _confirmatory_hard_fail"
+    seen = set(matches)
+    assert seen == set(range(1, max(seen) + 1)), (
+        f"clause-number set {sorted(seen)} is not the dense sequence "
+        f"1..{max(seen)}; check _confirmatory_hard_fail for gaps "
+        "(retired clause not removed from docstring count) or duplicates "
+        "across distinct gates (LOW-3 regression)."
+    )
+
+
+# ----------------------------------------------------------------------
+# RunManifest round-trip (PR1 step 3 fields populated)
+# ----------------------------------------------------------------------
+
+
+def test_run_manifest_round_trip_new_fields(tmp_path: Path, monkeypatch):
+    fixture = _build_happy_fixture(tmp_path)
+    monkeypatch.setattr(finalize, "_git_commit_sha", lambda: "f" * 40)
+    _run_finalize(monkeypatch, fixture)
+    payload = json.loads(fixture["output"].read_text(encoding="utf-8"))
+    assert "exposure_horizon_source_sha256" in payload
+    assert payload["exposure_horizon_source_sha256"] == finalize._sha256_file(
+        fixture["exposure_horizon"]
+    )
+    assert payload["pilot_trace_shas"] == {
+        "qwen2.5-7b": finalize._sha256_file(
+            fixture["traces_dir"] / "qwen2.5-7b__pilot.parquet"
+        ),
+        "qwen3-8b": finalize._sha256_file(
+            fixture["traces_dir"] / "qwen3-8b__pilot.parquet"
+        ),
+    }
+    # Round-trip through the schema validator.
+    from src.r5a.contracts import RunManifest
+
+    manifest = RunManifest.model_validate(payload)
+    assert manifest.exposure_horizon_source_sha256 == payload[
+        "exposure_horizon_source_sha256"
+    ]
+    assert manifest.pilot_trace_shas == payload["pilot_trace_shas"]

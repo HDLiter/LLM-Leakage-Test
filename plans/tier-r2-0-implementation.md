@@ -10,6 +10,7 @@ plan_review_inputs:
   - .scratch/codex_prompts_plan_review/SYNTHESIS.md (cross-lens plan review, 5 Codex xhigh threads)
   - .scratch/codex_prompts_plan_review/REPORT_{sequencing,scope,file_accuracy,tests,risk}.md
 status: post-review v3 (post-simplification pass); single operator; one consolidated commit
+superseded-by: refine-logs/reviews/R5A_TIER_R2_0_IMPL_REVIEW_20260502/IMPLEMENTATION_NOTE.md (post-349efab review fixes; execution mode of this plan is historical, design / acceptance criteria sections still valid as decision context)
 estimated_time: 5-7 hours (after simplification cuts; v2 was 9-13 hr)
 shell_environment: Git Bash (Windows). Where commands are PowerShell-incompatible the plan flags it inline; default to Git Bash unless told otherwise.
 simplification_inputs:

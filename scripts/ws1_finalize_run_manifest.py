@@ -10,14 +10,11 @@ script writes that artifact (`RunManifest`).
 (`refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/DECISIONS.md`):
 
   - decision #1 — confirmatory mode runs an 11-clause hard-fail check
-    (`_confirmatory_hard_fail`; expanded from the original 8 clauses
-    by Tier-R2-0 PR1 step 7 with hidden-states-dir and runstate-db
-    clauses, then renumbered end-to-end so each gate has a unique
-    `[clause N]`) before constructing the manifest. Each failed clause
-    is reported in a single multi-line `SystemExit` message prefixed
-    with `[clause N]` so operators see the full failure set, not just
-    the first one. `--allow-tbd` switches mode to `dev` and skips the
-    framework.
+    (`_confirmatory_hard_fail`) before constructing the manifest. Each
+    gate has a unique `[clause N]`, and each failed clause is reported
+    in a single multi-line `SystemExit` message so operators see the
+    full failure set, not just the first one. `--allow-tbd` switches
+    mode to `dev` and skips the framework.
   - decision #2 — manifest records the realized split-tier rosters via
     `fleet_p_predict_eligible` and `fleet_p_logprob_eligible`.
   - decision #5 — `--cutoff-observed` renamed to `--exposure-horizon`;
@@ -171,8 +168,22 @@ def parse_args() -> argparse.Namespace:
         default="data/pilot/logprob_traces",
         help="directory of per-model trace parquet files",
     )
-    p.add_argument("--exposure-horizon", default=None)
-    p.add_argument("--hidden-states-dir", default=None)
+    p.add_argument(
+        "--exposure-horizon",
+        default=None,
+        help=(
+            "exposure-horizon analyzer JSON to bind into RunManifest "
+            "(required in confirmatory mode)"
+        ),
+    )
+    p.add_argument(
+        "--hidden-states-dir",
+        default=None,
+        help=(
+            "directory of WS6 hidden-state .safetensors files "
+            "(required in confirmatory mode)"
+        ),
+    )
     p.add_argument("--article-manifest", required=True)
     p.add_argument(
         "--sampling-config",
@@ -182,8 +193,22 @@ def parse_args() -> argparse.Namespace:
     )
     p.add_argument("--perturbation-manifest", default=None)
     p.add_argument("--audit-manifest", default=None)
-    p.add_argument("--vllm-image-digest", default=None)
-    p.add_argument("--gpu-dtype", default=None)
+    p.add_argument(
+        "--vllm-image-digest",
+        default=None,
+        help=(
+            "Docker image digest for the vLLM backend, sha256:<64-hex> "
+            "(required in confirmatory mode)"
+        ),
+    )
+    p.add_argument(
+        "--gpu-dtype",
+        default=None,
+        help=(
+            "backend launch dtype, e.g. bf16 or fp16 "
+            "(required in confirmatory mode)"
+        ),
+    )
     p.add_argument("--launch-env", default=None)
     p.add_argument(
         "--seed-policy",

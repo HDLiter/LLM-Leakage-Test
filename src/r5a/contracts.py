@@ -233,11 +233,11 @@ class LogProbTrace(BaseModel):
 
     Schema versioning: bump `schema_version` whenever a new field is
     added so that downstream consumers can detect and refuse mismatched
-    artifacts. v2.0 introduces `top_alternative_token_ids`,
-    `top_alternative_logprobs`, `quant_scheme`, `weight_dtype`,
-    `vllm_image_digest`, `hidden_states_uri`, and the integrity
-    validators. v1.0 (in-flight pre-2026-04-27) traces are NOT readable
-    under v2.0 — none have been written yet, so this is forward-only.
+    artifacts. v2.0 introduces per-position alternative-token logprobs,
+    `quant_scheme`, `weight_dtype`, `vllm_image_digest`,
+    `hidden_states_uri`, and the integrity validators. v1.0 (in-flight
+    pre-2026-04-27) traces are NOT readable under v2.0 — none have been
+    written yet, so this is forward-only.
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -403,53 +403,49 @@ introduce a new table-naming branch.
 
 
 class RunManifest(BaseModel):
-    """Run-level provenance record (plan §10.4 + DECISION_20260427 §3.2 +
-    DECISION_20260429_gate_removal §2.6 + DECISION_20260429_llama_addition §3.2).
+    """Run-level provenance record for a finalized WS1 pilot or run.
 
-    Six fields beyond the base provenance set were added 2026-04-29:
+    The manifest is the durable join point between the pinned fleet,
+    runtime config, article manifest, operator outputs, Path-E exposure-
+    horizon analysis, and the WS6 hidden-state subset required for
+    confirmatory mode. Dev manifests may omit that subset. The model uses
+    `extra="forbid"` so downstream analysis fails closed on schema drift.
 
-    - `cutoff_observed`: per-model empirical cutoff dates produced by Path E
-      knee detection. None for models where the knee detector rejected the
-      fit (CI width > 3 months OR drop CI lower bound <= 0.05).
-    - `cutoff_date_yaml`: per-model `cutoff_date` values copied from the
-      fleet YAML at run time. Pairing with `cutoff_observed` lets downstream
-      analyses estimate exposure-misclassification when the two disagree.
-    - `quant_scheme`: per-model `quant_scheme` snapshot. Required for the
-      AWQ-vs-fp16 calibration audit (Stage 2.8) and for §8.2 random-effects
-      interpretation under cross-precision pooling.
-    - `pcsg_pair_registry_hash`: SHA256 of the canonicalized `pcsg_pairs`
-      block from the fleet YAML. Pinning the registry separately from the
-      whole-fleet hash means PCSG analysis can detect pair-set drift even
-      if a non-pair-related fleet edit changed `fleet_config_hash`.
-    - `hidden_state_subset_hash`: SHA256 over the sorted list of `case_id`s
-      used for WS1 Stage 2.7 hidden-state extraction. Lets WS6 detect that
-      the analysis layer is reading the same 30-case subset that was
-      written to disk.
-    - `quality_gate_thresholds`: realized strict-majority denominator
-      values per gate name (`e_extract_main_text`, `e_extract_confirmatory`,
-      etc.). Per `docs/DECISION_20260429_gate_removal.md` §2.6 the K is
-      derived from N at run time, so the manifest must record what K
-      ended up being.
+    Core provenance fields bind the code revision, fleet/runtime/sampling
+    config hashes, prompt versions, model fingerprints, runtime caps,
+    seed policy, runstate DB path/hash, article manifest hash, and optional
+    perturbation/audit manifest hashes.
 
-    2026-04-30 R2 amendments (cross-ref
-    `refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/DECISIONS.md`):
+    Model and backend provenance fields record white-box checkpoint SHAs,
+    tokenizer content SHAs, vLLM image digest, backend GPU dtype, and launch
+    environment. `tokenizer_shas` are SHA-256 hashes of `tokenizer.json`
+    bytes as loaded by the backend, not HuggingFace cache lookup keys.
 
-    - decision #1 — `mode: Literal["confirmatory", "dev"]` field added.
-      Confirmatory finalize enforces an 11-clause hard-fail framework
-      in `scripts/ws1_finalize_run_manifest.py` (originally 8 clauses;
-      Tier-R2-0 PR1 step 7 added hidden-states-dir + runstate-db
-      clauses and renumbered end-to-end). Dev mode (set via the
-      finalizer's `--allow-tbd` flag) skips the framework.
-    - decision #2 — split-tier roster fields `fleet_p_predict_eligible`
-      and `fleet_p_logprob_eligible` record the realized eligibility sets
-      so downstream analysis can detect drift from the YAML view.
-    - decision #5 — `cutoff_observed` renamed to
-      `exposure_horizon_observed`. The field carries Path-E empirical
-      exposure-horizon dates (knee-detector output); `cutoff_date_yaml`
-      keeps its name as it mirrors the operator-declared YAML value.
-    - decision #11 — `pcsg_pair_registry_hash` is now required (no
-      default); WS6 quality_gate_thresholds keys are dropped at the
-      finalizer (`scripts/ws1_finalize_run_manifest.py`), not the schema.
+    Analysis-state fields record:
+
+    - `mode`: `confirmatory` or `dev`; confirmatory manifests are produced
+      only after the finalizer's hard-fail gate accepts the configured inputs.
+    - `exposure_horizon_observed`: Path-E analyzer output, mapping each
+      P_logprob-eligible model to an empirical exposure-horizon date or
+      `None` when the analyzer rejects the estimate.
+    - `cutoff_date_yaml`: the operator-declared fleet YAML cutoff date,
+      copied verbatim for comparison with the empirical exposure horizon.
+    - `exposure_horizon_source_sha256` and `pilot_trace_shas`: SHA-256
+      bindings for the consumed analyzer JSON and per-model pilot traces.
+    - `quant_scheme`: per-model precision/quantization snapshot used by
+      calibration audits and cross-precision analysis.
+    - `pcsg_pair_registry_hash`: required SHA-256 hash of the canonical
+      fleet `pcsg_pairs` block, so PCSG analysis detects pair-set drift.
+    - `hidden_state_subset_hash`: SHA-256 binding for the WS6 hidden-state
+      case subset; required for confirmatory mode and nullable for dev mode.
+    - `quality_gate_thresholds`: realized denominator-derived K values for
+      retained quality gates.
+    - `fleet_p_predict_eligible` and `fleet_p_logprob_eligible`: realized
+      fleet eligibility rosters copied from the loaded fleet YAML.
+
+    Historical rename rationale is tracked in
+    `refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/DECISIONS.md`,
+    especially decisions #1, #2, #5, and #11.
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -487,11 +483,10 @@ class RunManifest(BaseModel):
     gpu_dtype: str | None = None  # e.g. "bf16", "fp16"; reflects backend launch flag
     launch_env: dict[str, str] = Field(default_factory=dict)  # CUDA_VISIBLE_DEVICES, vLLM args, etc.
 
-    # 2026-04-29 Tier-0 additions (DECISION_20260427 §3.2 +
-    # DECISION_20260429_gate_removal §2.6); 2026-04-30 R2 amendments
-    # (DECISIONS.md decisions #1, #2, #5, #11) renamed `cutoff_observed`
-    # to `exposure_horizon_observed`, tightened `pcsg_pair_registry_hash`
-    # to required, and added `mode` + the two split-tier roster fields.
+    # Analysis-state fields populated by the finalizer. `cutoff_date_yaml`
+    # keeps the fleet YAML terminology because it mirrors the operator-
+    # declared cutoff date; Path-E analyzer output uses exposure-horizon
+    # terminology.
     exposure_horizon_observed: dict[str, date | None] = Field(default_factory=dict)
     cutoff_date_yaml: dict[str, date] = Field(default_factory=dict)
     quant_scheme: dict[str, str] = Field(default_factory=dict)

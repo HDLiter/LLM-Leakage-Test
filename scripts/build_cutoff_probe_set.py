@@ -1,7 +1,7 @@
-"""Build the Path-E temporally-stratified cutoff probe set from CLS raw.
+"""Build the Path-E temporally-stratified exposure-horizon probe set from CLS raw.
 
 Per `docs/DECISION_20260427_pcsg_redefinition.md` §2.4: 60 articles per
-month × 24 months across 2023-Q1..2025-Q4 (≈1,440 articles total).
+month × 36 months across 2023-01..2025-12 (≈2,160 articles total).
 Output is a smoke-fixture-shaped JSON of `ArticleRecord` dicts, runnable
 through `scripts/ws1_run_logprob.py --smoke --fixture <output>` to obtain
 LogProbTraces. Knee detection + exposure-horizon extraction happens in
@@ -53,7 +53,9 @@ DEFAULT_END = "2025-12"  # inclusive — 36 months total at 60/month = 2,160 cas
 
 
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Build Path-E cutoff probe set")
+    p = argparse.ArgumentParser(
+        description="Build Path-E exposure-horizon probe set"
+    )
     p.add_argument("--source", type=Path, default=DEFAULT_SOURCE)
     p.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     p.add_argument("--start", default=DEFAULT_START, help="YYYY-MM inclusive")

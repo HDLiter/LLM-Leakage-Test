@@ -120,8 +120,9 @@ def parse_args() -> argparse.Namespace:
         type=float,
         default=0.05,
         help=(
-            "drop fraction threshold for accepting horizon (default 0.05); "
-            "reported in output and used as accept/reject criterion"
+            "minimum drop-magnitude CI lower bound for accepting horizon "
+            "(default 0.05); reported in output and used as accept/reject "
+            "criterion"
         ),
     )
     return p.parse_args()

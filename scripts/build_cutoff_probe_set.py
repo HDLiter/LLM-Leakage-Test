@@ -1,4 +1,4 @@
-"""Build the Path-E temporally-stratified cutoff probe set from CLS raw.
+"""Build the Path-E temporally-stratified exposure-horizon probe set from CLS raw.
 
 Per `docs/DECISION_20260427_pcsg_redefinition.md` §2.4: 60 articles per
 month × 36 months across 2023-01..2025-12 (≈2,160 articles total).
@@ -53,7 +53,9 @@ DEFAULT_END = "2025-12"  # inclusive — 36 months total at 60/month = 2,160 cas
 
 
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Build Path-E cutoff probe set")
+    p = argparse.ArgumentParser(
+        description="Build Path-E exposure-horizon probe set"
+    )
     p.add_argument("--source", type=Path, default=DEFAULT_SOURCE)
     p.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     p.add_argument("--start", default=DEFAULT_START, help="YYYY-MM inclusive")

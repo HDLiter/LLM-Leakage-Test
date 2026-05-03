@@ -7,7 +7,7 @@
 **Depends on:**
 - `refine-logs/reviews/R5A_STEP2/R5A_FROZEN_SHORTLIST.md` — frozen scope (5 confirmatory estimands × 4 core factors)
 - `refine-logs/reviews/R5A_STEP2/MEASUREMENT_FRAMEWORK.md` — four-layer framework (Factor / Perturbation / Operator / Estimand)
-- `refine-logs/reviews/R5A_FLEET_REVIEW/FLEET_REVIEW_R2_SYNTHESIS.md` — frozen 9-model core fleet
+- `config/fleet/r5a_fleet.yaml` — current 16-model split-tier fleet
 
 ---
 
@@ -17,10 +17,10 @@ This schema covers four operators (L3 in the framework):
 
 | ID | Operator | Access | Fleet coverage | Status |
 |---|---|---|---|---|
-| **P_predict** | Standardized prediction (sentiment / direction / confidence) | Black-box sufficient | 9 models (full fleet) | Confirmed — workhorse |
-| **P_logprob** | Token tail surprise (Min-K%++/CTS) | White-box (logprobs required) | 5 white-box models | Confirmed |
-| **P_extract** | Masked span completion | Black-box sufficient | 9 models | Confirmed |
-| **P_schema** | CLS prefix continuation | Black-box sufficient | 9 models | Candidate (continuation reserve, pilot-gated) |
+| **P_predict** | Standardized prediction (sentiment / direction / confidence) | Black-box sufficient | 14 P_predict-eligible models | Confirmed — workhorse |
+| **P_logprob** | Token tail surprise (Min-K%++/CTS) | White-box (logprobs required) | 12 white-box models | Confirmed |
+| **P_extract** | Masked span completion | Black-box sufficient | 14 P_predict-eligible models | Confirmed |
+| **P_schema** | CLS prefix continuation | Black-box sufficient | 14 P_predict-eligible models if reserve gate clears | Candidate (continuation reserve, pilot-gated) |
 
 This schema does **not** cover:
 - Perturbation generation (C_anon L0-L4, C_SR, C_CO, C_NoOp, C_temporal, C_ADG) — perturbations modify text *before* it enters an operator; their generation lives elsewhere
@@ -37,7 +37,7 @@ To preserve construct validity across the fleet while accommodating per-model AP
 
 | Layer | Content | Cross-fleet rule |
 |---|---|---|
-| **Semantic layer** (measurement core) | Task description, few-shot examples, output JSON schema, CLS text injection point, evidence rule | **STRICTLY UNIFORM** across all 9 models |
+| **Semantic layer** (measurement core) | Task description, few-shot examples, output JSON schema, CLS text injection point, evidence rule | **STRICTLY UNIFORM** across each operator's eligible roster |
 | **Deployment layer** (API adapter) | thinking-mode toggle, `response_format=json_object` vs prompt-based JSON, retry policy, max tokens, temperature, seed, stop tokens, provider routing | **Per-model adapter** (see §7) |
 
 **Rationale:** The fleet contrasts (E_CMMD, E_PCSG) require that all models receive the same stimulus. If the prompt body differed across models, cross-model differences would conflate construct signal with prompt-design noise. Conversely, deployment configuration must adapt: Qwen3 thinking-mode behaves differently from GPT-4.1's `response_format`, and forcing one configuration on all models will produce parse errors or thinking-mode contamination of P_logprob.
@@ -180,7 +180,7 @@ P_logprob(article: str, model_id: str)
 ```
 
 - `article`: Chinese CLS text, exact tokens. Critical: no instruction wrapping, no system prompt. The article is passed as the model's input to obtain the conditional logprob trace.
-- `model_id`: must be a white-box fleet member with logprob access (5 models per `FLEET_REVIEW_R2_SYNTHESIS.md`).
+- `model_id`: must be a white-box fleet member with logprob access (12 models per `config/fleet/r5a_fleet.yaml`).
 
 ### 4.3 Semantic layer (minimal — no instruction wrapping)
 
@@ -195,7 +195,7 @@ This is the cleanest construct: we measure the model's familiarity with the lite
 output = model.forward(
     input_ids=tokenizer.encode(article),
     return_logprobs=True,
-    thinking=False,  # MANDATORY OFF for all 5 white-box (see §4.5)
+    thinking=False,  # MANDATORY OFF for all 12 P_logprob white-boxes (see §4.5)
 )
 logprobs = output.logprobs  # per-token list[float]
 ```
@@ -311,13 +311,13 @@ Downstream of P_extract, two scores are computed per (mask, model):
 - **Fuzzy match**: char-level overlap ≥ 0.8 (or pilot-determined threshold)
 
 E_extract aggregates these into a per-(case, model) hit rate. Promotion rules (see `R5A_FROZEN_SHORTLIST.md` §4):
-- Main-text exploratory: hit rate ≥ 5% on ≥ 3/9 models
-- Confirmatory: hit rate ≥ 15% on ≥ 5/9 models AND partial corr with E_CTS < 0.5
+- Main-text exploratory: hit rate ≥ 5% on ≥ 5/14 P_predict-eligible models
+- Confirmatory: hit rate ≥ 15% on ≥ 8/14 P_predict-eligible models AND partial corr with E_CTS < 0.5
 - Demoted: hit rate < 5% on all models → qualitative case gallery only
 
 ### 5.6 Per-model adapter notes
 
-P_extract uses each model's default deployed mode (thinking ON where standard). All 9 fleet members run P_extract.
+P_extract uses each model's default deployed mode (thinking ON where standard). All 14 P_predict-eligible models run P_extract; the two Llama P_logprob-only models are excluded.
 
 **Aligned models** (Claude, GPT-4.1, GPT-5.x) are expected to paraphrase rather than quote; expect lower hit rates. This is informative — it constrains the interpretation of E_extract as a memorization vs paraphrase signal.
 
@@ -406,7 +406,7 @@ E_schema_cont = mean S_schema per (case, model), reported with hierarchical shri
 
 ### 6.8 Per-model adapter notes
 
-P_schema uses each model's default deployed mode. All 9 fleet members would run P_schema if reserve gate clears.
+P_schema uses each model's default deployed mode. All 14 P_predict-eligible models would run P_schema if reserve gate clears; the two Llama P_logprob-only models are excluded.
 
 For continuation, models that aggressively format output (Claude, GPT) may add "Here is my continuation:" preambles. Adapter must strip such preambles before scoring; deployment config includes a per-model preamble-strip regex (pilot-tuned).
 
@@ -414,21 +414,17 @@ For continuation, models that aggressively format output (Claude, GPT) may add "
 
 ## 7. Deployment-layer adapter matrix
 
-Per-model API configuration. Semantic-layer prompt body (§§3-6) is identical across the row; only deployment fields differ.
+Per-model API configuration lives in `config/fleet/r5a_fleet.yaml`; adapters must read the YAML rather than duplicate the matrix here. Semantic-layer prompt body (§§3-6) is identical across each operator's eligible roster; only deployment fields differ.
 
-| Model | Backend | Access | Operators served | Thinking mode | Output enforcement | Temperature | Max tokens | Seed | Notes |
-|---|---|---|---|---|---|---|---|---|---|
-| Qwen2.5-7B | local vLLM | white-box | P_logprob, P_predict, P_extract, P_schema(reserve) | OFF (P_logprob); default (others) | prompt-based JSON + parser | 0.0 | 1024 | 20260501 | Already deployed |
-| Qwen2.5-14B | local vLLM | white-box | P_logprob, P_predict, P_extract, P_schema(reserve) | OFF (P_logprob); default (others) | prompt-based JSON + parser | 0.0 | 1024 | 20260501 | Same tokenizer as 7B |
-| Qwen3-8B | local vLLM | white-box | P_logprob, P_predict, P_extract, P_schema(reserve) | OFF explicit (`enable_thinking=False`) for ALL operators | prompt-based JSON + parser | 0.0 | 1024 | 20260501 | Qwen3 thinking ON by default; must explicitly disable to avoid thinking-token contamination of logprobs |
-| Qwen3-14B | local vLLM | white-box | P_logprob, P_predict, P_extract, P_schema(reserve) | OFF explicit | prompt-based JSON + parser | 0.0 | 1024 | 20260501 | Same tokenizer as Qwen3-8B |
-| GLM-4-9B | local vLLM | white-box | P_logprob, P_predict, P_extract, P_schema(reserve) | OFF | prompt-based JSON + parser | 0.0 | 1024 | 20260501 | GLM tokenizer family |
-| DeepSeek-V3 | OpenRouter (`deepseek/deepseek-chat-v3-0324`) | black-box | P_predict, P_extract, P_schema(reserve) | n/a | `response_format=json_object` + parser fallback | 0.0 | 1024 | 20260501 | Pin to `-0324` to avoid silent updates; provider routing locked |
-| GPT-4.1 | OpenRouter (`openai/gpt-4.1-2025-04-14`) | black-box | P_predict, P_extract, P_schema(reserve) | n/a | `response_format=json_object` | 0.0 | 1024 | 20260501 | Pinned date checkpoint |
-| GPT-5.x | OpenRouter (TBD per FLEET_REVIEW_R2) | black-box | P_predict, P_extract, P_schema(reserve) | n/a (or per-model) | `response_format=json_object` | 0.0 | 1024 | 20260501 | Slug pinned at fleet freeze |
-| Claude Sonnet 4.6 | OpenRouter (`anthropic/claude-sonnet-4.6-{date}`) | black-box | P_predict, P_extract, P_schema(reserve) | extended thinking OFF | tool-use JSON or prompt-based + parser | 0.0 | 1024 | 20260501 | Pin date in `FLEET_REVIEW_R2_SYNTHESIS.md` |
+| Fleet slice | Members | Operators served | Adapter notes |
+|---|---|---|---|
+| Qwen2.5 AWQ white-box | qwen2.5-1.5b, qwen2.5-3b, qwen2.5-7b, qwen2.5-14b, qwen2.5-32b | P_logprob, P_predict, P_extract, P_schema(reserve) | local vLLM; P_logprob thinking off; prompt-based JSON + parser for structured operators |
+| Qwen3 AWQ white-box | qwen3-4b, qwen3-8b, qwen3-14b, qwen3-32b | P_logprob, P_predict, P_extract, P_schema(reserve) | local vLLM; P_logprob uses the fleet's no-think policy; prompt-based JSON + parser for structured operators |
+| Llama bf16 white-box | llama-3-8b-instruct, llama-3.1-8b-instruct | P_logprob only | local vLLM; excluded from P_predict / P_extract / P_schema because `p_predict` is absent |
+| GLM white-box | glm-4-9b | P_logprob, P_predict, P_extract, P_schema(reserve) | local vLLM with offline-HF fallback for P_logprob when echo is unsupported |
+| Black-box providers | deepseek-v3-0324, gpt-4.1, gpt-5.1, claude-sonnet-4.6 | P_predict, P_extract, P_schema(reserve) | provider model IDs must be pinned in fleet YAML; provider routing locked at run time |
 
-**Critical constraint (per `R5A_FROZEN_SHORTLIST.md` and `MEASUREMENT_FRAMEWORK.md` §4):** P_logprob requires `thinking=OFF` on all 5 white-box models. Mixing thinking-mode states across the white-box fleet would render E_CTS and E_PCSG uninterpretable.
+**Critical constraint (per `R5A_FROZEN_SHORTLIST.md` and `MEASUREMENT_FRAMEWORK.md` §4):** P_logprob requires thinking/off-prompt-overlay controls on all 12 P_logprob white-box models. Mixing thinking-mode states across the white-box fleet would render E_CTS and E_PCSG uninterpretable.
 
 **P_predict / P_extract / P_schema** use each model's default deployed mode (per the framework's distinction between operators that need clean logprobs and operators that just need structured output).
 
@@ -436,7 +432,7 @@ Per-model API configuration. Semantic-layer prompt body (§§3-6) is identical a
 
 **Provider routing (OpenRouter members):** lock `provider.order` to a single backend (e.g., Fireworks, Together, or vendor direct) and set `provider.allow_fallbacks=false`. This avoids quantization variance across providers.
 
-**Reproducibility artifacts:** preserve (a) HF commit SHAs for all 5 local white-box models, (b) OpenRouter request headers including resolved provider, (c) sha256 of every raw response.
+**Reproducibility artifacts:** preserve (a) HF commit SHAs for all 12 white-box models, (b) provider request headers including resolved backend/provider, (c) sha256 of every raw response.
 
 ---
 

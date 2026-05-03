@@ -407,7 +407,8 @@ class RunManifest(BaseModel):
 
     The manifest is the durable join point between the pinned fleet,
     runtime config, article manifest, operator outputs, Path-E exposure-
-    horizon analysis, and optional WS6 hidden-state subset. It uses
+    horizon analysis, and the WS6 hidden-state subset required for
+    confirmatory mode. Dev manifests may omit that subset. The model uses
     `extra="forbid"` so downstream analysis fails closed on schema drift.
 
     Core provenance fields bind the code revision, fleet/runtime/sampling
@@ -436,7 +437,7 @@ class RunManifest(BaseModel):
     - `pcsg_pair_registry_hash`: required SHA-256 hash of the canonical
       fleet `pcsg_pairs` block, so PCSG analysis detects pair-set drift.
     - `hidden_state_subset_hash`: SHA-256 binding for the WS6 hidden-state
-      case subset when hidden states are present.
+      case subset; required for confirmatory mode and nullable for dev mode.
     - `quality_gate_thresholds`: realized denominator-derived K values for
       retained quality gates.
     - `fleet_p_predict_eligible` and `fleet_p_logprob_eligible`: realized

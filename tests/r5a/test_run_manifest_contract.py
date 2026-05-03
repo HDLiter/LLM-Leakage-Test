@@ -56,6 +56,9 @@ REQUIRED_FIELDS = {
     "mode",
     "fleet_p_predict_eligible",
     "fleet_p_logprob_eligible",
+    # Tier-R2-0 PR1 additions (Path-E provenance + pilot trace SHAs)
+    "exposure_horizon_source_sha256",
+    "pilot_trace_shas",
 }
 
 

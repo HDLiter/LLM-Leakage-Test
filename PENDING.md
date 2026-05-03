@@ -26,13 +26,6 @@
 - **Owner**: cloud-run operator (Claude Code on AutoDL session).
 - **Target resolution date**: before WS1 pilot run.
 
-### Phase 7 orchestration writer — runstate DB contract
-- **Context**: confirmatory finalization now requires `data/pilot/runstate.db` to contain a terminal `request_runstate` table matching the `RunStateRow` lineage contract plus seed-triplet columns. Until the orchestration writer lands and runs, confirmatory finalize correctly fails the runstate clause.
-- **External action needed**: implement the Phase 7 orchestration writer so it creates and updates `request_runstate` with terminal statuses (`success` or `terminal_skipped`) for every request before finalization.
-- **Blocking**: confirmatory WS1 finalization and cloud-spend release.
-- **Owner**: Phase 7 orchestration implementation session.
-- **Target resolution date**: before WS1 confirmatory finalize.
-
 ### WS1 — `LogProbTrace` contract closure
 - **Context**: 4-lens code review (`refine-logs/reviews/WS1_CODE_REVIEW/`) found `LogProbTrace` is missing `top_logprobs`, `quant_scheme`, `weight_dtype`, `vllm_image_digest`, and `hidden_states_uri` (the last for WS6 prep). Once cloud traces are written, retroactively adding fields requires re-renting GPU.
 - **Decision needed**: which fields are required (vs. nice-to-have), and add Pydantic + Parquet schema before any cloud run.
@@ -119,6 +112,9 @@
 
 ### WS1 black-box `api_model_name` resolution
 - **Resolved 2026-05-03**: `docs/DECISION_20260503_blackbox_refresh.md` refreshes the 4-model black-box roster; `config/fleet/r5a_fleet.yaml` now has concrete provider slugs for DeepSeek V4 Pro, GPT-4.1, GPT-5.1, and Claude Sonnet 4.6.
+
+### Phase 7 orchestration writer — runstate DB contract
+- **Resolved 2026-05-03**: `src/r5a/orchestration/runstate.py` now creates and updates `request_runstate` with the `RunStateRow` fields plus seed-triplet columns, validates transitions through `pending`, and supports the finalizer's runstate gate.
 
 ---
 

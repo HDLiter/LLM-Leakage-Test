@@ -29,6 +29,8 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from src.r5a.contracts import RUNSTATE_TABLE_NAME
+
 finalize = importlib.import_module("scripts.ws1_finalize_run_manifest")
 
 
@@ -160,7 +162,7 @@ def _build_runstate_db(
     path: Path,
     *,
     statuses: list[str] | None = None,
-    table_name: str = "request_runstate",
+    table_name: str = RUNSTATE_TABLE_NAME,
 ) -> Path:
     """Construct a minimal runstate sqlite with one row per status.
 

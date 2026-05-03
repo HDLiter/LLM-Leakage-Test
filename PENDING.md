@@ -34,14 +34,6 @@
 - **Owner**: user (license click-through) + Claude Code (verification script in Stage 1).
 - **Target resolution date**: before WS1 cloud spend.
 
-### Black-box provider credential smoke — OpenRouter auth
-- **Context**: `scripts/smoke_provider_slugs.py` verifies black-box provider authentication and route/model slug liveness with one low-token request per model. DeepSeek uses the official DeepSeek API; GPT/Claude use direct OpenAI/Anthropic keys if present, otherwise OpenRouter fallback routing.
-- **Status**: partially blocked. Verified 2026-05-03: DeepSeek official `deepseek-v4-pro` catalog and 1-token completion smoke pass. OpenRouter catalog contains `openai/gpt-4.1`, `openai/gpt-5.1`, and `anthropic/claude-sonnet-4.6`, but the current `OPENROUTER_API_KEY` returns HTTP 401 `User not found` on `/api/v1/auth/key`, `/api/v1/credits`, and completion calls.
-- **External action needed**: replace/fix `OPENROUTER_API_KEY`, or provide direct `OPENAI_API_KEY` and `ANTHROPIC_API_KEY` in `.env`; then rerun `python scripts/smoke_provider_slugs.py --max-tokens 1`.
-- **Blocking**: GPT/Claude black-box Stage 0 credential smoke; later P_predict provider runs unless direct provider keys are supplied.
-- **Owner**: user (credential provisioning) + Codex/Claude Code (rerun smoke).
-- **Target resolution date**: before black-box P_predict pilot execution.
-
 ### BL2 post-cutoff sample expansion — CLS extraction beyond 2026-02
 - **Context**: `docs/DECISION_20260429_gate_removal.md` §3.3 + plan §6.2 expanded BL2 post-cutoff bucket from 20 → 350 cases, sampled from `>= 2026-02-01`. The original 20-case sampling pool is insufficient for this volume.
 - **External action needed**: extract additional CLS articles published `>= 2026-02-01` to support 350-case sampling with category quotas (policy / corporate / industry / macro). User to trigger CLS scrape; Claude Code to flag this when WS4 sampling step is reached.
@@ -116,6 +108,9 @@
 
 ### Path E — empirical cutoff probe data sourcing
 - **Resolved 2026-05-03**: `scripts/build_exposure_horizon_probe_set.py` built `data/pilot/exposure_horizon/probe_set_monthly60_36mo.json` locally from CLS with 36/36 months at 60 articles/month (2,160 total); ship this ignored JSON with the WS1 cloud data bundle.
+
+### Black-box provider credential smoke — OpenRouter auth
+- **Resolved 2026-05-03**: user replaced the expired `OPENROUTER_API_KEY`; `/api/v1/auth/key` and `/api/v1/credits` now return HTTP 200, and `python scripts/smoke_provider_slugs.py --max-tokens 16` passes for DeepSeek official `deepseek-v4-pro` plus OpenRouter routes `openai/gpt-4.1`, `openai/gpt-5.1`, and `anthropic/claude-sonnet-4.6`.
 
 ---
 

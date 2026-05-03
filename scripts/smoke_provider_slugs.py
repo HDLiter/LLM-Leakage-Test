@@ -79,8 +79,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--max-tokens",
         type=int,
-        default=1,
-        help="completion token cap for each probe",
+        default=16,
+        help=(
+            "completion token cap for each probe; 16 is the lowest value "
+            "accepted by OpenRouter's OpenAI/Azure route"
+        ),
     )
     parser.add_argument(
         "--timeout-s",

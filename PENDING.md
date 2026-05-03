@@ -6,7 +6,7 @@
 >
 > **Update rule**: when an item resolves, move it to `## Recently closed` at the bottom (keep for ~30 days), then delete. Do not silently remove — the history matters.
 >
-> **Last updated**: 2026-04-29
+> **Last updated**: 2026-05-02
 
 ---
 
@@ -19,12 +19,26 @@
 - **Owner**: post-pilot analyst.
 - **Target resolution date**: post-pilot.
 
-### WS1 — model/tokenizer/image provenance pinning
-- **Context**: `config/fleet/r5a_fleet.yaml` carries `<TBD>` for `tokenizer_sha`, `hf_commit_sha` on all 10 white-box entries plus `api_model_name` for `gpt-5.1` / `claude-sonnet-4.6`. Plan §10.1 forbids confirmatory runs with `<TBD>` placeholders.
-- **External action needed**: on AutoDL Stage 1, after `huggingface-cli download` completes for each white-box model, compute git-blob-SHA of `tokenizer.json` and read `hf_commit_sha` from snapshot metadata; write back into `config/fleet/r5a_fleet.yaml` and rebump `fleet_version`. Resolve `gpt-5.1` and `claude-sonnet-4.6` `api_model_name` after vendor catalog check.
+### WS1 white-box fleet pinning
+- **Context**: `config/fleet/r5a_fleet.yaml` still carries `<TBD>` for `tokenizer_sha` and `hf_commit_sha` on all 12 white-box entries. Plan §10.1 forbids confirmatory runs with `<TBD>` placeholders; the PR1 validators and confirmatory hard-fail gate prevent these placeholders from silently landing in a final manifest.
+- **External action needed**: on AutoDL Stage 1, after `huggingface-cli download` completes for each white-box model, run `python scripts/ws1_pin_fleet.py --hf-cache <path> --vllm-image-digest sha256:<64-hex>` to discover the loaded HF snapshot commit and SHA-256 tokenizer content hash, write them into `config/fleet/r5a_fleet.yaml`, append the pinning log, and rebump `fleet_version`.
 - **Blocking**: WS1 cloud run final commit. Smoke runs allowed pre-pin.
 - **Owner**: cloud-run operator (Claude Code on AutoDL session).
 - **Target resolution date**: before WS1 pilot run.
+
+### WS1 black-box `api_model_name` resolution
+- **Context**: `config/fleet/r5a_fleet.yaml` still carries `<TBD>` for black-box `api_model_name` on `gpt-5.1` and `claude-sonnet-4.6`.
+- **External action needed**: manually check the vendor/OpenRouter catalog at fleet-freeze time, choose the exact provider model slugs for `gpt-5.1` and `claude-sonnet-4.6`, write them into the fleet YAML, and rebump `fleet_version`.
+- **Blocking**: WS1 cloud run final commit. Smoke runs allowed pre-resolution.
+- **Owner**: cloud-run operator.
+- **Target resolution date**: before WS1 pilot run.
+
+### Phase 7 orchestration writer — runstate DB contract
+- **Context**: confirmatory finalization now requires `data/pilot/runstate.db` to contain a terminal `request_runstate` table matching the `RunStateRow` lineage contract plus seed-triplet columns. Until the orchestration writer lands and runs, confirmatory finalize correctly fails the runstate clause.
+- **External action needed**: implement the Phase 7 orchestration writer so it creates and updates `request_runstate` with terminal statuses (`success` or `terminal_skipped`) for every request before finalization.
+- **Blocking**: confirmatory WS1 finalization and cloud-spend release.
+- **Owner**: Phase 7 orchestration implementation session.
+- **Target resolution date**: before WS1 confirmatory finalize.
 
 ### WS1 — `LogProbTrace` contract closure
 - **Context**: 4-lens code review (`refine-logs/reviews/WS1_CODE_REVIEW/`) found `LogProbTrace` is missing `top_logprobs`, `quant_scheme`, `weight_dtype`, `vllm_image_digest`, and `hidden_states_uri` (the last for WS6 prep). Once cloud traces are written, retroactively adding fields requires re-renting GPU.
@@ -34,8 +48,8 @@
 - **Target resolution date**: this week.
 
 ### Path E — empirical cutoff probe data sourcing
-- **Context**: `docs/DECISION_20260427_pcsg_redefinition.md` §2.4 specifies a 2,160-article temporally-stratified probe (60/month × 36 months 2023-01..2025-12) from CLS source corpus. Local fixture already produced 2026-04-27 (`data/pilot/cutoff_probe/probe_set_monthly60_36mo.json`).
-- **External action needed**: confirm read access to `D:\GitRepos\Thales\datasets\cls_telegraph_raw` from the cloud instance, OR ship the probe-set JSON to cloud (already built locally, ~2.5 MB — easier path).
+- **Context**: `docs/DECISION_20260427_pcsg_redefinition.md` §2.4 specifies a 2,160-article temporally-stratified probe (60/month × 36 months 2023-01..2025-12) from CLS source corpus. Current Path-E fixtures live under `data/pilot/exposure_horizon/`; expected probe-set path is `data/pilot/exposure_horizon/probe_set_monthly60_36mo.json`.
+- **External action needed**: confirm read access to `D:\GitRepos\Thales\datasets\cls_telegraph_raw` from the cloud instance, OR ship the probe-set JSON to cloud (already built locally, ~2.5 MB — easier path; rebuild or copy into the current `data/pilot/exposure_horizon/` location before handoff).
 - **Blocking**: Path E execution (Stage 2.5 of WS1 cloud plan).
 - **Owner**: user (data access) + Claude Code (sampling script).
 - **Target resolution date**: before WS1 cloud Stage 2.5.

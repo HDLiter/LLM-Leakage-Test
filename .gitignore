@@ -31,10 +31,10 @@ data/cls_telegraph_raw/
 data/pilot/exposure_horizon/probe_set_*.json
 data/pilot/exposure_horizon/traces/
 data/pilot/exposure_horizon/horizon_observed.json
-# Legacy pre-rename Path-E dir; left ignored so leftover local artifacts
-# from the old `data/pilot/cutoff_probe/` location are not accidentally
-# staged by the Tier-R2-0 consolidated commit.
-data/pilot/cutoff_probe/
+# Retired pre-rename Path-E generated files. Keep file-level ignores so
+# unexpected writes under data/pilot/cutoff_probe/ still surface.
+data/pilot/cutoff_probe/*.json
+data/pilot/cutoff_probe/*.parquet
 
 # WS1 main pilot logprob traces (GPU-derived, regenerable)
 data/pilot/logprob_traces/

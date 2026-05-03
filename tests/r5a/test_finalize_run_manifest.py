@@ -916,27 +916,59 @@ def test_confirmatory_hard_fail_runstate_orphan_pending(tmp_path: Path, monkeypa
 
 
 def test_confirmatory_hard_fail_clause_numbers_are_dense_and_complete():
-    """Static guard: the set of `[clause N]` numbers used in the
-    production `_confirmatory_hard_fail` body is exactly the dense
-    sequence {1..max}. Catches both a future copy/paste collision
-    where one number serves two distinct gates (LOW-3 regression) and
-    a renumbering gap that would silently retire a clause without
-    updating the docstring count. Multiple literal occurrences of the
-    SAME clause number are expected (e.g., one `[clause 4]` per
-    placeholder field) and not penalized.
+    """C1 / Tier-R2-0 PR2 step 11 (strengthens LOW-3 guard): clause
+    numbers are now declared as module-level `_CLAUSE_*` constants and
+    registered in `CONFIRMATORY_CLAUSE_NUMBERS`. The test enforces
+    three invariants that together close the holes in the original
+    "scan source for `[clause N]` literals" guard:
+
+    1. The registry is the dense sequence 1..N — catches a renumbering
+       gap that would silently retire a clause.
+    2. Every value in the registry is distinct — catches a copy/paste
+       collision where two constants resolve to the same integer (the
+       original LOW-3 hazard).
+    3. Every `_CLAUSE_*` constant is referenced at least once in the
+       `_confirmatory_hard_fail` body — catches a constant retired
+       from the function but left dangling in the registry.
     """
+    nums = list(finalize.CONFIRMATORY_CLAUSE_NUMBERS)
+    assert nums, "CONFIRMATORY_CLAUSE_NUMBERS is empty"
+    assert sorted(nums) == list(range(1, len(nums) + 1)), (
+        f"CONFIRMATORY_CLAUSE_NUMBERS {sorted(nums)} is not the dense "
+        f"sequence 1..{len(nums)}; check for gaps (retired clause not "
+        "removed from registry) or out-of-order renumbering."
+    )
+    assert len(set(nums)) == len(nums), (
+        f"CONFIRMATORY_CLAUSE_NUMBERS has duplicate values: {nums}. "
+        "Each clause must own a distinct integer (LOW-3 / C1 closure)."
+    )
+
     finalize_path = finalize.__file__
     assert finalize_path is not None
     src = Path(finalize_path).read_text(encoding="utf-8")
     body = src.split("def _confirmatory_hard_fail")[1].split("\ndef ")[0]
-    matches = [int(n) for n in re.findall(r"\[clause (\d+)\]", body)]
-    assert matches, "no [clause N] strings found in _confirmatory_hard_fail"
-    seen = set(matches)
-    assert seen == set(range(1, max(seen) + 1)), (
-        f"clause-number set {sorted(seen)} is not the dense sequence "
-        f"1..{max(seen)}; check _confirmatory_hard_fail for gaps "
-        "(retired clause not removed from docstring count) or duplicates "
-        "across distinct gates (LOW-3 regression)."
+    constant_names = [
+        name for name in vars(finalize)
+        if name.startswith("_CLAUSE_") and isinstance(getattr(finalize, name), int)
+    ]
+    assert constant_names, "no _CLAUSE_* constants found on finalize module"
+    for name in constant_names:
+        assert name in body, (
+            f"constant {name} is registered but not referenced inside "
+            "_confirmatory_hard_fail; either remove the constant or wire "
+            "it into the collector."
+        )
+
+    # Backstop: no bare `[clause <int>]` literals should survive in the
+    # collector body — every emitted clause label must go through the
+    # constants. A bare literal would also satisfy this test only if
+    # someone hand-wrote `[clause N]` instead of `[clause {_CLAUSE_X}]`,
+    # which defeats the constant-extraction guarantee.
+    bare_literals = re.findall(r"\[clause (\d+)\]", body)
+    assert not bare_literals, (
+        f"bare `[clause N]` integer literals found in _confirmatory_hard_fail "
+        f"({bare_literals}); use the `_CLAUSE_*` constants via "
+        "f-string interpolation so duplicates surface as a Python rename."
     )
 
 

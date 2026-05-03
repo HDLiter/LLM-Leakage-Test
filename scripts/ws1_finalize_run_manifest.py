@@ -91,7 +91,7 @@ import sys
 import uuid
 from datetime import date as Date, datetime, timezone
 from pathlib import Path
-from typing import Literal
+from typing import Final, Literal
 
 import pyarrow.parquet as pq
 
@@ -106,6 +106,53 @@ from src.r5a.runtime import load_runtime  # noqa: E402
 
 
 VLLM_IMAGE_DIGEST_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
+
+
+# ----------------------------------------------------------------------
+# Confirmatory hard-fail clause numbers (Tier-R2-0 PR2 step 11 / C1)
+# ----------------------------------------------------------------------
+#
+# Each constant binds a logical confirmatory-mode gate to the `[clause N]`
+# label that surfaces in operator messages and tests. The collector in
+# `_confirmatory_hard_fail` formats every failure message via these
+# constants so a copy/paste collision (two distinct gates emitting
+# `[clause 4]`) becomes a Python-level rename rather than a free-floating
+# integer literal in a long function. `CONFIRMATORY_CLAUSE_NUMBERS` is
+# the canonical registry; the test
+# `test_confirmatory_hard_fail_clause_numbers_are_dense_and_complete`
+# asserts the registry is the dense sequence 1..N with each value used
+# at exactly one site.
+#
+# Renaming a clause: change the constant value AND its in-message wording
+# in `_confirmatory_hard_fail`. Retiring a clause: drop the constant
+# from `CONFIRMATORY_CLAUSE_NUMBERS` AND remove all references in the
+# collector body.
+
+_CLAUSE_GIT_SHA: Final[int] = 1
+_CLAUSE_VLLM_DIGEST: Final[int] = 2
+_CLAUSE_SAMPLING_CONFIG: Final[int] = 3
+_CLAUSE_PIN_PLACEHOLDER: Final[int] = 4
+_CLAUSE_BLACKBOX_API: Final[int] = 5
+_CLAUSE_HORIZON_ROSTER: Final[int] = 6
+_CLAUSE_TRACES_ROSTER: Final[int] = 7
+_CLAUSE_LAUNCH_ENV: Final[int] = 8
+_CLAUSE_GPU_DTYPE: Final[int] = 9
+_CLAUSE_HIDDEN_STATES_DIR: Final[int] = 10
+_CLAUSE_RUNSTATE: Final[int] = 11
+
+CONFIRMATORY_CLAUSE_NUMBERS: Final[tuple[int, ...]] = (
+    _CLAUSE_GIT_SHA,
+    _CLAUSE_VLLM_DIGEST,
+    _CLAUSE_SAMPLING_CONFIG,
+    _CLAUSE_PIN_PLACEHOLDER,
+    _CLAUSE_BLACKBOX_API,
+    _CLAUSE_HORIZON_ROSTER,
+    _CLAUSE_TRACES_ROSTER,
+    _CLAUSE_LAUNCH_ENV,
+    _CLAUSE_GPU_DTYPE,
+    _CLAUSE_HIDDEN_STATES_DIR,
+    _CLAUSE_RUNSTATE,
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -654,59 +701,61 @@ def _confirmatory_hard_fail(
     failures: list[str] = []
     placeholder_set = {None, "", "<TBD>"}
 
-    # Clause 1 — git_commit_sha must be a real SHA, not the all-zero fallback.
+    # git_commit_sha must be a real SHA, not the all-zero fallback.
     git_sha = _git_commit_sha()
     if git_sha == "0" * 40:
         failures.append(
-            "[clause 1] git_commit_sha is all-zero (run from a non-git checkout?); "
-            "cannot record provenance."
+            f"[clause {_CLAUSE_GIT_SHA}] git_commit_sha is all-zero "
+            "(run from a non-git checkout?); cannot record provenance."
         )
 
-    # Clause 2 — vllm_image_digest must match sha256:<64-hex>.
+    # vllm_image_digest must match sha256:<64-hex>.
     digest = args.vllm_image_digest
     if not digest:
         failures.append(
-            "[clause 2] --vllm-image-digest is required in confirmatory mode."
+            f"[clause {_CLAUSE_VLLM_DIGEST}] --vllm-image-digest is required "
+            "in confirmatory mode."
         )
     elif not VLLM_IMAGE_DIGEST_RE.match(digest):
         failures.append(
-            f"[clause 2] --vllm-image-digest {digest!r} does not match "
-            "sha256:<64-hex>."
+            f"[clause {_CLAUSE_VLLM_DIGEST}] --vllm-image-digest {digest!r} "
+            "does not match sha256:<64-hex>."
         )
 
-    # Clause 3 — sampling-config path must exist.
+    # sampling-config path must exist.
     if not sampling_config_path.exists():
         failures.append(
-            f"[clause 3] --sampling-config {sampling_config_path} does not exist; "
-            "confirmatory finalize cannot hash it into sampling_config_hash."
+            f"[clause {_CLAUSE_SAMPLING_CONFIG}] --sampling-config "
+            f"{sampling_config_path} does not exist; confirmatory finalize "
+            "cannot hash it into sampling_config_hash."
         )
 
-    # Clause 4 — every P_logprob model has non-placeholder tokenizer_sha and
+    # Every P_logprob model has non-placeholder tokenizer_sha and
     # white-box checkpoint sha.
     p_logprob_ids = fleet.p_logprob_eligible_ids()
     for mid in p_logprob_ids:
         cfg = fleet.get(mid)
         if cfg.tokenizer_sha in placeholder_set:
             failures.append(
-                f"[clause 4] tokenizer_sha is {cfg.tokenizer_sha!r} for {mid} — "
-                "run scripts/ws1_pin_fleet.py."
+                f"[clause {_CLAUSE_PIN_PLACEHOLDER}] tokenizer_sha is "
+                f"{cfg.tokenizer_sha!r} for {mid} — run scripts/ws1_pin_fleet.py."
             )
         if cfg.hf_commit_sha in placeholder_set:
             failures.append(
-                f"[clause 4] hf_commit_sha is {cfg.hf_commit_sha!r} for {mid} — "
-                "run scripts/ws1_pin_fleet.py."
+                f"[clause {_CLAUSE_PIN_PLACEHOLDER}] hf_commit_sha is "
+                f"{cfg.hf_commit_sha!r} for {mid} — run scripts/ws1_pin_fleet.py."
             )
 
-    # Clause 5 — every black-box has a non-placeholder api_model_name.
+    # Every black-box has a non-placeholder api_model_name.
     for mid in fleet.black_box_ids():
         cfg = fleet.get(mid)
         if cfg.api_model_name in placeholder_set:
             failures.append(
-                f"[clause 5] api_model_name is {cfg.api_model_name!r} for "
-                f"black-box {mid}."
+                f"[clause {_CLAUSE_BLACKBOX_API}] api_model_name is "
+                f"{cfg.api_model_name!r} for black-box {mid}."
             )
 
-    # Clause 6 — exposure_horizon keys must equal the P_logprob fleet roster.
+    # exposure_horizon keys must equal the P_logprob fleet roster.
     # Normally short-circuited inside _read_exposure_horizon; mirrored here
     # so a caller that bypasses the helper still sees the gate.
     expected = set(p_logprob_ids)
@@ -715,55 +764,57 @@ def _confirmatory_hard_fail(
         missing = sorted(expected - eh_keys)
         extras = sorted(eh_keys - expected)
         failures.append(
-            "[clause 6] exposure_horizon roster mismatch "
-            f"(missing={missing}, unexpected={extras})."
+            f"[clause {_CLAUSE_HORIZON_ROSTER}] exposure_horizon roster "
+            f"mismatch (missing={missing}, unexpected={extras})."
         )
 
-    # Clause 7 — traces dir mapping must cover every P_logprob model.
+    # traces dir mapping must cover every P_logprob model.
     # Normally short-circuited inside _validate_traces_dir; mirrored here.
     trace_keys = set(traces)
     if trace_keys != expected:
         missing = sorted(expected - trace_keys)
         extras = sorted(trace_keys - expected)
         failures.append(
-            "[clause 7] traces-dir roster mismatch "
+            f"[clause {_CLAUSE_TRACES_ROSTER}] traces-dir roster mismatch "
             f"(missing={missing}, unexpected={extras})."
         )
 
-    # Clause 8 — launch_env must record CUDA_VISIBLE_DEVICES and VLLM_VERSION.
+    # launch_env must record CUDA_VISIBLE_DEVICES and VLLM_VERSION.
     for required_key in ("CUDA_VISIBLE_DEVICES", "VLLM_VERSION"):
         if required_key not in launch_env:
             failures.append(
-                f"[clause 8] launch_env is missing required key {required_key!r}; "
-                "supply it via --launch-env JSON."
+                f"[clause {_CLAUSE_LAUNCH_ENV}] launch_env is missing "
+                f"required key {required_key!r}; supply it via --launch-env JSON."
             )
 
-    # Clause 9 — gpu_dtype must be set (e.g. "bf16").
+    # gpu_dtype must be set (e.g. "bf16").
     if args.gpu_dtype in placeholder_set:
         failures.append(
-            f"[clause 9] --gpu-dtype is {args.gpu_dtype!r}; required in "
-            "confirmatory mode (e.g. \"bf16\", \"fp16\")."
+            f"[clause {_CLAUSE_GPU_DTYPE}] --gpu-dtype is {args.gpu_dtype!r}; "
+            "required in confirmatory mode (e.g. \"bf16\", \"fp16\")."
         )
 
-    # Clause 10 — --hidden-states-dir must be supplied (PR1 step 7 / #1 B).
+    # --hidden-states-dir must be supplied (PR1 step 7 / #1 B).
     # The directory's contents (subset hash) are checked inside
     # _hidden_state_subset_hash; this clause guards the upstream "operator
     # forgot the flag entirely" case so it does not silently degrade to
     # `hidden_state_subset_hash=None` in the manifest.
     if args.hidden_states_dir is None:
         failures.append(
-            "[clause 10] --hidden-states-dir is required in confirmatory mode; "
-            "WS6 subset hash cannot be computed without it."
+            f"[clause {_CLAUSE_HIDDEN_STATES_DIR}] --hidden-states-dir is "
+            "required in confirmatory mode; WS6 subset hash cannot be "
+            "computed without it."
         )
 
-    # Clause 11 — runstate.db must be initialized and have no orphan
+    # runstate.db must be initialized and have no orphan
     # `pending` / `retryable` rows (PR1 step 7 / MED-2 + S2 forward-
     # declared RUNSTATE_TABLE_NAME contract). Read-only `mode=ro&immutable=1`
     # so a missing file does not silently get created.
     if runstate_db_path is None:
         failures.append(
-            "[clause 11] runstate.db path is empty; runtime.runstate_db or "
-            "--runstate-db must point at the orchestration database."
+            f"[clause {_CLAUSE_RUNSTATE}] runstate.db path is empty; "
+            "runtime.runstate_db or --runstate-db must point at the "
+            "orchestration database."
         )
     else:
         rs_path = Path(runstate_db_path)
@@ -773,8 +824,9 @@ def _confirmatory_hard_fail(
             )
         except sqlite3.OperationalError:
             failures.append(
-                f"[clause 11] runstate.db at {rs_path} not initialized; "
-                "Phase 7 orchestration must run before confirmatory finalize."
+                f"[clause {_CLAUSE_RUNSTATE}] runstate.db at {rs_path} not "
+                "initialized; Phase 7 orchestration must run before "
+                "confirmatory finalize."
             )
         else:
             try:
@@ -797,8 +849,9 @@ def _confirmatory_hard_fail(
                         # §5.5A) is the writer's responsibility, not
                         # validated here.
                         failures.append(
-                            f"[clause 11] runstate.db at {rs_path} is missing "
-                            f"table {RUNSTATE_TABLE_NAME!r} or the columns "
+                            f"[clause {_CLAUSE_RUNSTATE}] runstate.db at "
+                            f"{rs_path} is missing table "
+                            f"{RUNSTATE_TABLE_NAME!r} or the columns "
                             f"needed by finalize ({exc!s}); Phase 7 "
                             "orchestration writer must create it per "
                             "RUNSTATE_TABLE_NAME contract."
@@ -810,8 +863,9 @@ def _confirmatory_hard_fail(
                                 "..." if len(sample_str) > 200 else ""
                             )
                             failures.append(
-                                f"[clause 11] runstate has {count} orphan "
-                                f"pending/retryable rows: {truncated}"
+                                f"[clause {_CLAUSE_RUNSTATE}] runstate has "
+                                f"{count} orphan pending/retryable rows: "
+                                f"{truncated}"
                             )
             finally:
                 conn.close()

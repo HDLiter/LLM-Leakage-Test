@@ -45,10 +45,17 @@ def test_atomic_write_text_overwrites_existing(tmp_path: Path):
 def test_atomic_write_text_cleanup_on_mid_write_failure(
     tmp_path: Path, monkeypatch
 ):
-    """Simulate a process kill mid-write: replace `os.replace` with one
-    that raises after the temp file has been written and synced. The
-    target must remain at its pre-write content and the .tmp sibling
-    must not leak.
+    """Verifies the except / finally cleanup path under an in-process
+    exception: when `os.replace` raises after the temp file has been
+    written and synced, the target stays at its pre-write content and
+    the `.tmp` sibling is removed.
+
+    Scope (C2 / Tier-R2-0 PR2 step 12): SIGKILL recovery is a
+    PROCESS-level concern (no `finally` runs after a kill -9) and is
+    out of scope for this unit test. Validating it would require a
+    subprocess + restart harness; the helper relies on `os.replace`
+    being atomic on POSIX/NTFS so a partial swap cannot land on disk
+    even without `finally` cleanup.
     """
     import os
 

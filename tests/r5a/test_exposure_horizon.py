@@ -74,6 +74,42 @@ def _make_step_series(
     return by_month
 
 
+def test_month_stratified_mink_returns_expected_per_article_scores():
+    """MED-6 / Tier-R2-0 PR2 step 6: numerical anchor for the
+    `month_stratified_mink` aggregator. Existing tests only checked
+    month-key membership and per-month counts, which would also pass if
+    the function returned arbitrary numeric values (or, for example,
+    accidentally returned mean-logprob instead of bottom-k% mean).
+
+    Construction: four 5-token traces with hand-chosen logprobs and
+    `k_pct=40.0`, so the per-article Min-K% reduces to the mean of the
+    two most-negative tokens (cutoff = ceil(5 * 0.4) = 2). The
+    expected per-article scores are therefore deterministic and have
+    no floating-point round-off slack worth speaking of:
+
+        c1 [-1, -2, -3, -4, -5]            -> mean(-5, -4) = -4.5
+        c2 [-2, -2, -2, -2, -2]            -> mean(-2, -2) = -2.0
+        c3 [-1, -1, -10, -10, -1]          -> mean(-10, -10) = -10.0
+        c4 [-3, -7, -1, -5, -2]            -> mean(-7, -5) = -6.0
+    """
+    traces = [
+        _trace("c1", [-1.0, -2.0, -3.0, -4.0, -5.0]),
+        _trace("c2", [-2.0, -2.0, -2.0, -2.0, -2.0]),
+        _trace("c3", [-1.0, -1.0, -10.0, -10.0, -1.0]),
+        _trace("c4", [-3.0, -7.0, -1.0, -5.0, -2.0]),
+    ]
+    publish_dates = {
+        "c1": date(2024, 1, 10),
+        "c2": date(2024, 1, 20),
+        "c3": date(2024, 2, 1),
+        "c4": date(2024, 2, 28),
+    }
+    by_month = month_stratified_mink(traces, publish_dates, k_pct=40.0)
+    assert sorted(by_month.keys()) == ["2024-01", "2024-02"]
+    assert by_month["2024-01"] == pytest.approx([-4.5, -2.0])
+    assert by_month["2024-02"] == pytest.approx([-10.0, -6.0])
+
+
 def test_month_stratified_groups_by_yyyy_mm():
     traces = [
         _trace("c1", [-1.0] * 5),

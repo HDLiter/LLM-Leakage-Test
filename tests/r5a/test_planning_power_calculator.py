@@ -76,6 +76,14 @@ def test_no_mc_se_in_output_rows(tmp_path: Path, monkeypatch):
         assert "power_main_mc_se" not in row
         assert "power_pilot_ci95_low" not in row
         assert "power_main_ci95_high" not in row
+        # LOW-2 / Tier-R2-0 PR2 step 10: the two missing CI bounds are
+        # the *upper* of the pilot interval and the *lower* of the main
+        # interval. The original assertion only checked their opposite
+        # ends, so a regression that re-emitted only `power_pilot_ci95_high`
+        # or `power_main_ci95_low` (e.g. half-applied revert of E.32) would
+        # have slipped through.
+        assert "power_pilot_ci95_high" not in row
+        assert "power_main_ci95_low" not in row
     # E.32 sub-step 2: b_outer removed from output config.
     assert "b_outer" not in data["config"]
 

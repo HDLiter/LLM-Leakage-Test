@@ -23,8 +23,8 @@ This schema covers four operators (L3 in the framework):
 | **P_schema** | CLS prefix continuation | Black-box sufficient | 9 models | Candidate (continuation reserve, pilot-gated) |
 
 This schema does **not** cover:
-- Perturbation generation (C_anon L0-L4, C_SR, C_FO, C_NoOp, C_temporal, C_ADG) — perturbations modify text *before* it enters an operator; their generation lives elsewhere
-- Estimand computation (E_CMMD, E_PCSG, E_CTS, E_FO, E_NoOp, …) — estimands are post-hoc combinations of operator outputs across baseline + perturbed text variants
+- Perturbation generation (C_anon L0-L4, C_SR, C_CO, C_NoOp, C_temporal, C_ADG) — perturbations modify text *before* it enters an operator; their generation lives elsewhere
+- Estimand computation (E_CMMD, E_PCSG, E_CTS, E_OR, E_NoOp, …) — estimands are post-hoc combinations of operator outputs across baseline + perturbed text variants
 - Factor annotation prompts (Bloc 0-3 labels) — handled in the LLM annotation track
 
 ---
@@ -48,7 +48,7 @@ Operators are **stateless scoring functions** of (text, model). Perturbations mo
 
 - One operator prompt template per operator, regardless of perturbation
 - Perturbation-specific prompts (e.g., "judge this counterfactual") do **NOT** belong in this schema — they belong in the perturbation generation pipeline
-- Estimands (E_FO, E_NoOp, E_SR) are computed downstream by differencing operator outputs across (baseline, perturbed) text pairs
+- Estimands (E_OR, E_NoOp, E_SR) are computed downstream by differencing operator outputs across (baseline, perturbed) text pairs
 
 ### 2.3 Pilot-iterable vs frozen
 
@@ -73,7 +73,7 @@ All operators inherit the legacy `README.md` prohibition: prompts forbid hindsig
 
 ### 3.1 Purpose
 
-Produce a structured sentiment/direction/confidence prediction for the (article, target) pair. Serves as the carrier for all perturbation-based estimands (E_CMMD, E_FO, E_NoOp, E_SR, E_EAD_t, E_EAD_nt, E_ADG, E_ADG_conflict). Baseline P_predict on unperturbed text feeds E_CMMD directly; deltas from baseline feed the perturbation family.
+Produce a structured sentiment/direction/confidence prediction for the (article, target) pair. Serves as the carrier for all perturbation-based estimands (E_CMMD, E_OR, E_NoOp, E_SR, E_EAD_t, E_EAD_nt, E_ADG, E_ADG_conflict). Baseline P_predict on unperturbed text feeds E_CMMD directly; deltas from baseline feed the perturbation family.
 
 ### 3.2 Input contract
 
@@ -155,7 +155,7 @@ P_predict runs identically on baseline and on each perturbation variant. Estiman
 | Estimand | Formula | Perturbation | Notes |
 |---|---|---|---|
 | E_CMMD | direct fleet aggregation of baseline P_predict outputs | none | Cutoff-monotone fleet disagreement |
-| E_FO | P_predict(original).direction != P_predict(C_FO(text)).direction | C_FO | Quality-gated confirmatory |
+| E_OR | P_predict(original).direction != P_predict(C_CO(text)).direction | C_CO | Quality-gated confirmatory |
 | E_NoOp | confidence shift between baseline and C_NoOp variant | C_NoOp | Quality-gated confirmatory |
 | E_SR | flip rate between baseline and C_SR variant | C_SR | Exploratory |
 | E_EAD_t / E_EAD_nt | confidence/direction shift across C_anon levels (target / non-target) | C_anon L0-L4 | Exploratory; dose-response |
@@ -456,7 +456,7 @@ Per-model API configuration. Semantic-layer prompt body (§§3-6) is identical a
 | `counterfactual_templates.novelty_toggle` | DEPRECATED | — | Novelty handled by factor annotation, not perturbation |
 | `counterfactual_templates.neutral_paraphrase` | RETAINED (relocated) | Reserved for future use as paraphrase robustness probe | Not in R5A confirmatory; pilot may resurrect |
 | `counterfactual_templates.sham_edits` | DEPRECATED | — | Phase 0-4 falsification; R5A uses C_NoOp |
-| (none) | NEW in R5A | C_FO generation | False outcome slot replacement; rule-based per event type |
+| (none) | NEW in R5A | C_CO generation | Counterfactual outcome slot replacement; rule-based per event type |
 | (none) | NEW in R5A | C_NoOp generation | Irrelevant clause insertion; deterministic clause bank |
 | (none) | NEW in R5A | C_anon L0-L4 generation | Multi-level entity anonymization gradient |
 | (none) | NEW in R5A | C_temporal generation | Temporal cue degradation; 2-3 dose levels |

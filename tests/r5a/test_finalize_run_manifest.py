@@ -196,8 +196,10 @@ def _build_runstate_db(
 
 
 def _build_happy_fixture(tmp_path: Path) -> dict[str, Path]:
-    """All 8 clauses satisfied. Returns a dict of paths/values to feed
-    to the finalizer CLI."""
+    """All 11 clauses satisfied (post-Tier-R2-0 PR1 step 7 renumbering;
+    framework now spans clauses 1..`_CLAUSE_RUNSTATE` per
+    `CONFIRMATORY_CLAUSE_NUMBERS`). Returns a dict of paths/values to
+    feed to the finalizer CLI."""
     fleet_path = _write(tmp_path, "fleet.yaml", _FLEET_DICT)
     runtime_path = _write(tmp_path, "runtime.yaml", _RUNTIME_DICT)
 
@@ -916,27 +918,59 @@ def test_confirmatory_hard_fail_runstate_orphan_pending(tmp_path: Path, monkeypa
 
 
 def test_confirmatory_hard_fail_clause_numbers_are_dense_and_complete():
-    """Static guard: the set of `[clause N]` numbers used in the
-    production `_confirmatory_hard_fail` body is exactly the dense
-    sequence {1..max}. Catches both a future copy/paste collision
-    where one number serves two distinct gates (LOW-3 regression) and
-    a renumbering gap that would silently retire a clause without
-    updating the docstring count. Multiple literal occurrences of the
-    SAME clause number are expected (e.g., one `[clause 4]` per
-    placeholder field) and not penalized.
+    """C1 / Tier-R2-0 PR2 step 11 (strengthens LOW-3 guard): clause
+    numbers are now declared as module-level `_CLAUSE_*` constants and
+    registered in `CONFIRMATORY_CLAUSE_NUMBERS`. The test enforces
+    three invariants that together close the holes in the original
+    "scan source for `[clause N]` literals" guard:
+
+    1. The registry is the dense sequence 1..N — catches a renumbering
+       gap that would silently retire a clause.
+    2. Every value in the registry is distinct — catches a copy/paste
+       collision where two constants resolve to the same integer (the
+       original LOW-3 hazard).
+    3. Every `_CLAUSE_*` constant is referenced at least once in the
+       `_confirmatory_hard_fail` body — catches a constant retired
+       from the function but left dangling in the registry.
     """
+    nums = list(finalize.CONFIRMATORY_CLAUSE_NUMBERS)
+    assert nums, "CONFIRMATORY_CLAUSE_NUMBERS is empty"
+    assert sorted(nums) == list(range(1, len(nums) + 1)), (
+        f"CONFIRMATORY_CLAUSE_NUMBERS {sorted(nums)} is not the dense "
+        f"sequence 1..{len(nums)}; check for gaps (retired clause not "
+        "removed from registry) or out-of-order renumbering."
+    )
+    assert len(set(nums)) == len(nums), (
+        f"CONFIRMATORY_CLAUSE_NUMBERS has duplicate values: {nums}. "
+        "Each clause must own a distinct integer (LOW-3 / C1 closure)."
+    )
+
     finalize_path = finalize.__file__
     assert finalize_path is not None
     src = Path(finalize_path).read_text(encoding="utf-8")
     body = src.split("def _confirmatory_hard_fail")[1].split("\ndef ")[0]
-    matches = [int(n) for n in re.findall(r"\[clause (\d+)\]", body)]
-    assert matches, "no [clause N] strings found in _confirmatory_hard_fail"
-    seen = set(matches)
-    assert seen == set(range(1, max(seen) + 1)), (
-        f"clause-number set {sorted(seen)} is not the dense sequence "
-        f"1..{max(seen)}; check _confirmatory_hard_fail for gaps "
-        "(retired clause not removed from docstring count) or duplicates "
-        "across distinct gates (LOW-3 regression)."
+    constant_names = [
+        name for name in vars(finalize)
+        if name.startswith("_CLAUSE_") and isinstance(getattr(finalize, name), int)
+    ]
+    assert constant_names, "no _CLAUSE_* constants found on finalize module"
+    for name in constant_names:
+        assert name in body, (
+            f"constant {name} is registered but not referenced inside "
+            "_confirmatory_hard_fail; either remove the constant or wire "
+            "it into the collector."
+        )
+
+    # Backstop: no bare `[clause <int>]` literals should survive in the
+    # collector body — every emitted clause label must go through the
+    # constants. A bare literal would also satisfy this test only if
+    # someone hand-wrote `[clause N]` instead of `[clause {_CLAUSE_X}]`,
+    # which defeats the constant-extraction guarantee.
+    bare_literals = re.findall(r"\[clause (\d+)\]", body)
+    assert not bare_literals, (
+        f"bare `[clause N]` integer literals found in _confirmatory_hard_fail "
+        f"({bare_literals}); use the `_CLAUSE_*` constants via "
+        "f-string interpolation so duplicates surface as a Python rename."
     )
 
 
@@ -970,3 +1004,285 @@ def test_run_manifest_round_trip_new_fields(tmp_path: Path, monkeypatch):
         "exposure_horizon_source_sha256"
     ]
     assert manifest.pilot_trace_shas == payload["pilot_trace_shas"]
+
+
+# ----------------------------------------------------------------------
+# MED-12 / Tier-R2-0 PR2 step 5 — sampling-config missing in isolation
+# ----------------------------------------------------------------------
+
+
+def test_confirmatory_hard_fail_sampling_config_missing_isolated(
+    tmp_path: Path, monkeypatch
+):
+    """MED-12 / Tier-R2-0 PR2 step 5: when the only violation is a
+    nonexistent `--sampling-config` path, the framework must report
+    `[clause 3]` (post-renumber) and only `[clause 3]` — earlier
+    coverage of clause 3 was bundled into the simultaneous-violations
+    integration test, which would also pass if clause 3 fired only as
+    a side-effect of one of the other clauses.
+    """
+    fixture = _build_happy_fixture(tmp_path)
+    monkeypatch.setattr(finalize, "_git_commit_sha", lambda: "f" * 40)
+    fixture["sampling_config"].unlink()
+
+    with pytest.raises(SystemExit) as exc:
+        _run_finalize(monkeypatch, fixture)
+    msg = str(exc.value)
+    assert "[clause 3]" in msg
+    assert "--sampling-config" in msg
+    # Isolation: no other clause numbers in the message.
+    other_clauses = [
+        n for n in re.findall(r"\[clause (\d+)\]", msg) if n != "3"
+    ]
+    assert other_clauses == [], (
+        f"expected only [clause 3], also got: {other_clauses}"
+    )
+
+
+# ----------------------------------------------------------------------
+# MED-9 / Tier-R2-0 PR2 step 8 — real-fleet cardinality sentinel
+# ----------------------------------------------------------------------
+
+
+def test_real_fleet_roster_cardinality_matches_expected_triple():
+    """MED-9 / Tier-R2-0 PR2 step 8: pin the real
+    `config/fleet/r5a_fleet.yaml` roster cardinalities so that any
+    accidental fleet edit (a model deleted, a `p_predict` block toggled
+    on/off, a pcsg_pair retired) trips this sentinel before the change
+    can land.
+
+    The expected triple `(14, 12, 2)` reflects the post-Llama-3 split
+    tier per `docs/DECISION_20260429_llama_addition.md`: 14 P_predict-
+    eligible (10 Qwen white-box + 1 GLM + 4 black-box minus the 2
+    P_logprob-only Llama models), 12 P_logprob-eligible (10 Qwen +
+    2 Llama, GLM excluded), and 2 temporal pcsg_pairs
+    (`temporal_qwen_cross_version` + `temporal_llama_cross_version`).
+    When the fleet roster legitimately changes, update this assertion
+    AND record the change in a fresh `docs/DECISION_*.md` so the
+    sentinel's failure has a documented governing decision to point at.
+    """
+    from src.r5a.fleet import load_fleet
+
+    fleet = load_fleet(REPO_ROOT / "config" / "fleet" / "r5a_fleet.yaml")
+    assert (
+        len(fleet.p_predict_eligible_ids()),
+        len(fleet.p_logprob_eligible_ids()),
+        len(fleet.temporal_pairs()),
+    ) == (14, 12, 2)
+
+
+# ----------------------------------------------------------------------
+# LOW-4 / Tier-R2-0 PR2 step 9 — behavior-based pcsg_pair_registry_hash
+# ----------------------------------------------------------------------
+
+
+def _pcsg_pair_dict(**overrides) -> dict:
+    base = {
+        "id": "temporal_test",
+        "role": "temporal",
+        "early": "qwen2.5-7b",
+        "late": "qwen3-8b",
+        "tokenizer_compat": "qwen2_class",
+        "max_token_id_inclusive": 151664,
+    }
+    base.update(overrides)
+    return base
+
+
+def _fleet_with_pairs(tmp_path: Path, pairs: list[dict]):
+    from src.r5a.fleet import load_fleet
+
+    fleet_dict = json.loads(json.dumps(_FLEET_DICT))
+    fleet_dict["pcsg_pairs"] = pairs
+    fleet_path = _write(tmp_path, "fleet.yaml", fleet_dict)
+    return load_fleet(fleet_path)
+
+
+def test_pcsg_pair_registry_hash_changes_when_field_changes(tmp_path: Path):
+    """LOW-4 / Tier-R2-0 PR2 step 9: replace the F.38 source-inspection
+    test (which required PCSGPair field names to appear as quoted
+    string literals in the hash function source) with a behavior-based
+    test: two registries that differ in any single field must hash to
+    different values, and a registry rebuilt with identical fields
+    must hash to the same value.
+    """
+    base = _fleet_with_pairs(tmp_path, [_pcsg_pair_dict()])
+    base_hash = base.pcsg_pair_registry_hash()
+
+    # Identical content (different fleet object) must hash equal.
+    same = _fleet_with_pairs(tmp_path, [_pcsg_pair_dict()])
+    assert same.pcsg_pair_registry_hash() == base_hash
+
+    # Each field perturbation must shift the hash. We mutate one field
+    # at a time so that a regression where (e.g.) `tokenizer_compat`
+    # was dropped from the canonicalization would surface as a
+    # specific assertion failure rather than a vague "hash didn't
+    # change".
+    perturbations = [
+        {"id": "temporal_renamed"},
+        {"role": "capacity", "early": None, "late": None,
+         "members": ["qwen2.5-7b", "qwen3-8b"]},
+        {"early": "qwen3-8b", "late": "qwen2.5-7b"},  # swap
+        {"tokenizer_compat": "llama3_class"},
+        {"max_token_id_inclusive": 151665},
+    ]
+    for ovr in perturbations:
+        mutated = _fleet_with_pairs(tmp_path, [_pcsg_pair_dict(**ovr)])
+        assert mutated.pcsg_pair_registry_hash() != base_hash, (
+            f"pcsg_pair_registry_hash failed to change after mutating {ovr}"
+        )
+
+
+def test_pcsg_pair_registry_hash_isolates_members_field(tmp_path: Path):
+    """PR2 cross-review HIGH-1 follow-up to LOW-4 / step 9: the per-
+    field loop above cannot independently verify `members`. Capacity
+    pairs forbid `early` / `late`, so the temporal -> capacity
+    perturbation bundles `role`, `early`, `late`, AND `members`
+    changes into one mutation — any of the other three shifting the
+    hash would mask a regression that dropped `members` from the
+    canonicalized payload at `src/r5a/fleet.py:166`.
+
+    Construction: extend `_FLEET_DICT` with a third P_logprob-eligible
+    white-box (`qwen2.5-1.5b`), then build two capacity pairs that are
+    byte-identical EXCEPT for which two models they declare as
+    `members`. Otherwise-equal canonical payloads must hash differently;
+    a hash function that omitted `members` would return equal hashes
+    and fail this assertion.
+    """
+    from src.r5a.fleet import load_fleet
+
+    extra_white_box = {
+        "family": "qwen",
+        "access": "white_box",
+        "provider": "vllm",
+        "cutoff_date": "2023-10-31",
+        "cutoff_source": "community_paraphrase",
+        "tokenizer_family": "qwen",
+        "hf_repo": "Qwen/Qwen2.5-1.5B-Instruct-AWQ",
+        "quant_scheme": "AWQ-INT4",
+        "tokenizer_sha": "c" * 64,
+        "hf_commit_sha": "c" * 40,
+        "p_logprob": {
+            "thinking_control": "default_off",
+            "prompt_overlay_policy": "none",
+            "route_lock_required": "hf_commit_sha",
+            "echo_supported": True,
+        },
+        "p_predict": {
+            "thinking_control": "default_deployed",
+            "prompt_overlay_policy": "baseline_only",
+        },
+    }
+
+    def _build(pair_members: list[str], suffix: str):
+        fleet_dict = json.loads(json.dumps(_FLEET_DICT))
+        fleet_dict["models"]["qwen2.5-1.5b"] = extra_white_box
+        fleet_dict["pcsg_pairs"] = [
+            {
+                "id": "capacity_test",
+                "role": "capacity",
+                "members": pair_members,
+                "tokenizer_compat": "qwen2_class",
+                "max_token_id_inclusive": 151664,
+            }
+        ]
+        path = _write(tmp_path, f"fleet_{suffix}.yaml", fleet_dict)
+        return load_fleet(path)
+
+    base = _build(["qwen2.5-7b", "qwen3-8b"], "members_base")
+    swapped_one = _build(["qwen3-8b", "qwen2.5-1.5b"], "members_swapped")
+    assert base.pcsg_pair_registry_hash() != swapped_one.pcsg_pair_registry_hash(), (
+        "pcsg_pair_registry_hash must shift when only `members` content "
+        "differs; if this fails, `members` is not contributing to the "
+        "canonical payload at src/r5a/fleet.py:166."
+    )
+
+
+# ----------------------------------------------------------------------
+# MED-8 / Tier-R2-0 PR2 step 7 — hidden-state negative tests
+# ----------------------------------------------------------------------
+
+
+def _build_hs_dir(
+    root: Path, models: list[str], cases: list[str]
+) -> Path:
+    root.mkdir(parents=True, exist_ok=True)
+    for case in cases:
+        for mid in models:
+            (root / f"{case}__{mid}.safetensors").write_bytes(b"HS")
+    return root
+
+
+def test_hidden_state_subset_missing_model_dir_fails(tmp_path: Path):
+    """MED-8 (a) / Tier-R2-0 PR2 step 7: confirmatory mode rejects a
+    hidden-state directory that contains files for SOME but not all
+    expected P_logprob models — the missing model surfaces as part of
+    the "subset incomplete" message.
+    """
+    hs_dir = _build_hs_dir(
+        tmp_path / "hs", models=["qwen2.5-7b"],
+        cases=[f"case_{i:03d}" for i in range(30)],
+    )
+    with pytest.raises(SystemExit) as exc:
+        finalize._hidden_state_subset_hash(
+            hs_dir,
+            ["qwen2.5-7b", "qwen3-8b"],
+            expected_case_count=30,
+            mode="confirmatory",
+        )
+    msg = str(exc.value)
+    assert "qwen3-8b" in msg
+    assert "have 0 cases" in msg or "missing" in msg
+
+
+def test_hidden_state_subset_mismatched_case_set_fails(tmp_path: Path):
+    """MED-8 (b) / Tier-R2-0 PR2 step 7: confirmatory mode rejects
+    when two models' case sets disagree (canonical vs. observed) even
+    though both have entries.
+    """
+    cases_canonical = [f"case_{i:03d}" for i in range(30)]
+    hs_dir = tmp_path / "hs"
+    hs_dir.mkdir()
+    for case in cases_canonical:
+        (hs_dir / f"{case}__qwen2.5-7b.safetensors").write_bytes(b"HS")
+    # qwen3-8b has 30 files but a partially different case set.
+    cases_other = cases_canonical[:25] + [f"alt_{i:03d}" for i in range(5)]
+    for case in cases_other:
+        (hs_dir / f"{case}__qwen3-8b.safetensors").write_bytes(b"HS")
+    with pytest.raises(SystemExit) as exc:
+        finalize._hidden_state_subset_hash(
+            hs_dir,
+            ["qwen2.5-7b", "qwen3-8b"],
+            expected_case_count=30,
+            mode="confirmatory",
+        )
+    msg = str(exc.value)
+    assert "qwen3-8b" in msg
+    assert "missing case_ids" in msg
+
+
+def test_hidden_state_subset_wrong_filename_layout_fails(tmp_path: Path):
+    """MED-8 (c) / Tier-R2-0 PR2 step 7: confirmatory mode rejects a
+    directory whose `.safetensors` files use the wrong filename layout
+    (e.g., a single underscore between case and model instead of the
+    `case__model` double-underscore convention required by
+    `_save_hidden_states`). With no files matching the layout, the
+    loader treats the directory as empty and surfaces the standard
+    "no `case__model` files" error.
+    """
+    hs_dir = tmp_path / "hs"
+    hs_dir.mkdir()
+    # Single underscore: `case_000_qwen2.5-7b.safetensors`. The reader
+    # splits on `__`, so these files contribute no entries.
+    for i in range(30):
+        for mid in ("qwen2.5-7b", "qwen3-8b"):
+            (hs_dir / f"case_{i:03d}_{mid}.safetensors").write_bytes(b"HS")
+    with pytest.raises(SystemExit) as exc:
+        finalize._hidden_state_subset_hash(
+            hs_dir,
+            ["qwen2.5-7b", "qwen3-8b"],
+            expected_case_count=30,
+            mode="confirmatory",
+        )
+    msg = str(exc.value)
+    assert "case_id}__{model_id" in msg or "no" in msg.lower()

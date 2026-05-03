@@ -233,11 +233,11 @@ class LogProbTrace(BaseModel):
 
     Schema versioning: bump `schema_version` whenever a new field is
     added so that downstream consumers can detect and refuse mismatched
-    artifacts. v2.0 introduces `top_alternative_token_ids`,
-    `top_alternative_logprobs`, `quant_scheme`, `weight_dtype`,
-    `vllm_image_digest`, `hidden_states_uri`, and the integrity
-    validators. v1.0 (in-flight pre-2026-04-27) traces are NOT readable
-    under v2.0 — none have been written yet, so this is forward-only.
+    artifacts. v2.0 introduces per-position alternative-token logprobs,
+    `quant_scheme`, `weight_dtype`, `vllm_image_digest`,
+    `hidden_states_uri`, and the integrity validators. v1.0 (in-flight
+    pre-2026-04-27) traces are NOT readable under v2.0 — none have been
+    written yet, so this is forward-only.
     """
 
     model_config = ConfigDict(extra="forbid")

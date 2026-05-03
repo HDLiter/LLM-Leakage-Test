@@ -37,11 +37,10 @@ section line-by-line, locates `<TBD>` values for the chosen model, and
 replaces them in place. This preserves the file's leading comments and
 PCSG pair registry (which is the SHA-256 input for
 `pcsg_pair_registry_hash` so a careless round-trip would silently
-invalidate prior RunManifests). The file is replaced atomically via
-`os.replace` so a crash mid-write cannot leave a half-written fleet
-YAML on disk; the pinning log append is best-effort post-fleet, so if
-you ever see fleet changes without a corresponding log entry, add the
-entry by hand.
+invalidate prior RunManifests). Before any fleet write, an existing
+pinning log must parse as a JSON array; a corrupt or non-array log
+raises, and the operator must reconcile it before retry. The fleet YAML
+and pinning log are both replaced atomically via `os.replace`.
 
 Usage:
 

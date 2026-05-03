@@ -26,13 +26,6 @@
 - **Owner**: cloud-run operator (Claude Code on AutoDL session).
 - **Target resolution date**: before WS1 pilot run.
 
-### Path E — empirical cutoff probe data sourcing
-- **Context**: `docs/DECISION_20260427_pcsg_redefinition.md` §2.4 specifies a 2,160-article temporally-stratified probe (60/month × 36 months 2023-01..2025-12) from CLS source corpus. Current Path-E fixtures live under `data/pilot/exposure_horizon/`; expected probe-set path is `data/pilot/exposure_horizon/probe_set_monthly60_36mo.json`.
-- **External action needed**: confirm read access to `D:\GitRepos\Thales\datasets\cls_telegraph_raw` from the cloud instance, OR ship the probe-set JSON to cloud (already built locally, ~2.5 MB — easier path; rebuild or copy into the current `data/pilot/exposure_horizon/` location before handoff).
-- **Blocking**: Path E execution (Stage 2.5 of WS1 cloud plan).
-- **Owner**: user (data access) + Claude Code (sampling script).
-- **Target resolution date**: before WS1 cloud Stage 2.5.
-
 ### Llama fleet addition — Meta HF gating pre-flight
 - **Context**: `docs/DECISION_20260429_llama_addition.md` adds `meta-llama/Meta-Llama-3-8B-Instruct` and `meta-llama/Meta-Llama-3.1-8B-Instruct` as P_logprob-only fleet members. Both are HF-gated; `hf-mirror.com` does NOT bypass Meta gating (verified 2026-04-29).
 - **External action needed**: user clicks through Meta license at `https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct` and `https://huggingface.co/meta-llama/Meta-Llama-3.1-8B-Instruct`; verifies HF fine-grained read-only token includes access via `huggingface-cli whoami` then `huggingface-cli download meta-llama/Meta-Llama-3-8B-Instruct --include "*.json"` test pull.
@@ -111,6 +104,9 @@
 
 ### WS1 — `LogProbTrace` contract closure
 - **Resolved 2026-05-03**: `LogProbTrace` and Parquet persistence now carry required non-null `quant_scheme`, `weight_dtype`, and `vllm_image_digest`; nullable `top_logprobs` and `hidden_states_uri`; producer CLI support for `--top-logprobs`; and a confirmatory finalizer check for required trace fields.
+
+### Path E — empirical cutoff probe data sourcing
+- **Resolved 2026-05-03**: `scripts/build_exposure_horizon_probe_set.py` built `data/pilot/exposure_horizon/probe_set_monthly60_36mo.json` locally from CLS with 36/36 months at 60 articles/month (2,160 total); ship this ignored JSON with the WS1 cloud data bundle.
 
 ---
 

@@ -26,7 +26,7 @@ __pycache__/
 data/cls_telegraph_raw/
 
 # Path-E exposure-horizon probe fixtures (CLS-content-heavy; regenerable
-# via scripts/build_cutoff_probe_set.py against the local CLS corpus;
+# via scripts/build_exposure_horizon_probe_set.py against the local CLS corpus;
 # renamed 2026-04-30 per DECISIONS.md decision #5)
 data/pilot/exposure_horizon/probe_set_*.json
 data/pilot/exposure_horizon/traces/

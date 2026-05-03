@@ -1152,6 +1152,13 @@ Phase 7 should add `data/pilot/` as the authoritative artifact root, `data/refer
 | `P_logprob` full pilot (430 cases × 12 P_logprob-eligible white-box) | 7-12 hours | 80 pre-cutoff + 350 post-cutoff (BL2 expansion); trace saving and per-model queuing included; +2 Llama bf16 models (2026-04-29) |
 | Hidden-state extraction (30 cases × 12 P_logprob-eligible white-box, WS6 prep) | ~6 hours | offline_hf backend; WS1 cloud Stage 2.7 (Path C eager pre-compute) |
 | Path E cutoff probe (2,160 articles × 12 P_logprob-eligible white-box) | ~2.5 hours | shares same instance, see WS1 cloud plan Stage 2.5; Llama probes are sanity anchors per `docs/DECISION_20260429_llama_addition.md` §2.4 |
+
+Path E probe-set input is built locally from the CLS raw corpus via
+`scripts/build_exposure_horizon_probe_set.py` and shipped to cloud as
+part of the WS1 data bundle at
+`data/pilot/exposure_horizon/probe_set_monthly60_36mo.json`. The script
+writes a seeded JSON envelope with monthly realized counts so cloud
+execution can detect underfilled months before scoring.
 | AWQ-vs-fp16 calibration audit (Qwen2.5-7B bf16 × 430 pilot cases) | ~3 hours | new Stage 2.8; closes Adversarial A3 per `docs/DECISION_20260429_llama_addition.md` §2.5 |
 | `P_predict` smoke (20 cases × 14 models) | 30-90 minutes | includes repair/retry overhead |
 | `P_predict` full pilot baseline + perturbations (430 cases × 14 models, perturbations on pre-cutoff only) | 8-14 hours | depends on provider latency and retry rate |

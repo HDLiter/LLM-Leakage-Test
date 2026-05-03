@@ -60,7 +60,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from src.r5a.contracts import AccessTier, ArticleRecord  # noqa: E402
+from src.r5a.contracts import AccessTier, ArticleRecord, HostCategory  # noqa: E402
 from src.r5a.fleet import ModelConfig, load_fleet  # noqa: E402
 from src.r5a.operators.p_logprob import (  # noqa: E402
     PLogprobOperator,
@@ -310,11 +310,42 @@ def _load_articles(args: argparse.Namespace) -> list[ArticleRecord]:
     if not path.exists():
         raise SystemExit(f"article source not found: {path}")
     payload = json.loads(path.read_text(encoding="utf-8"))
+    if isinstance(payload, dict) and "articles" in payload:
+        articles = payload["articles"]
+        if not isinstance(articles, list):
+            raise SystemExit(f"{path} field 'articles' must be a JSON array")
+        return [_probe_article_to_record(row) for row in articles]
     if not isinstance(payload, list):
         raise SystemExit(
             f"{path} must be a JSON array of ArticleRecord-shaped objects"
         )
     return [ArticleRecord(**row) for row in payload]
+
+
+def _probe_article_to_record(row: object) -> ArticleRecord:
+    if not isinstance(row, dict):
+        raise SystemExit("probe-set articles must be JSON objects")
+    category = str(row.get("category") or "corporate").lower()
+    if category not in {c.value for c in HostCategory}:
+        category = HostCategory.CORPORATE.value
+    ts = str(row.get("ts") or f"{row.get('month', '1970-01')}-01")
+    publish_date = ts.replace("T", " ").split(" ")[0]
+    return ArticleRecord(
+        case_id=str(row["id"]),
+        text=str(row["body"]),
+        target=str(row.get("headline") or "unspecified"),
+        target_type="other",
+        publish_date=publish_date,
+        event_type="exposure_horizon_probe",
+        host_category=category,
+        metadata={
+            "month": row.get("month"),
+            "category": row.get("category"),
+            "headline": row.get("headline"),
+            "source_id": row.get("source_id"),
+            "source": row.get("source"),
+        },
+    )
 
 
 def _resolve_output_paths(args: argparse.Namespace, model_id: str) -> tuple[Path, Path, Path, str]:

@@ -196,8 +196,10 @@ def _build_runstate_db(
 
 
 def _build_happy_fixture(tmp_path: Path) -> dict[str, Path]:
-    """All 8 clauses satisfied. Returns a dict of paths/values to feed
-    to the finalizer CLI."""
+    """All 11 clauses satisfied (post-Tier-R2-0 PR1 step 7 renumbering;
+    framework now spans clauses 1..`_CLAUSE_RUNSTATE` per
+    `CONFIRMATORY_CLAUSE_NUMBERS`). Returns a dict of paths/values to
+    feed to the finalizer CLI."""
     fleet_path = _write(tmp_path, "fleet.yaml", _FLEET_DICT)
     runtime_path = _write(tmp_path, "runtime.yaml", _RUNTIME_DICT)
 
@@ -1129,6 +1131,71 @@ def test_pcsg_pair_registry_hash_changes_when_field_changes(tmp_path: Path):
         assert mutated.pcsg_pair_registry_hash() != base_hash, (
             f"pcsg_pair_registry_hash failed to change after mutating {ovr}"
         )
+
+
+def test_pcsg_pair_registry_hash_isolates_members_field(tmp_path: Path):
+    """PR2 cross-review HIGH-1 follow-up to LOW-4 / step 9: the per-
+    field loop above cannot independently verify `members`. Capacity
+    pairs forbid `early` / `late`, so the temporal -> capacity
+    perturbation bundles `role`, `early`, `late`, AND `members`
+    changes into one mutation — any of the other three shifting the
+    hash would mask a regression that dropped `members` from the
+    canonicalized payload at `src/r5a/fleet.py:166`.
+
+    Construction: extend `_FLEET_DICT` with a third P_logprob-eligible
+    white-box (`qwen2.5-1.5b`), then build two capacity pairs that are
+    byte-identical EXCEPT for which two models they declare as
+    `members`. Otherwise-equal canonical payloads must hash differently;
+    a hash function that omitted `members` would return equal hashes
+    and fail this assertion.
+    """
+    from src.r5a.fleet import load_fleet
+
+    extra_white_box = {
+        "family": "qwen",
+        "access": "white_box",
+        "provider": "vllm",
+        "cutoff_date": "2023-10-31",
+        "cutoff_source": "community_paraphrase",
+        "tokenizer_family": "qwen",
+        "hf_repo": "Qwen/Qwen2.5-1.5B-Instruct-AWQ",
+        "quant_scheme": "AWQ-INT4",
+        "tokenizer_sha": "c" * 64,
+        "hf_commit_sha": "c" * 40,
+        "p_logprob": {
+            "thinking_control": "default_off",
+            "prompt_overlay_policy": "none",
+            "route_lock_required": "hf_commit_sha",
+            "echo_supported": True,
+        },
+        "p_predict": {
+            "thinking_control": "default_deployed",
+            "prompt_overlay_policy": "baseline_only",
+        },
+    }
+
+    def _build(pair_members: list[str], suffix: str):
+        fleet_dict = json.loads(json.dumps(_FLEET_DICT))
+        fleet_dict["models"]["qwen2.5-1.5b"] = extra_white_box
+        fleet_dict["pcsg_pairs"] = [
+            {
+                "id": "capacity_test",
+                "role": "capacity",
+                "members": pair_members,
+                "tokenizer_compat": "qwen2_class",
+                "max_token_id_inclusive": 151664,
+            }
+        ]
+        path = _write(tmp_path, f"fleet_{suffix}.yaml", fleet_dict)
+        return load_fleet(path)
+
+    base = _build(["qwen2.5-7b", "qwen3-8b"], "members_base")
+    swapped_one = _build(["qwen3-8b", "qwen2.5-1.5b"], "members_swapped")
+    assert base.pcsg_pair_registry_hash() != swapped_one.pcsg_pair_registry_hash(), (
+        "pcsg_pair_registry_hash must shift when only `members` content "
+        "differs; if this fails, `members` is not contributing to the "
+        "canonical payload at src/r5a/fleet.py:166."
+    )
 
 
 # ----------------------------------------------------------------------

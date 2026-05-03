@@ -120,8 +120,15 @@ VLLM_IMAGE_DIGEST_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
 # integer literal in a long function. `CONFIRMATORY_CLAUSE_NUMBERS` is
 # the canonical registry; the test
 # `test_confirmatory_hard_fail_clause_numbers_are_dense_and_complete`
-# asserts the registry is the dense sequence 1..N with each value used
-# at exactly one site.
+# enforces (a) the registry is the dense sequence 1..N, (b) every value
+# is distinct, (c) every `_CLAUSE_*` constant is referenced at least
+# once in the collector body, and (d) no bare `[clause <int>]` literals
+# survive in the body. A single constant is allowed to surface at MANY
+# message sites (e.g., `_CLAUSE_PIN_PLACEHOLDER` fires once per
+# placeholder field per model); the test does NOT — and structurally
+# cannot without a hand-maintained mapping — detect a future engineer
+# semantically reusing an existing constant for a brand-new gate, so
+# the gate-vs-constant binding remains a code-review responsibility.
 #
 # Renaming a clause: change the constant value AND its in-message wording
 # in `_confirmatory_hard_fail`. Retiring a clause: drop the constant

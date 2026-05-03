@@ -104,3 +104,23 @@ def test_estimand_label_renamed_to_e_or():
     labels = {r["estimand"] for r in rows}
     assert "E_OR_E_NoOp_beta_cutoff" in labels
     assert "E_FO_E_NoOp_beta_cutoff" not in labels
+    e_or_rows = [r for r in rows if r["estimand"] == "E_OR_E_NoOp_beta_cutoff"]
+    assert e_or_rows
+    expected_keys = {
+        "estimand",
+        "scenario",
+        "family_state",
+        "beta_planning",
+        "beta_effective",
+        "or_eligibility",
+        "n_case_pilot_eligible",
+        "n_case_main_eligible",
+        "se_pilot",
+        "se_main",
+        "power_pilot",
+        "power_main",
+        "n_models",
+        "n_families",
+    }
+    for row in e_or_rows:
+        assert set(row) == expected_keys

@@ -32,7 +32,8 @@ For each model:
      recompute per-month aggregator, refit κ̂ + δ̂ over the same grid.
      Repeat `B = 2000` times.
 
-  4. Report κ̂, δ̂, 95% CIs, P(δ > 0.05) from bootstrap, and CI widths.
+  4. Report κ̂, δ̂, 95% CIs, P(δ > drop_threshold) from bootstrap,
+     and CI widths.
 
   5. Accept `horizon_observed = months_sorted[κ̂]` only if both:
        * horizon CI width ≤ 3 months, AND
@@ -76,7 +77,7 @@ class ExposureHorizonEstimate:
     drop_magnitude: float  # δ̂ point estimate (positive = expected direction)
     drop_ci_lower: float | None
     drop_ci_upper: float | None
-    p_drop_gt_005: float | None  # bootstrap fraction with δ > 0.05
+    p_drop_gt_threshold: float | None  # bootstrap fraction with δ > drop_threshold
     n_months: int
     n_articles: int
     kappa_hat_index: int | None  # κ̂ in 0..n_months-1 (last pre-cutoff month)
@@ -306,7 +307,7 @@ def detect_exposure_horizon(
             drop_magnitude=0.0,
             drop_ci_lower=None,
             drop_ci_upper=None,
-            p_drop_gt_005=None,
+            p_drop_gt_threshold=None,
             n_months=0,
             n_articles=0,
             kappa_hat_index=None,
@@ -325,7 +326,7 @@ def detect_exposure_horizon(
             drop_magnitude=0.0,
             drop_ci_lower=None,
             drop_ci_upper=None,
-            p_drop_gt_005=None,
+            p_drop_gt_threshold=None,
             n_months=n_months,
             n_articles=n_articles,
             kappa_hat_index=None,
@@ -346,7 +347,7 @@ def detect_exposure_horizon(
             drop_magnitude=0.0,
             drop_ci_lower=None,
             drop_ci_upper=None,
-            p_drop_gt_005=None,
+            p_drop_gt_threshold=None,
             n_months=n_months,
             n_articles=n_articles,
             kappa_hat_index=None,
@@ -364,7 +365,7 @@ def detect_exposure_horizon(
             drop_magnitude=0.0,
             drop_ci_lower=None,
             drop_ci_upper=None,
-            p_drop_gt_005=None,
+            p_drop_gt_threshold=None,
             n_months=n_months,
             n_articles=n_articles,
             kappa_hat_index=None,
@@ -393,7 +394,7 @@ def detect_exposure_horizon(
             drop_magnitude=drop_hat,
             drop_ci_lower=None,
             drop_ci_upper=None,
-            p_drop_gt_005=None,
+            p_drop_gt_threshold=None,
             n_months=n_months,
             n_articles=n_articles,
             kappa_hat_index=int(kappa_hat),
@@ -429,7 +430,7 @@ def detect_exposure_horizon(
             drop_magnitude=drop_hat,
             drop_ci_lower=drop_lo,
             drop_ci_upper=drop_hi,
-            p_drop_gt_005=p_drop,
+            p_drop_gt_threshold=p_drop,
             n_months=n_months,
             n_articles=n_articles,
             kappa_hat_index=int(kappa_hat),
@@ -453,7 +454,7 @@ def detect_exposure_horizon(
         drop_magnitude=drop_hat,
         drop_ci_lower=drop_lo,
         drop_ci_upper=drop_hi,
-        p_drop_gt_005=p_drop,
+        p_drop_gt_threshold=p_drop,
         n_months=n_months,
         n_articles=n_articles,
         kappa_hat_index=int(kappa_hat),

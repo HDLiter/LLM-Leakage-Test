@@ -435,8 +435,10 @@ class RunManifest(BaseModel):
     `refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/DECISIONS.md`):
 
     - decision #1 — `mode: Literal["confirmatory", "dev"]` field added.
-      Confirmatory finalize enforces an 8-clause hard-fail framework in
-      `scripts/ws1_finalize_run_manifest.py`; dev mode (set via the
+      Confirmatory finalize enforces an 11-clause hard-fail framework
+      in `scripts/ws1_finalize_run_manifest.py` (originally 8 clauses;
+      Tier-R2-0 PR1 step 7 added hidden-states-dir + runstate-db
+      clauses and renumbered end-to-end). Dev mode (set via the
       finalizer's `--allow-tbd` flag) skips the framework.
     - decision #2 — split-tier roster fields `fleet_p_predict_eligible`
       and `fleet_p_logprob_eligible` record the realized eligibility sets

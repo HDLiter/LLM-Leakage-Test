@@ -9,12 +9,15 @@ script writes that artifact (`RunManifest`).
 2026-04-30 R2 amendments
 (`refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/DECISIONS.md`):
 
-  - decision #1 — confirmatory mode runs an 8-clause hard-fail check
-    (`_confirmatory_hard_fail`) before constructing the manifest. Each
-    failed clause is reported in a single multi-line `SystemExit`
-    message prefixed with `[clause N]` so operators see the full
-    failure set, not just the first one. `--allow-tbd` switches mode
-    to `dev` and skips the framework.
+  - decision #1 — confirmatory mode runs an 11-clause hard-fail check
+    (`_confirmatory_hard_fail`; expanded from the original 8 clauses
+    by Tier-R2-0 PR1 step 7 with hidden-states-dir and runstate-db
+    clauses, then renumbered end-to-end so each gate has a unique
+    `[clause N]`) before constructing the manifest. Each failed clause
+    is reported in a single multi-line `SystemExit` message prefixed
+    with `[clause N]` so operators see the full failure set, not just
+    the first one. `--allow-tbd` switches mode to `dev` and skips the
+    framework.
   - decision #2 — manifest records the realized split-tier rosters via
     `fleet_p_predict_eligible` and `fleet_p_logprob_eligible`.
   - decision #5 — `--cutoff-observed` renamed to `--exposure-horizon`;
@@ -150,7 +153,7 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help=(
             "permit `<TBD>` placeholders in the fleet (smoke / dev only); "
-            "sets manifest.mode='dev' and skips the 8-clause confirmatory "
+            "sets manifest.mode='dev' and skips the 11-clause confirmatory "
             "hard-fail framework. Confirmatory runs MUST run "
             "scripts/ws1_pin_fleet.py first and OMIT this flag."
         ),
@@ -785,11 +788,20 @@ def _confirmatory_hard_fail(
                         )
                         count, sample = cur.fetchone()
                     except sqlite3.OperationalError as exc:
+                        # NOTE: this clause queries only `case_id`,
+                        # `model_id`, `status` — the columns this
+                        # finalize step actually needs. The full
+                        # forward-declared `RUNSTATE_TABLE_NAME` schema
+                        # (RunStateRow fields + seed-triplet columns
+                        # per plans/phase7-pilot-implementation.md
+                        # §5.5A) is the writer's responsibility, not
+                        # validated here.
                         failures.append(
                             f"[clause 11] runstate.db at {rs_path} is missing "
-                            f"table {RUNSTATE_TABLE_NAME!r} or expected columns "
-                            f"({exc!s}); Phase 7 orchestration writer must "
-                            "create it per RUNSTATE_TABLE_NAME contract."
+                            f"table {RUNSTATE_TABLE_NAME!r} or the columns "
+                            f"needed by finalize ({exc!s}); Phase 7 "
+                            "orchestration writer must create it per "
+                            "RUNSTATE_TABLE_NAME contract."
                         )
                     else:
                         if count and count > 0:

@@ -1,10 +1,13 @@
 """Unit tests for scripts/ws1_finalize_run_manifest.py.
 
-Per R2 Tier-0 Block F.35 (v3 simplified). Covers Block C hardening:
-mode-aware 8-clause confirmatory hard-fail (decision #1), exposure-
-horizon JSON validation, traces-dir validation, hidden-state subset
-hash, quality_gate_thresholds key cleanup, sampling-config hash,
-split-tier roster fields.
+Per R2 Tier-0 Block F.35 (v3 simplified) + Tier-R2-0 PR1 step 7
+(framework expanded to 11 clauses; new hidden-states-dir + runstate
+clauses; end-to-end renumbering). Covers Block C hardening: mode-aware
+11-clause confirmatory hard-fail (decision #1), exposure-horizon JSON
+validation (top-level shape gate + schema-strict horizon_observed
+parse), traces-dir validation (row-count + per-model SHA), hidden-state
+subset hash, quality_gate_thresholds key cleanup, sampling-config hash,
+split-tier roster fields, analyzer→finalizer e2e SHA equality.
 
 All tests use `tmp_path` and call `main()` after monkeypatching
 `sys.argv`.

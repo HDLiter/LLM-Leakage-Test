@@ -217,7 +217,7 @@ def main() -> int:
             "drop_magnitude": est.drop_magnitude,
             "drop_ci_lower": est.drop_ci_lower,
             "drop_ci_upper": est.drop_ci_upper,
-            "p_drop_gt_threshold": est.p_drop_gt_005,
+            "p_drop_gt_threshold": est.p_drop_gt_threshold,
             "n_months": est.n_months,
             "n_articles": est.n_articles,
             "kappa_hat_index": est.kappa_hat_index,

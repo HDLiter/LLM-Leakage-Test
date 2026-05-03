@@ -355,17 +355,17 @@ def _simulate_estimand_powers(args: argparse.Namespace) -> list[dict]:
                 # E_OR / E_NoOp: pooled over 14 P_predict models with
                 # eligibility mask. We treat eligibility as a multiplier
                 # on n_case (Statistical §1 simulation parameters).
-                for fo_eligibility in (0.5, 0.7, 0.9):
+                for or_eligibility in (0.5, 0.7, 0.9):
                     sigma_within = 1.1  # OR outcomes coarser than CMMD
                     sigma_model = 0.40
                     sigma_family = 0.20
                     n_models = fleet.n_p_predict
                     n_families = len(fleet.family_p_predict)
                     eff_pilot = max(
-                        int((args.n_case_pilot + args.n_case_bl2_post) * fo_eligibility),
+                        int((args.n_case_pilot + args.n_case_bl2_post) * or_eligibility),
                         1,
                     )
-                    eff_main = max(int(args.n_case_main_total * fo_eligibility), 1)
+                    eff_main = max(int(args.n_case_main_total * or_eligibility), 1)
                     se_pilot = _se_with_family_intercepts(
                         n_case=eff_pilot,
                         n_models=n_models,
@@ -389,7 +389,7 @@ def _simulate_estimand_powers(args: argparse.Namespace) -> list[dict]:
                             "family_state": family_state,
                             "beta_planning": beta,
                             "beta_effective": effect_eff,
-                            "fo_eligibility": fo_eligibility,
+                            "or_eligibility": or_eligibility,
                             "n_case_pilot_eligible": eff_pilot,
                             "n_case_main_eligible": eff_main,
                             "se_pilot": se_pilot,

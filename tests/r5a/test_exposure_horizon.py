@@ -155,7 +155,7 @@ def test_detect_exposure_horizon_accepts_clean_step():
     assert est.horizon_ci_width_months is not None
     assert est.horizon_ci_width_months <= 3
     assert est.drop_ci_lower is not None and est.drop_ci_lower > 0.05
-    assert est.p_drop_gt_005 is not None and est.p_drop_gt_005 > 0.95
+    assert est.p_drop_gt_threshold is not None and est.p_drop_gt_threshold > 0.95
 
 
 def test_detect_exposure_horizon_rejects_flat_series():

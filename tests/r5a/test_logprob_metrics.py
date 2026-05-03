@@ -127,6 +127,8 @@ def _make_trace(
         tokenizer_sha=tokenizer_sha,
         hf_commit_sha="hf-xyz",
         quant_scheme="AWQ-INT4",
+        weight_dtype="int4",
+        vllm_image_digest="dev-unpinned",
         article_token_count=len(token_logprobs),
         raw_token_ids=raw_token_ids,
         token_logprobs=token_logprobs,
@@ -299,6 +301,8 @@ def test_logprob_trace_rejects_prefix_longer_than_article():
             tokenizer_sha="tok",
             hf_commit_sha="hf",
             quant_scheme="AWQ-INT4",
+            weight_dtype="int4",
+            vllm_image_digest="dev-unpinned",
             article_token_count=3,
             raw_token_ids=[1, 2, 3],
             token_logprobs=[-1.0, -2.0, -3.0],
@@ -315,11 +319,11 @@ def test_logprob_trace_rejects_prefix_longer_than_article():
 
 
 def test_logprob_trace_rejects_top_alt_outer_length_mismatch():
-    """`top_alternative_logprobs` must align position-by-position with
+    """`top_logprobs` must align position-by-position with
     `raw_token_ids` per the LogProbTrace integrity validator."""
     from pydantic import ValidationError
 
-    with pytest.raises(ValidationError, match="top_alternative_logprobs"):
+    with pytest.raises(ValidationError, match="top_logprobs"):
         LogProbTrace(
             case_id="c1",
             model_id="qwen2.5-7b",
@@ -327,10 +331,12 @@ def test_logprob_trace_rejects_top_alt_outer_length_mismatch():
             tokenizer_sha="tok",
             hf_commit_sha="hf",
             quant_scheme="AWQ-INT4",
+            weight_dtype="int4",
+            vllm_image_digest="dev-unpinned",
             article_token_count=3,
             raw_token_ids=[1, 2, 3],
             token_logprobs=[-1.0, -2.0, -3.0],
-            top_alternative_logprobs=[[-1.5, -2.5], [-2.5, -3.5]],  # outer=2, expected=3
+            top_logprobs=[[-1.5, -2.5], [-2.5, -3.5]],  # outer=2, expected=3
             top_logprobs_k=2,
             thinking_mode="off",
             backend="vllm_completion",

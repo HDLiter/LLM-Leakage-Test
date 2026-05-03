@@ -108,6 +108,15 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     p.add_argument(
+        "--top-logprobs",
+        type=int,
+        default=5,
+        help=(
+            "number of per-position alternative logprobs to persist in "
+            "LogProbTrace.top_logprobs; default 5 per plan §5.2"
+        ),
+    )
+    p.add_argument(
         "--model-path",
         default=None,
         help="local HF checkpoint path (offline_hf backend only)",
@@ -278,6 +287,19 @@ def _decide_backend(args: argparse.Namespace, cfg: ModelConfig) -> str:
     )
 
 
+def _weight_dtype_from_quant_scheme(quant_scheme: str) -> str:
+    normalized = quant_scheme.lower()
+    if "int4" in normalized:
+        return "int4"
+    if normalized in {"bf16", "bfloat16"}:
+        return "bf16"
+    if normalized in {"fp16", "float16"}:
+        return "fp16"
+    if normalized in {"fp32", "float32"}:
+        return "fp32"
+    return normalized or "unknown"
+
+
 def _load_articles(args: argparse.Namespace) -> list[ArticleRecord]:
     if args.smoke:
         path = Path(args.fixture)
@@ -337,8 +359,9 @@ def _build_backend(args: argparse.Namespace, cfg: ModelConfig, runtime, backend_
             tokenizer_sha=cfg.tokenizer_sha or "",
             hf_commit_sha=cfg.hf_commit_sha or "",
             quant_scheme=cfg.quant_scheme or "fp16",
-            weight_dtype=None,
+            weight_dtype=_weight_dtype_from_quant_scheme(cfg.quant_scheme or "fp16"),
             vllm_image_digest=args.vllm_image_digest,
+            top_logprobs=args.top_logprobs,
             timeout_seconds=timeout_s,
             max_retries=retry_max,
         )
@@ -355,8 +378,10 @@ def _build_backend(args: argparse.Namespace, cfg: ModelConfig, runtime, backend_
         hf_commit_sha=cfg.hf_commit_sha or "",
         quant_scheme=cfg.quant_scheme or "fp16",
         weight_dtype=args.torch_dtype,
+        vllm_image_digest=args.vllm_image_digest,
         device=args.device,
         torch_dtype=args.torch_dtype,
+        top_logprobs=args.top_logprobs,
         extract_hidden_states=args.extract_hidden_states,
         hidden_states_dir=args.hidden_states_dir,
     )

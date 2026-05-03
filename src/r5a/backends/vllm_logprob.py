@@ -56,8 +56,10 @@ class VLLMLogprobBackend:
         model_id: fleet model_id, used in trace records.
         tokenizer_family / tokenizer_sha / hf_commit_sha: pinning fields.
         quant_scheme: e.g. ``"AWQ-INT4"`` or ``"fp16"``; recorded into trace.
-        weight_dtype: optional ``"float16"`` / ``"bfloat16"``; recorded.
-        vllm_image_digest: optional Docker image SHA; recorded.
+        weight_dtype: ``"int4"`` / ``"bf16"`` / ``"fp16"``; inferred from
+            quant_scheme when omitted.
+        vllm_image_digest: Docker image SHA in pilot/Path-E modes; dev
+            smoke traces use a non-null placeholder when omitted.
         timeout_seconds: per-HTTP-request timeout.
         max_retries: count of retries for transient failures only.
         top_logprobs: how many alternative tokens per position. Plan §5.2
@@ -87,8 +89,8 @@ class VLLMLogprobBackend:
         self.tokenizer_sha = tokenizer_sha
         self.hf_commit_sha = hf_commit_sha
         self.quant_scheme = quant_scheme
-        self.weight_dtype = weight_dtype
-        self.vllm_image_digest = vllm_image_digest
+        self.weight_dtype = weight_dtype or _infer_weight_dtype(quant_scheme)
+        self.vllm_image_digest = vllm_image_digest or "dev-unpinned"
         self.max_retries = max(1, max_retries)
         self.top_logprobs = top_logprobs
         self._client = httpx.AsyncClient(
@@ -191,7 +193,7 @@ class VLLMLogprobBackend:
             article_token_count=len(cleaned_lp),
             raw_token_ids=cleaned_ids,
             token_logprobs=cleaned_lp,
-            top_alternative_logprobs=cleaned_top,
+            top_logprobs=cleaned_top,
             top_logprobs_k=self.top_logprobs,
             prefix_token_count=0,  # vLLM /tokenize default add_special_tokens behavior
             thinking_mode="off",
@@ -304,6 +306,19 @@ def _extract_top_alternatives(
     values = [float(v) for v in values if v is not None]
     values.sort(reverse=True)
     return values
+
+
+def _infer_weight_dtype(quant_scheme: str) -> str:
+    normalized = quant_scheme.lower()
+    if "int4" in normalized:
+        return "int4"
+    if normalized in {"bf16", "bfloat16"}:
+        return "bf16"
+    if normalized in {"fp16", "float16"}:
+        return "fp16"
+    if normalized in {"fp32", "float32"}:
+        return "fp32"
+    return normalized or "unknown"
 
 
 __all__ = ["VLLMBackendError", "VLLMLogprobBackend"]

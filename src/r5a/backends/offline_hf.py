@@ -44,6 +44,8 @@ class OfflineHFBackend:
         tokenizer_family / tokenizer_sha / hf_commit_sha: pinning fields.
         quant_scheme: e.g. ``"fp16"`` or ``"AWQ-INT4"``; recorded into trace.
         weight_dtype: e.g. ``"float16"``; recorded.
+        vllm_image_digest: run-level Docker image digest recorded for
+            trace provenance; dev smoke traces may pass ``"dev-unpinned"``.
         device: ``"cuda"`` (default) or ``"cpu"``.
         torch_dtype: ``"float16"`` (default), ``"bfloat16"``, or ``"float32"``.
         top_logprobs: how many alternative-token logprobs to record per
@@ -64,6 +66,7 @@ class OfflineHFBackend:
         hf_commit_sha: str,
         quant_scheme: str,
         weight_dtype: str | None = None,
+        vllm_image_digest: str | None = None,
         device: str = "cuda",
         torch_dtype: str = "float16",
         top_logprobs: int = 5,
@@ -100,6 +103,7 @@ class OfflineHFBackend:
         self.hf_commit_sha = hf_commit_sha
         self.quant_scheme = quant_scheme
         self.weight_dtype = weight_dtype or torch_dtype
+        self.vllm_image_digest = vllm_image_digest or "dev-unpinned"
         self.device = device
         self.torch_dtype = torch_dtype
         self.top_logprobs = top_logprobs
@@ -230,11 +234,11 @@ class OfflineHFBackend:
             hf_commit_sha=self.hf_commit_sha,
             quant_scheme=self.quant_scheme,
             weight_dtype=self.weight_dtype,
-            vllm_image_digest=None,  # not applicable to HF backend
+            vllm_image_digest=self.vllm_image_digest,
             article_token_count=len(token_logprobs),
             raw_token_ids=raw_token_ids,
             token_logprobs=token_logprobs,
-            top_alternative_logprobs=top_alts,
+            top_logprobs=top_alts,
             top_logprobs_k=self.top_logprobs,
             prefix_token_count=prefix_after_drop,
             hidden_states_uri=hidden_uri,

@@ -281,6 +281,49 @@ def _parquet_rowcount_or_error(path: Path) -> int | str:
         return f"failed to read parquet metadata: {exc!r}"
 
 
+_REQUIRED_LOGPROB_TRACE_FIELDS: Final[tuple[str, ...]] = (
+    "quant_scheme",
+    "weight_dtype",
+    "vllm_image_digest",
+)
+
+
+def _validate_logprob_trace_required_fields(
+    path: Path,
+    model_id: str,
+    *,
+    required_fields: tuple[str, ...] = _REQUIRED_LOGPROB_TRACE_FIELDS,
+) -> list[str]:
+    """Return LogProbTrace provenance-field failures for one parquet.
+
+    Confirmatory traces must carry non-null trace-level provenance. The
+    nullable contract fields (`top_logprobs`, `hidden_states_uri`) are
+    intentionally not checked here.
+    """
+    try:
+        table = pq.read_table(str(path), columns=list(required_fields))
+    except Exception as exc:
+        return [
+            f"  {model_id} ({path.name}): missing or unreadable required "
+            f"LogProbTrace fields {list(required_fields)} ({exc!r})"
+        ]
+
+    failures: list[str] = []
+    for field in required_fields:
+        values = table[field].to_pylist()
+        bad_rows = [
+            idx
+            for idx, value in enumerate(values)
+            if value is None or (isinstance(value, str) and not value.strip())
+        ]
+        if bad_rows:
+            failures.append(
+                f"  {model_id} ({path.name}): required LogProbTrace field "
+                f"{field!r} is null/empty in rows {bad_rows[:5]}"
+            )
+    return failures
+
+
 def _validate_traces_dir(
     traces_dir: Path,
     expected_models: list[str],
@@ -323,31 +366,45 @@ def _validate_traces_dir(
         on_disk[model_id] = parquet
 
     rowcount_problems: list[str] = []
+    trace_contract_problems: list[str] = []
 
     def _check_rowcount(model_id: str, parquet_path: Path) -> None:
-        if expected_n_articles is None:
-            return
-        result = _parquet_rowcount_or_error(parquet_path)
-        if isinstance(result, str):
-            rowcount_problems.append(
-                f"  {model_id} ({parquet_path.name}): {result}"
+        if expected_n_articles is not None:
+            result = _parquet_rowcount_or_error(parquet_path)
+            if isinstance(result, str):
+                rowcount_problems.append(
+                    f"  {model_id} ({parquet_path.name}): {result}"
+                )
+            elif result != expected_n_articles:
+                rowcount_problems.append(
+                    f"  {model_id} ({parquet_path.name}): row count {result} "
+                    f"!= expected {expected_n_articles}"
+                )
+        if mode == "confirmatory":
+            trace_contract_problems.extend(
+                _validate_logprob_trace_required_fields(parquet_path, model_id)
             )
-        elif result != expected_n_articles:
-            rowcount_problems.append(
-                f"  {model_id} ({parquet_path.name}): row count {result} "
-                f"!= expected {expected_n_articles}"
+
+    def _raise_trace_problems(prefix: str) -> None:
+        blocks: list[str] = []
+        if rowcount_problems:
+            blocks.append(prefix + "\n" + "\n".join(rowcount_problems))
+        if trace_contract_problems:
+            blocks.append(
+                "pilot trace LogProbTrace contract fields are incomplete:\n"
+                + "\n".join(trace_contract_problems)
             )
+        if blocks:
+            raise SystemExit("\n".join(blocks))
 
     if mode == "dev":
         for mid, path in on_disk.items():
             if mid in expected_set:
                 out[mid] = str(path)
                 _check_rowcount(mid, path)
-        if rowcount_problems:
-            raise SystemExit(
-                "pilot trace row count does not match article-manifest:\n"
-                + "\n".join(rowcount_problems)
-            )
+        _raise_trace_problems(
+            "pilot trace row count does not match article-manifest:"
+        )
         return out
 
     missing = sorted(expected_set - set(on_disk))
@@ -366,12 +423,10 @@ def _validate_traces_dir(
         out[mid] = str(on_disk[mid])
         _check_rowcount(mid, on_disk[mid])
 
-    if rowcount_problems:
-        raise SystemExit(
-            "pilot trace row count does not match article-manifest "
-            f"(expected {expected_n_articles} per model):\n"
-            + "\n".join(rowcount_problems)
-        )
+    _raise_trace_problems(
+        "pilot trace row count does not match article-manifest "
+        f"(expected {expected_n_articles} per model):"
+    )
     return out
 
 

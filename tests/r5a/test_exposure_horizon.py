@@ -34,6 +34,8 @@ def _trace(case_id: str, logprobs: list[float]) -> LogProbTrace:
         tokenizer_sha="tok-x",
         hf_commit_sha="hf-x",
         quant_scheme="AWQ-INT4",
+        weight_dtype="int4",
+        vllm_image_digest="dev-unpinned",
         article_token_count=len(logprobs),
         raw_token_ids=list(range(100, 100 + len(logprobs))),
         token_logprobs=logprobs,

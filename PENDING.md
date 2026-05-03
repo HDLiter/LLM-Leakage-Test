@@ -26,13 +26,6 @@
 - **Owner**: cloud-run operator (Claude Code on AutoDL session).
 - **Target resolution date**: before WS1 pilot run.
 
-### WS1 — `LogProbTrace` contract closure
-- **Context**: 4-lens code review (`refine-logs/reviews/WS1_CODE_REVIEW/`) found `LogProbTrace` is missing `top_logprobs`, `quant_scheme`, `weight_dtype`, `vllm_image_digest`, and `hidden_states_uri` (the last for WS6 prep). Once cloud traces are written, retroactively adding fields requires re-renting GPU.
-- **Decision needed**: which fields are required (vs. nice-to-have), and add Pydantic + Parquet schema before any cloud run.
-- **Blocking**: WS1 cloud run.
-- **Owner**: WS1 P0 fix batch (in progress 2026-04-27 session).
-- **Target resolution date**: this week.
-
 ### Path E — empirical cutoff probe data sourcing
 - **Context**: `docs/DECISION_20260427_pcsg_redefinition.md` §2.4 specifies a 2,160-article temporally-stratified probe (60/month × 36 months 2023-01..2025-12) from CLS source corpus. Current Path-E fixtures live under `data/pilot/exposure_horizon/`; expected probe-set path is `data/pilot/exposure_horizon/probe_set_monthly60_36mo.json`.
 - **External action needed**: confirm read access to `D:\GitRepos\Thales\datasets\cls_telegraph_raw` from the cloud instance, OR ship the probe-set JSON to cloud (already built locally, ~2.5 MB — easier path; rebuild or copy into the current `data/pilot/exposure_horizon/` location before handoff).
@@ -115,6 +108,9 @@
 
 ### Phase 7 orchestration writer — runstate DB contract
 - **Resolved 2026-05-03**: `src/r5a/orchestration/runstate.py` now creates and updates `request_runstate` with the `RunStateRow` fields plus seed-triplet columns, validates transitions through `pending`, and supports the finalizer's runstate gate.
+
+### WS1 — `LogProbTrace` contract closure
+- **Resolved 2026-05-03**: `LogProbTrace` and Parquet persistence now carry required non-null `quant_scheme`, `weight_dtype`, and `vllm_image_digest`; nullable `top_logprobs` and `hidden_states_uri`; producer CLI support for `--top-logprobs`; and a confirmatory finalizer check for required trace fields.
 
 ---
 

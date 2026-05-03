@@ -17,7 +17,7 @@ from datetime import date, datetime
 from enum import Enum
 from typing import Any, Final, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, model_validator
 
 
 # ---------------------------------------------------------------------------
@@ -234,13 +234,20 @@ class LogProbTrace(BaseModel):
     Schema versioning: bump `schema_version` whenever a new field is
     added so that downstream consumers can detect and refuse mismatched
     artifacts. v2.0 introduces per-position alternative-token logprobs,
-    `quant_scheme`, `weight_dtype`, `vllm_image_digest`,
+    `top_logprobs`, `quant_scheme`, `weight_dtype`, `vllm_image_digest`,
     `hidden_states_uri`, and the integrity validators. v1.0 (in-flight
     pre-2026-04-27) traces are NOT readable under v2.0 — none have been
     written yet, so this is forward-only.
+
+    Required vs optional (closed 2026-05-03):
+    - Required and non-null: `quant_scheme`, `weight_dtype`,
+      `vllm_image_digest`.
+    - Nullable: `top_logprobs` (`None` means not requested) and
+      `hidden_states_uri` (`None` means no hidden-state tensor was
+      emitted for this trace).
     """
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
     schema_version: Literal["v2.0"] = "v2.0"
 
@@ -250,22 +257,22 @@ class LogProbTrace(BaseModel):
     tokenizer_sha: str
     hf_commit_sha: str
     quant_scheme: str  # e.g. "AWQ-INT4", "fp16"; recorded for cross-precision sanity
-    weight_dtype: str | None = None  # "float16" / "bfloat16" / "float32" / null for INT4
-    vllm_image_digest: str | None = None  # Docker image SHA256 if backend was vLLM
+    weight_dtype: str  # "int4" / "bf16" / "fp16" / "fp32"
+    vllm_image_digest: str  # Docker image digest or dev placeholder recorded with the trace
 
     article_token_count: int = Field(ge=1)
     raw_token_ids: list[int]
     token_logprobs: list[float]
 
-    # Per-position alternative-token logprobs from vLLM's top_logprobs.
-    # Stored as a ragged list[list[float]] because Parquet handles it
-    # natively. Outer length == article_token_count; inner length is
-    # bounded by top_logprobs_k (typically 5) but may be 0 at the first
-    # position (vLLM returns null there). Token-string identifiers of
-    # the alternatives are NOT persisted: Min-K%++ scoring only needs
-    # the logprob values, and the OpenAI-compatible top_logprobs field
-    # exposes token strings, not token IDs.
-    top_alternative_logprobs: list[list[float]] = Field(default_factory=list)
+    # Per-position alternative-token logprobs from backend top-K output.
+    # Stored as ragged `list[list[float]]` because Min-K%++ needs the
+    # alternative logprob distribution, not provider-specific token text.
+    # Outer length must equal article_token_count when not None. Inner
+    # length is bounded by top_logprobs_k (typically 5).
+    top_logprobs: list[list[float]] | None = Field(
+        default=None,
+        validation_alias=AliasChoices("top_logprobs", "top_alternative_logprobs"),
+    )
     top_logprobs_k: int = Field(ge=0, default=0)
 
     # Special-token / prefix bookkeeping: how many tokens at the head of
@@ -282,6 +289,11 @@ class LogProbTrace(BaseModel):
     thinking_mode: Literal["off"]
     backend: Literal["vllm_completion", "offline_hf"]
     fingerprint: RequestFingerprint
+
+    @property
+    def top_alternative_logprobs(self) -> list[list[float]]:
+        """Backward-compatible alias for pre-closure code/tests."""
+        return self.top_logprobs or []
 
     @model_validator(mode="after")
     def _check_consistency(self) -> "LogProbTrace":
@@ -301,16 +313,20 @@ class LogProbTrace(BaseModel):
         if any(not math.isfinite(lp) for lp in self.token_logprobs):
             raise ValueError("token_logprobs contains non-finite values")
 
-        if self.top_alternative_logprobs:
-            if len(self.top_alternative_logprobs) != n:
+        for name in ("quant_scheme", "weight_dtype", "vllm_image_digest"):
+            if not getattr(self, name).strip():
+                raise ValueError(f"{name} must be a non-empty string")
+
+        if self.top_logprobs is not None:
+            if len(self.top_logprobs) != n:
                 raise ValueError(
-                    "top_alternative_logprobs must align with raw_token_ids"
+                    "top_logprobs must align with raw_token_ids"
                 )
             if self.top_logprobs_k > 0:
-                for i, lps in enumerate(self.top_alternative_logprobs):
+                for i, lps in enumerate(self.top_logprobs):
                     if lps and len(lps) > self.top_logprobs_k:
                         raise ValueError(
-                            f"top_alternative_logprobs at position {i} has "
+                            f"top_logprobs at position {i} has "
                             f"{len(lps)} entries; declared k={self.top_logprobs_k}"
                         )
 

@@ -144,16 +144,24 @@ def _write(tmp_path: Path, name: str, content: str | dict | list) -> Path:
 
 
 def _write_parquet(path: Path, n_rows: int) -> Path:
-    """Write a tiny 1-column parquet with `n_rows` rows.
+    """Write a tiny trace-shaped parquet with `n_rows` rows.
 
     Used by finalizer fixtures to satisfy the row-count gate
     (Tier-R2-0 PR1 step 4 / S5: pilot trace row count must equal
-    article-manifest entry count, per model).
+    article-manifest entry count, per model) and the trace-level
+    required-provenance gate.
     """
     import pyarrow as pa
     import pyarrow.parquet as pq
 
-    table = pa.table({"case_id": [f"case_{i:03d}" for i in range(n_rows)]})
+    table = pa.table(
+        {
+            "case_id": [f"case_{i:03d}" for i in range(n_rows)],
+            "quant_scheme": ["AWQ-INT4"] * n_rows,
+            "weight_dtype": ["int4"] * n_rows,
+            "vllm_image_digest": ["sha256:" + "f" * 64] * n_rows,
+        }
+    )
     pq.write_table(table, str(path))
     return path
 
@@ -592,6 +600,8 @@ def _build_logprob_trace_parquet(
                 tokenizer_sha="tok-x",
                 hf_commit_sha="hf-x",
                 quant_scheme="AWQ-INT4",
+                weight_dtype="int4",
+                vllm_image_digest="sha256:" + "f" * 64,
                 article_token_count=4,
                 raw_token_ids=[101, 102, 103, 104],
                 token_logprobs=[-1.0, -1.5, -2.0, -2.5],

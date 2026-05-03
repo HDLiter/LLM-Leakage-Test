@@ -138,7 +138,7 @@ _PARQUET_SCHEMA = pa.schema(
         ("article_token_count", pa.int32()),
         ("raw_token_ids", pa.list_(pa.int64())),
         ("token_logprobs", pa.list_(pa.float64())),
-        ("top_alternative_logprobs", pa.list_(pa.list_(pa.float64()))),
+        ("top_logprobs", pa.list_(pa.list_(pa.float64()))),
         ("top_logprobs_k", pa.int32()),
         ("prefix_token_count", pa.int32()),
         ("hidden_states_uri", pa.string()),
@@ -173,7 +173,7 @@ def _trace_to_row(trace: LogProbTrace) -> dict[str, Any]:
         "article_token_count": trace.article_token_count,
         "raw_token_ids": trace.raw_token_ids,
         "token_logprobs": trace.token_logprobs,
-        "top_alternative_logprobs": trace.top_alternative_logprobs,
+        "top_logprobs": trace.top_logprobs,
         "top_logprobs_k": trace.top_logprobs_k,
         "prefix_token_count": trace.prefix_token_count,
         "hidden_states_uri": trace.hidden_states_uri,
@@ -226,7 +226,9 @@ def _row_to_trace(row: dict[str, Any]) -> LogProbTrace:
             f"unsupported LogProbTrace schema_version {schema_version!r}; "
             "v2.0 expected (see contracts.LOGPROB_TRACE_SCHEMA_VERSION)"
         )
-    top_lps_raw = row.get("top_alternative_logprobs")
+    top_lps_raw = row.get("top_logprobs")
+    if top_lps_raw is None:
+        top_lps_raw = row.get("top_alternative_logprobs")
     return LogProbTrace(
         schema_version="v2.0",
         case_id=row["case_id"],
@@ -240,10 +242,10 @@ def _row_to_trace(row: dict[str, Any]) -> LogProbTrace:
         article_token_count=int(row["article_token_count"]),
         raw_token_ids=[int(x) for x in row["raw_token_ids"]],
         token_logprobs=[float(x) for x in row["token_logprobs"]],
-        top_alternative_logprobs=(
+        top_logprobs=(
             [[float(lp) for lp in inner] for inner in top_lps_raw]
             if top_lps_raw is not None and len(top_lps_raw) > 0
-            else []
+            else None
         ),
         top_logprobs_k=int(row.get("top_logprobs_k") or 0),
         prefix_token_count=int(row.get("prefix_token_count") or 0),

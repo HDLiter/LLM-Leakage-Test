@@ -112,8 +112,9 @@ Hence Path E.
 
 ### 2.4 Path E — empirical cutoff probe
 
-Build a temporally-stratified dataset from CLS source corpus
-(`D:\GitRepos\Thales\datasets\cls_telegraph_raw`):
+Build a temporally-stratified dataset from the local CLS source snapshot
+(`data/cls_telegraph_raw`, refreshed from the Thales companion repo before
+cloud spend):
 
 - 60 articles per month from 2023-01 (inclusive) to 2025-12 (inclusive)
 - 36 months × 60 = **2,160 articles** (the original "24 months / 1,440"

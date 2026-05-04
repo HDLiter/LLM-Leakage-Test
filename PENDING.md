@@ -100,7 +100,7 @@
 - **Resolved 2026-05-03**: user completed Meta gated-repo approval; `HF_TOKEN` authenticates as `HDLiter`, and authenticated HEAD checks to `config.json` return HTTP 200 for `meta-llama/Meta-Llama-3-8B-Instruct` and `meta-llama/Llama-3.1-8B-Instruct`. `config/fleet/r5a_fleet.yaml` was canonicalized to the non-redirect Llama-3.1 repo id.
 
 ### BL2 post-cutoff sample expansion — CLS extraction beyond 2026-02
-- **Resolved 2026-05-03**: `D:\GitRepos\Thales\datasets\cls_telegraph_raw` now contains CLS files through 2026-05-03. Verified `>= 2026-02-01` coverage: 93 daily files, 55,324 raw items, 46,117 title+body eligible items, enough for the 350-case BL2 post-cutoff bucket. Do not copy the raw corpus into this repo; it is ignored under `data/cls_telegraph_raw/` and WS4 should read Thales directly, then commit only derived manifest artifacts.
+- **Resolved 2026-05-03**: copied the refreshed CLS snapshot from `D:\GitRepos\Thales\datasets\cls_telegraph_raw` into this repo's ignored `data/cls_telegraph_raw/` to isolate LLM-Leakage-Test from future Thales corpus changes. Verified mirror size: 2,316 top-level files, 975,459,494 bytes, through 2026-05-03. Verified `>= 2026-02-01` coverage: 93 daily files, 55,324 raw items, 46,117 title+body eligible items, enough for the 350-case BL2 post-cutoff bucket.
 
 ---
 

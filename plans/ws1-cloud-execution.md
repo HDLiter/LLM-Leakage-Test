@@ -271,7 +271,7 @@ statements with a same-corpus control.
 # 1. build the fixture (run once, ideally locally before scp-ing the
 #    JSON up to the cloud — avoids needing the full CLS corpus on cloud)
 python scripts/build_cutoff_probe_set.py \
-  --source D:\GitRepos\Thales\datasets\cls_telegraph_raw \
+  --source data\cls_telegraph_raw \
   --start 2023-01 --end 2025-12 \
   --per-month 60 \
   --output data/pilot/cutoff_probe/probe_set_monthly60_36mo.json

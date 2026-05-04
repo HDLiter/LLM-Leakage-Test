@@ -14,8 +14,9 @@ import random
 from pathlib import Path
 from collections import Counter
 
-CLS_DIR = Path("D:/GitRepos/Thales/datasets/cls_telegraph_raw")
-OUTPUT = Path("D:/GitRepos/LLM-Leakage-Test/data/seed/expansion_candidates.json")
+REPO_ROOT = Path(__file__).resolve().parents[1]
+CLS_DIR = REPO_ROOT / "data" / "cls_telegraph_raw"
+OUTPUT = REPO_ROOT / "data" / "seed" / "expansion_candidates.json"
 
 random.seed(42)
 

@@ -7,8 +7,8 @@ through `scripts/ws1_run_logprob.py --smoke --fixture <output>` to obtain
 LogProbTraces. Knee detection + exposure-horizon extraction happens in
 `scripts/run_exposure_horizon_analysis.py`.
 
-The CLS source layout (per project memory `infra_capabilities.md` and
-the Thales companion repo) is daily-partitioned JSON:
+The CLS source layout is daily-partitioned JSON in the local snapshot
+under `data/cls_telegraph_raw`:
 
     <CLS_RAW>/YYYY-MM-DD.json
         {"date": "...", "items": [{"id", "title", "content", "time",
@@ -37,7 +37,7 @@ if str(REPO_ROOT) not in sys.path:
 
 from src.r5a.contracts import ArticleRecord, HostCategory  # noqa: E402
 
-DEFAULT_SOURCE = Path(r"D:\GitRepos\Thales\datasets\cls_telegraph_raw")
+DEFAULT_SOURCE = REPO_ROOT / "data" / "cls_telegraph_raw"
 DEFAULT_OUTPUT = (
     REPO_ROOT
     / "data"

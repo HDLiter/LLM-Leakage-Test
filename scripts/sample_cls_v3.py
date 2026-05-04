@@ -29,9 +29,10 @@ from typing import Any
 import jieba
 
 # ── Configuration ────────────────────────────────────────────────────────────
-CLS_DIR = Path("D:/GitRepos/Thales/datasets/cls_telegraph_raw")
-OUTPUT = Path("D:/GitRepos/LLM-Leakage-Test/data/seed/expansion_candidates_v3.json")
-EXISTING_CASES = Path("D:/GitRepos/LLM-Leakage-Test/data/seed/test_cases_expanded.json")
+REPO_ROOT = Path(__file__).resolve().parents[1]
+CLS_DIR = REPO_ROOT / "data" / "cls_telegraph_raw"
+OUTPUT = REPO_ROOT / "data" / "seed" / "expansion_candidates_v3.json"
+EXISTING_CASES = REPO_ROOT / "data" / "seed" / "test_cases_expanded.json"
 
 CUTOFF_DATE = "2025-10"  # files >= this are post-cutoff
 TARGET_HIGH_PER_PERIOD = 125  # 125 pre + 125 post = 250 high-anchor total

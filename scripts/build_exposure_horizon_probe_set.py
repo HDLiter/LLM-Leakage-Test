@@ -1,8 +1,9 @@
 """Build the Path-E exposure-horizon probe set from local CLS raw data.
 
 The probe is month-stratified: 60 eligible articles per month across
-2023-01..2025-12 by default. Source files are the Thales CLS raw daily
-JSON shards (`YYYY-MM-DD.json`). The script never calls model APIs.
+2023-01..2025-12 by default. Source files are the local CLS raw snapshot
+under `data/cls_telegraph_raw` (`YYYY-MM-DD.json`). The script never
+calls model APIs.
 """
 
 from __future__ import annotations
@@ -21,7 +22,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-DEFAULT_CLS_ROOT = Path(r"D:\GitRepos\Thales\datasets\cls_telegraph_raw")
+DEFAULT_CLS_ROOT = REPO_ROOT / "data" / "cls_telegraph_raw"
 DEFAULT_OUT = (
     REPO_ROOT
     / "data"

@@ -30,8 +30,9 @@ import jieba
 from rank_bm25 import BM25Okapi
 
 # ── Configuration ────────────────────────────────────────────────────────────
-CLS_DIR = Path("D:/GitRepos/Thales/datasets/cls_telegraph_raw")
-OUTPUT = Path("D:/GitRepos/LLM-Leakage-Test/data/cache/cls_bm25_index.pkl")
+REPO_ROOT = Path(__file__).resolve().parents[1]
+CLS_DIR = REPO_ROOT / "data" / "cls_telegraph_raw"
+OUTPUT = REPO_ROOT / "data" / "cache" / "cls_bm25_index.pkl"
 CORPUS_CUTOFF = "2025-09-30"  # last day inclusive (DeepSeek-chat training cutoff)
 MIN_CONTENT_LEN = 30          # drop ultra-short stub items
 SANITY_QUERIES = ["央行降准", "证监会", "宁德时代"]

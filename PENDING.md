@@ -26,14 +26,6 @@
 - **Owner**: cloud-run operator (Claude Code on AutoDL session).
 - **Target resolution date**: before WS1 pilot run.
 
-### BL2 post-cutoff sample expansion — CLS extraction beyond 2026-02
-- **Context**: `docs/DECISION_20260429_gate_removal.md` §3.3 + plan §6.2 expanded BL2 post-cutoff bucket from 20 → 350 cases, sampled from `>= 2026-02-01`. The original 20-case sampling pool is insufficient for this volume.
-- **External action needed**: extract additional CLS articles published `>= 2026-02-01` to support 350-case sampling with category quotas (policy / corporate / industry / macro). User to trigger CLS scrape; Claude Code to flag this when WS4 sampling step is reached.
-- **Blocking**: WS4 pilot manifest freeze (the 350-case post-cutoff bucket cannot be sampled without expanded corpus).
-- **Owner**: user (data extraction) + Claude Code (sampling script + reminder hook at WS4).
-- **Target resolution date**: before WS4 pilot manifest freeze.
-- **Notes**: Implementation must NOT silently fall back to fewer than 350 articles without a memo. Tracked as Tier-0 reminder per session.
-
 ### WS6 — mechanistic analysis (now unconditional, eager pre-compute)
 - **Context**: `docs/DECISION_20260429_gate_removal.md` §2.4 / §3.2 made WS6 unconditional; hidden states pre-computed in WS1 cloud Stage 2.7 (Path C, ~5 hr GPU). The earlier conditional trigger (`>= 5/9` then `>= 5/14`) is retired alongside the gate that produced it.
 - **Investigation needed**: after WS1 Stage 2.7 hidden states are downloaded, scope WS6 analysis modules (DS via logit-lens, layer-wise KL, activation patching) for WS5. No GPU rerun required since hidden states are pre-computed.
@@ -106,6 +98,9 @@
 
 ### Llama fleet addition — Meta HF gating pre-flight
 - **Resolved 2026-05-03**: user completed Meta gated-repo approval; `HF_TOKEN` authenticates as `HDLiter`, and authenticated HEAD checks to `config.json` return HTTP 200 for `meta-llama/Meta-Llama-3-8B-Instruct` and `meta-llama/Llama-3.1-8B-Instruct`. `config/fleet/r5a_fleet.yaml` was canonicalized to the non-redirect Llama-3.1 repo id.
+
+### BL2 post-cutoff sample expansion — CLS extraction beyond 2026-02
+- **Resolved 2026-05-03**: `D:\GitRepos\Thales\datasets\cls_telegraph_raw` now contains CLS files through 2026-05-03. Verified `>= 2026-02-01` coverage: 93 daily files, 55,324 raw items, 46,117 title+body eligible items, enough for the 350-case BL2 post-cutoff bucket. Do not copy the raw corpus into this repo; it is ignored under `data/cls_telegraph_raw/` and WS4 should read Thales directly, then commit only derived manifest artifacts.
 
 ---
 

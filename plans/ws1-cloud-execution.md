@@ -418,7 +418,7 @@ decision memo before publishing PCSG results).
 - [x] RTX PRO 6000 chosen, budget approved (raised to $45 on 2026-04-29)
 - [x] HF fine-grained read-only token created (user, 2026-04-26)
 - [x] **HF Meta license click-through complete for both Llama-3-8B-Instruct and Llama-3.1-8B-Instruct** (verified 2026-05-03 via authenticated `config.json` HEAD checks for `meta-llama/Meta-Llama-3-8B-Instruct` and `meta-llama/Llama-3.1-8B-Instruct`; no weight files downloaded).
-- [ ] Stage 0 modules + tests merged
+- [x] Stage 0 modules + tests merged into `main` (2026-05-03, `main` fast-forwarded to `859ed79`)
 - [x] Stage 0 smoke fixture committed (`data/pilot/fixtures/smoke_30.json`, 30 cases, sha256 `1862e4e7a6286a6b49a635f246366120d4f5a51b3143725cdb4eedc0fbdf1576`)
 - [ ] AutoDL account ready
 - [ ] Stage 1 instance reserved
@@ -433,10 +433,9 @@ decision memo before publishing PCSG results).
 
 ## 9. Handoff State (2026-05-03)
 
-This branch (`r2-tier1-cloud-closure`) is ready for a new cloud-bring-up
-session after it is either merged or explicitly checked out on the cloud
-worker. The unchecked "Stage 0 modules + tests merged" item above is a
-process state, not a known implementation gap.
+This handoff is now on `main` as of commit `859ed79` (fast-forwarded
+from `r2-tier1-cloud-closure`). The Stage 0 modules/tests merge item is
+closed; the next session can start from `main`.
 
 Local closure already completed:
 

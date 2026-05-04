@@ -430,3 +430,57 @@ decision memo before publishing PCSG results).
 - [ ] Path E `cutoff_observed.json` produced and joined into RunManifest via `scripts/ws1_finalize_run_manifest.py` (Tier-0 #4)
 - [ ] Llama differential calibration check passes (`cutoff_observed(llama-3.1) - cutoff_observed(llama-3) ≈ 9 months` within bootstrap CI; per `docs/DECISION_20260429_llama_addition.md` §2.4)
 - [ ] Instance + data disk torn down
+
+## 9. Handoff State (2026-05-03)
+
+This branch (`r2-tier1-cloud-closure`) is ready for a new cloud-bring-up
+session after it is either merged or explicitly checked out on the cloud
+worker. The unchecked "Stage 0 modules + tests merged" item above is a
+process state, not a known implementation gap.
+
+Local closure already completed:
+
+- Fleet is `r5a-v2.3-2026-05-03`; the cardinality sentinel remains
+  14 P_predict-eligible / 12 P_logprob-eligible / 2 temporal PCSG pairs.
+- Black-box provider smoke passed with `scripts/smoke_provider_slugs.py`:
+  DeepSeek official `deepseek-v4-pro`, OpenRouter `openai/gpt-4.1`,
+  OpenRouter `openai/gpt-5.1`, and OpenRouter
+  `anthropic/claude-sonnet-4.6`.
+- HF gated access for both Llama repos passed authenticated
+  `config.json` HEAD checks; no weight files were downloaded locally.
+- `data/pilot/fixtures/smoke_30.json` is committed and covered by a
+  contract/hash test.
+- `data/pilot/exposure_horizon/probe_set_monthly60_36mo.json` exists
+  locally and is intentionally ignored; ship it with the WS1 cloud data
+  bundle.
+- `data/cls_telegraph_raw/` is an ignored local snapshot copied from
+  Thales on 2026-05-03 (2,316 top-level files, 975,459,494 bytes,
+  through 2026-05-03). Sampling/probe scripts now default to this local
+  snapshot rather than reading the Thales repo directly.
+
+Last local verification before handoff:
+
+```text
+pytest tests/r5a -q
+140 passed
+
+python scripts/smoke_phase7.py --check-config
+fleet_version: r5a-v2.3-2026-05-03
+black_box (4): deepseek-v4-pro, gpt-4.1, gpt-5.1, claude-sonnet-4.6
+p_predict_eligible (14)
+p_logprob_eligible (12)
+pcsg.temporal_pairs (2)
+```
+
+Recommended next-session order:
+
+1. Merge or explicitly deploy `r2-tier1-cloud-closure`; do not launch
+   cloud work from stale `main`.
+2. Reserve the Stage 1 GPU instance and run the provisioning script.
+3. Download/pin all 12 white-box HF snapshots and record the vLLM image
+   digest.
+4. Run `scripts/ws1_pin_fleet.py --hf-cache <path>
+   --vllm-image-digest sha256:<64-hex>` and commit the pinned fleet.
+5. Run the 30-case smoke fixture first. Full pilot-manifest traces still
+   depend on WS0.5/WS3/WS4 manifest freeze; Path E can run from the
+   prebuilt 2,160-article probe set.

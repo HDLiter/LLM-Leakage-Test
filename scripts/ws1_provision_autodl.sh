@@ -8,7 +8,9 @@
 # network on AutoDL cannot reach huggingface.co).
 #
 # AutoDL container instances are already Docker-isolated and do not support
-# nested Docker. The existing `vllm_image_digest` trace/manifest field stores
+# nested Docker. AutoDL platform image save/migration can move the instance
+# environment, but it is not a repository-managed Docker image. The existing
+# `vllm_image_digest` trace/manifest field stores
 # `/data/vllm_runtime_provenance.json`'s `sha256:<64-hex>` digest on this path.
 #
 # Per-model download/launch is left to the operator (see Stage 2 in the

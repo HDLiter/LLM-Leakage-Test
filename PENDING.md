@@ -6,7 +6,7 @@
 >
 > **Update rule**: when an item resolves, move it to `## Recently closed` at the bottom (keep for ~30 days), then delete. Do not silently remove — the history matters.
 >
-> **Last updated**: 2026-05-03
+> **Last updated**: 2026-05-04
 
 ---
 
@@ -35,6 +35,19 @@
   cloud repo is staged at `/data/repo`, with
   `/data -> /root/autodl-tmp/data`, `.env` copied with `0600`, and
   `data/pilot/exposure_horizon/probe_set_monthly60_36mo.json` copied.
+  Follow-up non-Docker provision completed on the same instance at repo HEAD
+  `f378d86` and wrote runtime digest
+  `sha256:a5f57079381be329fa35e18101b52027f5feaea01098dbef4040fe6d10b102dd`
+  from `vllm==0.10.0`, `torch==2.7.1+cu126`, and the RTX PRO 6000
+  Blackwell device. AutoDL platform image save/migration can preserve or move
+  the instance environment operationally, but it is not a repository-managed
+  Docker image digest; because the WS1 runtime venv and caches live under
+  `/data`, migration must include the data disk or rerun provisioning.
+  Current blocker: Torch warns that RTX PRO 6000 reports CUDA capability
+  `sm_120`, while the installed Torch wheel supports only through `sm_90`.
+  Do not proceed to all-model snapshot pinning or the 30-case smoke until the
+  Blackwell-compatible vLLM/Torch runtime is selected, or the operator
+  deliberately approves a tiny `qwen2.5-7b` compatibility smoke that may fail.
 
 ### WS6 — mechanistic analysis (now unconditional, eager pre-compute)
 - **Context**: `docs/DECISION_20260429_gate_removal.md` §2.4 / §3.2 made WS6 unconditional; hidden states pre-computed in WS1 cloud Stage 2.7 (Path C, ~5 hr GPU). The earlier conditional trigger (`>= 5/9` then `>= 5/14`) is retired alongside the gate that produced it.

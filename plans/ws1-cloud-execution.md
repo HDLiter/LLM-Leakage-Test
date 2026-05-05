@@ -69,6 +69,13 @@ installs/validates vLLM in the Python environment and writes
 AutoDL; Docker deployments, if ever run on bare metal, may still store
 the Docker image digest.
 
+AutoDL's platform image save/migration can preserve the instance environment
+for reuse, but WS1 does not manage a pullable Docker image. The reproducibility
+contract is therefore the runtime provenance digest plus the JSON payload it
+hashes. Because the WS1 venv and caches are placed under `/data` to avoid the
+30 GB system disk, migrating this environment requires migrating/copying the
+data disk as well, or rerunning provisioning on the next instance.
+
 OpenRouter and similar API gateways are *not* viable for WS1 because
 every hosted API has stripped prompt-side `echo=True` logprobs (project
 memory `infra_capabilities.md` confirms DeepSeek explicitly forbids the
@@ -524,3 +531,15 @@ Stage 1 attempt update (2026-05-04):
   converts WS1 to the non-Docker host vLLM runtime path while preserving
   the `sha256:<64-hex>` hard provenance gate via
   `/data/vllm_runtime_provenance.json`.
+- Follow-up non-Docker provision completed on the same instance at repo HEAD
+  `f378d86`, with runtime digest
+  `sha256:a5f57079381be329fa35e18101b52027f5feaea01098dbef4040fe6d10b102dd`,
+  `vllm==0.10.0`, `torch==2.7.1+cu126`, `transformers==4.57.6`, and
+  `huggingface_hub==0.36.2`. The runtime venv and caches are on the data
+  disk; system disk remained at roughly 320 MB used, while `/data` used
+  roughly 13 GB.
+- Current blocker: Torch reports that RTX PRO 6000 Blackwell has CUDA
+  capability `sm_120`, while the installed Torch wheel supports only through
+  `sm_90`. Stop before all-model snapshot pinning or the 30-case smoke until
+  a Blackwell-compatible vLLM/Torch runtime is selected, or explicitly approve
+  a tiny `qwen2.5-7b` compatibility smoke as a bounded failure probe.

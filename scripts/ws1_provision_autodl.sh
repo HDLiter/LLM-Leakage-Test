@@ -26,6 +26,7 @@
 #
 # Optional env:
 #   VLLM_PIP_SPEC                    defaults to "vllm==0.10.2"
+#   ACCELERATE_PIP_SPEC              defaults to "accelerate==1.13.0"
 #   WS1_SKIP_VLLM_INSTALL            set to 1 to skip pip installing vLLM
 #   WS1_VENV_SYSTEM_SITE_PACKAGES    defaults to 1 so the venv inherits the
 #                                    AutoDL image's Blackwell-compatible torch
@@ -38,17 +39,19 @@ set -euo pipefail
 # first WS1-validated Blackwell path on AutoDL when paired with the base
 # image's torch 2.8.0+cu128.
 VLLM_PIP_SPEC="${VLLM_PIP_SPEC:-vllm==0.10.2}"
+ACCELERATE_PIP_SPEC="${ACCELERATE_PIP_SPEC:-accelerate==1.13.0}"
 DATA_ROOT="${DATA_ROOT:-/data}"
 WS1_VENV="${WS1_VENV:-${DATA_ROOT}/venvs/ws1-cu128}"
 WS1_VENV_SYSTEM_SITE_PACKAGES="${WS1_VENV_SYSTEM_SITE_PACKAGES:-1}"
 HF_ENDPOINT="${HF_ENDPOINT:-https://hf-mirror.com}"
 
 echo "== ws1_provision_autodl =="
-echo "VLLM_PIP_SPEC = ${VLLM_PIP_SPEC}"
-echo "DATA_ROOT      = ${DATA_ROOT}"
-echo "WS1_VENV       = ${WS1_VENV}"
-echo "SYSTEM_SITE    = ${WS1_VENV_SYSTEM_SITE_PACKAGES}"
-echo "HF_ENDPOINT    = ${HF_ENDPOINT}"
+echo "VLLM_PIP_SPEC       = ${VLLM_PIP_SPEC}"
+echo "ACCELERATE_PIP_SPEC = ${ACCELERATE_PIP_SPEC}"
+echo "DATA_ROOT           = ${DATA_ROOT}"
+echo "WS1_VENV            = ${WS1_VENV}"
+echo "SYSTEM_SITE         = ${WS1_VENV_SYSTEM_SITE_PACKAGES}"
+echo "HF_ENDPOINT         = ${HF_ENDPOINT}"
 
 if ! command -v python >/dev/null 2>&1 && [[ -x /root/miniconda3/bin/python ]]; then
     export PATH="/root/miniconda3/bin:${PATH}"
@@ -155,6 +158,11 @@ else
     echo "WS1_SKIP_VLLM_INSTALL=1; skipping vLLM pip install"
 fi
 
+# GLM's fleet-declared offline_hf fallback loads with device_map="cuda",
+# which requires accelerate. Install it by default after vLLM/Torch
+# resolution so the validated Blackwell torch stack is preserved.
+python -m pip install "${ACCELERATE_PIP_SPEC}"
+
 python - <<'PY'
 import sys
 
@@ -181,15 +189,14 @@ if torch.cuda.is_available():
         )
 PY
 
-# transformers + torch are installed only if --with-torch is requested,
-# since vLLM normally pulls its own compatible torch stack and we only need
-# accelerate on the host for the offline_hf fallback path.
+# An explicit torch install is normally unnecessary on the validated AutoDL
+# Blackwell path because the venv inherits the base torch wheel and accelerate
+# is installed above for the GLM offline_hf fallback.
 if [[ " $* " == *" --with-torch "* ]]; then
     echo "installing torch + transformers (offline_hf fallback path)"
     python -m pip install \
         "torch>=2.4" \
-        "transformers>=4.45" \
-        "accelerate>=0.30"
+        "transformers>=4.45"
 fi
 
 # 6. HF login (token, no git credential helper)
@@ -255,6 +262,6 @@ GLM-4-9B requires --trust-remote-code (custom ChatGLM4Tokenizer):
   python scripts/ws1_run_logprob.py \
       --model glm-4-9b --smoke --backend offline_hf \
       --model-path /data/models/glm-4-9b --device cuda --torch-dtype float16
-  # (offline_hf path requires this script was run with --with-torch)
+  # (offline_hf path uses the default accelerate install plus inherited torch)
 
 EOF

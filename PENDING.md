@@ -21,20 +21,20 @@
 
 ### WS1 white-box fleet pinning
 - **Context**: `config/fleet/r5a_fleet.yaml` still carries `<TBD>` for `tokenizer_sha` and `hf_commit_sha` on all 12 white-box entries. Plan §10.1 forbids confirmatory runs with `<TBD>` placeholders; the PR1 validators and confirmatory hard-fail gate prevent these placeholders from silently landing in a final manifest.
-- **External action needed**: on AutoDL Stage 1, after `huggingface-cli download` completes for each white-box model, run `python scripts/ws1_pin_fleet.py --hf-cache <path> --vllm-image-digest sha256:<64-hex>` to discover the loaded HF snapshot commit and SHA-256 tokenizer content hash, write them into `config/fleet/r5a_fleet.yaml`, append the pinning log, and rebump `fleet_version`.
+- **External action needed**: on AutoDL Stage 1, after `huggingface-cli download` completes for each white-box model, run `python scripts/ws1_pin_fleet.py --hf-cache <path> --vllm-image-digest "$(cat /data/vllm_runtime_digest.txt)"` to discover the loaded HF snapshot commit and SHA-256 tokenizer content hash, write them into `config/fleet/r5a_fleet.yaml`, append the pinning log, and rebump `fleet_version`.
 - **Blocking**: WS1 cloud run final commit. Smoke runs allowed pre-pin.
 - **Owner**: cloud-run operator (Claude Code on AutoDL session).
 - **Target resolution date**: before WS1 pilot run.
 - **Notes**: 2026-05-04 Stage 1 attempt on
   `connect.westd.seetacloud.com:10349` reached HF auth and dependency
-  install, but the selected AutoDL image has no `docker` CLI/daemon, so
-  `scripts/ws1_provision_autodl.sh` stopped at `docker: command not
-  found` before vLLM image digest capture. The cloud repo is staged at
-  `/data/repo`, with `/data -> /root/autodl-tmp/data`, `.env` copied
-  with `0600`, and
+  install, but AutoDL container instances do not support nested Docker, so
+  the original Docker image path stopped at `docker: command not found`.
+  `docs/DECISION_20260504_autodl_nondocker_runtime.md` converts WS1 to a
+  non-Docker host vLLM runtime while preserving the `sha256:<64-hex>`
+  hard provenance gate through `/data/vllm_runtime_provenance.json`. The
+  cloud repo is staged at `/data/repo`, with
+  `/data -> /root/autodl-tmp/data`, `.env` copied with `0600`, and
   `data/pilot/exposure_horizon/probe_set_monthly60_36mo.json` copied.
-  Resume after switching to a Docker-capable/vLLM-capable AutoDL image
-  or explicitly approving a non-Docker vLLM runtime design.
 
 ### WS6 — mechanistic analysis (now unconditional, eager pre-compute)
 - **Context**: `docs/DECISION_20260429_gate_removal.md` §2.4 / §3.2 made WS6 unconditional; hidden states pre-computed in WS1 cloud Stage 2.7 (Path C, ~5 hr GPU). The earlier conditional trigger (`>= 5/9` then `>= 5/14`) is retired alongside the gate that produced it.

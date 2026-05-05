@@ -13,7 +13,7 @@ as-is):
   1. `--pin-json PATH` — JSON map `{model_id: {hf_commit_sha,
      tokenizer_sha, [revision]}}` for cases where auto-discovery fails
      (e.g., no HF cache available because models are pre-baked into the
-     Docker image). Unknown model_ids in the JSON are rejected so a
+     runtime image). Unknown model_ids in the JSON are rejected so a
      typo cannot silently no-op a confirmatory pinning run.
 
   2. `--hf-cache DIR` — HuggingFace hub cache root (default precedence:
@@ -56,7 +56,9 @@ Usage:
 The `--vllm-image-digest` value is NOT written into the fleet YAML
 (it's a per-run, not per-model, field; recorded in RunManifest by
 `scripts/ws1_finalize_run_manifest.py`). It is required for non-`--check`
-runs and must match the regex `sha256:<64-hex>`; recorded into
+runs and must match the regex `sha256:<64-hex>`. On AutoDL non-Docker
+runs this is `/data/vllm_runtime_provenance.json`'s digest, not a Docker
+image digest. The value is recorded into
 `data/pilot/.fleet_pinning_log.json`.
 """
 
@@ -116,8 +118,9 @@ def parse_args() -> argparse.Namespace:
         required=False,
         default=None,
         help=(
-            "Docker image digest used during pinning; required for non-check "
-            "runs (must match sha256:<64-hex>); recorded in pinning log"
+            "vLLM runtime provenance digest used during pinning; required "
+            "for non-check runs (must match sha256:<64-hex>); recorded in "
+            "pinning log"
         ),
     )
     p.add_argument(

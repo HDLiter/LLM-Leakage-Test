@@ -2,7 +2,7 @@
 #
 # Concurrency caps and the trust_env=false / proxy=none policy are
 # load-bearing: project memory `feedback_concurrency.md` records that
-# the local proxy interferes with DeepSeek and the dockerized vLLM
+# the local proxy interferes with DeepSeek and the local vLLM
 # endpoint, and `feedback_concurrency.md` records that 50 (the legacy
 # default) overruns DeepSeek and the local GPU.
 

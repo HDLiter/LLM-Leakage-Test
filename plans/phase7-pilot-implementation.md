@@ -164,7 +164,7 @@ The ML Engineer feasibility gate should occur twice:
    - `trust_env: false`
    - `proxy: none`
    - cache mode and seed policy.
-5. Freeze the manifest schema with hashable fields. A run manifest must include prompt versions, config hashes, model fingerprints, Docker image digests for white-box endpoints, and git commit SHA of the repository.
+5. Freeze the manifest schema with hashable fields. A run manifest must include prompt versions, config hashes, model fingerprints, vLLM runtime digests for white-box endpoints, and git commit SHA of the repository.
 6. Add a smoke-test harness `scripts/smoke_phase7.py` that validates the fleet manifest, loads the runtime config, and checks one request path per provider.
 7. Before WS2 deep implementation is considered open, run a minimal nine-model `P_predict` feasibility smoke with the frozen zero-shot baseline prompt. The WS0 feasibility gate requires all 9 models to achieve strict-JSON parse success `>= 95%` on a 20-case smoke set, using adapter hardening only and no semantic prompt edits.
 
@@ -1036,7 +1036,7 @@ White-box runs must pin:
 
 - HF model repo and commit SHA;
 - tokenizer repo and commit SHA;
-- vLLM Docker image tag and digest;
+- vLLM runtime provenance digest (Docker image digest on bare-metal Docker runs, `vllm_runtime_provenance.json` digest on AutoDL container runs);
 - GPU dtype/quantization setting;
 - launch command and environment variables.
 
@@ -1112,7 +1112,7 @@ Each pilot run should emit `data/pilot/manifests/run_{timestamp}.json` containin
 - prompt versions;
 - model fingerprints;
 - white-box checkpoint SHAs (per `cutoff_source`, `tokenizer_sha`, `hf_commit_sha`, `quant_scheme`);
-- vLLM image tag and digest; GPU dtype; launch command and environment variables;
+- vLLM runtime provenance digest; GPU dtype; launch command and environment variables;
 - runtime caps;
 - seed policy;
 - request-lineage database path and hash;

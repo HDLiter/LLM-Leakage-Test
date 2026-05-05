@@ -44,8 +44,8 @@ class OfflineHFBackend:
         tokenizer_family / tokenizer_sha / hf_commit_sha: pinning fields.
         quant_scheme: e.g. ``"fp16"`` or ``"AWQ-INT4"``; recorded into trace.
         weight_dtype: e.g. ``"float16"``; recorded.
-        vllm_image_digest: run-level Docker image digest recorded for
-            trace provenance; dev smoke traces may pass ``"dev-unpinned"``.
+        vllm_image_digest: run-level vLLM runtime provenance digest recorded
+            for trace provenance; dev smoke traces may pass ``"dev-unpinned"``.
         device: ``"cuda"`` (default) or ``"cpu"``.
         torch_dtype: ``"float16"`` (default), ``"bfloat16"``, or ``"float32"``.
         top_logprobs: how many alternative-token logprobs to record per

@@ -3,7 +3,7 @@
 Per Tier-0 #4 (`refine-logs/reviews/R5A_DESIGN_REVIEW_20260427/SYNTHESIS.md`)
 + Operational §6: a confirmatory cloud run is non-reproducible without
 a single artifact joining together pinned fleet + main traces + Path E
-output + pcsg_pairs hash + Docker digest + sub-artifact hashes. This
+output + pcsg_pairs hash + vLLM runtime digest + sub-artifact hashes. This
 script writes that artifact (`RunManifest`).
 
 2026-04-30 R2 amendments
@@ -45,7 +45,7 @@ Inputs (file paths; missing optional inputs are recorded as `None`):
                        hash is independent of article_manifest_hash
   --perturbation-manifest   (optional) C_CO/C_NoOp output manifest
   --audit-manifest     (optional) audit manifest
-  --vllm-image-digest  Docker image digest used for the run
+  --vllm-image-digest  vLLM runtime provenance digest used for the run
   --gpu-dtype          backend launch dtype (e.g. "bf16", "fp16")
   --launch-env         JSON file with the run's environment snapshot
                        (CUDA_VISIBLE_DEVICES, vLLM args, NO_PROXY, etc.)
@@ -197,7 +197,9 @@ def parse_args() -> argparse.Namespace:
         "--vllm-image-digest",
         default=None,
         help=(
-            "Docker image digest for the vLLM backend, sha256:<64-hex> "
+            "vLLM runtime provenance digest, sha256:<64-hex>; Docker "
+            "deployments use the image digest, AutoDL container deployments "
+            "use /data/vllm_runtime_provenance.json's digest "
             "(required in confirmatory mode)"
         ),
     )
@@ -796,7 +798,9 @@ def _confirmatory_hard_fail(
             "(run from a non-git checkout?); cannot record provenance."
         )
 
-    # vllm_image_digest must match sha256:<64-hex>.
+    # vllm_image_digest must match sha256:<64-hex>. On AutoDL non-Docker
+    # runs, this is the runtime provenance digest rather than a Docker
+    # image digest.
     digest = args.vllm_image_digest
     if not digest:
         failures.append(

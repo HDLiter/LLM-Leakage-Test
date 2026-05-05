@@ -58,8 +58,10 @@ class VLLMLogprobBackend:
         quant_scheme: e.g. ``"AWQ-INT4"`` or ``"fp16"``; recorded into trace.
         weight_dtype: ``"int4"`` / ``"bf16"`` / ``"fp16"``; inferred from
             quant_scheme when omitted.
-        vllm_image_digest: Docker image SHA in pilot/Path-E modes; dev
-            smoke traces use a non-null placeholder when omitted.
+        vllm_image_digest: vLLM runtime provenance digest in pilot/Path-E
+            modes; Docker deployments use the image SHA, AutoDL non-Docker
+            deployments use the runtime provenance JSON SHA, and dev smoke
+            traces use a non-null placeholder when omitted.
         timeout_seconds: per-HTTP-request timeout.
         max_retries: count of retries for transient failures only.
         top_logprobs: how many alternative tokens per position. Plan §5.2

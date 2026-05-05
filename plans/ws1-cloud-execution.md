@@ -3,13 +3,14 @@ title: WS1 Cloud Execution Plan — P_logprob on AutoDL RTX PRO 6000
 stage: Phase 7 / WS1
 date: 2026-04-26
 last_amended: 2026-04-29
-status: APPROVED — Stage 0 in progress; revised for fleet expansion + GPU upgrade + Stage 2.7 (WS6 Path C eager pre-compute) + Llama integration (DECISION_20260429_llama_addition)
+status: APPROVED — revised for fleet expansion + GPU upgrade + Stage 2.7 (WS6 Path C eager pre-compute) + Llama integration + AutoDL non-Docker vLLM runtime
 authority: plans/phase7-pilot-implementation.md §5.2 (WS1 spec)
 related_decisions:
   - docs/DECISION_20260426_phase7_interfaces.md (WS0 sign-off; partly superseded by 0427+0429)
   - docs/DECISION_20260427_pcsg_redefinition.md (PCSG redefinition + fleet expansion + Path E)
   - docs/DECISION_20260429_gate_removal.md (gate removal + WS6 unconditional via Stage 2.7 Path C eager pre-compute + BL2 n_post 350)
   - docs/DECISION_20260429_llama_addition.md (Llama-3 + Llama-3.1 P_logprob-only addition; second confirmatory PCSG pair; AWQ-vs-fp16 calibration audit)
+  - docs/DECISION_20260504_autodl_nondocker_runtime.md (AutoDL container instances do not support nested Docker; use host vLLM runtime provenance digest)
 gpu_decision: RTX PRO 6000 (Blackwell, 96 GB) single-card on AutoDL
 quantization_decision:
   qwen2_5_family: AWQ-INT4 (5 sizes — official Qwen AWQ)
@@ -57,13 +58,22 @@ published").
 
 ## 2. Platform
 
-**AutoDL** (Chinese GPU rental). SSH supported, mirror market includes
-official vLLM image, HF downloads via `hf-mirror.com`. OpenRouter and
-similar API gateways are *not* viable for WS1 because every hosted API
-has stripped prompt-side `echo=True` logprobs (project memory
-`infra_capabilities.md` confirms DeepSeek explicitly forbids the
-`echo+logprobs` combo; OpenAI chat API removed echo years ago;
-Anthropic exposes no logprobs). P_logprob requires direct vLLM access.
+**AutoDL** (Chinese GPU rental). SSH supported; HF downloads use
+`hf-mirror.com`. AutoDL container instances are themselves Docker-backed
+and do not support nested Docker, so WS1 uses a **non-Docker host vLLM
+runtime** in the AutoDL container. `scripts/ws1_provision_autodl.sh`
+installs/validates vLLM in the Python environment and writes
+`/data/vllm_runtime_provenance.json` plus
+`/data/vllm_runtime_digest.txt`. The existing trace/manifest field
+`vllm_image_digest` stores that `sha256:<64-hex>` runtime digest on
+AutoDL; Docker deployments, if ever run on bare metal, may still store
+the Docker image digest.
+
+OpenRouter and similar API gateways are *not* viable for WS1 because
+every hosted API has stripped prompt-side `echo=True` logprobs (project
+memory `infra_capabilities.md` confirms DeepSeek explicitly forbids the
+`echo+logprobs` combo; OpenAI chat API removed echo years ago; Anthropic
+exposes no logprobs). P_logprob requires direct vLLM access.
 
 ## 3. GPU and quantization
 
@@ -129,16 +139,19 @@ credential-side blocker in `PENDING.md`.
 
 ### Stage 1 — AutoDL bring-up (1 hr)
 
-1. Reserve A6000 48 GB + 50 GB disk; record region and host (latency
-   matters for HF mirror).
+1. Reserve RTX PRO 6000 96 GB with at least 100 GB data disk; record
+   region and host (latency matters for HF mirror).
 2. SSH in. Run `ws1_provision_autodl.sh`:
    - export `HF_ENDPOINT=https://hf-mirror.com`
    - `huggingface-cli login` with the user's fine-grained read-only token
-   - mkdir `/data/{models,traces,repo}`
-   - `docker pull vllm/vllm-openai:<version>` and capture digest
+   - create `/data/{models,traces,repo}` (`/data` symlinks to
+     `/root/autodl-tmp/data` on AutoDL container instances when needed)
+   - install/validate host vLLM (`VLLM_PIP_SPEC`, default `vllm==0.10.0`)
+   - capture `/data/vllm_runtime_provenance.json` and
+     `/data/vllm_runtime_digest.txt`
    - `git clone` or `rsync` repo into `/data/repo`
-3. Sanity: `nvidia-smi` confirms A6000; `vllm --version` matches the
-   pinned image.
+3. Sanity: `nvidia-smi` confirms RTX PRO 6000; the runtime provenance
+   digest is passed to every `--vllm-image-digest` argument.
 
 ### Stage 2 — Per-model loop (~11-13 hr, sequential)
 
@@ -168,23 +181,26 @@ Per-model script:
 huggingface-cli download Qwen/Qwen2.5-7B-Instruct-AWQ \
   --revision <pinned-sha> \
   --local-dir /data/models/qwen2.5-7b
-docker run -d --gpus all --rm \
-  -v /data/models/qwen2.5-7b:/model \
-  -p 8000:8000 \
-  vllm/vllm-openai@sha256:<digest> \
-  --model /model --served-model-name qwen2.5-7b \
-  --gpu-memory-utilization 0.9
+nohup python -m vllm.entrypoints.openai.api_server \
+  --model /data/models/qwen2.5-7b \
+  --served-model-name qwen2.5-7b \
+  --gpu-memory-utilization 0.9 \
+  --quantization awq_marlin \
+  > /data/traces/qwen2.5-7b.vllm.log 2>&1 &
+echo $! > /data/traces/qwen2.5-7b.vllm.pid
 # health
 curl -s http://localhost:8000/v1/models
 # smoke
 python scripts/ws1_run_logprob.py --model qwen2.5-7b --smoke \
   --vllm-url http://localhost:8000 \
+  --vllm-image-digest "$(cat /data/vllm_runtime_digest.txt)" \
   --fixture data/pilot/fixtures/smoke_30.json
 # pilot (only after smoke passes)
 python scripts/ws1_run_logprob.py --model qwen2.5-7b --pilot \
   --vllm-url http://localhost:8000 \
+  --vllm-image-digest "$(cat /data/vllm_runtime_digest.txt)" \
   --manifest data/pilot/manifests/pilot_100_cases.json
-docker stop $(docker ps -q --filter ancestor=vllm/vllm-openai)
+kill "$(cat /data/traces/qwen2.5-7b.vllm.pid)"
 ```
 
 Smoke gate per model:
@@ -226,7 +242,7 @@ for model_id in \
     qwen3-{4b,8b,14b,32b} \
     llama-3-8b-instruct llama-3.1-8b-instruct \
     glm-4-9b; do
-  docker stop $(docker ps -q --filter ancestor=vllm/vllm-openai) 2>/dev/null || true
+  pkill -f 'vllm.entrypoints.openai.api_server' 2>/dev/null || true
   python scripts/ws1_run_logprob.py \
     --model "$model_id" \
     --backend offline_hf \
@@ -312,14 +328,14 @@ full 430-case pilot manifest.
 
 ```bash
 # Reload Qwen2.5-7B in bf16 (no AWQ) on the same instance:
-docker stop $(docker ps -q --filter ancestor=vllm/vllm-openai) 2>/dev/null || true
-docker run -d --gpus all --rm \
-  -v /data/models/qwen2.5-7b-bf16:/model \
-  -p 8000:8000 \
-  vllm/vllm-openai@sha256:<digest> \
-  --model /model --served-model-name qwen2.5-7b-bf16 \
+pkill -f 'vllm.entrypoints.openai.api_server' 2>/dev/null || true
+nohup python -m vllm.entrypoints.openai.api_server \
+  --model /data/models/qwen2.5-7b-bf16 \
+  --served-model-name qwen2.5-7b-bf16 \
   --dtype bfloat16 \
-  --gpu-memory-utilization 0.9
+  --gpu-memory-utilization 0.9 \
+  > /data/traces/qwen2.5-7b-bf16.vllm.log 2>&1 &
+echo $! > /data/traces/qwen2.5-7b-bf16.vllm.pid
 
 python scripts/ws1_run_logprob.py \
   --model qwen2.5-7b \
@@ -328,7 +344,7 @@ python scripts/ws1_run_logprob.py \
   --vllm-url http://localhost:8000 \
   --served-model-name qwen2.5-7b-bf16 \
   --output-dir data/pilot/quant_calibration \
-  --vllm-image-digest sha256:...
+  --vllm-image-digest "$(cat /data/vllm_runtime_digest.txt)"
 ```
 
 **Local analysis** (after traces download):
@@ -388,7 +404,7 @@ decision memo before publishing PCSG results).
 - Run `scripts/ws1_pin_fleet.py` to write back tokenizer / hf_commit
   SHAs and bump fleet_version (Tier-0 #2).
 - Run `scripts/ws1_finalize_run_manifest.py` to join the pinned fleet
-  with traces + Path E output + pcsg_pairs hash + Docker digest +
+  with traces + Path E output + pcsg_pairs hash + vLLM runtime digest +
   hidden-state subset hash + quality-gate thresholds (Tier-0 #4).
 - Verify the resulting RunManifest carries all 6 new fields per plan
   §10.4 + DECISION_20260429_gate_removal §2.6 +
@@ -476,7 +492,7 @@ Recommended next-session order:
 1. Merge or explicitly deploy `r2-tier1-cloud-closure`; do not launch
    cloud work from stale `main`.
 2. Reserve the Stage 1 GPU instance and run the provisioning script.
-3. Download/pin all 12 white-box HF snapshots and record the vLLM image
+3. Download/pin all 12 white-box HF snapshots and record the vLLM runtime
    digest.
 4. Run `scripts/ws1_pin_fleet.py --hf-cache <path>
    --vllm-image-digest sha256:<64-hex>` and commit the pinned fleet.
@@ -497,9 +513,12 @@ Stage 1 attempt update (2026-05-04):
   to the cloud repo.
 - `scripts/ws1_provision_autodl.sh` completed Python dependency install
   and HF auth (`HDLiter`, private endpoint `https://hf-mirror.com`) after
-  CRLF cleanup, then stopped before vLLM image pull because the selected
-  AutoDL image has no `docker` CLI/daemon: `docker: command not found`.
-- No model snapshots, vLLM image digest, fleet pinning, smoke traces, or
-  full-run artifacts were produced in this attempt. Resume with a
-  Docker-capable/vLLM-capable AutoDL image, or make and document an
-  explicit non-Docker vLLM runtime decision before continuing.
+  CRLF cleanup, then stopped before vLLM image pull because AutoDL
+  container instances have no nested Docker support (`docker: command not
+  found`).
+- No model snapshots, runtime digest, fleet pinning, smoke traces, or
+  full-run artifacts were produced in this attempt.
+- Follow-up decision `docs/DECISION_20260504_autodl_nondocker_runtime.md`
+  converts WS1 to the non-Docker host vLLM runtime path while preserving
+  the `sha256:<64-hex>` hard provenance gate via
+  `/data/vllm_runtime_provenance.json`.

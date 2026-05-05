@@ -130,3 +130,34 @@ Validated probe result (2026-05-05):
 - 30-case smoke passed: `qwen2.5-7b__smoke.parquet` with 30 traces under
   `/data/traces/qwen2.5-7b-smoke-probe`; summary token range 55-726 and
   mean 174.97.
+
+## AutoDL Operator Notes
+
+These notes are operational guardrails from the 2026-05-05 bring-up, not
+changes to the experimental design.
+
+- AutoDL's SSH gateway can transiently accept TCP but fail before sending an
+  SSH banner (`Error reading SSH protocol banner`). Treat this as a gateway
+  transient; wait 30-60 seconds and retry before changing credentials or
+  rebuilding the instance.
+- HF/Xet large-file downloads can time out on `cas-bridge.xethub.hf.co` and
+  then resume successfully. Do not start a second download into the same
+  `--local-dir` while the first is alive; it will wait on Hugging Face lock
+  files and can confuse progress accounting. Check for active
+  `huggingface-cli`/`hf download` processes first, then resume only if no
+  process is holding the download.
+- If the AutoDL image or container is switched, `/data` may disappear even
+  though `/root/autodl-tmp/data` persists. Recreate the symlink before running
+  WS1 commands:
+
+  ```bash
+  [ -e /data ] || ln -s /root/autodl-tmp/data /data
+  ```
+
+- Do not use the old isolated venv path `/data/venvs/ws1`; it installed
+  `torch==2.7.1+cu126`. The validated path is `/data/venvs/ws1-cu128`, and
+  new shells should source that venv or rely on the `.bashrc` block installed
+  by `scripts/ws1_provision_autodl.sh`.
+- Stop probe vLLM servers after compatibility or smoke checks. Leaving them
+  idle holds GPU memory and can make later per-model launches look like model
+  failures when the real issue is a stale server or occupied port.

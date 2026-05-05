@@ -558,3 +558,21 @@ Stage 1 attempt update (2026-05-04):
   30-case smoke wrote 30 traces under `/data/traces/qwen2.5-7b-smoke-probe`.
   Blackwell runtime compatibility is no longer the blocker. Continue with
   all-model snapshot/tokenizer pinning using this runtime path.
+
+AutoDL operator notes from bring-up:
+
+- SSH may transiently fail after TCP connect with `Error reading SSH protocol
+  banner`; wait 30-60 seconds and retry before changing credentials or
+  rebuilding the instance.
+- HF/Xet large-file downloads may time out and then resume successfully. Do
+  not start a second `hf download`/`huggingface-cli download` into the same
+  `--local-dir` while the first process is alive; it will block on HF lock
+  files. Check active download processes first, then resume only if none are
+  running.
+- If `/data` disappears after an AutoDL image/container switch but
+  `/root/autodl-tmp/data` remains, recreate the symlink:
+  `[ -e /data ] || ln -s /root/autodl-tmp/data /data`.
+- Use only `/data/venvs/ws1-cu128`; the old `/data/venvs/ws1` isolated venv
+  installed `torch==2.7.1+cu126` and should stay removed.
+- Stop probe vLLM servers after smoke/compatibility checks so GPU memory and
+  port 8000 are free for the next model.

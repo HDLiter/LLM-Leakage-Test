@@ -75,3 +75,34 @@ compatibility warning: RTX PRO 6000 Blackwell reports CUDA capability
 `sm_120`, while that Torch wheel advertises support only through `sm_90`.
 Treat this as the current runtime blocker before snapshot pinning or smoke
 unless a deliberate tiny smoke is approved as a compatibility probe.
+
+The same AutoDL instance reports NVIDIA driver `595.58.03` and CUDA driver
+capability `13.2`, so the driver can host CUDA 12.8/12.9/13.0 wheels. The
+bad state is specifically the selected PyTorch wheel: `torch.version.cuda` is
+`12.6`, and `torch.cuda.get_arch_list()` lacks `sm_120`.
+
+Candidate Blackwell-compatible runtime selections, in order of preference:
+
+| Role | vLLM | PyTorch wheel | Reason |
+|---|---:|---:|---|
+| Preferred near-term WS1 choice | `vllm==0.10.2` | `torch==2.8.0+cu128` or `+cu129` | Smallest major movement from current `0.10.0`, but moves to a Blackwell-capable CUDA wheel. vLLM 0.10.2 declares `torch==2.8.0`; its install docs state Blackwell requires CUDA 12.8 minimum. |
+| Conservative newer fallback | `vllm==0.11.2` | `torch==2.9.0+cu128` or `+cu130` | Newer public vLLM with PyTorch 2.9.0 pin; larger dependency movement, so run the `qwen2.5-7b` smoke before pinning the fleet. |
+| Minimal-change fallback only | `vllm==0.10.0` | `torch==2.7.1+cu128` | Keeps current vLLM version and changes only CUDA wheel family. Lower confidence because the failed provision already found `0.10.0` easy to resolve to `+cu126` unless the PyTorch index/backend is pinned. |
+
+Do not select a `cu126` image or let pip resolve PyTorch from a generic mirror
+for WS1 on RTX PRO 6000 Blackwell. The acceptance check for any candidate is:
+
+```bash
+python - <<'PY'
+import torch
+print(torch.__version__)
+print(torch.version.cuda)
+print(torch.cuda.get_device_name(0))
+print(torch.cuda.get_device_capability(0))
+print(torch.cuda.get_arch_list())
+assert torch.cuda.get_device_capability(0) == (12, 0)
+assert "sm_120" in torch.cuda.get_arch_list()
+PY
+```
+
+Only after that check passes should WS1 run a bounded `qwen2.5-7b` smoke.

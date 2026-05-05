@@ -45,9 +45,15 @@
   `/data`, migration must include the data disk or rerun provisioning.
   Current blocker: Torch warns that RTX PRO 6000 reports CUDA capability
   `sm_120`, while the installed Torch wheel supports only through `sm_90`.
-  Do not proceed to all-model snapshot pinning or the 30-case smoke until the
-  Blackwell-compatible vLLM/Torch runtime is selected, or the operator
-  deliberately approves a tiny `qwen2.5-7b` compatibility smoke that may fail.
+  The instance driver reports CUDA driver capability `13.2`; the failure is
+  specifically the selected `torch==2.7.1+cu126` wheel. Recommended AutoDL
+  image/runtime selection is `vllm==0.10.2` with `torch==2.8.0+cu128` or
+  `+cu129`, followed by the `sm_120` arch-list check in
+  `docs/DECISION_20260504_autodl_nondocker_runtime.md` and a bounded
+  `qwen2.5-7b` smoke. `vllm==0.11.2` with `torch==2.9.0+cu128/+cu130` is the
+  newer fallback; `vllm==0.10.0` with `torch==2.7.1+cu128` is the
+  minimal-change fallback only. Do not proceed to all-model snapshot pinning
+  or the 30-case smoke until one candidate passes the `sm_120` check.
 
 ### WS6 — mechanistic analysis (now unconditional, eager pre-compute)
 - **Context**: `docs/DECISION_20260429_gate_removal.md` §2.4 / §3.2 made WS6 unconditional; hidden states pre-computed in WS1 cloud Stage 2.7 (Path C, ~5 hr GPU). The earlier conditional trigger (`>= 5/9` then `>= 5/14`) is retired alongside the gate that produced it.

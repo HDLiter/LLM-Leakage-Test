@@ -410,3 +410,68 @@ copying into the repo.
 - WS1 white-box fleet pinning is complete; the next WS1 work should start
   from the pinned fleet and should still avoid full pilot or long Path E runs
   without explicit confirmation.
+
+## Stage 2 Smoke Start Attempt
+
+Follow-up local baseline on 2026-05-05 after commit
+`3a8c0517b691ddec5988994b5f30c2fe01b43e64`:
+
+- `git status --short --branch`: `## main...origin/main`, plus untracked
+  `.scratch/`
+- `git pull --ff-only`: already up to date
+- `python scripts/smoke_phase7.py --check-config`: passed at fleet version
+  `r5a-v2.3-2026-05-03+pinned-whitebox-20260505`
+- `pytest tests/r5a -q`: `145 passed`
+
+The intended next step was to fast-forward AutoDL `/data/repo` from its prior
+clean state to `3a8c051`, then run only bounded Stage 2 smoke probes. The
+non-interactive SSH probe reached the target but failed authentication:
+
+```text
+Permission denied (publickey,password).
+```
+
+No cloud repository sync, runtime check, model load, vLLM server launch, smoke
+trace, full pilot, Path E run, hidden-state extraction, or AWQ audit was
+performed in this attempt. A sanitized report with the resume plan is recorded
+in `docs/WS1_AUTODL_STAGE2_SMOKE_REPORT_20260505.md`.
+
+Follow-up after the user provided an SSH password:
+
+- The password was stored only as `AUTODL_SSH_PASSWORD` in ignored `.env`.
+  The value is not recorded in this log.
+- A temporary `.scratch/` askpass helper was used for SSH/SCP; it contains no
+  password literal.
+- AutoDL `/data/repo` could not pull from `origin` because `origin` pointed to
+  the older bundle `/root/autodl-tmp/ws1_uploads/ws1_runtime_f378d86.bundle`.
+  A new local `main` bundle was copied up and `/data/repo` was fast-forwarded
+  from `a37d373` to `3a8c0517b691ddec5988994b5f30c2fe01b43e64`.
+- Runtime check passed with `torch 2.8.0+cu128`, CUDA `12.8`, vLLM `0.10.2`,
+  and `sm_120` present.
+- `python scripts/smoke_phase7.py --check-config` passed on AutoDL at fleet
+  version `r5a-v2.3-2026-05-03+pinned-whitebox-20260505`.
+
+Bounded Stage 2 smoke results:
+
+| model | backend | result | output |
+|---|---|---:|---|
+| `qwen2.5-7b` | vLLM AWQ | 30/30 | `/data/traces/ws1_stage2_smoke_20260505T120823Z/qwen2.5-7b__smoke.parquet` |
+| `qwen3-8b` | vLLM AWQ | 30/30 | `/data/traces/ws1_stage2_sentinel_smoke_20260505T121057Z/qwen3-8b__smoke.parquet` |
+| `llama-3-8b-instruct` | vLLM bf16 | 30/30 | `/data/traces/ws1_stage2_sentinel_smoke_20260505T121057Z/llama-3-8b-instruct__smoke.parquet` |
+| `glm-4-9b` | offline_hf fp16 | 30/30 | `/data/traces/ws1_stage2_glm_offline_smoke_20260505T121615Z/glm-4-9b__smoke.parquet` |
+
+All four smoke summaries reported `thinking_off_pct=100.0`, pinned
+tokenizer/checkpoint hashes matching the fleet, and non-empty token logprobs.
+The GLM fallback first failed because `accelerate` was absent from the venv;
+`accelerate==1.13.0` was installed, runtime provenance was recaptured, and GLM
+then passed.
+
+Current AutoDL runtime digest after the `accelerate` dependency fix:
+
+```text
+sha256:ba5b8d6150af7f5943f7e52a5b40ab0463066317303a02af25c32f58aa523fc5
+```
+
+Use this current digest for future pilot or confirmatory artifacts unless the
+runtime changes again. Final cleanup check found no vLLM server process, port
+8000 closed, GPU memory at 0 MiB, and `/data` still with about 393 GB free.

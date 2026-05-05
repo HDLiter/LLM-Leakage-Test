@@ -475,3 +475,69 @@ sha256:ba5b8d6150af7f5943f7e52a5b40ab0463066317303a02af25c32f58aa523fc5
 Use this current digest for future pilot or confirmatory artifacts unless the
 runtime changes again. Final cleanup check found no vLLM server process, port
 8000 closed, GPU memory at 0 MiB, and `/data` still with about 393 GB free.
+
+## Stage 2 All-12 Smoke Follow-up
+
+After the four sentinel smokes passed, the user approved a broader Stage 2
+smoke pass across all 12 `P_logprob` white-box models. This was still bounded
+smoke only. No full pilot, long Path E, Stage 2.7 hidden-state extraction, or
+Stage 2.8 AWQ-vs-fp16 audit was run.
+
+Preparation:
+
+- Local commit `d7e2ad2` (`Install accelerate in WS1 AutoDL provision`) was
+  created to install `accelerate==1.13.0` by default in
+  `scripts/ws1_provision_autodl.sh`, after vLLM/Torch resolution.
+- AutoDL `/data/repo` was fast-forwarded from
+  `8d1746959d6b7a6d5f2eb6b7ba8f1925b6abc1d9` to
+  `d7e2ad2c7a20c2df913ff75f23d8fd313bb0179b`.
+- Remote repo state after sync: `## main`, clean.
+- Runtime digest used for all 12 smoke traces:
+  `sha256:ba5b8d6150af7f5943f7e52a5b40ab0463066317303a02af25c32f58aa523fc5`.
+- Runtime preflight passed with `torch 2.8.0+cu128`, CUDA `12.8`,
+  vLLM `0.10.2`, `accelerate 1.13.0`, RTX PRO 6000 Blackwell,
+  capability `(12, 0)`, and `sm_120=True`.
+
+One initial all-12 driver attempt exited before any model launch because a
+best-effort `nvidia-smi` status print returned a format error under `set -e`.
+GPU status printing was changed to best-effort and the run was restarted. No
+trace or GPU scoring artifact was produced by the failed preflight attempt.
+
+Successful run:
+
+- Run tag: `20260505T131200Z`
+- Run directory: `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z`
+- Main log: `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z.log`
+- Summary TSV:
+  `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z/summary.tsv`
+- Status file:
+  `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z.status` = `0`
+
+All-12 smoke results:
+
+| model | backend | result | token counts | output |
+|---|---|---:|---|---|
+| `qwen2.5-1.5b` | vLLM AWQ | 30/30 | min 55 / max 726 / mean 174.97 | `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z/qwen2.5-1.5b__smoke.parquet` |
+| `qwen2.5-3b` | vLLM AWQ | 30/30 | min 55 / max 726 / mean 174.97 | `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z/qwen2.5-3b__smoke.parquet` |
+| `qwen2.5-7b` | vLLM AWQ | 30/30 | min 55 / max 726 / mean 174.97 | `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z/qwen2.5-7b__smoke.parquet` |
+| `qwen2.5-14b` | vLLM AWQ | 30/30 | min 55 / max 726 / mean 174.97 | `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z/qwen2.5-14b__smoke.parquet` |
+| `qwen2.5-32b` | vLLM AWQ | 30/30 | min 55 / max 726 / mean 174.97 | `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z/qwen2.5-32b__smoke.parquet` |
+| `qwen3-4b` | vLLM AWQ | 30/30 | min 55 / max 726 / mean 174.97 | `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z/qwen3-4b__smoke.parquet` |
+| `qwen3-8b` | vLLM AWQ | 30/30 | min 55 / max 726 / mean 174.97 | `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z/qwen3-8b__smoke.parquet` |
+| `qwen3-14b` | vLLM AWQ | 30/30 | min 55 / max 726 / mean 174.97 | `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z/qwen3-14b__smoke.parquet` |
+| `qwen3-32b` | vLLM AWQ | 30/30 | min 55 / max 726 / mean 174.97 | `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z/qwen3-32b__smoke.parquet` |
+| `llama-3-8b-instruct` | vLLM bf16 | 30/30 | min 69 / max 850 / mean 212.87 | `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z/llama-3-8b-instruct__smoke.parquet` |
+| `llama-3.1-8b-instruct` | vLLM bf16 | 30/30 | min 69 / max 850 / mean 212.87 | `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z/llama-3.1-8b-instruct__smoke.parquet` |
+| `glm-4-9b` | offline_hf fp16 | 30/30 | min 52 / max 663 / mean 162.70 | `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z/glm-4-9b__smoke.parquet` |
+
+Post-run validation:
+
+- All 12 consolidated smoke parquet files have exactly 30 rows.
+- All 12 summaries report `thinking_off_pct=100.0`.
+- Trace-level `vllm_image_digest` equals the current runtime digest for every
+  row.
+- Trace-level `tokenizer_sha`, `hf_commit_sha`, and `quant_scheme` match the
+  pinned fleet for every model.
+- Trace-level `thinking_mode` is exactly `off` for every row.
+- Final cleanup: no vLLM server process, port 8000 closed, GPU memory 0 MiB,
+  `/data` about 393 GB free.

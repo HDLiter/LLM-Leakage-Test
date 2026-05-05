@@ -182,7 +182,76 @@ GLM smoke used the new digest. Earlier Qwen/Llama smoke traces used the
 pre-`accelerate` digest. For future confirmatory or pilot artifacts, use the
 current recaptured digest unless the runtime changes again.
 
-## Current Stage 1 Acceptance State
+## Full 12-Model Smoke Follow-up
+
+After the bounded sentinel smokes passed, the user explicitly approved a
+broader Stage 2 smoke pass across all 12 `P_logprob` white-box models. This
+was still smoke-only: no full pilot, long Path E, Stage 2.7 hidden-state
+extraction, or Stage 2.8 AWQ-vs-fp16 audit was run.
+
+Preparation:
+
+- Local `main` gained commit `d7e2ad2`:
+  `Install accelerate in WS1 AutoDL provision`.
+- That commit makes `accelerate==1.13.0` a default provision dependency for
+  the GLM `offline_hf` fallback, installed after vLLM/Torch resolution so the
+  validated Blackwell Torch stack is preserved.
+- AutoDL `/data/repo` was fast-forwarded from
+  `8d1746959d6b7a6d5f2eb6b7ba8f1925b6abc1d9` to
+  `d7e2ad2c7a20c2df913ff75f23d8fd313bb0179b`.
+- Remote repo state after sync: `## main`, clean.
+- Runtime digest used for all 12 smoke traces:
+  `sha256:ba5b8d6150af7f5943f7e52a5b40ab0463066317303a02af25c32f58aa523fc5`.
+- Runtime preflight again reported `torch==2.8.0+cu128`, CUDA `12.8`,
+  `vllm==0.10.2`, `accelerate==1.13.0`, RTX PRO 6000 Blackwell,
+  capability `(12, 0)`, and `sm_120=True`.
+
+One first driver attempt exited during preflight before any model launched
+because a best-effort `nvidia-smi --format=csv,noheader` status print returned
+a format error under `set -e`. The driver was adjusted so GPU status printing
+is best-effort. No trace, model launch, or GPU scoring happened in that
+failed preflight attempt.
+
+Successful all-12 smoke run:
+
+- Run directory:
+  `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z`
+- Main log:
+  `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z.log`
+- Summary:
+  `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z/summary.tsv`
+- Status file:
+  `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z.status` = `0`
+
+| model | backend | result | trace output | token counts |
+|---|---|---:|---|---|
+| `qwen2.5-1.5b` | vLLM AWQ | 30/30 | `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z/qwen2.5-1.5b__smoke.parquet` | min 55 / max 726 / mean 174.97 |
+| `qwen2.5-3b` | vLLM AWQ | 30/30 | `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z/qwen2.5-3b__smoke.parquet` | min 55 / max 726 / mean 174.97 |
+| `qwen2.5-7b` | vLLM AWQ | 30/30 | `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z/qwen2.5-7b__smoke.parquet` | min 55 / max 726 / mean 174.97 |
+| `qwen2.5-14b` | vLLM AWQ | 30/30 | `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z/qwen2.5-14b__smoke.parquet` | min 55 / max 726 / mean 174.97 |
+| `qwen2.5-32b` | vLLM AWQ | 30/30 | `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z/qwen2.5-32b__smoke.parquet` | min 55 / max 726 / mean 174.97 |
+| `qwen3-4b` | vLLM AWQ | 30/30 | `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z/qwen3-4b__smoke.parquet` | min 55 / max 726 / mean 174.97 |
+| `qwen3-8b` | vLLM AWQ | 30/30 | `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z/qwen3-8b__smoke.parquet` | min 55 / max 726 / mean 174.97 |
+| `qwen3-14b` | vLLM AWQ | 30/30 | `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z/qwen3-14b__smoke.parquet` | min 55 / max 726 / mean 174.97 |
+| `qwen3-32b` | vLLM AWQ | 30/30 | `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z/qwen3-32b__smoke.parquet` | min 55 / max 726 / mean 174.97 |
+| `llama-3-8b-instruct` | vLLM bf16 | 30/30 | `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z/llama-3-8b-instruct__smoke.parquet` | min 69 / max 850 / mean 212.87 |
+| `llama-3.1-8b-instruct` | vLLM bf16 | 30/30 | `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z/llama-3.1-8b-instruct__smoke.parquet` | min 69 / max 850 / mean 212.87 |
+| `glm-4-9b` | offline_hf fp16 | 30/30 | `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z/glm-4-9b__smoke.parquet` | min 52 / max 663 / mean 162.70 |
+
+Post-run validation:
+
+- All 12 consolidated parquet files have exactly 30 rows.
+- All 12 summaries report `thinking_off_pct=100.0`.
+- Trace-level `vllm_image_digest` equals the current runtime digest above for
+  every row.
+- Trace-level `tokenizer_sha`, `hf_commit_sha`, and `quant_scheme` match the
+  pinned fleet entry for every model.
+- Trace-level `thinking_mode` is exactly `off` for every row.
+- All vLLM model servers were stopped after their smoke.
+- Final cleanup: no vLLM server process, port 8000 closed, GPU memory 0 MiB,
+  `/data` still about 393 GB free.
+
+## Current Stage 2 Smoke Acceptance State
 
 Completed:
 
@@ -196,12 +265,14 @@ Completed:
   `tokenizer_sha` is the SHA-256 of the backend-loaded tokenizer-materials
   canonical manifest, not a synthetic `tokenizer.json`.
 - Local config smoke and `tests/r5a` are green.
+- All 12 `P_logprob` white-box models passed the 30-case smoke set on AutoDL
+  under the recaptured runtime digest.
 
-No current blocker is known for starting bounded Stage 2 smoke after SSH
-authentication is available. Confirmatory finalization still depends on later
-artifacts: 12 pilot trace parquets, Path E exposure-horizon analyzer JSON,
-WS6 hidden-state subset, launch env, gpu dtype, runstate DB clean gate, and
-trace row-count/contract checks.
+No current blocker is known for moving from smoke readiness to the next
+explicitly approved WS1 cloud stage. Confirmatory finalization still depends
+on later artifacts: 12 pilot trace parquets, Path E exposure-horizon analyzer
+JSON, WS6 hidden-state subset, launch env, gpu dtype, runstate DB clean gate,
+and trace row-count/contract checks.
 
 ## Resume Plan
 
@@ -213,7 +284,9 @@ For the next cloud session, resume with:
    [ -e /data ] || ln -s /root/autodl-tmp/data /data
    ```
 
-2. Verify `/data/repo` remains at `3a8c051` and clean.
+2. Verify `/data/repo` remains at
+   `d7e2ad2c7a20c2df913ff75f23d8fd313bb0179b` or a later intentionally
+   synced commit, and is clean.
 
 3. Verify the current runtime digest and pinned config:
 
@@ -233,10 +306,11 @@ For the next cloud session, resume with:
    python scripts/smoke_phase7.py --check-config
    ```
 
-4. If moving into broader Stage 2, continue with per-model smoke before any
-   pilot run. Use the recaptured runtime digest above. GLM should use the
-   `offline_hf` fallback unless a separate vLLM echo/logprobs diagnostic is
-   explicitly requested.
+4. The all-12 per-model smoke pass is complete. Any next step beyond smoke
+   still requires separate explicit confirmation: full pilot, long Path E,
+   Stage 2.7 hidden-state extraction, and Stage 2.8 AWQ audit are all out of
+   scope until approved. GLM should continue using the `offline_hf` fallback
+   unless a separate vLLM echo/logprobs diagnostic is explicitly requested.
 
 5. After every vLLM probe:
 
@@ -247,7 +321,6 @@ For the next cloud session, resume with:
 
 ## Explicit Non-Actions
 
-- No push.
 - No full pilot.
 - No long Path E.
 - No Stage 2.7 hidden-state extraction.

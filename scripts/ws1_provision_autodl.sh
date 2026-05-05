@@ -49,6 +49,8 @@ if [[ -z "${HF_TOKEN:-}" ]]; then
     echo "        https://huggingface.co/settings/tokens )" >&2
     exit 2
 fi
+HF_TOKEN="${HF_TOKEN//$'\r'/}"
+export HF_TOKEN
 
 # 3. Directory layout
 mkdir -p "${DATA_ROOT}/models" "${DATA_ROOT}/traces" "${DATA_ROOT}/repo"
@@ -80,7 +82,7 @@ python -m pip install \
     "pandas>=2.2" \
     "pyarrow>=14" \
     "pyyaml>=6" \
-    "huggingface_hub>=0.24" \
+    "huggingface_hub>=0.24,<1.0" \
     "numpy>=1.26"
 
 # transformers + torch are installed only if --with-torch is requested,
@@ -95,7 +97,7 @@ if [[ " $* " == *" --with-torch "* ]]; then
 fi
 
 # 6. HF login (token, no git credential helper)
-huggingface-cli login --token "${HF_TOKEN}" --add-to-git-credential=False
+huggingface-cli login --token "${HF_TOKEN}"
 huggingface-cli whoami
 
 # 7. Pull vLLM image and record digest

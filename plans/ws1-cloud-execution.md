@@ -483,3 +483,23 @@ Recommended next-session order:
 5. Run the 30-case smoke fixture first. Full pilot-manifest traces still
    depend on WS0.5/WS3/WS4 manifest freeze; Path E can run from the
    prebuilt 2,160-article probe set.
+
+Stage 1 attempt update (2026-05-04):
+
+- AutoDL SSH reached `connect.westd.seetacloud.com:10349` as `root`.
+- GPU sanity passed: `NVIDIA RTX PRO 6000 Blackwell Server Edition`
+  with 97,887 MiB VRAM.
+- `/data` was created as a symlink to `/root/autodl-tmp/data`; the
+  backing disk reports 550 GB available.
+- The current tracked repo was staged to `/data/repo`, `.env` was copied
+  with mode `0600`, and
+  `data/pilot/exposure_horizon/probe_set_monthly60_36mo.json` was copied
+  to the cloud repo.
+- `scripts/ws1_provision_autodl.sh` completed Python dependency install
+  and HF auth (`HDLiter`, private endpoint `https://hf-mirror.com`) after
+  CRLF cleanup, then stopped before vLLM image pull because the selected
+  AutoDL image has no `docker` CLI/daemon: `docker: command not found`.
+- No model snapshots, vLLM image digest, fleet pinning, smoke traces, or
+  full-run artifacts were produced in this attempt. Resume with a
+  Docker-capable/vLLM-capable AutoDL image, or make and document an
+  explicit non-Docker vLLM runtime decision before continuing.

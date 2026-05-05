@@ -25,7 +25,16 @@
 - **Blocking**: WS1 cloud run final commit. Smoke runs allowed pre-pin.
 - **Owner**: cloud-run operator (Claude Code on AutoDL session).
 - **Target resolution date**: before WS1 pilot run.
-- **Notes**: next session starts here after `r2-tier1-cloud-closure` is merged or explicitly checked out on the cloud worker; local provider/HF gates, smoke fixture, Path E probe JSON, and local CLS snapshot are ready.
+- **Notes**: 2026-05-04 Stage 1 attempt on
+  `connect.westd.seetacloud.com:10349` reached HF auth and dependency
+  install, but the selected AutoDL image has no `docker` CLI/daemon, so
+  `scripts/ws1_provision_autodl.sh` stopped at `docker: command not
+  found` before vLLM image digest capture. The cloud repo is staged at
+  `/data/repo`, with `/data -> /root/autodl-tmp/data`, `.env` copied
+  with `0600`, and
+  `data/pilot/exposure_horizon/probe_set_monthly60_36mo.json` copied.
+  Resume after switching to a Docker-capable/vLLM-capable AutoDL image
+  or explicitly approving a non-Docker vLLM runtime design.
 
 ### WS6 — mechanistic analysis (now unconditional, eager pre-compute)
 - **Context**: `docs/DECISION_20260429_gate_removal.md` §2.4 / §3.2 made WS6 unconditional; hidden states pre-computed in WS1 cloud Stage 2.7 (Path C, ~5 hr GPU). The earlier conditional trigger (`>= 5/9` then `>= 5/14`) is retired alongside the gate that produced it.

@@ -245,6 +245,32 @@ Smoke result:
 
 The probe vLLM server was stopped after smoke. GPU returned to idle.
 
+## Fleet Pinning Progress
+
+Qwen2.5 family snapshot/tokenizer pinning completed on AutoDL:
+
+- Download root: `/data/models`
+- Pin source: explicit HF `main` resolutions from `huggingface_hub` API, then
+  `huggingface-cli download --revision <commit> --local-dir /data/models/<id>`
+- Runtime digest recorded in the local pinning log:
+  `sha256:75e40429893cdcad6cdf69a765ae252716aeff05b80f5ccec7d7d2029c8a8d2e`
+- Local fleet version after this milestone:
+  `r5a-v2.3-2026-05-03+pinned-qwen25-20260505`
+
+Pinned Qwen2.5 entries:
+
+| model_id | hf_commit_sha | tokenizer_sha |
+|---|---|---|
+| `qwen2.5-1.5b` | `3ecffa0ceb27851800f45519bab9c457a04405e1` | `c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539` |
+| `qwen2.5-3b` | `3559b226e8ce77211e2c1bd7ddfb7686fec4d6dd` | `c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539` |
+| `qwen2.5-7b` | `b25037543e9394b818fdfca67ab2a00ecc7dd641` | `c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539` |
+| `qwen2.5-14b` | `539535859b135b0244c91f3e59816150c8056698` | `c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539` |
+| `qwen2.5-32b` | `5c7cb76a268fc6cfbb9c4777eb24ba6e27f9ee6c` | `c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539` |
+
+Operational note: the `qwen2.5-32b` download hit one Xet/CAS read timeout and
+resumed successfully in the same `huggingface-cli` process. The raw AutoDL log
+contains a signed CAS URL and must not be committed without sanitization.
+
 ## Validation
 
 Local validation after the runtime/backend fixes:

@@ -49,7 +49,7 @@
 # authenticated HEAD requests to `config.json`; Llama-3.1 uses the
 # canonical HF repo id `meta-llama/Llama-3.1-8B-Instruct`.
 
-fleet_version: "r5a-v2.3-2026-05-03"
+fleet_version: "r5a-v2.3-2026-05-03+pinned-qwen25-20260505"
 
 models:
 
@@ -62,8 +62,8 @@ models:
     cutoff_date: 2023-10-31
     cutoff_source: community_paraphrase  # HaoooWang/llm-knowledge-cutoff-dates
     tokenizer_family: qwen
-    tokenizer_sha: <TBD>
-    hf_commit_sha: <TBD>
+    tokenizer_sha: "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539"
+    hf_commit_sha: "3ecffa0ceb27851800f45519bab9c457a04405e1"
     hf_repo: Qwen/Qwen2.5-1.5B-Instruct-AWQ
     quant_scheme: AWQ-INT4
     p_logprob:
@@ -82,8 +82,8 @@ models:
     cutoff_date: 2023-10-31
     cutoff_source: community_paraphrase
     tokenizer_family: qwen
-    tokenizer_sha: <TBD>
-    hf_commit_sha: <TBD>
+    tokenizer_sha: "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539"
+    hf_commit_sha: "3559b226e8ce77211e2c1bd7ddfb7686fec4d6dd"
     hf_repo: Qwen/Qwen2.5-3B-Instruct-AWQ
     quant_scheme: AWQ-INT4
     p_logprob:
@@ -102,8 +102,8 @@ models:
     cutoff_date: 2023-10-31
     cutoff_source: community_paraphrase
     tokenizer_family: qwen
-    tokenizer_sha: <TBD>
-    hf_commit_sha: <TBD>
+    tokenizer_sha: "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539"
+    hf_commit_sha: "b25037543e9394b818fdfca67ab2a00ecc7dd641"
     hf_repo: Qwen/Qwen2.5-7B-Instruct-AWQ
     quant_scheme: AWQ-INT4
     p_logprob:
@@ -122,8 +122,8 @@ models:
     cutoff_date: 2023-10-31
     cutoff_source: community_paraphrase
     tokenizer_family: qwen
-    tokenizer_sha: <TBD>
-    hf_commit_sha: <TBD>
+    tokenizer_sha: "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539"
+    hf_commit_sha: "539535859b135b0244c91f3e59816150c8056698"
     hf_repo: Qwen/Qwen2.5-14B-Instruct-AWQ
     quant_scheme: AWQ-INT4
     p_logprob:
@@ -142,8 +142,8 @@ models:
     cutoff_date: 2023-10-31
     cutoff_source: community_paraphrase
     tokenizer_family: qwen
-    tokenizer_sha: <TBD>
-    hf_commit_sha: <TBD>
+    tokenizer_sha: "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539"
+    hf_commit_sha: "5c7cb76a268fc6cfbb9c4777eb24ba6e27f9ee6c"
     hf_repo: Qwen/Qwen2.5-32B-Instruct-AWQ
     quant_scheme: AWQ-INT4
     p_logprob:

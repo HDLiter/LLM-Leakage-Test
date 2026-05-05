@@ -1,0 +1,56 @@
+[
+  {
+    "ts": "2026-05-05T07:04:39.466024+00:00",
+    "fleet_version_old": "r5a-v2.3-2026-05-03",
+    "fleet_version_new": "r5a-v2.3-2026-05-03+pinned-qwen25-20260505",
+    "vllm_image_digest": "sha256:75e40429893cdcad6cdf69a765ae252716aeff05b80f5ccec7d7d2029c8a8d2e",
+    "models_pinned": {
+      "qwen2.5-1.5b": {
+        "hf_commit_sha": "3ecffa0ceb27851800f45519bab9c457a04405e1",
+        "tokenizer_sha": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+        "source": "override"
+      },
+      "qwen2.5-3b": {
+        "hf_commit_sha": "3559b226e8ce77211e2c1bd7ddfb7686fec4d6dd",
+        "tokenizer_sha": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+        "source": "override"
+      },
+      "qwen2.5-7b": {
+        "hf_commit_sha": "b25037543e9394b818fdfca67ab2a00ecc7dd641",
+        "tokenizer_sha": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+        "source": "override"
+      },
+      "qwen2.5-14b": {
+        "hf_commit_sha": "539535859b135b0244c91f3e59816150c8056698",
+        "tokenizer_sha": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+        "source": "override"
+      },
+      "qwen2.5-32b": {
+        "hf_commit_sha": "5c7cb76a268fc6cfbb9c4777eb24ba6e27f9ee6c",
+        "tokenizer_sha": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+        "source": "override"
+      }
+    },
+    "models_skipped": {},
+    "changes": [
+      "qwen2.5-1.5b.tokenizer_sha: <TBD> -> c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+      "qwen2.5-1.5b.hf_commit_sha: <TBD> -> 3ecffa0ceb27851800f45519bab9c457a04405e1",
+      "qwen2.5-3b.tokenizer_sha: <TBD> -> c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+      "qwen2.5-3b.hf_commit_sha: <TBD> -> 3559b226e8ce77211e2c1bd7ddfb7686fec4d6dd",
+      "qwen2.5-7b.tokenizer_sha: <TBD> -> c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+      "qwen2.5-7b.hf_commit_sha: <TBD> -> b25037543e9394b818fdfca67ab2a00ecc7dd641",
+      "qwen2.5-14b.tokenizer_sha: <TBD> -> c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+      "qwen2.5-14b.hf_commit_sha: <TBD> -> 539535859b135b0244c91f3e59816150c8056698",
+      "qwen2.5-32b.tokenizer_sha: <TBD> -> c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+      "qwen2.5-32b.hf_commit_sha: <TBD> -> 5c7cb76a268fc6cfbb9c4777eb24ba6e27f9ee6c",
+      "qwen3-4b: NO PINNING — no override, no cache hit",
+      "qwen3-8b: NO PINNING — no override, no cache hit",
+      "qwen3-14b: NO PINNING — no override, no cache hit",
+      "qwen3-32b: NO PINNING — no override, no cache hit",
+      "llama-3-8b-instruct: NO PINNING — no override, no cache hit",
+      "llama-3.1-8b-instruct: NO PINNING — no override, no cache hit",
+      "glm-4-9b: NO PINNING — no override, no cache hit",
+      "fleet_version: r5a-v2.3-2026-05-03 -> r5a-v2.3-2026-05-03+pinned-qwen25-20260505"
+    ]
+  }
+]

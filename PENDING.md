@@ -55,9 +55,9 @@
   30 traces to `/data/traces/qwen2.5-7b-smoke-probe`. Current remaining
   blocker is still fleet pinning for all 12 white-box models, not Blackwell
   runtime compatibility. 2026-05-05 continuation pinned the Qwen2.5 family
-  (1.5B/3B/7B/14B/32B) and Qwen3 family (4B/8B/14B/32B) from explicit HF
-  commit revisions under `/data/models`; remaining placeholders are
-  Llama-3/3.1 and GLM.
+  (1.5B/3B/7B/14B/32B), Qwen3 family (4B/8B/14B/32B), and Llama-3/3.1
+  from explicit HF commit revisions under `/data/models`; the remaining
+  placeholder is GLM.
 
 ### WS6 — mechanistic analysis (now unconditional, eager pre-compute)
 - **Context**: `docs/DECISION_20260429_gate_removal.md` §2.4 / §3.2 made WS6 unconditional; hidden states pre-computed in WS1 cloud Stage 2.7 (Path C, ~5 hr GPU). The earlier conditional trigger (`>= 5/9` then `>= 5/14`) is retired alongside the gate that produced it.

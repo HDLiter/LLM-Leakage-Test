@@ -100,5 +100,41 @@
       "glm-4-9b: NO PINNING — no override, no cache hit",
       "fleet_version: r5a-v2.3-2026-05-03+pinned-qwen25-20260505 -> r5a-v2.3-2026-05-03+pinned-qwen-20260505"
     ]
+  },
+  {
+    "ts": "2026-05-05T09:41:37.213547+00:00",
+    "fleet_version_old": "r5a-v2.3-2026-05-03+pinned-qwen-20260505",
+    "fleet_version_new": "r5a-v2.3-2026-05-03+pinned-qwen-llama-20260505",
+    "vllm_image_digest": "sha256:75e40429893cdcad6cdf69a765ae252716aeff05b80f5ccec7d7d2029c8a8d2e",
+    "models_pinned": {
+      "llama-3-8b-instruct": {
+        "hf_commit_sha": "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
+        "tokenizer_sha": "e134af98b985517b4f068e3755ae90d4e9cd2d45d328325dc503f1c6b2d06cc7",
+        "source": "override"
+      },
+      "llama-3.1-8b-instruct": {
+        "hf_commit_sha": "0e9e39f249a16976918f6564b8830bc894c89659",
+        "tokenizer_sha": "79e3e522635f3171300913bb421464a87de6222182a0570b9b2ccba2a964b2b4",
+        "source": "override"
+      }
+    },
+    "models_skipped": {},
+    "changes": [
+      "qwen2.5-1.5b: NO PINNING — no override, no cache hit",
+      "qwen2.5-3b: NO PINNING — no override, no cache hit",
+      "qwen2.5-7b: NO PINNING — no override, no cache hit",
+      "qwen2.5-14b: NO PINNING — no override, no cache hit",
+      "qwen2.5-32b: NO PINNING — no override, no cache hit",
+      "qwen3-4b: NO PINNING — no override, no cache hit",
+      "qwen3-8b: NO PINNING — no override, no cache hit",
+      "qwen3-14b: NO PINNING — no override, no cache hit",
+      "qwen3-32b: NO PINNING — no override, no cache hit",
+      "llama-3-8b-instruct.tokenizer_sha: <TBD> -> e134af98b985517b4f068e3755ae90d4e9cd2d45d328325dc503f1c6b2d06cc7",
+      "llama-3-8b-instruct.hf_commit_sha: <TBD> -> 8afb486c1db24fe5011ec46dfbe5b5dccdb575c2",
+      "llama-3.1-8b-instruct.tokenizer_sha: <TBD> -> 79e3e522635f3171300913bb421464a87de6222182a0570b9b2ccba2a964b2b4",
+      "llama-3.1-8b-instruct.hf_commit_sha: <TBD> -> 0e9e39f249a16976918f6564b8830bc894c89659",
+      "glm-4-9b: NO PINNING — no override, no cache hit",
+      "fleet_version: r5a-v2.3-2026-05-03+pinned-qwen-20260505 -> r5a-v2.3-2026-05-03+pinned-qwen-llama-20260505"
+    ]
   }
 ]

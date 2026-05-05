@@ -49,7 +49,7 @@
 # authenticated HEAD requests to `config.json`; Llama-3.1 uses the
 # canonical HF repo id `meta-llama/Llama-3.1-8B-Instruct`.
 
-fleet_version: "r5a-v2.3-2026-05-03+pinned-qwen-20260505"
+fleet_version: "r5a-v2.3-2026-05-03+pinned-qwen-llama-20260505"
 
 models:
 
@@ -253,8 +253,8 @@ models:
     cutoff_date: 2023-03-01
     cutoff_source: vendor_stated  # Meta model card: "data through March 2023"
     tokenizer_family: llama3
-    tokenizer_sha: <TBD>
-    hf_commit_sha: <TBD>
+    tokenizer_sha: "e134af98b985517b4f068e3755ae90d4e9cd2d45d328325dc503f1c6b2d06cc7"
+    hf_commit_sha: "8afb486c1db24fe5011ec46dfbe5b5dccdb575c2"
     hf_repo: meta-llama/Meta-Llama-3-8B-Instruct
     quant_scheme: bf16
     p_logprob:
@@ -271,8 +271,8 @@ models:
     cutoff_date: 2023-12-01
     cutoff_source: vendor_stated  # Meta model card: "data through December 2023"
     tokenizer_family: llama3
-    tokenizer_sha: <TBD>
-    hf_commit_sha: <TBD>
+    tokenizer_sha: "79e3e522635f3171300913bb421464a87de6222182a0570b9b2ccba2a964b2b4"
+    hf_commit_sha: "0e9e39f249a16976918f6564b8830bc894c89659"
     hf_repo: meta-llama/Llama-3.1-8B-Instruct
     quant_scheme: bf16
     p_logprob:

@@ -291,6 +291,27 @@ Pinned Qwen3 entries:
 Operational note: the `qwen3-32b` download hit one transient HF mirror HEAD
 timeout and retried successfully in the same process.
 
+Llama family snapshot/tokenizer pinning completed on AutoDL:
+
+- Download root: `/data/models`
+- Pin source: explicit HF `main` resolutions from `huggingface_hub` API, then
+  `huggingface-cli download --revision <commit> --local-dir /data/models/<id>`
+- Local fleet version after this milestone:
+  `r5a-v2.3-2026-05-03+pinned-qwen-llama-20260505`
+
+Pinned Llama entries:
+
+| model_id | hf_commit_sha | tokenizer_sha |
+|---|---|---|
+| `llama-3-8b-instruct` | `8afb486c1db24fe5011ec46dfbe5b5dccdb575c2` | `e134af98b985517b4f068e3755ae90d4e9cd2d45d328325dc503f1c6b2d06cc7` |
+| `llama-3.1-8b-instruct` | `0e9e39f249a16976918f6564b8830bc894c89659` | `79e3e522635f3171300913bb421464a87de6222182a0570b9b2ccba2a964b2b4` |
+
+Operational note: both Llama local-dir downloads completed as full HF
+snapshots and include `original/` checkpoint files in addition to the
+safetensors files. Each local model directory is approximately 30 GB. This
+does not change fleet design or runtime provenance, but it should be considered
+if the AutoDL data disk is migrated or replicated.
+
 ## Validation
 
 Local validation after the runtime/backend fixes:

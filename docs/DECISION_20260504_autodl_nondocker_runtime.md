@@ -21,8 +21,8 @@ WS1 will run vLLM directly in the AutoDL container Python environment rather
 than through `vllm/vllm-openai` Docker images.
 
 `scripts/ws1_provision_autodl.sh` now installs/validates the host vLLM
-runtime in a data-disk virtualenv (`/data/venvs/ws1` by default, backed by
-AutoDL's `/root/autodl-tmp`) and calls
+runtime in a data-disk virtualenv (`/data/venvs/ws1-cu128` by default on
+the validated Blackwell path, backed by AutoDL's `/root/autodl-tmp`) and calls
 `scripts/ws1_capture_runtime_provenance.py`, which writes:
 
 - `/data/vllm_runtime_provenance.json`
@@ -81,6 +81,14 @@ capability `13.2`, so the driver can host CUDA 12.8/12.9/13.0 wheels. The
 bad state is specifically the selected PyTorch wheel: `torch.version.cuda` is
 `12.6`, and `torch.cuda.get_arch_list()` lacks `sm_120`.
 
+Follow-up on 2026-05-05 confirmed that the AutoDL base image was correct:
+`/root/miniconda3/bin/python` exposed `torch==2.8.0+cu128`, CUDA `12.8`,
+and `torch.cuda.get_arch_list()` included `sm_120`. The stale WS1 venv was
+the problem because it had been created as an isolated venv and installed
+`torch==2.7.1+cu126`. The validated runtime now uses a
+`--system-site-packages` data-disk venv at `/data/venvs/ws1-cu128`, installs
+`vllm==0.10.2`, and preserves the base image's Blackwell-compatible Torch.
+
 Candidate Blackwell-compatible runtime selections, in order of preference:
 
 | Role | vLLM | PyTorch wheel | Reason |
@@ -106,3 +114,19 @@ PY
 ```
 
 Only after that check passes should WS1 run a bounded `qwen2.5-7b` smoke.
+
+Validated probe result (2026-05-05):
+
+- Runtime digest:
+  `sha256:75e40429893cdcad6cdf69a765ae252716aeff05b80f5ccec7d7d2029c8a8d2e`
+- Runtime stack: `torch==2.8.0+cu128`, `vllm==0.10.2`,
+  `transformers==4.57.6`, `huggingface_hub==0.36.2`
+- Model: `Qwen/Qwen2.5-7B-Instruct-AWQ` under `/data/models/qwen2.5-7b`
+- vLLM launch: `--quantization awq_marlin --max-model-len 4096`
+- Direct route probe passed: `/tokenize` plus `/v1/completions` with
+  `echo=true`, pre-tokenized IDs, `max_tokens=0`, and `logprobs=5`
+- Project backend probe passed after adding `/tokenize` fallback and trimming
+  returned top-logprob lists to the declared K.
+- 30-case smoke passed: `qwen2.5-7b__smoke.parquet` with 30 traces under
+  `/data/traces/qwen2.5-7b-smoke-probe`; summary token range 55-726 and
+  mean 174.97.

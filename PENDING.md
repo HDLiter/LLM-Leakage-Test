@@ -6,7 +6,7 @@
 >
 > **Update rule**: when an item resolves, move it to `## Recently closed` at the bottom (keep for ~30 days), then delete. Do not silently remove — the history matters.
 >
-> **Last updated**: 2026-05-04
+> **Last updated**: 2026-05-05
 
 ---
 
@@ -43,17 +43,18 @@
   the instance environment operationally, but it is not a repository-managed
   Docker image digest; because the WS1 runtime venv and caches live under
   `/data`, migration must include the data disk or rerun provisioning.
-  Current blocker: Torch warns that RTX PRO 6000 reports CUDA capability
-  `sm_120`, while the installed Torch wheel supports only through `sm_90`.
-  The instance driver reports CUDA driver capability `13.2`; the failure is
-  specifically the selected `torch==2.7.1+cu126` wheel. Recommended AutoDL
-  image/runtime selection is `vllm==0.10.2` with `torch==2.8.0+cu128` or
-  `+cu129`, followed by the `sm_120` arch-list check in
-  `docs/DECISION_20260504_autodl_nondocker_runtime.md` and a bounded
-  `qwen2.5-7b` smoke. `vllm==0.11.2` with `torch==2.9.0+cu128/+cu130` is the
-  newer fallback; `vllm==0.10.0` with `torch==2.7.1+cu128` is the
-  minimal-change fallback only. Do not proceed to all-model snapshot pinning
-  or the 30-case smoke until one candidate passes the `sm_120` check.
+  2026-05-05 follow-up showed the AutoDL base image was already correct
+  (`torch==2.8.0+cu128`, CUDA `12.8`, `sm_120` present); the stale isolated
+  WS1 venv had installed `torch==2.7.1+cu126`. The validated runtime now uses
+  `/data/venvs/ws1-cu128` with `--system-site-packages`, `vllm==0.10.2`, and
+  runtime digest
+  `sha256:75e40429893cdcad6cdf69a765ae252716aeff05b80f5ccec7d7d2029c8a8d2e`.
+  `Qwen/Qwen2.5-7B-Instruct-AWQ` downloaded under
+  `/data/models/qwen2.5-7b`; vLLM launched with `awq_marlin`; direct
+  `echo+logprobs` and project-backend probes passed; the 30-case smoke wrote
+  30 traces to `/data/traces/qwen2.5-7b-smoke-probe`. Current remaining
+  blocker is still fleet pinning for all 12 white-box models, not Blackwell
+  runtime compatibility.
 
 ### WS6 — mechanistic analysis (now unconditional, eager pre-compute)
 - **Context**: `docs/DECISION_20260429_gate_removal.md` §2.4 / §3.2 made WS6 unconditional; hidden states pre-computed in WS1 cloud Stage 2.7 (Path C, ~5 hr GPU). The earlier conditional trigger (`>= 5/9` then `>= 5/14`) is retired alongside the gate that produced it.

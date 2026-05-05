@@ -6,7 +6,8 @@ Chat endpoints add a chat template wrapping that contaminates the
 per-token logprobs we score.
 
 Token-alignment strategy (rewritten 2026-04-27 after WS0+WS1 review):
-  1. Call `POST /v1/tokenize` once to obtain canonical integer IDs.
+  1. Call the vLLM tokenization endpoint once to obtain canonical integer IDs
+     (`/v1/tokenize` on some builds, `/tokenize` on vLLM 0.10.x).
   2. Call `POST /v1/completions` with `prompt=<list[int]>` (vLLM accepts
      pre-tokenized input directly), so the completion path cannot
      re-tokenize and the response logprobs align 1:1 with the IDs.
@@ -42,6 +43,19 @@ _TRANSIENT_STATUS = frozenset({408, 409, 425, 429, 500, 502, 503, 504})
 
 class VLLMBackendError(RuntimeError):
     """Raised when vLLM returns malformed or inconsistent data."""
+
+
+class VLLMBackendHTTPError(VLLMBackendError):
+    """Raised for non-retryable HTTP responses from vLLM."""
+
+    def __init__(self, *, path: str, status_code: int, body: str) -> None:
+        self.path = path
+        self.status_code = status_code
+        self.body = body
+        super().__init__(
+            f"POST {path} failed with non-retryable "
+            f"{status_code}: {body[:500]}"
+        )
 
 
 class VLLMLogprobBackend:
@@ -164,7 +178,11 @@ class VLLMLogprobBackend:
                 continue  # drop the leading None
             cleaned_lp.append(float(lp))
             cleaned_ids.append(int(token_ids[i]))
-            cleaned_top.append(_extract_top_alternatives(top_logprobs_field, i))
+            cleaned_top.append(
+                _extract_top_alternatives(
+                    top_logprobs_field, i, limit=self.top_logprobs
+                )
+            )
 
         if not cleaned_lp:
             raise VLLMBackendError(
@@ -211,10 +229,20 @@ class VLLMLogprobBackend:
             "prompt": text,
             "add_special_tokens": True,  # default; explicit for parity with offline_hf
         }
-        data = await self._post_with_retry("/v1/tokenize", payload)
+        try:
+            data = await self._post_with_retry("/v1/tokenize", payload)
+            endpoint = "/v1/tokenize"
+        except VLLMBackendHTTPError as exc:
+            if exc.status_code != 404:
+                raise
+            # vLLM 0.10.x exposes tokenization at /tokenize while keeping
+            # completions under /v1/completions. A 404 here means route
+            # absence, not a malformed tokenization payload.
+            data = await self._post_with_retry("/tokenize", payload)
+            endpoint = "/tokenize"
         tokens = data.get("tokens")
         if not isinstance(tokens, list) or not tokens:
-            raise VLLMBackendError(f"/v1/tokenize returned no tokens: {data!r}")
+            raise VLLMBackendError(f"{endpoint} returned no tokens: {data!r}")
         return [int(t) for t in tokens]
 
     async def _echo_completion(self, token_ids: list[int]) -> dict:
@@ -248,9 +276,10 @@ class VLLMLogprobBackend:
                     )
                 elif 400 <= resp.status_code < 500:
                     # Permanent client error — retrying just hides the bug.
-                    raise VLLMBackendError(
-                        f"POST {path} failed with non-retryable "
-                        f"{resp.status_code}: {resp.text[:500]}"
+                    raise VLLMBackendHTTPError(
+                        path=path,
+                        status_code=resp.status_code,
+                        body=resp.text,
                     )
                 else:
                     try:
@@ -273,7 +302,7 @@ class VLLMLogprobBackend:
 
 
 def _extract_top_alternatives(
-    top_logprobs_field: list, position: int
+    top_logprobs_field: list, position: int, *, limit: int
 ) -> list[float]:
     """Extract a flat list of alternative-token logprobs at one position.
 
@@ -307,7 +336,7 @@ def _extract_top_alternatives(
         return []
     values = [float(v) for v in values if v is not None]
     values.sort(reverse=True)
-    return values
+    return values[: max(0, limit)]
 
 
 def _infer_weight_dtype(quant_scheme: str) -> str:

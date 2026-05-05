@@ -153,8 +153,10 @@ credential-side blocker in `PENDING.md`.
    - `huggingface-cli login` with the user's fine-grained read-only token
    - create `/data/{models,traces,repo}` (`/data` symlinks to
      `/root/autodl-tmp/data` on AutoDL container instances when needed)
-   - install/validate host vLLM in `/data/venvs/ws1` (`VLLM_PIP_SPEC`,
-     default `vllm==0.10.0`; `PIP_CACHE_DIR=/data/pip_cache`;
+   - install/validate host vLLM in `/data/venvs/ws1-cu128`
+     (`VLLM_PIP_SPEC`, default `vllm==0.10.2`;
+     `WS1_VENV_SYSTEM_SITE_PACKAGES=1` to inherit AutoDL's
+     Blackwell-compatible Torch; `PIP_CACHE_DIR=/data/pip_cache`;
      `TMPDIR=/data/tmp`; `XDG_CACHE_HOME=/data/cache`)
    - capture `/data/vllm_runtime_provenance.json` and
      `/data/vllm_runtime_digest.txt`
@@ -543,3 +545,16 @@ Stage 1 attempt update (2026-05-04):
   `sm_90`. Stop before all-model snapshot pinning or the 30-case smoke until
   a Blackwell-compatible vLLM/Torch runtime is selected, or explicitly approve
   a tiny `qwen2.5-7b` compatibility smoke as a bounded failure probe.
+- Follow-up on 2026-05-05 confirmed the AutoDL base image already had
+  `torch==2.8.0+cu128` with `sm_120`; the stale isolated WS1 venv was the
+  cu126 source. A replacement data-disk venv at `/data/venvs/ws1-cu128`
+  inherits base Torch via `--system-site-packages`, installs `vllm==0.10.2`,
+  and writes runtime digest
+  `sha256:75e40429893cdcad6cdf69a765ae252716aeff05b80f5ccec7d7d2029c8a8d2e`.
+  `Qwen/Qwen2.5-7B-Instruct-AWQ` downloaded to `/data/models/qwen2.5-7b`;
+  vLLM launched with `--quantization awq_marlin --max-model-len 4096`; direct
+  `/tokenize` + `/v1/completions echo/logprobs` passed; the project backend
+  passed after adding `/tokenize` fallback and top-logprob trimming; and the
+  30-case smoke wrote 30 traces under `/data/traces/qwen2.5-7b-smoke-probe`.
+  Blackwell runtime compatibility is no longer the blocker. Continue with
+  all-model snapshot/tokenizer pinning using this runtime path.

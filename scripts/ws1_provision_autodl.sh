@@ -25,25 +25,29 @@
 #                    transferred to the instance via SCP into ~/.env)
 #
 # Optional env:
-#   VLLM_PIP_SPEC          defaults to "vllm==0.10.0"
-#   WS1_SKIP_VLLM_INSTALL  set to 1 to skip pip installing vLLM
-#   DATA_ROOT              defaults to /data
-#   WS1_VENV               defaults to ${DATA_ROOT}/venvs/ws1
+#   VLLM_PIP_SPEC                    defaults to "vllm==0.10.2"
+#   WS1_SKIP_VLLM_INSTALL            set to 1 to skip pip installing vLLM
+#   WS1_VENV_SYSTEM_SITE_PACKAGES    defaults to 1 so the venv inherits the
+#                                    AutoDL image's Blackwell-compatible torch
+#   DATA_ROOT                        defaults to /data
+#   WS1_VENV                         defaults to ${DATA_ROOT}/venvs/ws1-cu128
 
 set -euo pipefail
 
-# vLLM v0.7.0 lacks Qwen3ForCausalLM (added in v0.8.5). Pin to a recent
-# stable that supports both Qwen2.5 AWQ and Qwen3 AWQ; verify on a
-# minor smoke per the WS1 stage-1 plan.
-VLLM_PIP_SPEC="${VLLM_PIP_SPEC:-vllm==0.10.0}"
+# vLLM v0.7.0 lacks Qwen3ForCausalLM (added in v0.8.5). v0.10.2 is the
+# first WS1-validated Blackwell path on AutoDL when paired with the base
+# image's torch 2.8.0+cu128.
+VLLM_PIP_SPEC="${VLLM_PIP_SPEC:-vllm==0.10.2}"
 DATA_ROOT="${DATA_ROOT:-/data}"
-WS1_VENV="${WS1_VENV:-${DATA_ROOT}/venvs/ws1}"
+WS1_VENV="${WS1_VENV:-${DATA_ROOT}/venvs/ws1-cu128}"
+WS1_VENV_SYSTEM_SITE_PACKAGES="${WS1_VENV_SYSTEM_SITE_PACKAGES:-1}"
 HF_ENDPOINT="${HF_ENDPOINT:-https://hf-mirror.com}"
 
 echo "== ws1_provision_autodl =="
 echo "VLLM_PIP_SPEC = ${VLLM_PIP_SPEC}"
 echo "DATA_ROOT      = ${DATA_ROOT}"
 echo "WS1_VENV       = ${WS1_VENV}"
+echo "SYSTEM_SITE    = ${WS1_VENV_SYSTEM_SITE_PACKAGES}"
 echo "HF_ENDPOINT    = ${HF_ENDPOINT}"
 
 if ! command -v python >/dev/null 2>&1 && [[ -x /root/miniconda3/bin/python ]]; then
@@ -121,7 +125,13 @@ export no_proxy="$NO_PROXY"
 
 # 5. Python deps for the local CLI (operator + backends). Install into
 # DATA_ROOT so AutoDL's 30 GB system disk is not consumed by vLLM/Torch.
-python -m venv "${WS1_VENV}"
+# On AutoDL Blackwell images, inherit the base torch wheel; a normal isolated
+# venv can silently replace torch 2.8.0+cu128 with a non-Blackwell cu126 wheel.
+venv_args=()
+if [[ "${WS1_VENV_SYSTEM_SITE_PACKAGES}" == "1" ]]; then
+    venv_args+=(--system-site-packages)
+fi
+python -m venv "${venv_args[@]}" "${WS1_VENV}"
 source "${WS1_VENV}/bin/activate"
 python -m pip config set global.index-url "http://mirrors.aliyun.com/pypi/simple" >/dev/null
 python -m pip config set global.trusted-host "mirrors.aliyun.com" >/dev/null
@@ -137,10 +147,39 @@ python -m pip install \
 
 if [[ "${WS1_SKIP_VLLM_INSTALL:-0}" != "1" ]]; then
     echo "installing non-Docker vLLM runtime: ${VLLM_PIP_SPEC}"
-    python -m pip install "${VLLM_PIP_SPEC}"
+    python -m pip install \
+        "${VLLM_PIP_SPEC}" \
+        "transformers>=4.55.2,<5" \
+        "huggingface_hub>=0.24,<1.0"
 else
     echo "WS1_SKIP_VLLM_INSTALL=1; skipping vLLM pip install"
 fi
+
+python - <<'PY'
+import sys
+
+import torch
+
+try:
+    import vllm
+except Exception as exc:  # pragma: no cover - provision-time guard
+    raise SystemExit(f"FATAL: vLLM import failed: {exc}") from exc
+
+print(f"python={sys.executable}")
+print(f"torch={torch.__version__} cuda={torch.version.cuda}")
+print(f"vllm={vllm.__version__}")
+if torch.cuda.is_available():
+    cap = torch.cuda.get_device_capability(0)
+    arch_list = torch.cuda.get_arch_list()
+    print(f"gpu={torch.cuda.get_device_name(0)} capability={cap}")
+    print(f"torch_arch_list={arch_list}")
+    if cap == (12, 0) and "sm_120" not in arch_list:
+        raise SystemExit(
+            "FATAL: Blackwell GPU detected but torch wheel lacks sm_120; "
+            "select a CUDA 12.8+ AutoDL image or recreate the venv with "
+            "--system-site-packages."
+        )
+PY
 
 # transformers + torch are installed only if --with-torch is requested,
 # since vLLM normally pulls its own compatible torch stack and we only need

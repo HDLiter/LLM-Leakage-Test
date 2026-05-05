@@ -7,6 +7,7 @@ review fix batch:
 - interior `None` logprob (i.e. anywhere except position 0) raises
 - HTTP 400/422 fail fast (no retry)
 - HTTP 429 / 5xx are retried up to `max_retries`
+- vLLM builds that expose tokenization at /tokenize are supported
 """
 
 from __future__ import annotations
@@ -125,6 +126,35 @@ async def test_4xx_does_not_retry():
 
 
 @pytest.mark.asyncio
+async def test_tokenize_404_falls_back_to_unversioned_route():
+    """vLLM 0.10.x exposes /tokenize, while completions remain under
+    /v1/completions. Route absence should not block the trace path."""
+
+    seen_paths: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen_paths.append(request.url.path)
+        if request.url.path.endswith("/v1/tokenize"):
+            return httpx.Response(404, json={"detail": "Not Found"})
+        if request.url.path.endswith("/tokenize"):
+            return _ok_tokenize([10, 20, 30, 40])
+        return _ok_completion(
+            [None, -1.0, -2.0, -3.0],
+            [None, {"a": -1.0}, {"a": -2.0}, {"a": -3.0}],
+        )
+
+    backend = _make_backend(handler)
+    try:
+        trace = await backend.trace(case_id="c1", article_text="...")
+    finally:
+        await backend.aclose()
+
+    assert seen_paths[:2] == ["/v1/tokenize", "/tokenize"]
+    assert seen_paths[-1] == "/v1/completions"
+    assert trace.raw_token_ids == [20, 30, 40]
+
+
+@pytest.mark.asyncio
 async def test_429_is_retried():
     """Transient 429 should be retried up to max_retries."""
     call_count = {"n": 0}
@@ -179,3 +209,29 @@ async def test_happy_path_strict_alignment():
     assert trace.quant_scheme == "AWQ-INT4"
 
 
+@pytest.mark.asyncio
+async def test_top_logprobs_are_trimmed_to_declared_k():
+    """Some vLLM builds include the selected token plus K alternatives in
+    top_logprobs. Persist no more than the declared top_logprobs_k."""
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path.endswith("/v1/tokenize"):
+            return _ok_tokenize([10, 20, 30, 40])
+        return _ok_completion(
+            [None, -1.0, -2.0, -3.0],
+            [
+                None,
+                {"a": -1.5, "b": -1.7, "c": -1.9, "d": -2.1},
+                {"a": -2.5, "b": -2.7, "c": -2.9, "d": -3.1},
+                {"a": -3.5, "b": -3.7, "c": -3.9, "d": -4.1},
+            ],
+        )
+
+    backend = _make_backend(handler)
+    try:
+        trace = await backend.trace(case_id="c1", article_text="...")
+    finally:
+        await backend.aclose()
+
+    assert trace.top_logprobs_k == 3
+    assert all(len(row) == 3 for row in trace.top_alternative_logprobs)

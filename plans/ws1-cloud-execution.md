@@ -2,7 +2,7 @@
 title: WS1 Cloud Execution Plan — P_logprob on AutoDL RTX PRO 6000
 stage: Phase 7 / WS1
 date: 2026-04-26
-last_amended: 2026-04-29
+last_amended: 2026-05-05
 status: APPROVED — revised for fleet expansion + GPU upgrade + Stage 2.7 (WS6 Path C eager pre-compute) + Llama integration + AutoDL non-Docker vLLM runtime
 authority: plans/phase7-pilot-implementation.md §5.2 (WS1 spec)
 related_decisions:
@@ -447,9 +447,10 @@ decision memo before publishing PCSG results).
 - [x] **HF Meta license click-through complete for both Llama-3-8B-Instruct and Llama-3.1-8B-Instruct** (verified 2026-05-03 via authenticated `config.json` HEAD checks for `meta-llama/Meta-Llama-3-8B-Instruct` and `meta-llama/Llama-3.1-8B-Instruct`; no weight files downloaded).
 - [x] Stage 0 modules + tests merged into `main` (2026-05-03, `main` fast-forwarded to `859ed79`)
 - [x] Stage 0 smoke fixture committed (`data/pilot/fixtures/smoke_30.json`, 30 cases, sha256 `1862e4e7a6286a6b49a635f246366120d4f5a51b3143725cdb4eedc0fbdf1576`)
-- [ ] AutoDL account ready
-- [ ] Stage 1 instance reserved
-- [ ] **`scripts/ws1_pin_fleet.py` run**: fleet YAML carries no `<TBD>` for any of the 12 white-box `tokenizer_sha` / `hf_commit_sha` (Tier-0 #2)
+- [x] AutoDL account ready
+- [x] Stage 1 instance reserved
+- [x] **`scripts/ws1_pin_fleet.py` run**: fleet YAML carries no `<TBD>` for any of the 12 white-box `tokenizer_sha` / `hf_commit_sha` (Tier-0 #2; completed via AutoDL snapshot/tokenizer pinning and committed in `config/fleet/r5a_fleet.yaml`)
+- [x] Stage 2 all-12 smoke complete (30 cases × 12 `P_logprob` white-box models; run directory `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z`; runtime digest `sha256:ba5b8d6150af7f5943f7e52a5b40ab0463066317303a02af25c32f58aa523fc5`)
 - [ ] Run manifest fields populated for each of the **12 P_logprob-eligible white-box models + 4 black-box** (incl. `cutoff_observed`, `quant_scheme`, `pcsg_pair_registry_hash`, `hidden_state_subset_hash`, `quality_gate_thresholds` per plan §10.4)
 - [ ] Trace failure rate < 1% across the **12 P_logprob-eligible white-box models**
 - [ ] Stage 2.7 hidden-state extraction complete (30 cases × 12 models, packed and downloaded)
@@ -576,3 +577,29 @@ AutoDL operator notes from bring-up:
   installed `torch==2.7.1+cu126` and should stay removed.
 - Stop probe vLLM servers after smoke/compatibility checks so GPU memory and
   port 8000 are free for the next model.
+
+Stage 2 smoke validation update (2026-05-05):
+
+- `origin/main` reached `cff859e` after recording the all-model smoke
+  validation; AutoDL `/data/repo` was fast-forwarded to the same commit and
+  remained clean.
+- Provisioning now installs `accelerate==1.13.0` by default after vLLM/Torch
+  resolution so the GLM `offline_hf` fallback does not depend on a manual
+  runtime repair.
+- Current validated runtime digest:
+  `sha256:ba5b8d6150af7f5943f7e52a5b40ab0463066317303a02af25c32f58aa523fc5`.
+- All 12 `P_logprob` white-box models passed the 30-case smoke set under
+  `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z`.
+  Qwen2.5 and Qwen3 ran through vLLM AWQ, Llama ran through vLLM bf16, and
+  GLM ran through the fleet-declared `offline_hf` fp16 fallback.
+- Smoke validation confirmed 30 rows per model, `thinking_off_pct=100.0`,
+  trace-level runtime digest matches, and trace-level tokenizer/checkpoint
+  hashes match the pinned fleet.
+- Final cloud cleanup after smoke: no vLLM server process, port 8000 closed,
+  GPU memory 0 MiB, `/data` about 393 GB free.
+- Still not run without separate approval: full pilot, long Path E, Stage 2.7
+  hidden-state extraction, and Stage 2.8 AWQ-vs-fp16 audit.
+- Recommended next order is to confirm/freeze the pilot article manifest
+  before any Stage 2 full pilot execution. If the manifest is not frozen, keep
+  WS0.5 / WS3 / WS4 on the critical path and leave the AutoDL instance idle or
+  reserved only if economically justified.

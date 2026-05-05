@@ -146,7 +146,8 @@ credential-side blocker in `PENDING.md`.
    - `huggingface-cli login` with the user's fine-grained read-only token
    - create `/data/{models,traces,repo}` (`/data` symlinks to
      `/root/autodl-tmp/data` on AutoDL container instances when needed)
-   - install/validate host vLLM (`VLLM_PIP_SPEC`, default `vllm==0.10.0`)
+   - install/validate host vLLM in `/data/venvs/ws1` (`VLLM_PIP_SPEC`,
+     default `vllm==0.10.0`; `PIP_CACHE_DIR=/data/pip_cache`)
    - capture `/data/vllm_runtime_provenance.json` and
      `/data/vllm_runtime_digest.txt`
    - `git clone` or `rsync` repo into `/data/repo`

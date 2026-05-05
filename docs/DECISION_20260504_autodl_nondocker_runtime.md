@@ -17,7 +17,9 @@ WS1 will run vLLM directly in the AutoDL container Python environment rather
 than through `vllm/vllm-openai` Docker images.
 
 `scripts/ws1_provision_autodl.sh` now installs/validates the host vLLM
-runtime and calls `scripts/ws1_capture_runtime_provenance.py`, which writes:
+runtime in a data-disk virtualenv (`/data/venvs/ws1` by default, backed by
+AutoDL's `/root/autodl-tmp`) and calls
+`scripts/ws1_capture_runtime_provenance.py`, which writes:
 
 - `/data/vllm_runtime_provenance.json`
 - `/data/vllm_runtime_digest.txt`
@@ -48,7 +50,8 @@ still store a Docker image digest.
 ## Open Operational Risk
 
 Host vLLM installation is more sensitive to Python/CUDA/Torch compatibility
-than the original Docker image plan. The first model smoke (`qwen2.5-7b`) is
-therefore a real runtime gate: if vLLM cannot serve AWQ on Blackwell in the
-AutoDL Python environment, stop and record the exact import/launch error
-before trying alternate vLLM/Torch versions.
+than the original Docker image plan. Keep the venv and pip cache on the data
+disk, not the 30 GB AutoDL system disk. The first model smoke
+(`qwen2.5-7b`) is therefore a real runtime gate: if vLLM cannot serve AWQ on
+Blackwell in the AutoDL Python environment, stop and record the exact
+import/launch error before trying alternate vLLM/Torch versions.

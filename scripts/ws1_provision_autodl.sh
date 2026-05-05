@@ -26,6 +26,7 @@
 #   VLLM_PIP_SPEC          defaults to "vllm==0.10.0"
 #   WS1_SKIP_VLLM_INSTALL  set to 1 to skip pip installing vLLM
 #   DATA_ROOT              defaults to /data
+#   WS1_VENV               defaults to ${DATA_ROOT}/venvs/ws1
 
 set -euo pipefail
 
@@ -34,11 +35,13 @@ set -euo pipefail
 # minor smoke per the WS1 stage-1 plan.
 VLLM_PIP_SPEC="${VLLM_PIP_SPEC:-vllm==0.10.0}"
 DATA_ROOT="${DATA_ROOT:-/data}"
+WS1_VENV="${WS1_VENV:-${DATA_ROOT}/venvs/ws1}"
 HF_ENDPOINT="${HF_ENDPOINT:-https://hf-mirror.com}"
 
 echo "== ws1_provision_autodl =="
 echo "VLLM_PIP_SPEC = ${VLLM_PIP_SPEC}"
 echo "DATA_ROOT      = ${DATA_ROOT}"
+echo "WS1_VENV       = ${WS1_VENV}"
 echo "HF_ENDPOINT    = ${HF_ENDPOINT}"
 
 if ! command -v python >/dev/null 2>&1 && [[ -x /root/miniconda3/bin/python ]]; then
@@ -68,8 +71,9 @@ if [[ "${DATA_ROOT}" == "/data" && ! -e /data && -d /root/autodl-tmp ]]; then
     ln -s /root/autodl-tmp/data /data
     echo "created /data -> /root/autodl-tmp/data symlink"
 fi
-mkdir -p "${DATA_ROOT}/models" "${DATA_ROOT}/traces" "${DATA_ROOT}/repo"
-echo "created ${DATA_ROOT}/{models,traces,repo}"
+mkdir -p "${DATA_ROOT}/models" "${DATA_ROOT}/traces" "${DATA_ROOT}/repo" \
+    "${DATA_ROOT}/pip_cache" "$(dirname "${WS1_VENV}")"
+echo "created ${DATA_ROOT}/{models,traces,repo,pip_cache}"
 
 # 4. Persist HF env to ~/.bashrc so future shells inherit it
 HF_BLOCK_MARKER="# === ws1 HF env ==="
@@ -79,17 +83,34 @@ if ! grep -qF "${HF_BLOCK_MARKER}" "${HOME}/.bashrc" 2>/dev/null; then
 ${HF_BLOCK_MARKER}
 export HF_ENDPOINT="${HF_ENDPOINT}"
 export HF_HOME="${DATA_ROOT}/hf_cache"
+export WS1_VENV="${WS1_VENV}"
+export PIP_CACHE_DIR="${DATA_ROOT}/pip_cache"
+export PATH="${WS1_VENV}/bin:\$PATH"
 export NO_PROXY="localhost,127.0.0.1,host.docker.internal"
 export no_proxy="\$NO_PROXY"
 EOF
     echo "patched ~/.bashrc with HF env block"
 fi
+if ! grep -qF "export WS1_VENV=" "${HOME}/.bashrc" 2>/dev/null; then
+    cat >> "${HOME}/.bashrc" <<EOF
+export WS1_VENV="${WS1_VENV}"
+export PIP_CACHE_DIR="${DATA_ROOT}/pip_cache"
+export PATH="${WS1_VENV}/bin:\$PATH"
+EOF
+    echo "patched ~/.bashrc with WS1 venv block"
+fi
 export HF_ENDPOINT
 export HF_HOME="${DATA_ROOT}/hf_cache"
+export PIP_CACHE_DIR="${DATA_ROOT}/pip_cache"
 export NO_PROXY="localhost,127.0.0.1,host.docker.internal"
 export no_proxy="$NO_PROXY"
 
-# 5. Python deps for the local CLI (operator + backends)
+# 5. Python deps for the local CLI (operator + backends). Install into
+# DATA_ROOT so AutoDL's 30 GB system disk is not consumed by vLLM/Torch.
+python -m venv "${WS1_VENV}"
+source "${WS1_VENV}/bin/activate"
+python -m pip config set global.index-url "http://mirrors.aliyun.com/pypi/simple" >/dev/null
+python -m pip config set global.trusted-host "mirrors.aliyun.com" >/dev/null
 python -m pip install --upgrade pip
 python -m pip install \
     "pydantic>=2.0" \

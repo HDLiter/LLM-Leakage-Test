@@ -271,6 +271,26 @@ Operational note: the `qwen2.5-32b` download hit one Xet/CAS read timeout and
 resumed successfully in the same `huggingface-cli` process. The raw AutoDL log
 contains a signed CAS URL and must not be committed without sanitization.
 
+Qwen3 family snapshot/tokenizer pinning completed on AutoDL:
+
+- Download root: `/data/models`
+- Pin source: explicit HF `main` resolutions from `huggingface_hub` API, then
+  `huggingface-cli download --revision <commit> --local-dir /data/models/<id>`
+- Local fleet version after this milestone:
+  `r5a-v2.3-2026-05-03+pinned-qwen-20260505`
+
+Pinned Qwen3 entries:
+
+| model_id | hf_commit_sha | tokenizer_sha |
+|---|---|---|
+| `qwen3-4b` | `74d4bd2bd4bff9cafc9345221320bffb08b406a3` | `aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4` |
+| `qwen3-8b` | `4da05a8edb55c6046cce958586c33b61da07bb79` | `aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4` |
+| `qwen3-14b` | `31c69efc29464b6bb0aee1398b5a7b50a99340c3` | `aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4` |
+| `qwen3-32b` | `0499c3ac83fdef8810b907a23894ba91e95eddd8` | `aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4` |
+
+Operational note: the `qwen3-32b` download hit one transient HF mirror HEAD
+timeout and retried successfully in the same process.
+
 ## Validation
 
 Local validation after the runtime/backend fixes:

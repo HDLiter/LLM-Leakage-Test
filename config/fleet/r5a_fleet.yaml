@@ -49,7 +49,7 @@
 # authenticated HEAD requests to `config.json`; Llama-3.1 uses the
 # canonical HF repo id `meta-llama/Llama-3.1-8B-Instruct`.
 
-fleet_version: "r5a-v2.3-2026-05-03+pinned-qwen25-20260505"
+fleet_version: "r5a-v2.3-2026-05-03+pinned-qwen-20260505"
 
 models:
 
@@ -166,8 +166,8 @@ models:
     cutoff_date: 2025-01-31
     cutoff_source: operator_inferred
     tokenizer_family: qwen3
-    tokenizer_sha: <TBD>
-    hf_commit_sha: <TBD>
+    tokenizer_sha: "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4"
+    hf_commit_sha: "74d4bd2bd4bff9cafc9345221320bffb08b406a3"
     hf_repo: Qwen/Qwen3-4B-AWQ
     quant_scheme: AWQ-INT4
     p_logprob:
@@ -186,8 +186,8 @@ models:
     cutoff_date: 2025-01-31
     cutoff_source: operator_inferred
     tokenizer_family: qwen3
-    tokenizer_sha: <TBD>
-    hf_commit_sha: <TBD>
+    tokenizer_sha: "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4"
+    hf_commit_sha: "4da05a8edb55c6046cce958586c33b61da07bb79"
     hf_repo: Qwen/Qwen3-8B-AWQ
     quant_scheme: AWQ-INT4
     p_logprob:
@@ -206,8 +206,8 @@ models:
     cutoff_date: 2025-01-31
     cutoff_source: operator_inferred
     tokenizer_family: qwen3
-    tokenizer_sha: <TBD>
-    hf_commit_sha: <TBD>
+    tokenizer_sha: "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4"
+    hf_commit_sha: "31c69efc29464b6bb0aee1398b5a7b50a99340c3"
     hf_repo: Qwen/Qwen3-14B-AWQ
     quant_scheme: AWQ-INT4
     p_logprob:
@@ -226,8 +226,8 @@ models:
     cutoff_date: 2025-01-31
     cutoff_source: operator_inferred
     tokenizer_family: qwen3
-    tokenizer_sha: <TBD>
-    hf_commit_sha: <TBD>
+    tokenizer_sha: "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4"
+    hf_commit_sha: "0499c3ac83fdef8810b907a23894ba91e95eddd8"
     hf_repo: Qwen/Qwen3-32B-AWQ
     quant_scheme: AWQ-INT4
     p_logprob:

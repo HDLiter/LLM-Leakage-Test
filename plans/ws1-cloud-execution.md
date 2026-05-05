@@ -147,7 +147,8 @@ credential-side blocker in `PENDING.md`.
    - create `/data/{models,traces,repo}` (`/data` symlinks to
      `/root/autodl-tmp/data` on AutoDL container instances when needed)
    - install/validate host vLLM in `/data/venvs/ws1` (`VLLM_PIP_SPEC`,
-     default `vllm==0.10.0`; `PIP_CACHE_DIR=/data/pip_cache`)
+     default `vllm==0.10.0`; `PIP_CACHE_DIR=/data/pip_cache`;
+     `TMPDIR=/data/tmp`; `XDG_CACHE_HOME=/data/cache`)
    - capture `/data/vllm_runtime_provenance.json` and
      `/data/vllm_runtime_digest.txt`
    - `git clone` or `rsync` repo into `/data/repo`

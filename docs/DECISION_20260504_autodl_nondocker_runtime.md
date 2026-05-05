@@ -50,8 +50,9 @@ still store a Docker image digest.
 ## Open Operational Risk
 
 Host vLLM installation is more sensitive to Python/CUDA/Torch compatibility
-than the original Docker image plan. Keep the venv and pip cache on the data
-disk, not the 30 GB AutoDL system disk. The first model smoke
-(`qwen2.5-7b`) is therefore a real runtime gate: if vLLM cannot serve AWQ on
-Blackwell in the AutoDL Python environment, stop and record the exact
-import/launch error before trying alternate vLLM/Torch versions.
+than the original Docker image plan. Keep the venv, pip cache, temporary
+build/extract directory, and XDG cache on the data disk, not the 30 GB AutoDL
+system disk. The first model smoke (`qwen2.5-7b`) is therefore a real runtime
+gate: if vLLM cannot serve AWQ on Blackwell in the AutoDL Python environment,
+stop and record the exact import/launch error before trying alternate
+vLLM/Torch versions.

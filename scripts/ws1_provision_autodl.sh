@@ -72,8 +72,9 @@ if [[ "${DATA_ROOT}" == "/data" && ! -e /data && -d /root/autodl-tmp ]]; then
     echo "created /data -> /root/autodl-tmp/data symlink"
 fi
 mkdir -p "${DATA_ROOT}/models" "${DATA_ROOT}/traces" "${DATA_ROOT}/repo" \
-    "${DATA_ROOT}/pip_cache" "$(dirname "${WS1_VENV}")"
-echo "created ${DATA_ROOT}/{models,traces,repo,pip_cache}"
+    "${DATA_ROOT}/pip_cache" "${DATA_ROOT}/tmp" "${DATA_ROOT}/cache" \
+    "$(dirname "${WS1_VENV}")"
+echo "created ${DATA_ROOT}/{models,traces,repo,pip_cache,tmp,cache}"
 
 # 4. Persist HF env to ~/.bashrc so future shells inherit it
 HF_BLOCK_MARKER="# === ws1 HF env ==="
@@ -85,6 +86,8 @@ export HF_ENDPOINT="${HF_ENDPOINT}"
 export HF_HOME="${DATA_ROOT}/hf_cache"
 export WS1_VENV="${WS1_VENV}"
 export PIP_CACHE_DIR="${DATA_ROOT}/pip_cache"
+export TMPDIR="${DATA_ROOT}/tmp"
+export XDG_CACHE_HOME="${DATA_ROOT}/cache"
 export PATH="${WS1_VENV}/bin:\$PATH"
 export NO_PROXY="localhost,127.0.0.1,host.docker.internal"
 export no_proxy="\$NO_PROXY"
@@ -99,9 +102,18 @@ export PATH="${WS1_VENV}/bin:\$PATH"
 EOF
     echo "patched ~/.bashrc with WS1 venv block"
 fi
+if ! grep -qF "export TMPDIR=" "${HOME}/.bashrc" 2>/dev/null; then
+    cat >> "${HOME}/.bashrc" <<EOF
+export TMPDIR="${DATA_ROOT}/tmp"
+export XDG_CACHE_HOME="${DATA_ROOT}/cache"
+EOF
+    echo "patched ~/.bashrc with WS1 temp/cache block"
+fi
 export HF_ENDPOINT
 export HF_HOME="${DATA_ROOT}/hf_cache"
 export PIP_CACHE_DIR="${DATA_ROOT}/pip_cache"
+export TMPDIR="${DATA_ROOT}/tmp"
+export XDG_CACHE_HOME="${DATA_ROOT}/cache"
 export NO_PROXY="localhost,127.0.0.1,host.docker.internal"
 export no_proxy="$NO_PROXY"
 

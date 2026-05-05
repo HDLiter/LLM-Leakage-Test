@@ -312,13 +312,48 @@ safetensors files. Each local model directory is approximately 30 GB. This
 does not change fleet design or runtime provenance, but it should be considered
 if the AutoDL data disk is migrated or replicated.
 
+GLM snapshot/tokenizer pinning completed on AutoDL:
+
+- Download root: `/data/models/glm-4-9b`
+- HF repo: `THUDM/glm-4-9b-chat`
+- HF commit: `bd8234fe5e0c09c48637a92abb0c797cb5fa0e73`
+- Local fleet version after this milestone:
+  `r5a-v2.3-2026-05-03+pinned-whitebox-20260505`
+
+Pinned GLM entry:
+
+| model_id | hf_commit_sha | tokenizer_sha |
+|---|---|---|
+| `glm-4-9b` | `bd8234fe5e0c09c48637a92abb0c797cb5fa0e73` | `f24ce06ae6e5eae28010ec068ab18691f1b069894fb8bda4503e84c34d8f761b` |
+
+Operational note: the GLM HF snapshot does not publish `tokenizer.json`.
+`AutoTokenizer.from_pretrained(..., trust_remote_code=True)` loads
+`ChatGLM4Tokenizer` as a custom slow tokenizer from `tokenizer.model`,
+`tokenizer_config.json`, and `tokenization_chatglm.py`. The GLM
+`tokenizer_sha` above is therefore the SHA-256 of the canonical
+backend-loaded tokenizer-materials manifest at
+`/data/traces/ws1_glm_tokenizer_manifest.json`, not a synthetic
+`tokenizer.json`. The model directory was not modified to add a
+`tokenizer.json`.
+
+Tokenizer material hashes included in the GLM manifest:
+
+| path | sha256 |
+|---|---|
+| `tokenizer.model` | `5a493598071550244b2ee7f26118f3edec2150b9dfa967929a99052ac83fe716` |
+| `tokenizer_config.json` | `f891e4d4ebb4009b6996dea97befb77a60c0cef0e88ac1edd6c741b1367f9c62` |
+| `tokenization_chatglm.py` | `90a9a1b739f834cdf7a2f40959f9eeff2a705b80acefb2cea9c19ff3958a9279` |
+
 ## Validation
 
-Local validation after the runtime/backend fixes:
+Local validation after final white-box pinning:
 
 - `pytest tests/r5a -q`: `145 passed`
 - `python scripts/smoke_phase7.py --check-config`: passed
 - `git diff --check`: passed
+- Fleet cardinality remains 14 `P_predict`, 12 `P_logprob`, and 2 PCSG
+  temporal pairs.
+- No model `tokenizer_sha` or `hf_commit_sha` fields remain `<TBD>`.
 
 Cloud validation after syncing `60f7426`:
 
@@ -348,6 +383,12 @@ These files remain on AutoDL for detailed debugging:
 - `/data/vllm_runtime_provenance.json`
 - `/data/vllm_runtime_digest.txt`
 - `/data/traces/qwen2.5-7b-smoke-probe/`
+- `/data/traces/ws1_pins_qwen25.json`
+- `/data/traces/ws1_pins_qwen3.json`
+- `/data/traces/ws1_pins_llama.json`
+- `/data/traces/ws1_pins_glm.json`
+- `/data/traces/ws1_glm_files.json`
+- `/data/traces/ws1_glm_tokenizer_manifest.json`
 
 Do not commit raw logs blindly. Check them for secrets or signed URLs before
 copying into the repo.
@@ -366,5 +407,6 @@ copying into the repo.
 - Do not run concurrent HF downloads into the same `--local-dir`.
 - Stop probe vLLM servers after tests so later failures are not caused by
   occupied GPU memory or port 8000.
-- The next WS1 blocker is fleet pinning for the remaining white-box models,
-  not Blackwell runtime compatibility.
+- WS1 white-box fleet pinning is complete; the next WS1 work should start
+  from the pinned fleet and should still avoid full pilot or long Path E runs
+  without explicit confirmation.

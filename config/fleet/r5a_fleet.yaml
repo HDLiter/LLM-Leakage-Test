@@ -49,7 +49,7 @@
 # authenticated HEAD requests to `config.json`; Llama-3.1 uses the
 # canonical HF repo id `meta-llama/Llama-3.1-8B-Instruct`.
 
-fleet_version: "r5a-v2.3-2026-05-03+pinned-qwen-llama-20260505"
+fleet_version: "r5a-v2.3-2026-05-03+pinned-whitebox-20260505"
 
 models:
 
@@ -291,8 +291,11 @@ models:
     cutoff_date: 2024-06-30
     cutoff_source: operator_inferred  # GLM-4 (0520) pipeline hint, no vendor cutoff
     tokenizer_family: glm4
-    tokenizer_sha: <TBD>
-    hf_commit_sha: <TBD>
+    # GLM publishes a custom slow tokenizer without tokenizer.json. This is
+    # the SHA-256 of the canonical backend-loaded tokenizer-materials manifest
+    # recorded in docs/WS1_AUTODL_OPS_LOG_20260505.md.
+    tokenizer_sha: "f24ce06ae6e5eae28010ec068ab18691f1b069894fb8bda4503e84c34d8f761b"
+    hf_commit_sha: "bd8234fe5e0c09c48637a92abb0c797cb5fa0e73"
     hf_repo: THUDM/glm-4-9b-chat
     quant_scheme: fp16  # no Alibaba/Zhipu official AWQ for GLM-4-9B
     p_logprob:

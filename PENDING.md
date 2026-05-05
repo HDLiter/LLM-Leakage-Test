@@ -19,46 +19,6 @@
 - **Owner**: post-pilot analyst.
 - **Target resolution date**: post-pilot.
 
-### WS1 white-box fleet pinning
-- **Context**: `config/fleet/r5a_fleet.yaml` still carries `<TBD>` for `tokenizer_sha` and `hf_commit_sha` on all 12 white-box entries. Plan §10.1 forbids confirmatory runs with `<TBD>` placeholders; the PR1 validators and confirmatory hard-fail gate prevent these placeholders from silently landing in a final manifest.
-- **External action needed**: on AutoDL Stage 1, after `huggingface-cli download` completes for each white-box model, run `python scripts/ws1_pin_fleet.py --hf-cache <path> --vllm-image-digest "$(cat /data/vllm_runtime_digest.txt)"` to discover the loaded HF snapshot commit and SHA-256 tokenizer content hash, write them into `config/fleet/r5a_fleet.yaml`, append the pinning log, and rebump `fleet_version`.
-- **Blocking**: WS1 cloud run final commit. Smoke runs allowed pre-pin.
-- **Owner**: cloud-run operator (Claude Code on AutoDL session).
-- **Target resolution date**: before WS1 pilot run.
-- **Notes**: 2026-05-04 Stage 1 attempt on
-  `connect.westd.seetacloud.com:10349` reached HF auth and dependency
-  install, but AutoDL container instances do not support nested Docker, so
-  the original Docker image path stopped at `docker: command not found`.
-  `docs/DECISION_20260504_autodl_nondocker_runtime.md` converts WS1 to a
-  non-Docker host vLLM runtime while preserving the `sha256:<64-hex>`
-  hard provenance gate through `/data/vllm_runtime_provenance.json`. The
-  cloud repo is staged at `/data/repo`, with
-  `/data -> /root/autodl-tmp/data`, `.env` copied with `0600`, and
-  `data/pilot/exposure_horizon/probe_set_monthly60_36mo.json` copied.
-  Follow-up non-Docker provision completed on the same instance at repo HEAD
-  `f378d86` and wrote runtime digest
-  `sha256:a5f57079381be329fa35e18101b52027f5feaea01098dbef4040fe6d10b102dd`
-  from `vllm==0.10.0`, `torch==2.7.1+cu126`, and the RTX PRO 6000
-  Blackwell device. AutoDL platform image save/migration can preserve or move
-  the instance environment operationally, but it is not a repository-managed
-  Docker image digest; because the WS1 runtime venv and caches live under
-  `/data`, migration must include the data disk or rerun provisioning.
-  2026-05-05 follow-up showed the AutoDL base image was already correct
-  (`torch==2.8.0+cu128`, CUDA `12.8`, `sm_120` present); the stale isolated
-  WS1 venv had installed `torch==2.7.1+cu126`. The validated runtime now uses
-  `/data/venvs/ws1-cu128` with `--system-site-packages`, `vllm==0.10.2`, and
-  runtime digest
-  `sha256:75e40429893cdcad6cdf69a765ae252716aeff05b80f5ccec7d7d2029c8a8d2e`.
-  `Qwen/Qwen2.5-7B-Instruct-AWQ` downloaded under
-  `/data/models/qwen2.5-7b`; vLLM launched with `awq_marlin`; direct
-  `echo+logprobs` and project-backend probes passed; the 30-case smoke wrote
-  30 traces to `/data/traces/qwen2.5-7b-smoke-probe`. Current remaining
-  blocker is still fleet pinning for all 12 white-box models, not Blackwell
-  runtime compatibility. 2026-05-05 continuation pinned the Qwen2.5 family
-  (1.5B/3B/7B/14B/32B), Qwen3 family (4B/8B/14B/32B), and Llama-3/3.1
-  from explicit HF commit revisions under `/data/models`; the remaining
-  placeholder is GLM.
-
 ### WS6 — mechanistic analysis (now unconditional, eager pre-compute)
 - **Context**: `docs/DECISION_20260429_gate_removal.md` §2.4 / §3.2 made WS6 unconditional; hidden states pre-computed in WS1 cloud Stage 2.7 (Path C, ~5 hr GPU). The earlier conditional trigger (`>= 5/9` then `>= 5/14`) is retired alongside the gate that produced it.
 - **Investigation needed**: after WS1 Stage 2.7 hidden states are downloaded, scope WS6 analysis modules (DS via logit-lens, layer-wise KL, activation patching) for WS5. No GPU rerun required since hidden states are pre-computed.
@@ -113,6 +73,14 @@
 ---
 
 ## Recently closed
+
+### WS1 white-box fleet pinning
+- **Resolved 2026-05-05**: all 12 white-box `hf_commit_sha` and
+  `tokenizer_sha` fields are pinned in `config/fleet/r5a_fleet.yaml` at
+  fleet version `r5a-v2.3-2026-05-03+pinned-whitebox-20260505`. Qwen2.5,
+  Qwen3, and Llama use explicit HF commit snapshots under `/data/models`.
+  GLM uses the fixed HF commit plus a documented custom slow-tokenizer
+  materials manifest because the upstream snapshot has no `tokenizer.json`.
 
 ### WS1 black-box `api_model_name` resolution
 - **Resolved 2026-05-03**: `docs/DECISION_20260503_blackbox_refresh.md` refreshes the 4-model black-box roster; `config/fleet/r5a_fleet.yaml` now has concrete provider slugs for DeepSeek V4 Pro, GPT-4.1, GPT-5.1, and Claude Sonnet 4.6.

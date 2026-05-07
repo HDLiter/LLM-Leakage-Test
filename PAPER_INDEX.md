@@ -1,14 +1,14 @@
 # Paper Index
 
-> **Last sync:** 2026-04-27 (added Wang et al. sycophancy mechanism for WS6 conditional)
-> **Previous sync:** 2026-04-16 (post-R5A-freeze cleanup)
-> **Total PDFs in `related papers/`:** 129
+> **Last sync:** 2026-05-07 (added Phase 8 goal-frame / sycophancy / LLM-measurement sweep)
+> **Previous sync:** 2026-04-27 (added Wang et al. sycophancy mechanism for WS6 conditional)
+> **Total PDFs in `related papers/`:** 136
 > **Status legend:** `IN_LIBRARY` = PDF on disk; `REFERENCED_ONLY` = cited in project docs / sweeps but no PDF in `related papers/`.
 
 This index is a **categorical pointer view** for fast navigation. The richer per-paper records (sha256, abstract excerpts, page counts, author guesses) live alongside the PDFs:
 
 - **Per-topic notes:** `related papers/notes/*.md` (ten thematic note files)
-- **Machine-readable catalog:** `related papers/notes/_paper_catalog.json` (last machine sync covered ~86 of the 128 files; not authoritative for newest additions)
+- **Machine-readable catalog:** `related papers/notes/_paper_catalog.json` (not authoritative for newest additions)
 
 This file at repo root is the human-facing categorical index that ties paper filenames back to the R5A research design and the v6.2 decision document.
 
@@ -62,6 +62,7 @@ This file at repo root is the human-facing categorical index that ties paper fil
 | `Caution Ahead Numerical Reasoning Look-ahead.pdf` | Levy 2025 | Numerical reasoning + look-ahead in finance | IN_LIBRARY |
 | `A Test of Lookahead Bias in LLM Forecasts.pdf` | Gao, Jiang & Yan 2026 | Lookahead Propensity (LAP) statistical test | IN_LIBRARY |
 | `All Leaks Count, Some Count More Interpretable Temporal.pdf` | Zhang et al. 2026 | Shapley-DCLR + TimeSPEC claim-level temporal leakage | IN_LIBRARY |
+| `Seeing the Goal Missing the Truth Human Accountability for AI Bias.pdf` | Cao, Jiang & Xu 2026 | Downstream-goal disclosure shifts financial LLM intermediate scores; motivates Phase 8 `C_GoalFrame` | IN_LIBRARY |
 | `Fake Date Tests LLM Macro Forecasting.pdf` | — 2026 | Fake-date prompt sensitivity test | IN_LIBRARY |
 | `Fast Effective Solution Look-ahead Bias LLMs.pdf` | Merchant & Levy 2025 | Inference-time logit adjustment | IN_LIBRARY |
 | `Do LLMs Understand Chronology.pdf` | Wongchamcharoen & Glasserman 2025 | Prerequisite for prompt-based chrono control | IN_LIBRARY |
@@ -81,6 +82,12 @@ This file at repo root is the human-facing categorical index that ties paper fil
 | `Memorization Problem LLMs Economic Forecasts.pdf` | Lopez-Lira, Tang & Zhu 2025 | Selective perfect memory in GPT-4o forecasts | IN_LIBRARY |
 | `Lopez-Lira ChatGPT Stock Returns.pdf` | Lopez-Lira & Tang 2024 | LLM headline sentiment predicts returns | IN_LIBRARY |
 | `Evaluating LLMs Finance Explicit Bias.pdf` | Kong et al. 2026 | Structural bias framework for finance LLMs | IN_LIBRARY |
+| `Seeing the Goal Missing the Truth Human Accountability for AI Bias.pdf` | Cao, Jiang & Xu 2026 | Purpose-conditioned financial measurement; primary anchor for Phase 8 `C_GoalFrame` | IN_LIBRARY |
+| `A Financial Brain Scan of the LLM.pdf` | Chen, Didisheim, Somoza & Tian 2025 | Interpretable financial concepts inside LLMs; supports optional Phase 8 internal-probe appendix | IN_LIBRARY |
+| `AI Assisted Economics Measurement From Survey.pdf` | Wang & Sharma 2026 | LLM-generated latent economic measurements with out-of-sample validity diagnostics | IN_LIBRARY |
+| `From Model Choice to Model Belief.pdf` | Sun & Zhang 2025 | Token-probability-based LLM measurement for economics research | IN_LIBRARY |
+| Scaling Core Earnings Measurement with Large Language Models | Shaffer & Wang 2024/2025 | Prompt-sensitive LLM-generated accounting measurement; SSRN PDF blocked during 2026-05-07 sync | REFERENCED_ONLY |
+| When LLMs Go Abroad: Foreign Bias in AI Financial Predictions | Cao, Wang & Xiang 2025 | Cross-model financial prediction bias traced to training-information asymmetry | REFERENCED_ONLY |
 | `Your AI, Not Your View The Bias of LLMs in Investment Analysis.pdf` | — | Bias of LLMs in investment analysis | IN_LIBRARY |
 | `InvestorBench Financial Decision-Making Agent.pdf` | — | Agent-based financial decision benchmark | IN_LIBRARY |
 | `CFinBench Chinese Financial Benchmark.pdf` | Nie et al. 2024 | 50-model Chinese financial capability bench | IN_LIBRARY |
@@ -187,6 +194,7 @@ This file at repo root is the human-facing categorical index that ties paper fil
 | `Context-Faithfulness Memory Strength Evidence.pdf` | — | Memory-strength evidence | IN_LIBRARY |
 | `How Well Do LLMs Truly Ground.pdf` | Lee et al. 2024 | Grounding = use + stay-within | IN_LIBRARY |
 | `Language Models Represent Space Time.pdf` | Gurnee & Tegmark 2024 | Time as linearly decodable latent | IN_LIBRARY |
+| `A Financial Brain Scan of the LLM.pdf` | Chen, Didisheim, Somoza & Tian 2025 | Finance-domain internal concept extraction and steering | IN_LIBRARY |
 
 ## 11. Cognitive science: memory systems / LLM analogies
 
@@ -233,6 +241,11 @@ This file at repo root is the human-facing categorical index that ties paper fil
 | `Unfaithful Explanations in CoT.pdf` | Turpin et al. 2023 | CoT explanations can be unfaithful | IN_LIBRARY |
 | `Least-to-Most Prompting Complex Reasoning.pdf` | Zhou et al. 2023 | Decomposition-based prompting | IN_LIBRARY |
 | `CHiLL Zero-Shot Feature Extraction Clinical.pdf` | McInerney et al. | LLM-extract → ML-aggregate pattern | IN_LIBRARY |
+| `Seeing the Goal Missing the Truth Human Accountability for AI Bias.pdf` | Cao, Jiang & Xu 2026 | Downstream-use disclosure changes financial measurement prompts | IN_LIBRARY |
+| `Ask Dont Tell Reducing Sycophancy LLMs.pdf` | Dubois, Ududec, Summerfield & Luettgau 2026 | Question-reformulation intervention for sycophancy | IN_LIBRARY |
+| `Training Language Models Warm Accuracy Sycophancy.pdf` | Ibrahim, Hafner & Rocher 2026 | Warmth/persona tuning reduces accuracy and increases sycophancy | IN_LIBRARY |
+| `Sycophantic AI Decreases Prosocial Intentions.pdf` | Cheng et al. 2025 | User-affirming model behavior as systematic measurement-bias caveat | IN_LIBRARY |
+| `From Model Choice to Model Belief.pdf` | Sun & Zhang 2025 | Token-probability measurement alternative to repeated sampled choices | IN_LIBRARY |
 
 ## 15. Adjacent / background (cited in project docs)
 
@@ -266,15 +279,21 @@ This file at repo root is the human-facing categorical index that ties paper fil
 | **E_TDR** (temporal dose × cutoff interaction) | Dated Data, Set the Clock, Time Machine GPT, DatedGPT, Chronologically Consistent LLMs, Lookahead Bias in Pretrained LMs, Caution Ahead, Do LLMs Understand Chronology, A Test of Lookahead Bias, Fast Effective Solution Look-ahead Bias, Fake Date Tests, All Leaks Count Some Count More |
 | **E_ADG** (as-of-date prompt gating) | Do LLMs Understand Chronology, Set the Clock, Memorization Problem LLMs Economic Forecasts |
 | **Construct validity / framework** | Quantifying Construct Validity LLM Evaluations, Construct Validity LLM Nomological Networks, Evaluating NLG Metrics Measurement Theory, Structure of LM Capabilities Factor Analysis, BenchBench Benchmark Agreement |
+| **Phase 8 `C_GoalFrame`** (exploratory only) | Seeing the Goal Missing the Truth, Ask Don't Tell, Training Language Models Warm Accuracy Sycophancy, Sycophantic AI Decreases Prosocial Intentions, AI Assisted Economics Measurement From Survey, From Model Choice to Model Belief, A Financial Brain Scan of the LLM |
 
 ---
 
 ## Footer
 
-**Last sync:** 2026-04-16 (post-R5A-freeze cleanup).
-**Previous sync:** 2026-04-06.
+**Last sync:** 2026-05-07 (Phase 8 goal-frame / sycophancy / LLM-measurement additions).
+**Previous sync:** 2026-04-27.
 
-**What changed since 2026-04-06:**
+**What changed since 2026-04-27:**
+- Added six local PDFs from the incremental targeted sweep: `Ask Dont Tell Reducing Sycophancy LLMs.pdf`, `AI Assisted Economics Measurement From Survey.pdf`, `From Model Choice to Model Belief.pdf`, `A Financial Brain Scan of the LLM.pdf`, `Sycophantic AI Decreases Prosocial Intentions.pdf`, and `Training Language Models Warm Accuracy Sycophancy.pdf`.
+- Added two SSRN papers as `REFERENCED_ONLY` because direct PDF download returned 403 during the 2026-05-07 sync: Shaffer & Wang, *Scaling Core Earnings Measurement with Large Language Models*; Cao, Wang & Xiang, *When LLMs Go Abroad*.
+- Added the Phase 8 `C_GoalFrame` exploratory cross-reference. This does not alter the frozen confirmatory family.
+
+**Earlier 2026-04-16 sync summary:**
 - Total PDFs grew from 60 -> 128 (+68 net of dedupe). Most additions came from the **R4 literature sweep Sessions 1 + 2** (~25 papers added 2026-04-14/15: MIA foundations + skepticism, chrono-control precursors, look-ahead-bench family, finance memorization papers, construct-validity stack) and from the **R5A fleet review** (cross-model + cross-fleet contamination & memorization comparators).
 - New top-level categories: **MIA family + skepticism** (§2), **Chronological controls / look-ahead bias** (§3), **Finance memorization / leakage benchmarks** (§4, expanded), **Counterfactual / perturbation methodology** (§5), **Construct validity / benchmark methodology** (§6), **Cross-model / cross-fleet memorization** (§8).
 - Existing "Memorization, Contamination & Data Extraction" was split into §1 (foundations) + §7 (contamination detection) + §2 (MIA) for clarity.

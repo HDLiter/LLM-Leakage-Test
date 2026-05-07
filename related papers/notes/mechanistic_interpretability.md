@@ -124,4 +124,18 @@
 - **PCA + cosine similarity** on hidden-state centroids across conditions shows whether conditions cluster distinctly (Opinion-only vs Plain) or collapse (expertise levels).
 - Critical layers: Llama-3.1-8B layer 32 (KL peak) / 19 (DS shift); Qwen2.5-7B layer 27 (KL peak) / 22 (DS shift). All 5+ other models follow the same two-stage pattern in appendix.
 
-**Insight for our project:** This is the **structural template for the WS6 mechanistic study of E_FO** in our project. Our C_FO inserts a fake outcome into a financial article that contradicts the model's memorized real outcome — the conflict is structurally identical to "user opinion vs internal correct answer" in this paper, except the polarity is inverted: we want the model to **resist** the fake outcome (memorization signal), not succumb to it (sycophancy). The same DS / KL / activation-patching toolkit applies directly: we should localize at which layer the network's output diverges from the C_FO baseline, identify the "memorization override" layer per model, and use bidirectional patching to demonstrate causal control. The paper's result that override consolidates in the final 25% of layers gives us a layer-window prior to pre-register. Tooling required on our side: `offline_hf` backend with `output_hidden_states=True`, `LogProbTrace.hidden_states_uri` field, and a new `analysis/mechanistic.py` module implementing DS / KL / patching helpers (~200 lines). WS6 trigger: behavioral E_FO clears its quality gate (mean |delta| > 0 on ≥ 5/14 models given the post-2026-04-27 fleet). See `docs/DECISION_20260427_pcsg_redefinition.md` §2.5 for the full integration spec.
+**Insight for our project:** This is the **structural template for WS6 discriminative mechanism analysis of `E_OR` / `C_CO`** in our project. Our `C_CO` inserts a fake outcome into a financial article that contradicts the model's memorized real outcome; the conflict is structurally close to "user opinion vs internal correct answer" in this paper, except the polarity is inverted: we want the model to resist the fake outcome if it has a memorized-truth signal. The same DS / KL / activation-patching toolkit applies directly: localize where the network diverges from the `C_CO` baseline and ask whether the late-stage shift looks more like memorized-truth resistance, instruction following, or sycophancy/user-goal accommodation. Since WS6 is now unconditional with eager hidden-state precompute, this paper should guide the explanatory analysis after artifacts land rather than serve as a behavioral trigger.
+
+---
+
+## A Financial Brain Scan of the LLM
+**Authors & Year:** Chen, Didisheim, Somoza & Tian (2025)
+
+**Summary:** Chen et al. apply sparse-autoencoder-style interpretability to financial LLM forecasts, extracting human-readable concepts such as sentiment, timing, technical analysis, risk appetite, optimism, and pessimism from model internals. The paper then steers these concepts to test whether financial outputs move in predictable directions.
+
+**Key methods/findings**
+- Provides a finance-domain example of internal representation analysis as an empirical measurement tool.
+- Separates concept identification from behavioral steering, which is useful for avoiding purely post-hoc interpretation.
+- Shows that financial forecast behavior can be shifted by manipulating interpretable internal concepts.
+
+**Insight for our project:** This is not a confirmatory R5A anchor, but it is useful for Phase 8 if `C_GoalFrame` grows an internal-probe appendix. The natural question would be whether goal disclosure changes internal decision states or concept salience beyond the final `P_predict` output. This should reuse the WS6 white-box machinery where feasible and remain explanatory, not a new confirmatory estimand.

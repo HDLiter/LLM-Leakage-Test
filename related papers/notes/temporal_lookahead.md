@@ -1,5 +1,19 @@
 # Temporal Knowledge & Look-Ahead Bias
 
+## Seeing the Goal, Missing the Truth: Human Accountability for AI Bias
+**Authors & Year:** Cao, Jiang & Xu (2026)
+
+**Summary:** Cao, Jiang, and Xu show that disclosing a downstream financial goal can change LLM-generated intermediate sentiment or competition scores, and that the goal-aware increment is concentrated before the model knowledge cutoff. This makes the paper a temporal-leakage-adjacent result rather than just a prompt-engineering result.
+
+**Key methods/findings**
+- The prompt-level treatment holds article/transcript input and scoring target fixed while varying disclosed downstream use.
+- Goal-aware minus goal-blind score differences carry pre-cutoff predictive signal that attenuates after the cutoff.
+- Explicit anti-hindsight wording and prompt regularization can reduce but not necessarily eliminate goal-conditioned effects.
+
+**Insight for our project:** This is the main temporal justification for Phase 8 `C_GoalFrame`: the relevant R5A contrast is the pre/post-cutoff interaction in the goal-frame delta. A raw prompt delta is not enough because post-cutoff shifts can reflect generic sycophancy, objective framing, or measurement bias unrelated to memorized future information.
+
+---
+
 ## A Test of Lookahead Bias in LLM Forecasts
 **Authors & Year:** Gao, Jiang & Yan (2026)
 

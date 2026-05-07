@@ -10,7 +10,49 @@
 - The "Diff" score, defined as goal-aware minus goal-blind, has pre-cutoff return-predictive power but little or no post-cutoff advantage in the reported return regressions.
 - The paper reports that subtle contextual cues and prompt regularization matter: the model can infer the goal from surrounding context, and explicit anti-hindsight wording attenuates but does not eliminate the effect.
 
-**Insight for our project:** This should be treated as an exploratory prompt-level perturbation, not as a new confirmatory WS3 article perturbation. A candidate R5A extension is `C_GoalFrame`: keep `P_predict` input article and JSON schema fixed, but vary disclosed purpose. Candidate goal frames include neutral baseline, return/alpha forecasting, earnings/competition forecasting, memory-leakage audit, and strict article-only measurement. The estimand should be a pre/post-cutoff interaction, not the raw prompt delta: `E_GoalFrame = signed_score(goal_frame) - signed_score(goal_blind)`, with the memorization-relevant signal being whether that delta is materially larger for pre-cutoff cases than BL2 post-cutoff controls. This belongs in Phase 8 exploratory or appendix work after WS2 prompt lockdown and should not change the frozen confirmatory family.
+**Insight for our project:** This should be treated as an exploratory prompt-level perturbation, not as a new confirmatory WS3 article perturbation. `C_GoalFrame` is now a Phase 8 backlog item: keep `P_predict` input article and JSON schema fixed, but vary disclosed purpose. Candidate goal frames include neutral baseline, return/alpha forecasting, earnings/competition forecasting, memory-leakage audit, strict article-only measurement, and possibly user-confirmation framing. The default estimand should be a pre/post-cutoff interaction, not the raw prompt delta: `E_GoalFrame = signed_score(goal_frame) - signed_score(goal_blind)`, with the memorization-relevant signal being whether that delta is materially larger for pre-cutoff cases than BL2 post-cutoff controls. A small white-box internal-probe appendix can reuse WS6-style DS / KL / activation patching after the core confirmatory experiments, but it should remain explanatory and should not change the frozen confirmatory family.
+
+---
+
+## Ask Don't Tell: Reducing Sycophancy in Large Language Models
+**Authors & Year:** Dubois, Ududec, Summerfield & Luettgau (2026)
+
+**Summary:** This paper studies sycophancy as a prompt-framing failure and tests interventions that move user-provided assertions into question form before asking a responding model. The design is useful because it separates "the user has an opinion" from "the user asks for an answer," which is close to the distinction R5A needs when goal disclosure or user-confirmation framing changes model outputs.
+
+**Key methods/findings**
+- Treats sycophancy as a response shift caused by how the user's belief or goal is represented in the prompt.
+- Uses two-step question reformulation as a mitigation, with controls for generic instruction overhead.
+- Relevant to R5A because `C_CO` and future `C_GoalFrame` variants both need to distinguish evidence use from user-goal accommodation.
+
+**Insight for our project:** This supports keeping `C_GoalFrame` as a Phase 8 exploratory prompt-level arm and making the goal frame minimal. It also argues for a paired prompt set: the behavioral contrast should isolate downstream-purpose disclosure rather than accidentally adding a stronger instruction hierarchy or extra evidence.
+
+---
+
+## Training Language Models to Be Warm Can Reduce Accuracy and Increase Sycophancy
+**Authors & Year:** Ibrahim, Hafner & Rocher (2026)
+
+**Summary:** This open-access Nature article shows that optimizing models for warmer conversational style can reduce factual accuracy and increase agreement with incorrect user beliefs. The operationalization appends wrong user beliefs to factual prompts and measures whether the model shifts toward the user's stated belief.
+
+**Key methods/findings**
+- Warmth/persona tuning is treated as a separate objective that can trade off against factual accuracy.
+- The sycophancy measurement uses explicit user-belief perturbations, giving a concrete behavioral template for user-confirmation controls.
+- Standard benchmark scores can miss this failure mode, which makes it relevant as a measurement-bias caveat rather than a finance-specific result.
+
+**Insight for our project:** This strengthens the caveat that a goal-aware or user-confirming prompt can change outputs even without memorization. It supports treating Phase 8 `C_GoalFrame` effects as memorization-relevant only when the goal-frame delta is materially stronger pre-cutoff than in post-cutoff controls.
+
+---
+
+## Sycophantic AI Decreases Prosocial Intentions and Promotes Dependence
+**Authors & Year:** Cheng, Lee, Khadpe, Yu, Han & Jurafsky (2025)
+
+**Summary:** Cheng et al. measure sycophantic agreement across contemporary models and then test how exposure to sycophantic AI affects users. Although the downstream human-subject outcome is not central to R5A, the model-side finding is useful: user-affirming behavior can be systematic, preferred by users, and therefore incentivized by deployment objectives.
+
+**Key methods/findings**
+- Across 11 models, AI responses are more affirming than human responses in advice settings.
+- In preregistered experiments, sycophantic responses increase perceived quality and trust while reducing corrective action.
+- The paper frames sycophancy as an incentive-compatible alignment artifact, not just a prompt quirk.
+
+**Insight for our project:** This is a caveat paper. It should not change the confirmatory family, but it supports reserving a Phase 8 user-confirmation or goal-disclosure variant and reporting that `C_CO` resistance and `C_GoalFrame` drift can reflect user-goal conditioning unless post-cutoff controls and internal probes separate the mechanisms.
 
 ---
 

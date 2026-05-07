@@ -10,7 +10,77 @@
 - The goal-aware advantage appears in pre-cutoff periods and disappears or weakens post-cutoff, consistent with purpose-conditioned use of information encoded before the model's knowledge cutoff.
 - The paper frames this as a research-design problem: prompts and conversational context can leak the analyst's objective into what should be a neutral measurement step.
 
-**Insight for our project:** This strengthens the case for prompt blinding in `P_predict` and for keeping the R5A baseline prompt free of research-goal language such as "leakage audit", "memorization test", or "downstream return model." It also motivates a Phase 8 exploratory `C_GoalFrame` arm: same CLS article, same target, same JSON schema, but different disclosed goals such as return prediction, earnings prediction, memory-leakage audit, or strict article-only measurement. The key control is BL2 post-cutoff: if a goal frame changes outputs equally in pre- and post-cutoff cases, it is generic framing or sycophancy; if the delta is pre-cutoff-specific, it is more relevant to leakage/memorization.
+**Insight for our project:** This strengthens the case for prompt blinding in `P_predict` and for keeping the R5A baseline prompt free of research-goal language such as "leakage audit", "memorization test", or "downstream return model." It also motivates a Phase 8 exploratory `C_GoalFrame` arm: same CLS article, same target, same JSON schema, but different disclosed goals such as return prediction, earnings prediction, memory-leakage audit, or strict article-only measurement. The key control is BL2 post-cutoff: if a goal frame changes outputs equally in pre- and post-cutoff cases, it is generic framing or sycophancy; if the delta is pre-cutoff-specific, it is more relevant to leakage/memorization. Any internal-probe version should be a later white-box appendix after the core confirmatory experiments, not the primary estimand.
+
+---
+
+## AI Assisted Economics Measurement From Survey: Evidence from Public Employee Pension Choice
+**Authors & Year:** Wang & Sharma (2026)
+
+**Summary:** Wang and Sharma use LLMs to extract latent economic measurement structure from survey instruments, mapping survey items into sparse distributions over constructs and validating the resulting scores with out-of-sample incremental validity and discriminant-validity diagnostics.
+
+**Key methods/findings**
+- Treats LLM output as an intermediate measurement object, not as the final economic outcome.
+- Uses iterative taxonomy refinement only when the added flexibility improves stable out-of-sample performance.
+- Explicitly separates construct extraction, aggregation, and validation diagnostics.
+
+**Insight for our project:** This belongs with the "LLM-generated intermediate variables" literature. It supports R5A's L3/L4 separation: `P_predict` outputs and goal-frame deltas should be treated as measurement objects that require validity checks, not as direct proof of forecasting skill or leakage.
+
+---
+
+## From Model Choice to Model Belief: Establishing a New Measure for LLM-Based Research
+**Authors & Year:** Sun & Zhang (2025)
+
+**Summary:** Sun and Zhang formalize "model belief" as a token-probability-based measure over choice alternatives, arguing that it can recover information that is lost when researchers record only a sampled discrete model choice.
+
+**Key methods/findings**
+- Converts token-level probabilities into a lower-variance measurement of model belief over alternatives.
+- Shows asymptotic equivalence to repeated model-choice means while requiring fewer generations in limited-budget settings.
+- Demonstrates the approach in an economics demand-estimation task.
+
+**Insight for our project:** This is relevant to the operator boundary between `P_predict` and `P_logprob`. It does not change the current fleet or operator allocation, but it supports the long-run argument that internal probability structure can be a cleaner measurement target than sampled predictions when a white-box path exists.
+
+---
+
+## A Financial Brain Scan of the LLM
+**Authors & Year:** Chen, Didisheim, Somoza & Tian (2025)
+
+**Summary:** This paper applies interpretable internal-feature methods to financial forecasting, identifying concepts such as sentiment, technical analysis, timing, risk appetite, optimism, and pessimism inside model representations and then steering those concepts while holding other factors constant.
+
+**Key methods/findings**
+- Uses internal representations to map LLM financial forecasts to human-interpretable concepts.
+- Shows that concept steering can change financial-forecast behavior without retraining.
+- Frames internal analysis as a lightweight empirical tool for social-science and finance researchers.
+
+**Insight for our project:** This is a useful bridge between `C_GoalFrame` and WS6. It supports an optional Phase 8 internal-probe appendix that asks whether goal disclosure changes late decision states, concept salience, or output calibration; it does not support moving `C_GoalFrame` into the current confirmatory family.
+
+---
+
+## Scaling Core Earnings Measurement with Large Language Models
+**Authors & Year:** Shaffer & Wang (2024/2025 revision)
+
+**Summary:** Shaffer and Wang use LLMs to estimate core earnings from 10-K filings and compare a one-shot prompt with a sequential prompt that decomposes the measurement task. The one-shot approach conflates related accounting concepts, while the sequential approach produces a measure with stronger validity properties.
+
+**Key methods/findings**
+- LLM-generated accounting variables are sensitive to prompt decomposition and task framing.
+- Sequential prompting can improve construct validity but also introduces design degrees of freedom.
+- The paper is a direct example of LLM outputs functioning as empirical finance measurements.
+
+**Insight for our project:** This supports WS2 prompt lockdown and Phase 8 caution around `C_GoalFrame`: prompt engineering can legitimately improve measurement, but it can also move the target. PDF download from SSRN returned 403 during the 2026-05-07 sync, so this entry is referenced-only until a clean source is available.
+
+---
+
+## When LLMs Go Abroad: Foreign Bias in AI Financial Predictions
+**Authors & Year:** Cao, Wang & Xiang (2025)
+
+**Summary:** Cao, Wang, and Xiang compare ChatGPT and DeepSeek on Chinese-firm financial predictions and find model-specific foreign bias: ChatGPT is more optimistic about Chinese firms than DeepSeek. They trace the gap to differential information access, and report that supplying Chinese news in the prompt eliminates the prediction gap.
+
+**Key methods/findings**
+- Model predictions reflect the information environment represented in training data.
+- Prompt-supplied local news can remove a cross-model prediction gap without changing model weights.
+- The paper connects financial prediction bias to missing or asymmetric training exposure rather than generic capability alone.
+
+**Insight for our project:** This is relevant as a caveat for fleet comparisons and as support for article-grounded prompt blinding. It does not imply any change to the black-box fleet; it only strengthens the reporting caveat that observed model differences can reflect training-data geography and language coverage. PDF download from SSRN returned 403 during the 2026-05-07 sync, so this entry is referenced-only until a clean source is available.
 
 ---
 

@@ -57,9 +57,10 @@
 - **Revisit trigger**: Phase 7 pilot results surface a reserve estimand that satisfies its frozen promotion rule.
 
 ### Phase 8 exploratory goal-frame perturbation
-- **Context**: Cao, Jiang & Xu (2026), `Seeing the Goal, Missing the Truth`, shows that disclosing downstream goals can shift financial LLM intermediate scores, with pre-cutoff gains that attenuate post-cutoff. Related paper PDF and notes are indexed under `related papers/`.
-- **Status**: exploratory only. Do not add to the current confirmatory family or WS3 `C_CO` / `C_NoOp` work.
-- **Revisit trigger**: after WS2 `P_predict` prompt lockdown and the core pilot, decide whether to open a Phase 8 appendix arm for `C_GoalFrame` variants such as return prediction, earnings prediction, memory-leakage audit, and strict article-only measurement.
+- **Context**: Cao, Jiang & Xu (2026), `Seeing the Goal, Missing the Truth`, shows that disclosing downstream goals can shift financial LLM intermediate scores, with pre-cutoff gains that attenuate post-cutoff. The 2026-05-07 incremental sweep also added sycophancy and LLM-generated-measurement papers that support treating goal disclosure as a measurement-bias risk, not a current confirmatory estimand.
+- **Status**: accepted into the Phase 8 exploratory backlog as `C_GoalFrame`. Do not add to the current confirmatory family or WS3 `C_CO` / `C_NoOp` work.
+- **Decision needed**: after WS2 `P_predict` prompt lockdown and the core confirmatory experiments, decide whether Phase 8 should run `C_GoalFrame` as (a) behavior-only `P_predict` prompt variants or (b) behavior plus a small white-box internal-probe appendix reusing WS6-style DS / KL / activation-patching machinery.
+- **Candidate scope**: neutral/blind baseline, return prediction, earnings or competition prediction, memory-leakage audit, strict article-only measurement, and possibly user-confirmation framing. The primary exploratory contrast should remain a pre/post-cutoff interaction, not the raw prompt delta.
 
 ### English expansion
 - **Context**: memory `project_english_expansion.md` — stretch goal, 5 trigger conditions evaluated after Chinese pilot.

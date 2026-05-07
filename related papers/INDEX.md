@@ -82,6 +82,7 @@
 - [RealTime QA: What's the Answer Right Now?](RealTime QA.pdf)
 - [Seeing the Goal, Missing the Truth: Human Accountability for AI Bias](Seeing the Goal Missing the Truth Human Accountability for AI Bias.pdf)
 - [AI's Predictable Memory in Financial Analysis](AIs Predictable Memory Financial Analysis.md) *(HTML→markdown, paywalled PDF unavailable)*
+- [When LLMs Go Abroad: Foreign Bias in AI Financial Predictions](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5440116) *(referenced only; SSRN PDF download returned 403 on 2026-05-07)*
 
 
 ## Knowledge Editing & Localization
@@ -117,6 +118,7 @@
 - [Entity Cells in Language Models](Entity Cells Language Models.pdf)
 - [Entity Identification in Language Models](Entity Identification Language Models.pdf)
 - [Explaining the Unexplained](FinGPT Dissemination-Aware Context-Enriched LLMs.pdf)
+- [A Financial Brain Scan of the LLM](A Financial Brain Scan of the LLM.pdf)
 - [TRAK](TRAK Attributing Model Behavior at Scale.pdf)
 - [Transformer Feed-Forward Layers Are Key-Value Memories](FFN Key-Value Memories Transformers.pdf)
 
@@ -137,6 +139,11 @@
 - [Anonymization and Information Loss](Anonymization and Information Loss.pdf)
 - [LiveTradeBench: Seeking Real-World Alpha with Large Language Models](LiveTradeBench Real-World Alpha LLM.pdf)
 - [Seeing the Goal, Missing the Truth: Human Accountability for AI Bias](Seeing the Goal Missing the Truth Human Accountability for AI Bias.pdf)
+- [A Financial Brain Scan of the LLM](A Financial Brain Scan of the LLM.pdf)
+- [AI Assisted Economics Measurement From Survey](AI Assisted Economics Measurement From Survey.pdf)
+- [From Model Choice to Model Belief](From Model Choice to Model Belief.pdf)
+- [Scaling Core Earnings Measurement with Large Language Models](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4979501) *(referenced only; SSRN PDF download returned 403 on 2026-05-07)*
+- [When LLMs Go Abroad: Foreign Bias in AI Financial Predictions](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5440116) *(referenced only; SSRN PDF download returned 403 on 2026-05-07)*
 
 
 ## Prompting & Reasoning Techniques
@@ -148,10 +155,15 @@
 - [Least-to-Most Prompting Complex Reasoning](Least-to-Most Prompting Complex Reasoning.pdf)
 - [Rationalizing Neural Predictions](Rationalizing Neural Predictions.pdf)
 - [Seeing the Goal, Missing the Truth: Human Accountability for AI Bias](Seeing the Goal Missing the Truth Human Accountability for AI Bias.pdf)
+- [Ask Don't Tell: Reducing Sycophancy in Large Language Models](Ask Dont Tell Reducing Sycophancy LLMs.pdf)
+- [Sycophantic AI Decreases Prosocial Intentions and Promotes Dependence](Sycophantic AI Decreases Prosocial Intentions.pdf)
+- [Training Language Models to Be Warm Can Reduce Accuracy and Increase Sycophancy](Training Language Models Warm Accuracy Sycophancy.pdf)
 
 ## Methodology & Meta-Evaluation
 
 - [One Model Many Scores: Using Multiverse Analysis to Prevent Fairness Hacking](Multiverse Analysis Fairness Hacking.pdf)
+- [AI Assisted Economics Measurement From Survey](AI Assisted Economics Measurement From Survey.pdf)
+- [From Model Choice to Model Belief](From Model Choice to Model Belief.pdf)
 
 
 ## Calibration, Uncertainty & Robustness

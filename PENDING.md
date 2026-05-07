@@ -6,7 +6,7 @@
 >
 > **Update rule**: when an item resolves, move it to `## Recently closed` at the bottom (keep for ~30 days), then delete. Do not silently remove — the history matters.
 >
-> **Last updated**: 2026-05-05
+> **Last updated**: 2026-05-07
 
 ---
 
@@ -55,6 +55,11 @@
 - **Context**: `plans/phase7-pilot-implementation.md` §7.2A defines Phase 7b as non-critical-path contingency, activated only if pilot triggers promotion rules for `E_ADG`, `E_extract`, or `E_schema_cont` per `R5A_FROZEN_SHORTLIST.md` §4.
 - **Status**: dormant. Do not work on implementation until a pilot trigger fires.
 - **Revisit trigger**: Phase 7 pilot results surface a reserve estimand that satisfies its frozen promotion rule.
+
+### Phase 8 exploratory goal-frame perturbation
+- **Context**: Cao, Jiang & Xu (2026), `Seeing the Goal, Missing the Truth`, shows that disclosing downstream goals can shift financial LLM intermediate scores, with pre-cutoff gains that attenuate post-cutoff. Related paper PDF and notes are indexed under `related papers/`.
+- **Status**: exploratory only. Do not add to the current confirmatory family or WS3 `C_CO` / `C_NoOp` work.
+- **Revisit trigger**: after WS2 `P_predict` prompt lockdown and the core pilot, decide whether to open a Phase 8 appendix arm for `C_GoalFrame` variants such as return prediction, earnings prediction, memory-leakage audit, and strict article-only measurement.
 
 ### English expansion
 - **Context**: memory `project_english_expansion.md` — stretch goal, 5 trigger conditions evaluated after Chinese pilot.

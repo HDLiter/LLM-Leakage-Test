@@ -1,5 +1,19 @@
 # Financial NLP & Sentiment Analysis
 
+## Seeing the Goal, Missing the Truth: Human Accountability for AI Bias
+**Authors & Year:** Cao, Jiang & Xu (2026)
+
+**Summary:** This paper studies financial LLM measurement under purpose disclosure. Using earnings-call transcripts, it asks models to produce intermediate sentiment or competition scores, then compares goal-blind prompts with goal-aware prompts that disclose the downstream use in return or earnings prediction. The design is directly relevant to finance because the score itself is not the final forecast, yet the disclosed forecasting purpose still changes the score.
+
+**Key methods/findings**
+- Goal-aware sentiment and competition scores become more aligned with the disclosed downstream prediction target.
+- The goal-aware advantage appears in pre-cutoff periods and disappears or weakens post-cutoff, consistent with purpose-conditioned use of information encoded before the model's knowledge cutoff.
+- The paper frames this as a research-design problem: prompts and conversational context can leak the analyst's objective into what should be a neutral measurement step.
+
+**Insight for our project:** This strengthens the case for prompt blinding in `P_predict` and for keeping the R5A baseline prompt free of research-goal language such as "leakage audit", "memorization test", or "downstream return model." It also motivates a Phase 8 exploratory `C_GoalFrame` arm: same CLS article, same target, same JSON schema, but different disclosed goals such as return prediction, earnings prediction, memory-leakage audit, or strict article-only measurement. The key control is BL2 post-cutoff: if a goal frame changes outputs equally in pre- and post-cutoff cases, it is generic framing or sycophancy; if the delta is pre-cutoff-specific, it is more relevant to leakage/memorization.
+
+---
+
 ## Can ChatGPT Forecast Stock Price Movements? Return Predictability and Large Language Models
 **Authors & Year:** Lopez-Lira & Tang (2024)
 

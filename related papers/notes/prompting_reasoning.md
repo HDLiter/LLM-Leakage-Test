@@ -1,5 +1,19 @@
 # Prompting & Reasoning Techniques
 
+## Seeing the Goal, Missing the Truth: Human Accountability for AI Bias
+**Authors & Year:** Cao, Jiang & Xu (2026)
+
+**Summary:** Cao, Jiang, and Xu test whether an LLM's intermediate financial measurements change when the prompt discloses the downstream goal. They hold the input text, model, scoring task, and output format fixed, and vary only whether the model is told that the produced sentiment or competition score will later be used to predict stock returns or earnings. Goal-aware prompting shifts the intermediate scores toward the disclosed objective; the incremental predictive value is concentrated before the model knowledge cutoff and attenuates after the cutoff.
+
+**Key methods/findings**
+- Treatment is a minimal prompt-level intervention: goal-blind score extraction versus goal-aware score extraction with the downstream regression objective disclosed.
+- The "Diff" score, defined as goal-aware minus goal-blind, has pre-cutoff return-predictive power but little or no post-cutoff advantage in the reported return regressions.
+- The paper reports that subtle contextual cues and prompt regularization matter: the model can infer the goal from surrounding context, and explicit anti-hindsight wording attenuates but does not eliminate the effect.
+
+**Insight for our project:** This should be treated as an exploratory prompt-level perturbation, not as a new confirmatory WS3 article perturbation. A candidate R5A extension is `C_GoalFrame`: keep `P_predict` input article and JSON schema fixed, but vary disclosed purpose. Candidate goal frames include neutral baseline, return/alpha forecasting, earnings/competition forecasting, memory-leakage audit, and strict article-only measurement. The estimand should be a pre/post-cutoff interaction, not the raw prompt delta: `E_GoalFrame = signed_score(goal_frame) - signed_score(goal_blind)`, with the memorization-relevant signal being whether that delta is materially larger for pre-cutoff cases than BL2 post-cutoff controls. This belongs in Phase 8 exploratory or appendix work after WS2 prompt lockdown and should not change the frozen confirmatory family.
+
+---
+
 ## CHiLL: Zero-Shot Feature Extraction with Large Language Models
 **Authors & Year:** McInerney et al. (2022)
 

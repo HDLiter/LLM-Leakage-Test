@@ -80,6 +80,7 @@
 - [Lookahead Bias in Pretrained Language Models](Lookahead Bias in Pretrained LMs.pdf)
 - [Caution Ahead: Numerical Reasoning and Look-ahead Bias in AI Models](Caution Ahead Numerical Reasoning Look-ahead.pdf)
 - [RealTime QA: What's the Answer Right Now?](RealTime QA.pdf)
+- [Seeing the Goal, Missing the Truth: Human Accountability for AI Bias](Seeing the Goal Missing the Truth Human Accountability for AI Bias.pdf)
 - [AI's Predictable Memory in Financial Analysis](AIs Predictable Memory Financial Analysis.md) *(HTML→markdown, paywalled PDF unavailable)*
 
 
@@ -135,6 +136,7 @@
 - [Evaluating LLMs in Finance Requires Explicit Bias Consideration](Evaluating LLMs Finance Explicit Bias.pdf)
 - [Anonymization and Information Loss](Anonymization and Information Loss.pdf)
 - [LiveTradeBench: Seeking Real-World Alpha with Large Language Models](LiveTradeBench Real-World Alpha LLM.pdf)
+- [Seeing the Goal, Missing the Truth: Human Accountability for AI Bias](Seeing the Goal Missing the Truth Human Accountability for AI Bias.pdf)
 
 
 ## Prompting & Reasoning Techniques
@@ -145,6 +147,7 @@
 - [Language Models Don’t Always Say What They Think](Unfaithful Explanations in CoT.pdf)
 - [Least-to-Most Prompting Complex Reasoning](Least-to-Most Prompting Complex Reasoning.pdf)
 - [Rationalizing Neural Predictions](Rationalizing Neural Predictions.pdf)
+- [Seeing the Goal, Missing the Truth: Human Accountability for AI Bias](Seeing the Goal Missing the Truth Human Accountability for AI Bias.pdf)
 
 ## Methodology & Meta-Evaluation
 

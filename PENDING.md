@@ -6,7 +6,7 @@
 >
 > **Update rule**: when an item resolves, move it to `## Recently closed` at the bottom (keep for ~30 days), then delete. Do not silently remove — the history matters.
 >
-> **Last updated**: 2026-05-07
+> **Last updated**: 2026-05-19
 
 ---
 
@@ -33,19 +33,6 @@
 - **Owner**: user (recruiting attempt in progress).
 - **Target resolution date**: before WS4 pilot manifest freeze.
 - **Notes**: pitch template and qualification criteria discussed 2026-04-18 session; see conversation notes if recruiting.
-
-### WS0.5 — Thales alignment design
-- **Context**: `plans/phase7-pilot-implementation.md` §5.1A reserves WS0.5 as a named workstream but does NOT specify scope, deliverables, file paths, or effort. The v2.1 revision over-committed these; v2.2 softened back to a gate-only placeholder.
-- **Decision needed**: new session dedicated to Thales reuse-vs-rebuild for the 4 confirmatory factors (Cutoff Exposure, Historical Family Recurrence, Target Salience, Template Rigidity) plus Bloc 3 factors (Structured Event Type, Disclosure Regime / Modality, Authority). Produce a dedicated `docs/DECISION_*` memo that answers:
-  - **T1**: does Thales's topic-classification pipeline (EventType taxonomy) have persisted outputs on the CLS v3 sample, or does it need to run?
-  - **T2**: does Thales have (or can it derive) an `(entity, event_type, date_window)` frequency index suitable for `historical_family_recurrence`?
-  - **T3**: does CLS raw data preserve publisher metadata at coverage good enough for extra-corpus Authority operationalization?
-  - scope: how much is reused verbatim, what adapter code is needed, what validation is sufficient
-  - effort estimate once scope is settled
-- **Blocking**: pilot manifest freeze (Section 6) and Section 14.4 sign-off.
-- **Owner**: user (wants separate session).
-- **Target resolution date**: before WS4.
-- **Related docs**: `docs/THALES_SIGNAL_PROFILE_REVIEW.md`, `refine-logs/reviews/R5A_STEP2/R5A_FROZEN_SHORTLIST.md`, `refine-logs/reviews/R5A_STEP2/MEASUREMENT_FRAMEWORK.md`.
 
 ---
 
@@ -79,6 +66,16 @@
 ---
 
 ## Recently closed
+
+### WS0.5 — Thales alignment design
+- **Resolved 2026-05-19**: design closed via `docs/DECISION_20260518_ws0_5_thales_alignment.md` v0.3 (post-round-2 Codex review).
+  - **Round-0** (2026-05-18): v0.1 → Codex review → MAJOR-REVISIONS-NEEDED (4 blockers + 4 majors + 1 minor; 9 issues).
+  - **v0.2** (2026-05-19): 9 round-0 issues resolved via interactive user-Claude review (see `temp/ws0_5_issue_decisions.md`).
+  - **Round-1** (2026-05-19): 3 parallel Codex reviewers (ML engineer / statistician / measurement), all returned MAJOR-REVISIONS-NEEDED with 23 complementary critical issues (E-1…E-10, S-1…S-8, C-1…C-5). No cross-role conflict.
+  - **v0.3** (2026-05-19): all 23 round-1 issues patched in-place.
+  - **Round-2** (2026-05-19): 3 parallel Codex re-reviewers — Measurement APPROVE, ML-engineer APPROVE-WITH-MINOR-PATCHES, Statistician APPROVE-WITH-MINOR-PATCHES. 2 narrow text patches applied in-place to v0.3 (§4.1 MDE preflight q-grid wording, §5.2 R4 cache lookup key).
+  - T1 / T2 / T3 verification answers + reuse-vs-rebuild decisions + Scheme Y auto-tune validation + replay-from-cache determinism + budget ledger all locked. Implementation gates (frozen prompt configs, `factor_schema.yaml`, quota/discriminant/replay artifacts) remain per memo §9 closure conditions; tracked through memo §10 S1-S5 schedule.
+- **Related docs**: `docs/DECISION_20260518_ws0_5_thales_alignment.md` (memo), `temp/ws0_5_alignment_review.md` (round-0), `temp/ws0_5_issue_decisions.md` (round-0 → v0.2 decision log), `temp/ws0_5_round1_*_review.md` (round-1, 3 files), `temp/ws0_5_round2_*_review.md` (round-2, 3 files), `refine-logs/reviews/R5A_STEP2/R5A_FROZEN_SHORTLIST.md`, `refine-logs/reviews/R5A_STEP2/MEASUREMENT_FRAMEWORK.md`.
 
 ### WS1 white-box fleet pinning
 - **Resolved 2026-05-05**: all 12 white-box `hf_commit_sha` and

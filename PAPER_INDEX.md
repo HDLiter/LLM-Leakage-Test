@@ -1,14 +1,15 @@
 # Paper Index
 
-> **Last sync:** 2026-05-07 (added Phase 8 goal-frame / sycophancy / LLM-measurement sweep)
-> **Previous sync:** 2026-04-27 (added Wang et al. sycophancy mechanism for WS6 conditional)
-> **Total PDFs in `related papers/`:** 136
+> **Last sync:** 2026-05-19 (WS0.5 round-0 SOTA batch)
+> **Previous sync:** 2026-05-07 (added Phase 8 goal-frame / sycophancy / LLM-measurement sweep)
+> **Total PDFs in `related papers/`:** 158
 > **Status legend:** `IN_LIBRARY` = PDF on disk; `REFERENCED_ONLY` = cited in project docs / sweeps but no PDF in `related papers/`.
 
 This index is a **categorical pointer view** for fast navigation. The richer per-paper records (sha256, abstract excerpts, page counts, author guesses) live alongside the PDFs:
 
-- **Per-topic notes:** `related papers/notes/*.md` (ten thematic note files)
+- **Per-topic notes:** `related papers/notes/*.md` (twelve thematic note files)
 - **Machine-readable catalog:** `related papers/notes/_paper_catalog.json` (not authoritative for newest additions)
+- **WS0.5 round-0 source sweep:** `temp/ws0_5_autotune_sota_search.md`
 
 This file at repo root is the human-facing categorical index that ties paper filenames back to the R5A research design and the v6.2 decision document.
 
@@ -261,6 +262,62 @@ This file at repo root is the human-facing categorical index that ties paper fil
 | Ludwig, Mullainathan & Rambachan — *LLMs: Applied Econometric Framework* (NBER w33344) | Finance methodology | REFERENCED_ONLY |
 | BloombergGPT, FinanceBench, Financial Statement Analysis with LLMs | Finance background | REFERENCED_ONLY |
 
+## 16. Prompt optimization frameworks (WS0.5 round-0)
+
+| Filename | Authors / Year | Key contribution | Status |
+|---|---|---|---|
+| `DSPy Declarative LM Pipelines.pdf` | Khattab et al. 2024 | Declarative LM pipelines with signatures/modules compiled against metrics. WS0.5 used it as the Scheme X migration target and as the vocabulary for exporting frozen prompt behavior. | IN_LIBRARY |
+| `MIPRO Instructions Demonstrations LM Programs.pdf` | Opsahl-Ong et al. 2024 | Jointly optimizes free-form instructions and few-shot demonstrations for multi-stage LM programs with black-box scoring. WS0.5 used MIPRO/MIPROv2 as the practical optimizer candidate behind a separate acceptance gate. | IN_LIBRARY |
+| `GEPA Reflective Prompt Evolution.pdf` | Agrawal et al. 2025/2026 | Reflective prompt evolution uses natural-language feedback, Pareto frontier maintenance, and system-aware merging. WS0.5 treated GEPA as the strongest candidate generator, but not as a substitute for limited-exposure validation. | IN_LIBRARY |
+| `TextGrad Automatic Differentiation via Text.pdf` | Yuksekgonul et al. 2024 | Generalizes textual feedback into an automatic-differentiation-like interface for compound AI systems. WS0.5 used it to justify textual-gradient patch proposals from structured prompt failures. | IN_LIBRARY |
+| `ProTeGi Automatic Prompt Optimization.pdf` | Pryzant et al. 2023 | Uses minibatch natural-language gradients, beam search, and bandit selection for automatic prompt optimization. WS0.5 maps this directly to a stronger alternative to one-off Claude/Codex patch duels. | IN_LIBRARY |
+| `OPRO Large Language Models as Optimizers.pdf` | Yang et al. 2024 | Frames optimization as prompting an LLM with prior solutions and scores, including prompt search. WS0.5 treats OPRO as a simple proposer baseline that must be wrapped to avoid dev-set overfitting. | IN_LIBRARY |
+| `PromptWizard Task Aware Prompt Optimization.pdf` | Agarwal et al. 2024 | Feedback-driven critique and synthesis framework for optimizing instructions plus in-context examples. WS0.5 used it as an integration alternative to DSPy when black-box prompt extraction is required. | IN_LIBRARY |
+| `EvoPrompt Evolutionary Prompt Optimizers.pdf` | Guo et al. 2024 | Applies evolutionary algorithms to discrete prompt optimization. WS0.5 used it as support for population search, while flagging validation exposure risk. | IN_LIBRARY |
+| `Automatic Prompt Engineer Human Level Prompt Engineers.pdf` | Zhou et al. 2022 | Generates and selects candidate instructions automatically. WS0.5 used APE as a seed-generation baseline rather than a final optimizer. | IN_LIBRARY |
+| `Auto-CoT Automatic Chain of Thought Prompting.pdf` | Zhang et al. 2022 | Builds diverse automatic chain-of-thought demonstrations. WS0.5 cites it mostly as a caution: R5A extraction/classification prompts should not default to visible CoT if schema stability suffers. | IN_LIBRARY |
+
+## 17. Adaptive analysis & multiple-comparison discipline (WS0.5 round-0)
+
+| Filename | Authors / Year | Key contribution | Status |
+|---|---|---|---|
+| `Reusable Holdout Adaptive Data Analysis.pdf` | Dwork et al. 2015 | Establishes the reusable-holdout/adaptive-analysis failure mode and controlled holdout reuse. WS0.5 adapts the limited-exposure idea into train-visible, inner-dev, acceptance-holdout, and final-holdout splits. | IN_LIBRARY |
+| `Generic Holdout Adaptive Data Science.pdf` | Nakkiran & Blasiok 2018 | Proposes exploration-set freedom plus a holdout that answers only pass/fail-style questions. WS0.5 uses this to forbid rich acceptance-holdout score feedback to prompt proposers. | IN_LIBRARY |
+| `Ladder Reliable Leaderboard.pdf` | Blum & Hardt 2015 | Updates a leaderboard only when a submission clears a thresholded improvement rule. WS0.5 maps this to incumbent prompt replacement only after a pre-registered practical delta and paired statistical gate. | IN_LIBRARY |
+| `Always Valid Inference AB Testing.pdf` | Johari, Pekelis & Walsh 2015 | Provides always-valid inference for continuously monitored experiments and sequential multiple testing. WS0.5 uses it as the basis for an alpha ledger across prompt-candidate looks. | IN_LIBRARY |
+| `Dont Use CLT in LLM Evals.pdf` | Bowyer, Aitchison & Ivanova 2025 | Argues that CLT approximations can be unreliable for small specialized LLM evals. WS0.5 uses it to favor bootstrap/Bayesian uncertainty and conservative small-slice reporting. | IN_LIBRARY |
+
+## 18. NLP statistical tests & evaluation discipline (WS0.5 round-0)
+
+| Filename | Authors / Year | Key contribution | Status |
+|---|---|---|---|
+| `Hitchhikers Guide Statistical Significance NLP.pdf` | Dror et al. 2018 | Surveys significance-test choices for NLP and emphasizes task/metric-dependent paired tests. WS0.5 uses it to replace independent CI overlap with paired permutation, approximate randomization, bootstrap, or matched-pair tests. | IN_LIBRARY |
+| `Error Bars to Evals.pdf` | Miller 2024 | Treats LLM evals as statistical experiments with uncertainty estimates, deltas, and planning. WS0.5 uses it to require error bars and minimum detectable effect thinking in prompt acceptance logs. | IN_LIBRARY |
+
+## 19. Annotation methodology (WS0.5 round-0)
+
+| Filename | Authors / Year | Key contribution | Status |
+|---|---|---|---|
+| `Active Learning for NLP Survey.pdf` | Zhang, Strubell & Hovy 2022 | Surveys active-learning query strategies and practical NLP annotation concerns. WS0.5 uses it to replace random-only fixture rotation with disagreement, diversity, uncertainty, and rare-label sampling. | IN_LIBRARY |
+| `LLMs in the Loop Active Learning Annotation.pdf` | Kholodna et al. 2024 | Integrates LLM annotation into active learning for low-resource languages with agreement checks and cost analysis. WS0.5 uses it to support Claude/Codex-assisted labeling with explicit inter-annotator audits. | IN_LIBRARY |
+| `LLM Assisted Annotation Subjective Tasks.pdf` | Schroeder, Roy & Kabbara 2025 | Shows that LLM assistance can shift human labels in subjective annotation. WS0.5 uses it as the caution behind staged or blind adjudication for final-holdout signal-profile labels. | IN_LIBRARY |
+| `ActiveAED Annotation Error Detection.pdf` | Weber & Plank 2023 | Adds human-in-the-loop correction to annotation error detection. WS0.5 uses ActiveAED as the template for an error-audit queue driven by prompt disagreement and likely bad labels. | IN_LIBRARY |
+| `Skill-KNN Few-Shot Selection.pdf` | An et al. 2023 | Retrieves few-shot examples by task-skill descriptions instead of raw surface similarity. WS0.5 uses it as a possible dynamic-demonstration/retrieval policy if static prompt text plateaus. | IN_LIBRARY |
+
+### Referenced-only industry docs and implementation notes (WS0.5 round-0)
+
+| Reference | Where used | Status |
+|---|---|---|
+| DSPy GEPA docs | Prompt-optimizer implementation details for Scheme X / GEPA candidate generation | REFERENCED_ONLY - https://github.com/stanfordnlp/dspy/blob/main/docs/docs/api/optimizers/GEPA/overview.md |
+| DSPy MIPRO optimizer docs | MIPRO/MIPROv2 optimizer menu and DSPy integration notes | REFERENCED_ONLY - https://github.com/stanfordnlp/dspy/blob/main/docs/docs/learn/optimization/optimizers.md |
+| OpenAI evaluation best practices | Eval dataset, grader, and reporting discipline reference | REFERENCED_ONLY - https://developers.openai.com/api/docs/guides/evaluation-best-practices |
+| OpenAI prompt optimizer docs | Productized prompt optimization pattern reference | REFERENCED_ONLY - https://developers.openai.com/api/docs/guides/prompt-optimizer |
+| Anthropic eval guidance | Task-specific eval and grader reliability guidance | REFERENCED_ONLY - https://platform.claude.com/docs/en/test-and-evaluate/develop-tests |
+| LangSmith experiments docs | Experiment versioning and comparison metadata reference | REFERENCED_ONLY - https://docs.langchain.com/langsmith/analyze-an-experiment |
+| Promptfoo LLM judge guide | LLM-as-judge bias and validation reference | REFERENCED_ONLY - https://www.promptfoo.dev/docs/guides/llm-as-a-judge/ |
+| W&B Weave DSPy tutorial | DSPy prompt-optimization workflow example | REFERENCED_ONLY - https://docs.wandb.ai/weave/reference/gen_notebooks/dspy_prompt_optimization/ |
+| Microsoft Research PromptWizard blog | Industry explanation of PromptWizard feedback-driven optimization | REFERENCED_ONLY - https://www.microsoft.com/en-us/research/blog/promptwizard-the-future-of-prompt-optimization-through-feedback-driven-self-evolving-prompts/ |
+
 ---
 
 ## Cross-reference: which papers ground which R5A estimands
@@ -285,8 +342,13 @@ This file at repo root is the human-facing categorical index that ties paper fil
 
 ## Footer
 
-**Last sync:** 2026-05-07 (Phase 8 goal-frame / sycophancy / LLM-measurement additions).
-**Previous sync:** 2026-04-27.
+**Last sync:** 2026-05-19 (WS0.5 round-0 SOTA batch).
+**Previous sync:** 2026-05-07.
+
+**What changed since 2026-05-07:**
+- Added 22 local PDFs from `temp/ws0_5_autotune_sota_search.md`: ten prompt-optimization papers, five adaptive-analysis / multiple-look papers, two NLP statistical-evaluation papers, and five annotation-methodology papers.
+- Added referenced-only rows for nine industry documentation/blog sources that were decision inputs but are not PDF papers.
+- Added two WS0.5 thematic notes: `related papers/notes/prompt_optimization.md` and `related papers/notes/adaptive_analysis_reusable_holdout.md`.
 
 **What changed since 2026-04-27:**
 - Added six local PDFs from the incremental targeted sweep: `Ask Dont Tell Reducing Sycophancy LLMs.pdf`, `AI Assisted Economics Measurement From Survey.pdf`, `From Model Choice to Model Belief.pdf`, `A Financial Brain Scan of the LLM.pdf`, `Sycophantic AI Decreases Prosocial Intentions.pdf`, and `Training Language Models Warm Accuracy Sycophancy.pdf`.
@@ -307,5 +369,6 @@ This file at repo root is the human-facing categorical index that ties paper fil
 - `archive/r4_r5a_lineage/refine-logs/reviews/BENCHMARK_R5_KICKOFF.md`
 - `archive/r4_r5a_lineage/refine-logs/reviews/LIT_SWEEP_D_CITED_BUT_UNREAD.md`
 - `archive/r4_r5a_lineage/refine-logs/reviews/LIT_SWEEP_E_CONSTRUCT_VALIDATION.md`
-- `related papers/notes/_paper_catalog.json` (machine catalog, 86 entries — partially stale vs 128 PDFs on disk)
-- Filesystem listing of `related papers/*.pdf` (128 files, sorted alphabetically)
+- `temp/ws0_5_autotune_sota_search.md`
+- `related papers/notes/_paper_catalog.json` (machine catalog, 158 entries after WS0.5 update)
+- Filesystem listing of `related papers/*.pdf` (158 files, sorted alphabetically)

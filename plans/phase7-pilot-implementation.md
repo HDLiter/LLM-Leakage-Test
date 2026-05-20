@@ -124,7 +124,7 @@ Every run should be determined by a case manifest, fleet manifest, runtime confi
 | WS | Goal | Primary outputs | Depends on | Parallelizable |
 |---|---|---|---|---|
 | WS0 | R5A scaffolding and manifests | `src/r5a/` skeleton, fleet/runtime configs, contracts, smoke-test harness | none | starts immediately |
-| WS0.5 | Thales alignment and factor pipelines (scope locked 2026-05-19 — see `docs/DECISION_20260518_ws0_5_thales_alignment.md` v0.3 + `config/factors/factor_schema.yaml`) | decision memo signed; implementation gates per memo §9 closure conditions (frozen prompts, factor schema, quota / discriminant / replay artifacts) | WS0 contracts freeze | parallel with WS1/WS2/WS3; must close before WS4 |
+| WS0.5 | Thales alignment and factor pipelines (scope locked — see `docs/DECISION_20260518_ws0_5_thales_alignment.md` v0.4 + `config/factors/factor_schema.yaml`) | decision memo signed; implementation gates per memo §9 closure conditions (frozen prompts, factor schema, quota / discriminant / replay artifacts) | WS0 contracts freeze | parallel with WS1/WS2/WS3; must close before WS4 |
 | WS1 | `P_logprob` pipeline | white-box logprob traces, `E_CTS`, `E_PCSG` tables | WS0 | parallel with WS0.5/WS2/WS3 after contracts freeze |
 | WS2 | `P_predict` pipeline | 14-model prediction records, parser, cache/fingerprint layer | WS0 | parallel with WS0.5/WS1/WS3 |
 | WS3 | `C_FO` + `C_NoOp` generation and audit | perturbation artifacts, audit app, adjudicated pass-rate tables | WS0; reads event-type labels from WS0.5 before C_FO rule schema freeze | parallel with WS0.5/WS1/WS2 |
@@ -191,8 +191,8 @@ Decision point: if the WS0 interface review reveals that `src/llm_client.py` can
 
 **Scope locked.** The reuse-vs-rebuild decision, the deliverable list, the file layout, the auto-tune validation discipline, and the closure conditions for WS0.5 are recorded in:
 
-- `docs/DECISION_20260518_ws0_5_thales_alignment.md` (decision memo, v0.3 post-round-2 Codex review, 2026-05-19) — **authoritative**
-- `config/factors/factor_schema.yaml` (frozen factor names, dtypes, binning/collapse maps, missing-value policy, Target Salience raw-component fields, recurrence sensitivity fields, rank/tie/bin-stability policy) — **frozen**; produced as a closure-condition artifact per memo §9
+- `docs/DECISION_20260518_ws0_5_thales_alignment.md` (decision memo, v0.4, 2026-05-20 — v0.3 passed Codex round-2; v0.4 simplified §4 auto-tune per user decision) — **authoritative**
+- `config/factors/factor_schema.yaml` (frozen factor names, dtypes, binning/collapse maps, missing-value policy, Target Salience metric = log CLS mention count, recurrence sensitivity fields, rank/tie/bin-stability policy) — **frozen**; produced as a closure-condition artifact per memo §9
 
 The memo answers the three verification questions (T1/T2/T3 below) and locks:
 
@@ -217,7 +217,7 @@ The memo answers the three verification questions (T1/T2/T3 below) and locks:
 
 ### Gate behavior
 
-WS0.5 is closed in the design sense as of 2026-05-19 (memo v0.3 post-round-2 Codex review). The **implementation** gates that still apply before Section 6 pilot manifest freeze:
+WS0.5 is closed in the design sense as of 2026-05-20 (memo v0.4). The **implementation** gates that still apply before Section 6 pilot manifest freeze:
 
 1. Three frozen prompt configs committed (T1 topic, T2 entity, T3 signal_profile post-smoke-comparison winner) per memo §9 closure conditions.
 2. `factor_schema.yaml` committed per memo §9 condition #7.
@@ -599,7 +599,7 @@ These windows ensure enough "between-cutoff" cases for temporal contrasts, enoug
 
 ### 6.3 Factor and event-type quotas
 
-Factor values and event-type labels are produced by the WS0.5 factor pipeline (see Section 5.1A; scope locked per `docs/DECISION_20260518_ws0_5_thales_alignment.md` v0.3). The sampling script must consume the frozen factor schema at `config/factors/factor_schema.yaml` (memo §9 closure condition #7) rather than hard-coding bin thresholds. The sampling script should enforce four additional quota families:
+Factor values and event-type labels are produced by the WS0.5 factor pipeline (see Section 5.1A; scope locked per `docs/DECISION_20260518_ws0_5_thales_alignment.md` v0.4). The sampling script must consume the frozen factor schema at `config/factors/factor_schema.yaml` (memo §9 closure condition #7) rather than hard-coding bin thresholds. The sampling script should enforce four additional quota families:
 
 1. Each top-level news category (`policy`, `corporate`, `industry`, `macro`) should appear at least 15 times.
 2. The pilot event-type taxonomy used for `C_FO` should have at least 12 cases per super-type if five super-types are used, or at least 15 per super-type if collapsed to four.
@@ -1145,7 +1145,7 @@ Phase 7 should add `data/pilot/` as the authoritative artifact root, `data/refer
 | Workstream | Estimated elapsed time |
 |---|---|
 | WS0 | 1-2 working days |
-| WS0.5 | design closed 2026-05-19 (`docs/DECISION_20260518_ws0_5_thales_alignment.md` v0.3 post-round-2 Codex review); implementation estimate per memo §10 schedule — S1 (Track B coverage + market metadata + T1 auto-tune), S2 (T2 auto-tune + ancillary smoke), S3 (T3 smoke comparison + auto-tune), S4 (recurrence pipeline R1-R5 + pilot factor inference), S5 (commit + checklist tick). Budget ledgers per memo §7 give actual spend on completion. |
+| WS0.5 | design closed 2026-05-20 (`docs/DECISION_20260518_ws0_5_thales_alignment.md` v0.4); implementation estimate per memo §10 schedule — S1 (Track B coverage + T1 auto-tune), S2 (T2 auto-tune + ancillary smoke), S3 (T3 smoke comparison + auto-tune), S4 (recurrence pipeline R1-R5 + pilot factor inference), S5 (commit + checklist tick). Budget ledgers per memo §7 give actual spend on completion. |
 | WS1 | 2-3 working days |
 | WS2 | 2-3 working days |
 | WS3 | 3-4 working days including audit |
@@ -1495,7 +1495,7 @@ git tag -s prereg/phase7-stage1-v1.0 -m "Phase 7 Stage 1 prereg"
 ### 14.4 Minimal sign-off checklist
 
 - interfaces signed
-- [✓ design 2026-05-19; implementation pending S1-S5 per memo §10] WS0.5 Thales-alignment session closed, decision memo committed (`docs/DECISION_20260518_ws0_5_thales_alignment.md` v0.3 post-round-2 Codex review), factor schema lock file path = `config/factors/factor_schema.yaml`
+- [✓ design 2026-05-20; implementation pending S1-S5 per memo §10] WS0.5 Thales-alignment session closed, decision memo committed (`docs/DECISION_20260518_ws0_5_thales_alignment.md` v0.4), factor schema lock file path = `config/factors/factor_schema.yaml`
 - zero-shot 20-case smoke parse success `>=95%`
 - `runstate.db` initialized and request lineage validated
 - 100-case manifest signed

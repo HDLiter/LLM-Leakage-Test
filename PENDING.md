@@ -68,13 +68,15 @@
 ## Recently closed
 
 ### WS0.5 — Thales alignment design
-- **Resolved 2026-05-19**: design closed via `docs/DECISION_20260518_ws0_5_thales_alignment.md` v0.3 (post-round-2 Codex review).
+- **v0.4 content complete 2026-05-20 — user sign-off + decision→text walk-through pending**: `docs/DECISION_20260518_ws0_5_thales_alignment.md` v0.4.
   - **Round-0** (2026-05-18): v0.1 → Codex review → MAJOR-REVISIONS-NEEDED (4 blockers + 4 majors + 1 minor; 9 issues).
   - **v0.2** (2026-05-19): 9 round-0 issues resolved via interactive user-Claude review (see `temp/ws0_5_issue_decisions.md`).
   - **Round-1** (2026-05-19): 3 parallel Codex reviewers (ML engineer / statistician / measurement), all returned MAJOR-REVISIONS-NEEDED with 23 complementary critical issues (E-1…E-10, S-1…S-8, C-1…C-5). No cross-role conflict.
   - **v0.3** (2026-05-19): all 23 round-1 issues patched in-place.
   - **Round-2** (2026-05-19): 3 parallel Codex re-reviewers — Measurement APPROVE, ML-engineer APPROVE-WITH-MINOR-PATCHES, Statistician APPROVE-WITH-MINOR-PATCHES. 2 narrow text patches applied in-place to v0.3 (§4.1 MDE preflight q-grid wording, §5.2 R4 cache lookup key).
-  - T1 / T2 / T3 verification answers + reuse-vs-rebuild decisions + Scheme Y auto-tune validation + replay-from-cache determinism + budget ledger all locked. Implementation gates (frozen prompt configs, `factor_schema.yaml`, quota/discriminant/replay artifacts) remain per memo §9 closure conditions; tracked through memo §10 S1-S5 schedule.
+  - **v0.4** (2026-05-20): user-directed simplification of §4. The Codex reviews progressively built a heavy "Scheme Y" auto-tune framework (Ladder gate, McNemar / permutation tests, alpha spending, MDE preflight, 7-way fixture split, manifest lock, run-state resume); user judged this over-engineered for a measurement-instrument prompt and replaced §4 with a plain train/dev/test split (tune on train, rank on dev, evaluate the final prompt once on a sealed test split). Supersedes round-1 issues E-1/E-2/E-3/E-4/S-1/S-2/S-3/S-4/S-7; non-§4 issues unaffected. Not Codex-re-reviewed (removes machinery, adds no claim).
+  - **v0.4 cont.** (2026-05-20): the 14 non-§4 round-1/2 issues (C-1..C-5, E-5..E-10, S-5/S-6/S-8) reviewed issue-by-issue with the user; all 14 resolved — 10 produced memo edits, 3 dissolved as byproducts of the C-2/C-3 changes, 1 confirmed already-resolved. Two Codex literature reviews commissioned (E-6 entity disambiguation, S-6 collinearity diagnostics). Every issue confirmed or net-simplified. User sign-off + a final decision→text walk-through still pending.
+  - T1 / T2 / T3 verification answers + reuse-vs-rebuild decisions + simplified auto-tune validation + replay-from-cache determinism + budget ledger all locked. Implementation gates (frozen prompt configs, `factor_schema.yaml`, quota/discriminant/replay artifacts) remain per memo §9 closure conditions; tracked through memo §10 S1-S5 schedule.
 - **Related docs**: `docs/DECISION_20260518_ws0_5_thales_alignment.md` (memo), `temp/ws0_5_alignment_review.md` (round-0), `temp/ws0_5_issue_decisions.md` (round-0 → v0.2 decision log), `temp/ws0_5_round1_*_review.md` (round-1, 3 files), `temp/ws0_5_round2_*_review.md` (round-2, 3 files), `refine-logs/reviews/R5A_STEP2/R5A_FROZEN_SHORTLIST.md`, `refine-logs/reviews/R5A_STEP2/MEASUREMENT_FRAMEWORK.md`.
 
 ### WS1 white-box fleet pinning

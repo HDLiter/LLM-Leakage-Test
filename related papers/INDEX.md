@@ -181,3 +181,21 @@
 - [Episodic Memories](Episodic Memories Benchmark LLMs.pdf)
 - [Memory GAPS](Memory GAPS Tulving Test LLMs.pdf)
 - [Memory Traces](Memory Traces Transformers Tulving.pdf)
+
+## Entity Linking & Disambiguation
+
+*Collected for the WS0.5 E-6 entity-disambiguation methods review (Codex, 2026-05-20). Direction note: [notes/Entity Linking and Disambiguation.md](notes/Entity Linking and Disambiguation.md).*
+
+- [AIDA: Robust Disambiguation of Named Entities in Text (Hoffart et al., EMNLP 2011)](AIDA Robust Disambiguation of Named Entities.pdf)
+- [BLINK: Scalable Zero-shot Entity Linking with Dense Entity Retrieval (Wu et al. 2020, arXiv 1911.03814)](BLINK Scalable Zero-shot Entity Linking.pdf)
+- [GENRE: Autoregressive Entity Retrieval (De Cao et al. 2021, arXiv 2010.00904)](GENRE Autoregressive Entity Retrieval.pdf)
+- [Financial Entity Linking at JPMorgan (arXiv 2411.02695)](JEL Financial Entity Linking JPMorgan.pdf)
+- [Chinese Financial NER (Information Sciences, S0020025522015444)](https://www.sciencedirect.com/science/article/abs/pii/S0020025522015444) *(referenced only; paywalled, PDF unavailable)*
+
+## Regression & Collinearity Diagnostics
+
+*Collected for the WS0.5 S-6 collinearity-diagnostics methods review (Codex, 2026-05-20). Direction note (full bibliography): [notes/Collinearity and Non-Redundancy Diagnostics.md](notes/Collinearity and Non-Redundancy Diagnostics.md).*
+
+- [Fitting Linear Mixed-Effects Models Using lme4 (Bates et al. 2015, arXiv 1406.5823)](lme4 Fitting Linear Mixed-Effects Models.pdf)
+- [Parsimonious Mixed Models (Bates et al. 2015, arXiv 1506.04967)](Parsimonious Mixed Models.pdf)
+- The other S-6 references (Belsley, O'Brien, Fox & Monette, Dormann, Royston et al., …) are paywalled books / journal articles — see the direction note for the full DOI bibliography.

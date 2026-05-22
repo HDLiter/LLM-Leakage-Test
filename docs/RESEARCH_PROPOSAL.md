@@ -9,8 +9,8 @@ status: |
 supersedes: archive/pre_benchmark/docs/RESEARCH_PROPOSAL_v2.md(转向前的 "Task Design Gates" 版本)
 authority: |
   本文件是当前实验的成文研究问题文档(此前缺失 —— Pass-1 走查 flag ①)。
-  锚定内容的逐章依据:temp/walkthrough_pass1/section_01..07.md。
-  待重开项 R-1…R-6 的权威清单:temp/walkthrough_pass1/pending_items.md。
+  锚定内容的逐章依据:refine-logs/reviews/WALKTHROUGH_PASS1/section_01..07.md。
+  待重开项 R-1…R-6 的权威清单:refine-logs/reviews/WALKTHROUGH_PASS1/pending_items.md。
   冻结 scope 的名义权威:refine-logs/reviews/R5A_STEP2/R5A_FROZEN_SHORTLIST.md
   (其操作化细节正在重开)。
   四层框架术语权威:refine-logs/reviews/R5A_STEP2/MEASUREMENT_FRAMEWORK.md。
@@ -301,5 +301,5 @@ clean-room-first 方法(先白板独立分析,再对照既往 reviewer 意见)�
 | R-5 | 采样准入过滤器(可交易实体 / 新闻长度 / 反直觉案例) |
 | R-6 | 预测目标 & 是否 / 如何使用真实收益 |
 
-权威清单与每项细节见 `temp/walkthrough_pass1/pending_items.md`。本报告的
+权威清单与每项细节见 `refine-logs/reviews/WALKTHROUGH_PASS1/pending_items.md`。本报告的
 §4 与 §6 相关部分会随 R-1…R-6 的结论逐步更新为定稿。

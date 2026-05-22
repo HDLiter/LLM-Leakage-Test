@@ -1,7 +1,7 @@
 # WS0.5 Round-0 Papers Fetch Report
 
 **Timestamp:** 2026-05-19T05:44:48-07:00  
-**Source sweep:** `temp/ws0_5_autotune_sota_search.md`
+**Source sweep:** `refine-logs/reviews/WS0_5_DESIGN/ws0_5_autotune_sota_search.md`
 
 ## Summary
 

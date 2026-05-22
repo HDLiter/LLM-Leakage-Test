@@ -3,7 +3,7 @@
 **Reviewer**: GPT-5.5 xhigh (Statistician role)
 **Date**: 2026-05-19
 **Memo**: docs/DECISION_20260518_ws0_5_thales_alignment.md (v0.3)
-**Round-1 review verified against**: temp/ws0_5_round1_statistician_review.md
+**Round-1 review verified against**: refine-logs/reviews/WS0_5_DESIGN/ws0_5_round1_statistician_review.md
 
 ## TL;DR
 

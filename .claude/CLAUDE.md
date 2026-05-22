@@ -19,7 +19,7 @@ Pass-1 全实验走查完成:研究问题与四层框架确认 sound;框架与�
 - 关键文档:
   - `docs/RESEARCH_PROPOSAL.md` — 成文开题报告(中文 DRAFT;锚定部分定稿,
     §4 操作化部分待重开完善)
-  - `temp/walkthrough_pass1/pending_items.md` — 偏差 / 待处理项 + R-1…R-6 清单
+  - `refine-logs/reviews/WALKTHROUGH_PASS1/pending_items.md` — 偏差 / 待处理项 + R-1…R-6 清单
   - `refine-logs/reviews/R5A_STEP2/R5A_FROZEN_SHORTLIST.md` — 冻结 scope
     (名义权威;操作化细节在重开)
   - `refine-logs/reviews/R5A_STEP2/MEASUREMENT_FRAMEWORK.md` — 四层框架术语

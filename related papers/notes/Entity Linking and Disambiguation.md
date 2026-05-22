@@ -15,7 +15,7 @@ deterministic pipeline: build a tiered alias table from AKShare master data
 evidence-tier disambiguation (exact code > official full name > unique low-risk
 alias > high-risk alias + same-article cue > otherwise unresolved). LLM alias
 generation and LLM per-match confirmation are demoted to a one-off,
-user-reviewed smoke (§5.3). Full review: `temp/entity_disambig_methods_20260520.md`.
+user-reviewed smoke (§5.3). Full review: `refine-logs/reviews/WS0_5_DESIGN/entity_disambig_methods_20260520.md`.
 
 ## Papers
 
@@ -52,5 +52,5 @@ user-reviewed smoke (§5.3). Full review: `temp/entity_disambig_methods_20260520
   risk-scoring (short / generic-token aliases) need care.
 
 ## Pointers
-- Codex methods review: `temp/entity_disambig_methods_20260520.md`
+- Codex methods review: `refine-logs/reviews/WS0_5_DESIGN/entity_disambig_methods_20260520.md`
 - Memo decision: `docs/DECISION_20260518_ws0_5_thales_alignment.md` §5.2-§5.3 (E-6)

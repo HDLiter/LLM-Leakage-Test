@@ -9,7 +9,7 @@ This index is a **categorical pointer view** for fast navigation. The richer per
 
 - **Per-topic notes:** `related papers/notes/*.md` (twelve thematic note files)
 - **Machine-readable catalog:** `related papers/notes/_paper_catalog.json` (not authoritative for newest additions)
-- **WS0.5 round-0 source sweep:** `temp/ws0_5_autotune_sota_search.md`
+- **WS0.5 round-0 source sweep:** `refine-logs/reviews/WS0_5_DESIGN/ws0_5_autotune_sota_search.md`
 
 This file at repo root is the human-facing categorical index that ties paper filenames back to the R5A research design and the v6.2 decision document.
 
@@ -346,7 +346,7 @@ This file at repo root is the human-facing categorical index that ties paper fil
 **Previous sync:** 2026-05-07.
 
 **What changed since 2026-05-07:**
-- Added 22 local PDFs from `temp/ws0_5_autotune_sota_search.md`: ten prompt-optimization papers, five adaptive-analysis / multiple-look papers, two NLP statistical-evaluation papers, and five annotation-methodology papers.
+- Added 22 local PDFs from `refine-logs/reviews/WS0_5_DESIGN/ws0_5_autotune_sota_search.md`: ten prompt-optimization papers, five adaptive-analysis / multiple-look papers, two NLP statistical-evaluation papers, and five annotation-methodology papers.
 - Added referenced-only rows for nine industry documentation/blog sources that were decision inputs but are not PDF papers.
 - Added two WS0.5 thematic notes: `related papers/notes/prompt_optimization.md` and `related papers/notes/adaptive_analysis_reusable_holdout.md`.
 
@@ -369,6 +369,6 @@ This file at repo root is the human-facing categorical index that ties paper fil
 - `archive/r4_r5a_lineage/refine-logs/reviews/BENCHMARK_R5_KICKOFF.md`
 - `archive/r4_r5a_lineage/refine-logs/reviews/LIT_SWEEP_D_CITED_BUT_UNREAD.md`
 - `archive/r4_r5a_lineage/refine-logs/reviews/LIT_SWEEP_E_CONSTRUCT_VALIDATION.md`
-- `temp/ws0_5_autotune_sota_search.md`
+- `refine-logs/reviews/WS0_5_DESIGN/ws0_5_autotune_sota_search.md`
 - `related papers/notes/_paper_catalog.json` (machine catalog, 158 entries after WS0.5 update)
 - Filesystem listing of `related papers/*.pdf` (158 files, sorted alphabetically)

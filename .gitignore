@@ -42,5 +42,10 @@ data/pilot/logprob_traces/
 # Related papers (PDFs are large and re-downloadable; INDEX.md is tracked)
 related papers/*.pdf
 
+# Scratch / working dirs (codex-run signal files, kickoff prompts, run logs).
+# Durable artifacts are relocated into refine-logs/reviews/ before being kept.
+temp/
+.scratch/
+
 # Misc
 deepseek_speed_test.py

@@ -3,7 +3,7 @@
 **Purpose**: companion document for Codex round-1 reviewers. Records what Codex round-0 found, what user-Claude interactive review decided, and why. Reviewers consult this to verify v0.2 actually addresses round-0 issues.
 
 **Round-0 verdict**: `MAJOR-REVISIONS-NEEDED` (4 blockers + 4 majors + 1 minor)
-**Round-0 review file**: `temp/ws0_5_alignment_review.md`
+**Round-0 review file**: `refine-logs/reviews/WS0_5_DESIGN/ws0_5_alignment_review.md`
 
 ---
 
@@ -13,7 +13,7 @@
 
 **v0.2 response**:
 - Corrected factual claim in §2.1 + frontmatter
-- Adopted **Scheme A 5-super-type collapse** (Codex sub-analysis `temp/ws0_5_supertype_analysis.md`):
+- Adopted **Scheme A 5-super-type collapse** (Codex sub-analysis `refine-logs/reviews/WS0_5_DESIGN/ws0_5_supertype_analysis.md`):
   - `authority_decision` [POLICY+ENFORCEMENT+LEGAL+GEOPOLITICS] → host `policy`
   - `issuer_catalyst` [CORPORATE+PRODUCT+PERSONNEL] → host `corporate`
   - `issuer_quant` [EARNINGS+OWNERSHIP] → host `corporate`
@@ -36,7 +36,7 @@
 
 **Round-0 finding**: v0.1 implied Thales `salience=core` directly answers Target Salience. Actually `core` is just candidate-target signal; R5A Target Salience is ordinal case-level, needs target-selection + nullability + ordinal binning + validation rules.
 
-**v0.2 response** (§3.3, building on Codex sub-analysis `temp/ws0_5_target_salience_construct.md`):
+**v0.2 response** (§3.3, building on Codex sub-analysis `refine-logs/reviews/WS0_5_DESIGN/ws0_5_target_salience_construct.md`):
 
 **Selection rule** (centrality-first within tradable types — user override of Codex class-first):
 1. Candidate pool = `salience=core` entities with type ∈ {company, sector, index, ETF, commodity}
@@ -67,7 +67,7 @@
 2. K-rotation alone doesn't fix adaptive holdout reuse — acceptance gate still leaks score info to LLM proposers each round
 3. No alpha spending across 20 rounds × 2 patches = 40 tests at α=0.05 → ~2 false positives expected
 
-**v0.2 response** (§4 full rewrite, building on Codex SOTA search `temp/ws0_5_autotune_sota_search.md`):
+**v0.2 response** (§4 full rewrite, building on Codex SOTA search `refine-logs/reviews/WS0_5_DESIGN/ws0_5_autotune_sota_search.md`):
 
 **Adopted Scheme Y — Hybrid Current Loop + Limited-Exposure Acceptance Gate + Active Fixture**:
 - **4-layer fixture split** (3000 total): 60% train_visible / 20% inner_dev / 10% acceptance_holdout / 10% final_holdout

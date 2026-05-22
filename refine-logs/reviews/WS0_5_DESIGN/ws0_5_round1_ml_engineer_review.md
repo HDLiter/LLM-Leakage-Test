@@ -3,7 +3,7 @@
 **Reviewer**: GPT-5.5 xhigh (ML Engineer role)  
 **Date**: 2026-05-19  
 **Memo**: docs/DECISION_20260518_ws0_5_thales_alignment.md (v0.2)  
-**Companion**: temp/ws0_5_issue_decisions.md
+**Companion**: refine-logs/reviews/WS0_5_DESIGN/ws0_5_issue_decisions.md
 
 ## TL;DR
 

@@ -12,7 +12,7 @@
 > **本表只维护「依赖」与「可动?」**(可动性由依赖推导,不单独维护一份会漂移的
 > 状态字段)。已完成 / 进行中的事实另见 §1 与各行备注。
 >
-> **最后更新**:2026-05-22
+> **最后更新**:2026-05-23
 
 ---
 
@@ -42,16 +42,17 @@ Path E 探针集建好(均不在重开区)。WS0.5 设计完成(memo v0.4),代�
 
 | ID | 工作项 | 依赖(前置) | 可动? |
 |---|---|---|---|
-| R-6 | 预测目标 & 是否/如何用真实收益 | 无(**偏上游**) | ✅ 可动 |
+| **R-4a** | **方法论审计**:confirmatory/exploratory 划分、两阶段预注册、multiplicity 校正级别、E_CMMD 防御充分性 —— **单开 session(2026-05-23 起)** | **无(最上游 — family 大小决定下游能容多少因子×扰动)** | **✅ 可动(下一步)** |
+| R-6 | 预测目标 & 是否/如何用真实收益 | R-4a(family 容量限定 R-6 能否加新 estimand) | ⏸ **暂停**(待 R-4a;kickoff 已写好) |
 | R-1a | Cutoff Exposure:实现 + 选择确认 | 无(实现简单:日期+manifest) | ✅ 可动 |
 | R-1b | Historical Family Recurrence:实现 | 无(有 WS0.5 §5 管线待 clean-room 复审;family 粒度未定) | ✅ 可动 |
 | R-1c | Target Salience:实现 | 无(有 WS0.5 §3.3 待 clean-room 复审) | ✅ 可动 |
 | R-1d | Template Rigidity:从零设计 | 无(**零 spec**,从文献起;用户视为重点因子) | ✅ 可动 |
-| R-1e | 4 因子选择确认 | R-1a · R-1b · R-1c · R-1d | ⛔ 待 R-1a–d |
-| R-2 | 6 扰动实现构思 → 选保留几个进 confirmatory(重审 C_NoOp) | R-6(C_FO 靠事件结果) | ⛔ 待 R-6 |
-| R-5 | 采样准入过滤器(可交易实体 / 新闻长度 / 反直觉案例) | R-6(反直觉案例需真实股价) | ⛔ 待 R-6 |
+| R-1e | 4 因子选择确认 | R-1a · R-1b · R-1c · R-1d · **R-4a**(family 容量) | ⛔ 待上游 |
+| R-2 | 6 扰动实现构思 → 选保留几个进 confirmatory(重审 C_NoOp;C_FO vs C_SR 漂移见 `.scratch/cfo_csr_history_findings.md`) | R-4a · R-6(C_FO 靠事件结果) | ⛔ 待上游 |
+| R-5 | 采样准入过滤器(可交易实体 / 新闻长度 / 反直觉案例) | R-4a · R-6(反直觉案例需真实股价) | ⛔ 待上游 |
 | R-3 | 负对照充分性 | R-1e · R-2(需知最终因子 / 扰动) | ⛔ 待上游 |
-| R-4 | pilot 全套统计(混合模型 / TOST / Westfall-Young / 功效模拟)—— **单开 session** | R-1e · R-2 · R-3 · R-5(操作化定了才能算 power) | ⛔ 待上游 |
+| R-4b | pilot 具体统计(power 计算 / n_eff 矩阵 / 混合模型规格落地 / TOST / bootstrap 实施) | R-4a · R-1e · R-2 · R-3 · R-5(操作化定了才能算 power) | ⛔ 待上游 |
 
 ### 块 B — 并行轨道(与 A 同时)
 
@@ -79,7 +80,8 @@ Path E 探针集建好(均不在重开区)。WS0.5 设计完成(memo v0.4),代�
 
 ```mermaid
 flowchart TD
-    R6["R-6 预测目标/真实收益"]
+    R4a["R-4a 方法论审计 ★最上游"]
+    R6["R-6 预测目标/真实收益 ⏸"]
     R1a["R-1a Cutoff Exposure"]
     R1b["R-1b Recurrence"]
     R1c["R-1c Target Salience"]
@@ -88,7 +90,7 @@ flowchart TD
     R2["R-2 扰动选择"]
     R5["R-5 采样过滤器"]
     R3["R-3 负对照充分性"]
-    R4["R-4 pilot 统计 (单开 session)"]
+    R4b["R-4b pilot 具体统计"]
     B3["B-3 基建漂移审"]
     B2["B-2 WS0.5 基建"]
     B1["B-1 WS1 并行项"]
@@ -100,6 +102,10 @@ flowchart TD
     WS5["WS5 统计+预注册"]
     MAIN["main run N=2560"]
 
+    R4a --> R6
+    R4a --> R1e
+    R4a --> R2
+    R4a --> R5
     R1a --> R1e
     R1b --> R1e
     R1c --> R1e
@@ -108,12 +114,12 @@ flowchart TD
     R6 --> R5
     R1e --> R3
     R2 --> R3
-    R1e --> R4
-    R2 --> R4
-    R3 --> R4
-    R5 --> R4
+    R1e --> R4b
+    R2 --> R4b
+    R3 --> R4b
+    R5 --> R4b
     B3 --> B2
-    R4 --> C1
+    R4b --> C1
     C1 --> WS05
     C1 --> WS2
     C1 --> WS3
@@ -125,28 +131,32 @@ flowchart TD
     WS3 --> WS4
     B1 --> WS4
     WS4 --> WS5
-    R4 --> WS5
+    R4b --> WS5
     WS5 --> MAIN
 ```
 
-> 图中 `R-4 → C-1` 是简写:C-1 需要 **R-1…R-6 全部**完成,R-4 只是块 A 的
-> 终端节点(R-6 经 R-2/R-5 间接汇入 R-4),用它代表「A 收口」。
+> 图中 `R-4b → C-1` 是简写:C-1 需要 **R-1…R-6 全部**完成,R-4b 是块 A 的
+> 终端节点(R-6 经 R-2/R-5 间接汇入 R-4b),用它代表「A 收口」。**R-4a**
+> 反方向位于最上游 —— 整套严谨度机器决定下游能容多少因子×扰动 / estimand。
 
 ---
 
-## 4. 现在能动的(2026-05-22)
+## 4. 现在能动的(2026-05-23)
 
 无前置、立即可启动:
 
-- **R-6** —— 偏上游,解锁 R-2 / R-5;建议早做。
-- **R-1a / R-1b / R-1c / R-1d** —— 4 个因子各自的实现设计。`pending_items.md`
-  排序点名 **R-1 先行**;其中 **R-1d Template Rigidity 零 spec、用户视为重点
-  因子**,是最实打实的起点。
+- **R-4a 方法论审计** —— **下一步**(新 session,kickoff =
+  `.scratch/session_kickoff_r4.md`)。最上游,落了才能定下游 family 容量、
+  multiplicity、预注册结构。R-6 已暂停等它。
+- **R-1a / R-1b / R-1c / R-1d** —— 4 个因子各自的实现设计。可与 R-4a 并行
+  (各因子的实现细节不取决于 multiplicity 规模);其中 **R-1d Template
+  Rigidity 零 spec、用户视为重点因子**,是最实打实的起点。
 - **B-3** 基建漂移审(轻、独立)。
 - **B-1** WS1 云上可并行项。
 
-> R-1 与 R-6 互不依赖,可并行推进;R-2 / R-5 等 R-6,R-1e 等 R-1a–d。先把
-> R-6 + R-1 这一批做掉,下游(R-2/R-3/R-5/R-4 → C → D)按依赖自然解锁。
+> R-1a-d 与 R-4a 互不依赖,可并行。R-1e 因为「选哪几个进 confirmatory」会
+> 受 R-4a family 容量约束,放到 R-4a 之后。R-6 暂停(它需要 R-4a 给出
+> family 还能否加新 estimand 的答案)。
 
 ---
 

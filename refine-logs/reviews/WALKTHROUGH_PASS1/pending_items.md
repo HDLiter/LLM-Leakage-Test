@@ -81,6 +81,38 @@
       仍最下游,需要 R-1e / R-2 / R-3 / R-5 全部落定。
   - 用户决定 **2026-05-23 起新 session 先做 R-4a**;kickoff =
     `.scratch/session_kickoff_r4.md`。R-6 因此暂停,待 R-4a 后再接。
+  - **R-4a closed 2026-05-23**(双源证据 audit trail:
+    `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/whiteboard_analysis.md`
+    白板独立分析 + `subfield_lit_scan.md` 15 篇代表作文献扫描)。锁住的是
+    **框架级 8 条**,具体 estimand/factor/family 大小不锁,留 R-1/R-2/R-6
+    实现 + pilot 数据决定:
+    1. **无 family-wise multiplicity correction** —— 主报 effect size + 95%
+       CI(per-estimand 混合模型聚类稳健 SE)。子领域 15/15 不做正式校正。
+    2. **标签语言** main / primary / supporting / robustness / appendix
+       (子领域 confirmatory/exploratory 0 命中)。
+    3. **「预注册」措辞改 design memo + sealed pilot/test split +
+       transparency artifact**(子领域 15/15 无正式预注册)。
+    4. **混合模型 per-estimand 分别建**,case/model/pair 聚类;case-level
+       aggregate(如 E_CMMD)用 case-level inference。
+    5. **扰动质量改报 Gwet's AC1 + accuracy**(per-perturbation × event-type
+       矩阵),取消 ≥85% pass-rate hard gate;失败=方法节 caveat 非
+       exclusion。AntiLeakBench 2025 是 3-annotator + AC1 最强同行参照。
+    6. **baseline_confidence 退出 primary 只做 sensitivity**;
+       model_capability 协变量同样 sensitivity。
+    7. **TOST/SESOI=0.15 限定 BL2 等价检验**,不扩散主系数。
+    8. **Scenario-based MC power**(基于 pilot 效应/方差/eligibility/缺失
+       模拟),解绑 Westfall-Young。
+    + **E_CMMD 重命名**:Cross-Model **Cutoff-Monotone** Disagreement
+      (claim 层与 memorization 解释解耦)。
+    + **元层结论**:ratchet 论坐实 —— A 的 clean-room(不喂用户 ratchet
+      memory)独立推出比 frozen 简单 + B 子领域实然比 A 更轻 = 双源证据
+      表明当前 frozen 复杂度来自 reviewer pile-on,正是 memory
+      `feedback_review_complexity` 标定的失效模式。
+  - **R-4b 仍 open**(等 R-1e / R-2 / R-3 / R-5 落定);scenario-based MC
+    power、n_eff 矩阵、混合模型具体规格 = R-4b 范围。
+  - **R-6 解封**(R-4a 给的容量答案是"不锁数,加新 estimand 要替换或开新
+    design memo"); parked C_FO/C_SR 漂移调查可接,详见 [parked]
+    `refine-logs/reviews/REOPEN_R1_R6/cfo_csr_history_findings.md`。
 - **R-5 采样过滤器专题**:用户要求单开讨论。包含 ① 可交易实体 filter
   (已存在 WS0.5 §3.3.1 案例准入预过滤,但在重开区,一并重审)② 新闻长度
   filter(**新增** —— 超长讲话 / 一句话简讯;当前设计无长度过滤)③ 反直觉

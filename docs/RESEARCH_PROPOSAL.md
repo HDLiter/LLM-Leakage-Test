@@ -172,26 +172,75 @@ C_FO 与 C_NoOp 的变体均经全量人工审计(4 维 rubric,kappa≥0.70)。
 **[R-2 重开] 待定:** 6 个扰动各自的实现构思,以及最终保留几个 / 哪几个进
 confirmatory(用户点名重审 C_NoOp)。
 
-### 4.4 estimand 与统计结构 [R-4 重开中]
+### 4.4 estimand 与统计结构 [R-4a 框架已定 2026-05-23;具体清单 R-1/R-2/R-6 重开中]
 
-5 个 confirmatory estimand:**E_CMMD**(跨模型 cutoff-单调分歧)、**E_PCSG**
-(配对 cutoff 意外度差)、**E_CTS**(校准尾部意外度)、**E_FO**(假结果
-抵抗)、**E_NoOp**(无关插入敏感度)。每个对 4 因子各测一次 → 20 系数。
+**当前候选 estimand 池**(2026-04-29 frozen,作为 *候选*,非 primary family
+最终清单):E_CMMD(跨模型 cutoff-单调分歧)、E_PCSG(配对 cutoff 意外度
+差)、E_CTS(校准尾部意外度)、E_FO(假结果抵抗)、E_NoOp(无关插入
+敏感度)。
 
-**[R-4 重开] 待定:** pilot 全套统计(混合模型规格、TOST 等价检验、
-Westfall-Young 多重比较、功效模拟、bootstrap)单开一个 session、走
-clean-room 复审。E_CMMD"分歧≠记忆"的识别问题一并在此评估。
+**[R-4a 锁定 2026-05-23]** 基于 clean-room 白板独立分析 + 15 篇子领域代表作
+文献扫描双源证据(audit trail:
+`refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/`),锁定**框架级
+8 条**:
 
-### 4.5 负对照 [R-3 重开中]
+1. **无 family-wise multiplicity correction**。主报 effect size + 95% CI
+   (per-estimand 混合模型给出聚类稳健 SE)。子领域 15 篇代表作 0 篇做正式
+   校正(Bonferroni / Holm / Westfall-Young);FDR/BH 仅出现在 2026 新理论
+   预印本。本研究主张为人群层面 characterization,不是 hypothesis testing,
+   因此不做 family-wise α 控制。
+2. **标签语言**:**main / primary / supporting / robustness / appendix**
+   (对齐子领域同行),不再用 confirmatory/exploratory(子领域 0 命中)。
+3. **「预注册」措辞改 design memo + sealed pilot/test split + transparency
+   artifact**(见 §6)。子领域 15 篇 0 篇做正式预注册。
+4. **混合模型 per-estimand 分别建**,case/model/pair 聚类;case-level
+   aggregate(如 E_CMMD)用 case-level inference,不再套 model random
+   effect。
+5. **扰动质量审计改报 Gwet's AC1 + accuracy**(per-perturbation × event-type
+   矩阵)。**取消** ≥85% pass-rate hard gate;失败 = 方法节 caveat,非
+   exclusion。AntiLeakBench 2025 的 3-annotator + Gwet's AC1 + accuracy 是
+   子领域最强同行参照。Gwet's AC1 在 prevalence 高的场景下比 Cohen's kappa
+   稳定(避免 kappa paradox)。
+6. **baseline_confidence 退出 primary,只做 sensitivity**;model_capability
+   协变量同样 sensitivity,不写"控制了能力剩下就是泄露"。
+7. **TOST/SESOI=0.15 限定 BL2 等价检验**(见 §4.5),不扩散到主系数。
+8. **Scenario-based MC power 模拟**(基于 pilot 估计的 effect size / 方差 /
+   eligibility / 缺失结构),解绑 Westfall-Young。
+
+**E_CMMD 重命名**:Cross-Model **Cutoff-Monotone** Disagreement(原
+"Memorization Disagreement"),claim 层与 memorization 解释解耦 —— 只有
+与其他 estimand 收敛时才上升到 memorization characterization。
+
+**[R-1 / R-2 / R-6 重开] 待定**(component-level,留给实现 + pilot 数据):
+具体哪些 estimand 进 primary、primary family 大小(S8 / S10 / S12 等)、
+哪些因子(数量与具体哪几个)、C_FO 机制(就地换值 vs 文末追加真实收益)、
+P_predict 输出 schema(direction-only / + confidence / + memory_flag /
++ evidence)。
+
+**[R-4b] 仍开放**(等 R-1e / R-2 / R-3 / R-5 落定):power 计算具体数字、
+n_eff 矩阵、混合模型具体规格落地、bootstrap 实施细节。
+
+### 4.5 负对照 [R-3 重开中;R-4a 锁定具体处理方式 2026-05-23]
 
 - **BL2 post-cutoff 负对照** —— 700 个 ≥2026-02-01 的案例(晚于全队最晚
-  cutoff);事件在所有模型 cutoff 之后 → 泄露信号应近零;TOST 等价检验。
+  cutoff);事件在所有模型 cutoff 之后 → 泄露信号应近零。
+  - **[R-4a]** 用 **TOST(Two One-Sided Tests)等价检验,SESOI = 0.15**
+    (Smallest Effect Size Of Interest,标准化效应)。通过 = 95% CI 完全
+    落在 [-0.15, +0.15] 内 → "效应可忽略",比"不显著"强很多。仅限 BL2
+    与负对照,不扩散到主系数。
 - **同-cutoff 证伪对** —— GLM-4-9B ↔ GPT-4.1(同 cutoff、不同架构),查
   信号是否来自架构差异。
-- 另有 C_NoOp_placebo、BL1(元数据基线预测器)、BL3(非金融中文新闻负
-  对照,stretch)。
+  - **[R-4a]** 看主 estimand 上的差异 ratio:**ratio > 0.5 加 caveat,不
+    自动 fail**(架构混杂占信号一半以上时加 caveat,但 architecture noise
+    不能闭合识别 → 早期预警机制,非 hard gate)。
+- **BL1 元数据 / text-light challenger** —— 简单文本/元数据特征是否能
+  拟合到接近 LLM 水平。
+  - **[R-4a]** 用 **grouped-CV-by-case** 交叉验证(同一原文派生的多行不能
+    横跨 fold),否则数据泄露。
+- 另有 C_NoOp_placebo、BL3(非金融中文新闻负对照,stretch)。
 
-**[R-3 重开] 待定:** 负对照整体的充分性展开分析。
+**[R-3 重开] 待定:** 负对照整体充分性、C_NoOp_placebo 具体实现、BL3 中文
+非金融语料可得性。
 
 ### 4.6 预测目标与 ground truth [R-6 重开中]
 
@@ -237,20 +286,47 @@ hedged 的 "cutoff-monotone(非因果)" 措辞,并配同-cutoff 证伪对兜底�
 
 ---
 
-## 6. 两阶段预注册与 pilot 设计 [结构锚定]
+## 6. Design memo、sealed split 与 transparency artifact [结构锚定;R-4a 措辞重定 2026-05-23]
 
-本研究采用**两阶段自适应预注册**:
+本研究采用**两阶段提交流程**,但**不**包装为正式预注册 —— 子领域 15 篇
+代表作 0 例做 OSF / AsPredicted / registered report,在 LLM memorization
+子领域,正式预注册既无先例也非必要。改用三件套:
+
+### 6.1 Stage 1 — Design Memo(pilot 开跑前)
+
+一份 markdown,落到 git repo,有具体 commit SHA。内容:研究问题、候选
+estimand 清单、候选因子清单、扰动 inventory、模型 fleet、case 准入规则、
+pilot 后**允许修订**哪些(metric 实现细节、effect-size 估计、扰动
+inventory 微调、模型替换)和**不允许修订**哪些(estimand 框架级定义、
+core operator 集合、primary 因子总数原则上不在 pilot 后追加)。
+
+### 6.2 Sealed pilot / test split
 
 - **Phase 7 = pilot**,N=780(80 pre-cutoff + 700 post-cutoff)。pilot 的
   职责是证明冻结的测量栈"能跑、能审、能分析",估计 effect size 与协方差
   结构,为 main run 算 power。**pilot 不回答论文主问题。**
-- **Phase 8 = main run**,N=2,560。main run 才回答研究问题。
+- **Phase 8 = main run**,N=2,560,**与 pilot 0 重叠**。main run 才回答
+  研究问题。
 
-pilot 的 80 个 pre-cutoff 案例承载 confirmatory 因子分析;700 个 post-cutoff
-案例只做 baseline(无扰动、无审计),服务 BL2 负对照。
+pilot 的 80 个 pre-cutoff 案例承载主因子分析;700 个 post-cutoff 案例只做
+baseline(无扰动、无审计),服务 BL2 负对照。
 
-**[R-4 / R-1 关联]** pilot 的 n_eff 矩阵、统计计划搭在操作化层上,操作化
-重开后需相应重算;post-cutoff = 700 这个数本身已定。
+同行参照:Shi 2024(WikiMIA pre-2017 member / post-2023 non-member)、
+LiveBench 2025(每月 1/6 private slice)、AntiLeakBench 2025(post-cutoff
+自动构造)。
+
+### 6.3 Stage 2 — Transparency Artifact(pilot 跑完之后)
+
+一份 update,记录:pilot 看到了什么、所以改了什么、改动是否 design memo
+里 declared allowed、main run 开始前最终锁了什么。commit-locked,git diff
+可追溯。
+
+论文里写:"the final analysis plan was committed at commit Y prior to running
+the main experiment, with the diff from commit X documenting all pilot-driven
+refinements."
+
+**[R-4b / R-1 关联]** pilot 的 n_eff 矩阵、scenario-based MC power 模拟
+搭在操作化层上,操作化重开后需相应重算;post-cutoff = 700 这个数本身已定。
 
 ---
 
@@ -297,7 +373,8 @@ clean-room-first 方法(先白板独立分析,再对照既往 reviewer 意见)�
 | R-1 | 4 个 confirmatory 因子:各自的实现方法 → 然后选择(Template Rigidity 从零设计) |
 | R-2 | 6 个扰动:各自实现构思 → 然后保留几个 / 哪几个进 confirmatory |
 | R-3 | 负对照的充分性 |
-| R-4 | pilot 全套统计(混合模型 / 等价检验 / 多重比较 / 功效模拟) |
+| R-4a | ✅ closed 2026-05-23 — 框架级 8 条(无 family correction / main-primary-supporting-robustness 标签 / design memo 措辞 / Gwet's AC1 / etc.,见 §4.4) |
+| R-4b | pilot 具体数字(power、n_eff、混合模型规格落地、bootstrap),仍开放,等 R-1e / R-2 / R-3 / R-5 |
 | R-5 | 采样准入过滤器(可交易实体 / 新闻长度 / 反直觉案例) |
 | R-6 | 预测目标 & 是否 / 如何使用真实收益 |
 

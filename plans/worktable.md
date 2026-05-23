@@ -34,6 +34,19 @@ B-3 校准 + 2026-05-23 PM final-pass:整体质量审 + walk-through →
 §7 token-meter 整章删除 + §6.1 schema 收 11 列 + closure 14→11;
 reviewer-vs-author 路径分家全部落定),代码未动、签字搁置。WS2–WS5 未开工。
 
+**R-4a 方法论审计 2026-05-23 closed**(audit trail:
+`refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/whiteboard_analysis.md`
++ `subfield_lit_scan.md`)。锁住框架级 8 条(详见 `RESEARCH_PROPOSAL.md`
+§4.4 + `pending_items.md` R-4a closed 块):无 family-wise multiplicity
+correction / 标签语言改 main-primary-supporting-robustness-appendix /
+「预注册」措辞改 design memo + sealed split + transparency artifact /
+扰动质量 Gwet's AC1 取代 ≥85% pass-rate hard gate / 混合模型 per-estimand
+分别建 / E_CMMD 重命名 Cross-Model Cutoff-Monotone Disagreement / etc.。
+**不锁** estimand 清单 / family 大小 / 因子总数 —— 留给 R-1/R-2/R-6 实现
++ pilot 数据决定。R-6 因此解封。元层结论:**ratchet 论双源坐实**(A 的
+clean-room 独立推出比 frozen 简单 + B 子领域实然比 A 更轻),应用 memory
+`feedback_review_complexity` 解药生效。
+
 ---
 
 ## 2. 工作项表
@@ -44,17 +57,17 @@ reviewer-vs-author 路径分家全部落定),代码未动、签字搁置。WS2�
 
 | ID | 工作项 | 依赖(前置) | 可动? |
 |---|---|---|---|
-| **R-4a** | **方法论审计**:confirmatory/exploratory 划分、两阶段预注册、multiplicity 校正级别、E_CMMD 防御充分性 —— **单开 session(2026-05-23 起)** | **无(最上游 — family 大小决定下游能容多少因子×扰动)** | **✅ 可动(下一步)** |
-| R-6 | 预测目标 & 是否/如何用真实收益 | R-4a(family 容量限定 R-6 能否加新 estimand) | ⏸ **暂停**(待 R-4a;kickoff 已写好) |
+| **R-4a** | **方法论审计**:框架级 8 条(无 family correction / 标签词 / 「预注册」措辞改 design memo / Gwet's AC1 / etc.) | 无 | **✔ closed 2026-05-23**(audit `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/`) |
+| R-6 | 预测目标 & 是否/如何用真实收益(含 parked C_FO/C_SR 漂移调查) | 无(R-4a 给的容量答案是"不锁数,加新 estimand 要替换或开新 design memo") | ✅ 可动(2026-05-23 解封) |
 | R-1a | Cutoff Exposure:实现 + 选择确认 | 无(实现简单:日期+manifest) | ✅ 可动 |
 | R-1b | Historical Family Recurrence:实现 | 无(有 WS0.5 §5 管线待 clean-room 复审;family 粒度未定) | ✅ 可动 |
 | R-1c | Target Salience:实现 | 无(有 WS0.5 §3.3 待 clean-room 复审) | ✅ 可动 |
 | R-1d | Template Rigidity:从零设计 | 无(**零 spec**,从文献起;用户视为重点因子) | ✅ 可动 |
-| R-1e | 4 因子选择确认 | R-1a · R-1b · R-1c · R-1d · **R-4a**(family 容量) | ⛔ 待上游 |
-| R-2 | 6 扰动实现构思 → 选保留几个进 confirmatory(重审 C_NoOp;C_FO vs C_SR 漂移见 `.scratch/cfo_csr_history_findings.md`) | R-4a · R-6(C_FO 靠事件结果) | ⛔ 待上游 |
-| R-5 | 采样准入过滤器(可交易实体 / 新闻长度 / 反直觉案例) | R-4a · R-6(反直觉案例需真实股价) | ⛔ 待上游 |
+| R-1e | 因子最终选择确认(R-4a 不锁数 → 选哪几个由实现+pilot 实证证据决定) | R-1a · R-1b · R-1c · R-1d(R-4a 依赖已解除) | ⛔ 待 R-1a-d |
+| R-2 | 6 扰动实现构思 → 选保留几个进 primary(重审 C_NoOp;C_FO vs C_SR 漂移见 `.scratch/cfo_csr_history_findings.md`) | R-6(C_FO 机制选择,R-4a 依赖已解除) | ⛔ 待 R-6 |
+| R-5 | 采样准入过滤器(可交易实体 / 新闻长度 / 反直觉案例) | R-6(反直觉案例需真实股价,R-4a 依赖已解除) | ⛔ 待 R-6 |
 | R-3 | 负对照充分性 | R-1e · R-2(需知最终因子 / 扰动) | ⛔ 待上游 |
-| R-4b | pilot 具体统计(power 计算 / n_eff 矩阵 / 混合模型规格落地 / TOST / bootstrap 实施) | R-4a · R-1e · R-2 · R-3 · R-5(操作化定了才能算 power) | ⛔ 待上游 |
+| R-4b | pilot 具体统计(power 计算 / n_eff 矩阵 / 混合模型规格落地 / bootstrap 实施)—— R-4a 已锁 TOST/SESOI、scenario-based MC power 等框架 | R-1e · R-2 · R-3 · R-5(操作化定了才能算 power;R-4a 框架已就位) | ⛔ 待上游 |
 
 ### 块 B — 并行轨道(与 A 同时)
 
@@ -83,8 +96,8 @@ reviewer-vs-author 路径分家全部落定),代码未动、签字搁置。WS2�
 
 ```mermaid
 flowchart TD
-    R4a["R-4a 方法论审计 ★最上游"]
-    R6["R-6 预测目标/真实收益 ⏸"]
+    R4a["R-4a 方法论审计 ✔ closed"]
+    R6["R-6 预测目标/真实收益"]
     R1a["R-1a Cutoff Exposure"]
     R1b["R-1b Recurrence"]
     R1c["R-1c Target Salience"]
@@ -105,10 +118,6 @@ flowchart TD
     WS5["WS5 统计+预注册"]
     MAIN["main run N=2560"]
 
-    R4a --> R6
-    R4a --> R1e
-    R4a --> R2
-    R4a --> R5
     R1a --> R1e
     R1b --> R1e
     R1c --> R1e
@@ -140,21 +149,25 @@ flowchart TD
 
 > 图中 `R-4b → C-1` 是简写:C-1 需要 **R-1…R-6 全部**完成,R-4b 是块 A 的
 > 终端节点(R-6 经 R-2/R-5 间接汇入 R-4b),用它代表「A 收口」。**R-4a**
-> 反方向位于最上游 —— 整套严谨度机器决定下游能容多少因子×扰动 / estimand。
+> 已 closed(2026-05-23,框架级 8 条锁定;不锁 component-level 清单);其
+> 节点保留作里程碑,外延依赖箭头已移除。
 
 ---
 
-## 4. 现在能动的(2026-05-23)
+## 4. 现在能动的(2026-05-23 PM,R-4a closed 后)
 
 无前置、立即可启动:
 
-- **R-4a 方法论审计** —— **下一步**(新 session,kickoff =
-  `.scratch/session_kickoff_r4.md`)。最上游,落了才能定下游 family 容量、
-  multiplicity、预注册结构。R-6 已暂停等它。
-- **R-1a / R-1b / R-1c / R-1d** —— 4 个因子各自的实现设计。可与 R-4a 并行
-  (各因子的实现细节不取决于 multiplicity 规模);其中 **R-1d Template
-  Rigidity 零 spec、用户视为重点因子**,是最实打实的起点。
-- **B-2** WS0.5 design-agnostic 基建(B-3 + B-3+ 全部解锁)。现在 memo 文字与
+- **R-1d Template Rigidity 设计** —— **零 spec、用户视为重点因子**,是
+  R-1 系列里最实打实的起点。建议走 clean-room codex(模板参照
+  `.scratch/codex_prompt_r4a_whiteboard.md`)。
+- **R-1a / R-1b / R-1c** —— 3 个因子各自的实现设计。R-1b Recurrence(用户
+  点名作下一步实验管线搭建)、R-1c Salience 各有 WS0.5 §5 / §3.3 现成管线
+  待 clean-room 复审;R-1a Cutoff Exposure 实现简单。
+- **R-6 预测目标 & 真实收益**(2026-05-23 解封)。可接 parked C_FO/C_SR 漂移
+  调查(`refine-logs/reviews/REOPEN_R1_R6/cfo_csr_history_findings.md`);
+  kickoff 已写好 `.scratch/session_kickoff_r6.md`。
+- **B-2** WS0.5 design-agnostic 基建(B-3 + B-3+ 全部解锁)。memo 文字与
   reviewer-aligned 设计 + §7 teardown 后的精简设计**全部对齐**,可照 memo 实现
   4 个基建模块:**provider-agnostic caching wrapper**(DeepSeek + OpenRouter 共用)
   / SQLite cache(11 列 schema)/ Tier-A JSONL / `verify_canonical_hash.py` +
@@ -163,9 +176,12 @@ flowchart TD
   **不实现**(已删):metered client / budget_summary / per-round checkpoint。
 - **B-1** WS1 云上可并行项。
 
-> R-1a-d 与 R-4a 互不依赖,可并行。R-1e 因为「选哪几个进 confirmatory」会
-> 受 R-4a family 容量约束,放到 R-4a 之后。R-6 暂停(它需要 R-4a 给出
-> family 还能否加新 estimand 的答案)。
+> R-1a-d 各自实现细节独立,可并行。**R-1e 选因子由 R-1a-d 实现 + pilot 实证
+> 决定**(R-4a 不锁因子数,把"哪几个进 primary"留给数据)。R-2 与 R-5 仍待
+> R-6(C_FO 机制选择 / 反直觉案例需真实股价)。
+
+> **实现价值清单**(operator / perturbation / factor 三轴,哪些去实现 /
+> 简版 / 暂缓 / 不做):见 §7。
 
 ---
 
@@ -188,3 +204,66 @@ flowchart TD
 | OPEN-4 Phase 7 审计人手 | 阻塞 **WS4**;owner=用户;WS4 manifest 冻结前需解决 |
 | Phase 8 MC 仿真功效校准 | post-pilot;阻塞 PREREG_STAGE1 功效声明 |
 | WS6 机制分析 | dormant,待 WS1 Stage 2.7 hidden states 落地后 scope |
+
+---
+
+## 7. 实现价值清单(2026-05-23 R-4a 后)
+
+> R-4a 决定后梳理 —— 哪些 operator / perturbation / factor 现在去实现、
+> 哪些做简版等 pilot 看、哪些暂缓 / 不做。
+>
+> **清单不是 primary family 清单** —— primary 进哪些等实现 + pilot 数据
+> 决定(R-1e / R-2 / R-6 的范围)。本清单是"哪些值得花工程资源建出来"。
+
+### 7.1 Operators
+
+| 组件 | 现状 | 价值 | 推荐 |
+|---|---|---|---|
+| P_logprob | WS1 已建 + 冒烟通过 + AutoDL 开好 | **核心** —— logprob 路线物理基础 | ✅ 已实现 |
+| P_predict | WS2 未开工 | **核心** —— 所有行为类信号 | ✅ 实现 minimal schema = direction + confidence;memory_flag / evidence 留 optional 字段(不进主张),等 pilot 看是否有信息 |
+| P_extract | Path E 探针集已建(reuse) | 中 —— Path E 经验探针 load-bearing | ✅ 已实现,保留 |
+| P_schema | 未实现 | 边缘(已划 follow-up paper) | ❌ **不做** |
+
+### 7.2 Perturbations
+
+| 组件 | 现状 | 价值 | 推荐 |
+|---|---|---|---|
+| C_FO | 机制未定(parked R-2+R-6 漂移) | **主路径** —— counterfactual 信号子领域同行(Wu 2024 / Mirzadeh 2025)用法 | ✅ **先做"就地换值"最小版**;pilot 后由 R-6 决定是否升级 T+1/T+5 真实收益版 |
+| C_NoOp | WS3 未开工(用户点名重审) | 中(robustness / brittleness 信号,非直接 memorization) | ✅ 实现,定位 supporting |
+| C_SR | 与 C_FO 实操几乎重合(parked) | 中 —— secondary to C_FO within counterfactual family | ⏸ **先不单独做**;等 C_FO + pilot,如 C_FO 不足且 C_SR 有区分性再说 |
+| C_anon | exploratory(E_EAD_t / E_EAD_nt);依赖 WS0.5 entity 管线 | 中 —— identity-keyed memory probe | ⚖️ **先做 L0 vs L4 binary**,不做 L0-L4 dose 梯度 |
+| C_temporal | exploratory | 边缘 —— Cutoff Exposure 因子已直接 measure | ❌ **先不做**;pilot 看 E_CMMD 强度后再说 |
+| C_ADG | reserve(只改 system prompt) | 边缘但成本极低 | ✅ **做 D4b primary**(no text cues),备用 |
+
+### 7.3 Factors
+
+| 组件 | 现状 | 价值 | 推荐 |
+|---|---|---|---|
+| Cutoff Exposure | 实现简单(日期 + manifest);Path E 验证 | **核心** —— 整个 temporal route 物理基础 | ✅ **必实现** |
+| Historical Family Recurrence | WS0.5 §5 管线待 clean-room 复审;family 粒度未定 | **主候选** —— 对应 repetition memorization(Carlini 2023 数据点) | ✅ **实现**(用户点名 R-1b);family 粒度先选 粗(标的级)/ 细(标的×event_super_type)两档,lookup 窗口 90/365 天两档,在 pilot 看哪档有信号,不预设阈值 |
+| Target Salience | WS0.5 §3.3 待 clean-room 复审 | **主候选** —— prominence-mediated memorization | ✅ 实现 |
+| Template Rigidity | **零 spec**(用户视为重点) | **主候选** —— 中文金融新闻强模板化(财报 / 监管公告) | ✅ **先做 R-1d 设计**(用户点名下一步),再实现 |
+| Bloc 3 标注(事件类型 / 披露 / 阶段 / 时段) | WS0.5 管线本就标注 | exploratory stratification | ✅ 沿用,不单独实现 |
+
+### 7.4 总账
+
+- ✅ **实现**:P_predict、C_FO(简版)、C_NoOp、C_ADG、Cutoff Exposure、
+  Recurrence、Salience、Template Rigidity
+- ⚖️ **实现简版**:C_anon(L0 vs L4)、P_predict schema 留扩展位
+- ⏸ **暂缓**:C_SR、C_temporal(等 pilot 数据再说)
+- ❌ **不做**:P_schema(follow-up paper)
+
+### 7.5 与块 A 工作项的对应
+
+| 实现价值清单条 | 对应 worktable §2 工作项 |
+|---|---|
+| Template Rigidity(✅ 设计) | R-1d |
+| Recurrence(✅ 实现) | R-1b |
+| Salience(✅ 实现) | R-1c |
+| Cutoff Exposure(✅ 实现) | R-1a |
+| C_FO 机制(简版 → R-6 后升级) | R-2 + R-6 交叉项 |
+| C_NoOp(supporting) | R-2 |
+| C_SR / C_temporal(暂缓) | R-2(裁剪后) |
+| C_anon binary | R-2 |
+| P_predict schema | R-6 + WS2 |
+| 反直觉案例过滤 | R-5(R-6 后) |

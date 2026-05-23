@@ -10,6 +10,7 @@ depends_on: MEASUREMENT_FRAMEWORK.md (four-layer framework definitions)
 amendments:
   - "2026-04-27 (docs/DECISION_20260427_pcsg_redefinition.md): E_PCSG redefined as cross-version Qwen pair on token-intersection vocab; E_PCSG_capacity_curve added as exploratory; fleet expanded to 10 white-box; cutoff dates flagged as operator-asserted pending Path-E empirical probe"
   - "2026-04-29 (docs/DECISION_20260429_gate_removal.md): E_FO/E_NoOp gate condition 3 (mean |delta| > 0 on ≥ K/N) REMOVED — anti-pattern (gates measurement of X on magnitude of X). Gate condition 2 demoted to descriptive coverage report. Gate condition 1 retained as data-quality gate. WS6 (E_FO_mech) made unconditional (Path C eager hidden-state pre-compute in WS1 Stage 2.7). Stage 2 family states S16a/S16b/S12 retired — S20 is the only default. Reserve promotion thresholds rescaled to strict-majority rule (`⌊N/2⌋+1` for confirmatory-style, `⌈N/3⌉` for one-third-style). Fleet expansion alone no longer triggers shortlist amendment as long as the formulas are honored."
+  - "2026-05-23 (refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/whiteboard_analysis.md + subfield_lit_scan.md): R-4a methodology framework audit closed. Clean-room whiteboard analysis + 15-paper subfield literature scan (Carlini 2023 / Tirumala 2022 / Nasr 2023 / Shi 2024 / Duan 2024 / Oren 2024 / Golchin 2024 / PaCoST 2024 / LiveBench 2025 / AntiLeakBench 2025 / Yang 2023 / Wu 2024 / Mirzadeh 2025 / Glasserman 2023 / Gao 2025) provided dual-source evidence that current frozen statistical machinery is reviewer-ratcheted. Framework-level locks (8 items): (1) NO family-wise multiplicity correction — report effect size + 95% CI per-estimand from mixed-model clustered-robust SE; subfield 15/15 do not use Bonferroni/Holm/Westfall-Young, FDR/BH only in 2026 theoretical preprints. (2) Label vocabulary switched to main/primary/supporting/robustness/appendix; `confirmatory`/`exploratory` retired (0/15 subfield hits). (3) `Pre-registration` terminology dropped — replaced by **design memo + sealed pilot/test split + transparency artifact** (subfield 0/15 formal preregistration); see RESEARCH_PROPOSAL.md §6. (4) Mixed-model fit per-estimand separately (case/model/pair clustering); case-level aggregates (e.g. E_CMMD) use case-level inference. (5) Perturbation quality audit changed to **Gwet's AC1 + accuracy** matrix (per-perturbation × event-type); ≥85% pass-rate hard gate removed — failure → methods-section caveat, NOT exclusion. AntiLeakBench 2025 is the closest subfield analog (3 annotators + Gwet's AC1 + accuracy). (6) `baseline_confidence` exits primary → sensitivity only; `model_capability` covariate likewise sensitivity. (7) TOST/SESOI=0.15 confined to BL2 negative-control equivalence test, not extended to main coefficients. (8) Scenario-based MC power simulation retained but decoupled from Westfall-Young max-T. PLUS: E_CMMD renamed Cross-Model **Cutoff-Monotone** Disagreement (claim-layer separation from memorization interpretation). Specific estimand/factor/family-size choices NOT locked by R-4a — deferred to R-1/R-2/R-6 implementation + pilot data. §1 confirmatory/exploratory labels, §1 Westfall-Young default, §4 E_extract→24-coef confirmatory promotion path: SUPERSEDED — to be rewritten when R-1/R-2 land. R-4b (specific power numbers, n_eff matrix, mixed-model spec implementation) remains open."
 session_decisions:
   - "P_schema: Continuation RESERVE (pilot-gated appendix), Cloze DEFER, QA DEFER"
   - "E_TDR: redefined as mixed-model interaction term (cutoff × dose), not standalone estimand"
@@ -32,6 +33,19 @@ This document freezes the **conceptual measurement scope** of the R5A benchmark.
 ---
 
 ## 1. Confirmatory estimands (5 × 4 factors = 20 coefficients)
+
+> **Note (2026-05-23 R-4a amendment).** Section title and multiplicity
+> language below are **superseded** by the R-4a framework audit
+> (see frontmatter amendment + `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/`).
+> Specifically: (a) `confirmatory/exploratory` labels retired in favor of
+> `main / primary / supporting / robustness / appendix`; (b) Westfall-Young
+> stepdown max-T is NO LONGER the default — no family-wise correction is
+> applied, effect sizes + 95% CIs are reported per-estimand instead; (c) the
+> "5 × 4 = 20 coefficients" carve-up is no longer locked — final primary
+> family size and composition are deferred to R-1/R-2/R-6 + pilot data.
+> The estimand inventory below remains accurate as a *candidate pool*; only
+> the labels and statistical defaults are deprecated. This section will be
+> rewritten once R-1/R-2 reopen lands.
 
 Multiplicity control: Westfall-Young stepdown max-T across the 20-coefficient family.
 

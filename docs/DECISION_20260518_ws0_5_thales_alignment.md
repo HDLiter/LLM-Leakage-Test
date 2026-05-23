@@ -44,8 +44,9 @@ revision_basis: |
     Statistician: APPROVE-WITH-MINOR-PATCHES — same S-1 wording patch as ML-engineer's E-1 (`refine-logs/reviews/WS0_5_DESIGN/ws0_5_round2_statistician_review.md`); resolved by the E-1 patch above.
   Per runbook §5: 1× APPROVE + 2× APPROVE-WITH-MINOR-PATCHES → minor patches applied in-place to v0.3, no round-3 re-review.
   v0.4 (2026-05-20): user-directed simplification of §4 only. Replaced the heavy "Scheme Y" auto-tune framework (limited-exposure Ladder gate, paired McNemar / permutation tests, cross-task alpha spending, MDE preflight, 7-way fixture split, manifest lock, run-state resume) with a plain train/dev/test split: tune on `train`, rank candidates on `dev`, evaluate the final prompt once on a sealed `test` split. Rationale: a prompt is a measurement instrument; the per-round accept decision is an optimization step, not a confirmatory statistical claim, so it needs no hypothesis test. The sealed-test-set protection — the only necessary overfitting defense — is kept. v0.4 supersedes round-1 issues E-1/E-2/E-3/E-4/S-1/S-2/S-3/S-4/S-7 (all §4-machinery). Non-§4 round-1/2 issues remain in force. Downstream cleanup: §7.1 budget config rename, §7.4 trimmed to lightweight checkpoint, §8 deliverables (removed `ws0_5_mde_preflight.py`, `manifest.lock.yaml`, `mde_report.json`, `run_state.json`; `*_autotune_manifest.yaml` → `*_autotune_config.yaml`), §9 closure condition #5 simplified, §10 schedule, §11 risks R-W05-1/3/7. Not Codex-re-reviewed (removes machinery, adds no claim).
+  v0.4 cont. (2026-05-23, B-3 infra-drift audit + §6 reproducibility calibration — still v0.4): WS0.5 memo Pass-2 drift audit (B-3 in worktable) found 8 must-fix + 1 wording drift in the 4 design-agnostic infra themes (E-6 / E-8 / E-9 / E-10); Codex repro-norms research (`refine-logs/reviews/WS0_5_DESIGN/llm_reproducibility_norms_20260522.md`) found no NeurIPS / ICML / ICLR / ARR / ACL / EMNLP venue treats full raw-response cache or hard-fail replay as a closed-API LLM reproducibility hard requirement, so the §6 prose that elevated an author-internal bug-fix tool to a public exit gate was recalibrated. Drift fixes: §5.2 R3 "salient entity" → "extracted entity surface (`value`, `type`; no `salience=core` requirement here)"; §5.3 LLM disambiguation re-scoped to diagnostic smoke only (does not enter the per-match count path of the main pipeline; R4 refinement form deferred to follow-up work, not nailed down here); §6.1 Tier-B SQLite uniqueness key changed from single-column `cls_item_id` to composite `(rendered_prompt_sha256, requested_model_slug, decoding_params_sha)` with `task` / `phase` / `cls_item_id` / `prompt_template_git_sha` kept as indexed columns for resume queries; §6.2 `factor_provenance.json` gains a top-level `run_inputs` block recording run-wide model / API / date / params / sampling-manifest / upstream-artifact hashes once (count-factor cells point to `run_inputs` rather than carrying their own copy); §6.3 reorganized into two explicit reproducibility paths — **Path A reviewer-facing default** (canonical_table_hash integrity + run_inputs provenance + Tier-A sample plausibility; needs only the repo) and **Path B author-internal optional** (replay from Tier-A + Tier-B + frozen code, used for post-processing bug-fix without paying ~$200-400 to re-call full-CLS); Path B retains hard-fail on missing / corrupt / **duplicate** (the v0.4 "duplicate structurally impossible" claim was wrong for Tier-A JSONL which has no key constraint); §6.4 Tier-B bullet repositioned as author-internal input to Path B (Path A is unaffected if Tier-B is lost); §6.5 added — paper-level reproducibility disclosure expectations (reproducibility statement + method-to-`run_inputs` match + closed-API limitations per NeurIPS / ARR / ICLR norms); §7.3 auto-tune checkpoint stores full `meter_totals_by_task_phase` (per-task/phase tokens + USD) instead of a scalar `budget_totals_USD`, so the §7.2 per-task/phase report stays correct across a crash-resume; §8 adds `src/r5a/backends/metered_deepseek_client.py` (the §7.1 metered client — previously decided but missing from deliverables) and `scripts/verify_canonical_hash.py` (Path A reviewer integrity check); closure #6 redefined from "reproducible from cache + frozen code" to "reviewer-facing reproducibility complete" (Path A — schema + prompt yamls + provenance + Tier-A + canonical-hash check passes); closure #13 extended to require the metered client module committed alongside the budget report. The calibration applies the minimal-design principle (memory `feedback_minimal_design`): each component does only its named function (reviewer path serves reviewers, cache + replay serves the author, they do not back each other up). Not Codex-re-reviewed — a calibration that net-simplifies and lifts the publication exit gate to align with venue norms; adds no new statistical claim.
   v0.4 cont. (2026-05-20, continued review session — still v0.4): user is reviewing the 14 non-§4 round-1/2 issues (C-1..C-5, E-5..E-10, S-5/S-6/S-8). C-1 reopened and redesigned §3.3 — the case-admissibility test (a central, tradable target) is promoted to a GLOBAL sampling pre-filter (§3.3.1) applied to every case and every factor; Target Salience (§3.3.2) becomes a pure scorer, `log1p` of the target's CLS mention count. Removes the v0.3 `context_gate` veto + `target_validity_low` flag (collapsed into the pre-filter's centrality test — the same text-local signal was used twice), the `static_reach` 1/2/3 ordinal + family mapping table, and the market-metadata snapshot dependency (§3.3.4 deleted; `r5a_market_metadata_snapshot.json` + `build_market_metadata_snapshot.py` dropped from §8; §10 S1 trimmed; §12 Target-Salience class-1/2 open item closed). Rationale: market cap / index membership measures firm size, not fame, and misclassifies small-but-heavily-covered targets; a corpus mention count is the direct quantitative prominence proxy and reuses the §5 recurrence pipeline at near-zero cost. Supersedes the v0.3 C-1 patch. C-2 + user review then replaced the per-case recurrence window `[T−24mo, T)` with a fixed pre-cutoff window `[corpus_start, earliest_model_cutoff)`, shared by both Recurrence (§5) and Target Salience (§3.3.2) — the two factors now differ only by the event-family filter. This dissolves C-2 (model-visibility — `recurrence_count_visible_to_model` removed) and E-5 (recurrence now computable for all 430 cases incl. post-cutoff controls — no `not_applicable_post_cutoff`), and renames the primary recurrence variable `pre_case_cls_family_recurrence` → `cls_family_recurrence`. C-3: the recurrence confirmatory variable becomes the continuous `log1p_recurrence_count` — the within-super_type percentile, the median-split binary, the 4-way interpretation rules, and the `absolute_high_recurrence` parallel field are all removed; magnitude is the construct, and the event-family base-rate confound is handled by within-super_type stratified sampling plus super_type as a regression covariate, not by a percentile transform. A non-confirmatory within-super_type sampling bin remains for the plan §6.4 n_eff design. This also dissolves E-7/S-5 (the confirmatory variable has no bin → no bin-flip; the LOO/bootstrap bin-stability machinery and `ws0_5_bin_stability.py` are removed). C-4: an empirical probe (`scripts/cls_dup_probe.py`, 1.2M CLS items) found only 0.48% intra-day duplication — mostly legitimate rolling tickers — so the no-dedup recurrence count is used directly and all v0.3 C-4 dedup sensitivity fields (`recurrence_count_clustered`, `recurrence_count_first_per_day`, `duplicate_ratio`) are dropped. C-5: the §3.4 signal_profile smoke comparison gains a third arm — an independent two-pass (Authority predicted without conditioning on Modality, ported from Thales v5 Split-Independent); if it is selected, Authority is an independent measurement and the conditioning caveat is dropped (the caveat is now contingent on the smoke outcome). E-6: a Codex methods review (`refine-logs/reviews/WS0_5_DESIGN/entity_disambig_methods_20260520.md`) found the LLM-on-critical-path entity pipeline both over- and under-engineered; §5.2 Phase R2-R4 are redesigned to a deterministic master-data pipeline — Phase R2 builds a tiered alias table from AKShare securities master data (codes / official names / former names with effective dates), Phase R4 resolves matches by deterministic evidence tiers, risk is rule-scored against a broader collision universe. The LLM alias-gen + LLM per-match-confirm steps leave the main path (the v0.3 E-6 ambiguity-override rules + versioned cache key are moot); §5.3 becomes a one-off user-reviewed smoke testing whether LLM alias generation / disambiguation adds enough recall to be admitted as a human-reviewed tier-3. E-8: the replay cache is consolidated from the v0.3 three-tier sharded-JSONL + `shard_index.parquet` + `run_state.json` scheme into two objects — a committed ~5 MB `pilot_raw_responses.jsonl` (Tier A, normal git) and a single git-ignored SQLite DB `data/cache/ws0_5_response_cache.sqlite` (Tier B, full-CLS + auto-tune, which natively serves as cache + key index + resume state); no Git LFS anywhere; the `ws0_5_storage_preflight.py` LFS preflight is dropped; the SQLite is backed up to a private Kaggle dataset (sha in `factor_provenance.json`). E-9: replay reproducibility keeps the `canonical_table_hash` content check and the hard-fail-on-missing/corrupt-cache rule, but drops the pyarrow-version-pinning + `replay_environment.lock.json` gold-plating (the content hash is already the reproducibility guarantee; byte-identical parquet is an unneeded stricter goal). E-10: the budget subsystem collapses into one metered DeepSeek client (`src/`) — it meters tokens/cost per call, so the per-task token estimate falls out of the smokes + auto-tune runs that precede the heavy S4 phase (no separate `ws0_5_token_estimator.py` dry-run), the live total drives the 2×/5× safety rails, and the run-end dump is the budget report; the separate `budget_ledger_*.jsonl` + buffered writer + §7.2 `LedgerEntry` schema and the pricing daily-refresh/epoch machinery are removed; resume was already covered by the v0.4 §7.3 checkpoint + the E-8 SQLite. S-6: a Codex literature review (`refine-logs/reviews/WS0_5_DESIGN/collinearity_diagnostics_20260520.md`) confirms the v0.3 five-diagnostic discriminant suite is over-built by 2-3 items; §3.3.3 is cut to the field-standard minimum — VIF on the four confirmatory factors + a 4×4 Pearson correlation matrix, empirical max-VIF thresholds (≤5 / 5-10 / ≥10); condition number, partial/residual correlations, and the GVIF apparatus are dropped, and mixed-model singular-fit/convergence is reclassified as a separate analysis-stage model-fit check. S-8: confirmed already resolved — v0.4's §4 rewrite had already replaced the stale "bootstrap CI gate" wording in §11 R-W05-1/3/7. **All 14 round-1/2 issues are now resolved**: 10 produced memo edits (C-1..C-5, E-6, E-8, E-9, E-10, S-6); 3 dissolved as byproducts (E-5 via the C-2 window change, E-7 & S-5 via the C-3 continuous-variable change); 1 confirmed already-resolved (S-8). The review's consistent direction was simplification — each reviewer-driven heavyweight mechanism was cut to a minimal correct form. Awaiting user sign-off.
-status: v0.4 — 14-issue round-1/2 review complete (§3.3 / §3.4 / §5 / §6 / §7 revised, all net-simplified); awaiting user sign-off + WS0.5 closure
+status: v0.4 — 14-issue round-1/2 review + B-3 infra-drift audit (Pass-2 on E-6/E-8/E-9/E-10) + §6 reproducibility-model calibration (evidence-grounded by Codex repro-norms research) complete (all net-simplified); awaiting user sign-off + WS0.5 closure
 authority: |
   Resolves the WS0.5 scope-TBD placeholder in plans/phase7-pilot-implementation.md §5.1A
   (revisions v2.2 / v2.3 / v2.4) and the matching open item in PENDING.md (line 37-48).
@@ -672,8 +673,9 @@ Phase R3: Fixed-window candidate filter (+ type & date compatibility, per E-6)
   For each pilot target:
     Filter cls_event_type_index for:
       date ∈ [corpus_start, earliest_model_cutoff)
-      a salient entity whose normalized surface matches a target alias
-        (the §5.2 Phase R2 table)
+      an extracted entity surface (`value`, `type` from T2; no
+        `salience=core` requirement here) whose normalized form matches
+        a target alias (the §5.2 Phase R2 table)
       type compatibility: a company alias matches only company mentions,
         index↔index, sector↔sector
       effective-date check: a former name matched outside its alias
@@ -753,8 +755,13 @@ checks whether an LLM still adds value, on a sample the user reviews by hand:
   after user review (`source=llm_suggested_user_accepted`). Otherwise the
   master-data table is used alone and the LLM alias-gen prompt is not run in
   the main pipeline.
-- Likewise, LLM disambiguation enters the main path only if it beats the
-  deterministic Phase-R4 rule on the reviewed sample.
+- LLM disambiguation stays a diagnostic smoke only in this design — it
+  does not enter the per-match count path of the main pipeline (Phase R4
+  is deterministic, per E-6 and the §5.2 Phase R4 spec). The smoke's role
+  is to characterize what the deterministic R4 rule misses; the form of
+  any subsequent refinement to the R4 rule table is decided after the
+  smoke results are reviewed and is deferred to that follow-up work —
+  not nailed down in this memo.
 
 The smoke prompts (`ancillary/target_alias_gen_prompt.yaml`,
 `ancillary/entity_confirm_prompt.yaml`) exist for this smoke only. The smoke
@@ -816,15 +823,28 @@ data/cache/ws0_5_response_cache.sqlite     # Tier B — git-ignored, private Kag
 - **Tier A — pilot raw responses** (`pilot_raw_responses.jsonl`): the 430
   pilot cases × 3 tasks ≈ 1290 records, ~5 MB. One JSONL, committed to
   **normal git** — not Git LFS (LFS is for large files; KB-scale records gain
-  nothing from it). Committing it keeps `pilot_factor_values.parquet`
-  independently replayable by anyone with the repo.
+  nothing from it). Tier A's role is **reviewer-facing evidence** — a
+  sample-level inspection target so a reviewer can see real prompt /
+  parser / labeling behavior on the pilot subset (5 MB is small enough
+  to skim). It is also the author's audit / debug input for the pilot
+  subset; full raw-response replay of `pilot_factor_values.parquet` is
+  an **optional internal-audit path** (§6.3 Path B) that additionally
+  needs Tier B restored from the private backup. The default reviewer
+  reproducibility path (§6.3 Path A) is hash + provenance, not replay.
 - **Tier B — full-CLS + auto-tune response cache**
   (`ws0_5_response_cache.sqlite`): 500K-1M+ records, ~1.5-5 GB. A SQLite DB
   (Python-stdlib `sqlite3` — no server, no dependency). The table *is* the
-  cache; the primary key (`cls_item_id` / `case_id`) *is* the lookup index
-  (no `shard_index.parquet`); a `SELECT` of completed ids *is* the resume
-  state (a re-run does insert-or-ignore — no separate checkpoint file); WAL
-  mode gives crash-safety. `data/cache/` is already git-ignored (the
+  cache; the lookup / uniqueness key is the composite
+  `(rendered_prompt_sha256, requested_model_slug, decoding_params_sha)` —
+  `rendered_prompt_sha256` already encodes task + phase + item + template +
+  input, so this three-field key uniquely identifies a call (single-column
+  `cls_item_id` cannot: the same item appears under different task / prompt
+  / model combinations). `task`, `phase`, `cls_item_id`, and
+  `prompt_template_git_sha` are kept as indexed columns for resume queries
+  (no `shard_index.parquet`); a `SELECT cls_item_id WHERE task=? AND
+  prompt_template_git_sha=?` *is* the resume state (a re-run does
+  insert-or-ignore on the composite key — no separate checkpoint file);
+  WAL mode gives crash-safety. `data/cache/` is already git-ignored (the
   project's regenerable-API-cache directory) — no new ignore rule needed.
 
 Per-record fields (same content in either store): `id`, `task`,
@@ -845,35 +865,87 @@ snapshot across runs."
 
 ### 6.2 factor_provenance.json (audit trail)
 
-For each cell in `pilot_factor_values.parquet`:
+The provenance file has two layers — a top-level `run_inputs` block that
+records run-wide artifact hashes **once** (these are shared by every cell, so
+recording them per-cell would be redundant — minimal-design), and per-cell
+records that reference `run_inputs` when a factor is derived from those
+inputs:
 
 ```json
 {
+  "run_inputs": {
+    "model_id": "deepseek-v4-pro-<snapshot or month>",
+    "api_call_date_window": ["<ISO start>", "<ISO end>"],
+    "decoding_params": {"temperature": 0, "top_p": 1.0, "max_tokens": "<n>"},
+    "pricing_snapshot": {"date": "<ISO>", "input_per_1k_usd": <float>, "output_per_1k_usd": <float>},
+    "prompt_template_shas": {
+      "T1_topic_classification": "<git SHA of topic_classification_v4pro.yaml>",
+      "T2_entity_extraction":    "<git SHA of entity_extraction_v4pro.yaml>",
+      "T3_signal_profile":       "<git SHA of signal_profile_v4pro.yaml>"
+    },
+    "sampling_manifest_sha": "<sha256 of pilot_sampling_manifest.json>",
+    "upstream_artifacts": {
+      "cls_event_type_index_hash": "<sha256 of cls_event_type_index.parquet>",
+      "target_aliases_hash":       "<sha256 of target_aliases.json>",
+      "akshare_snapshot_hash":     "<sha256 of akshare_master_snapshot/>",
+      "disambiguation_rule_sha":   "<git SHA of §5.2 Phase R4 rule code>"
+    },
+    "tier_b_cache_sha256": "<sha256 of ws0_5_response_cache.sqlite at backup time>"
+  },
+  "canonical_table_hash": "<sha256 over canonicalized pilot_factor_values.parquet (§6.3)>",
   "<case_id>": {
     "<factor_name>": {
       "value": "<computed value>",
-      "source_raw_response": "pilot_raw_responses.jsonl#<id> | ws0_5_response_cache.sqlite:<id> | derived (for count-based factors)",
+      "source_raw_response": "pilot_raw_responses.jsonl#<id>  |  ws0_5_response_cache.sqlite:<rendered_prompt_sha256>  |  derived",
       "prompt_sha": "<git SHA of config/factors/*_v4pro.yaml>",
       "parser_version": "v1.0",
-      "model_snapshot": "deepseek-v4-pro-<date>",
-      "derived_from": "<upstream factor if any>",
+      "derived_from": "<\"run_inputs\" (for count-based factors)  |  upstream factor name (if any)>",
       "transformation_sha": "<git SHA of collapse_map / scoring code>"
     }
   }
 }
 ```
 
-### 6.3 Replay script
+For count-based factors (recurrence, Target Salience), `source_raw_response`
+is `"derived"` and `derived_from` points to `"run_inputs"` — the actual
+upstream artifact hashes are read off the top-level block, **not repeated in
+every cell**. For LLM-cell factors, `source_raw_response` points to the
+specific Tier-A line id or Tier-B composite cache key; the run-wide model id
++ decoding params live in `run_inputs` (run-wide constants, not per-cell).
 
-`scripts/replay_factor_values.py` — reads the Tier-A pilot JSONL + the Tier-B
-SQLite cache + frozen prompt configs + factor_schema.yaml; outputs
-`pilot_factor_values.parquet` and `factor_provenance.json` **without re-calling
-V4 Pro**.
+### 6.3 Two reproducibility paths (v0.4 per E-8/E-9 calibration)
 
-**Reproducibility check (v0.3 per ML-engineer reviewer E-9).** Bit-identical
-parquet across machines is fragile (pyarrow/pandas/compression library version
-differences). v0.3 uses a **canonical row-content hash** as the primary
-reproducibility check:
+Reproducibility for `pilot_factor_values.parquet` has two distinct paths,
+serving two distinct users — separating them is what stops design
+ratcheting (a reviewer SLA being conflated with an internal audit tool).
+The Codex repro-norms research
+(`refine-logs/reviews/WS0_5_DESIGN/llm_reproducibility_norms_20260522.md`)
+confirms this split matches NeurIPS / ICML / ICLR / ARR / ACL / EMNLP
+norms for closed-API LLM experiments: venues require a path to verify,
+not bit-identical replay; raw-response cache + hard-fail replay are
+treated as author-internal artifacts, not public requirements.
+
+**Path A — reviewer-facing default path (hash + provenance).** What
+reviewers actually verify in a 1-3 hour review pass. Needs only the
+repo; does **not** invoke replay; does **not** depend on Tier B.
+
+1. **Integrity check.** `scripts/verify_canonical_hash.py
+   data/factors/pilot_factor_values.parquet` recomputes the canonical
+   row-content hash and compares it to `canonical_table_hash` in
+   `factor_provenance.json` — proves the committed parquet is the one
+   the paper references and has not silently drifted.
+2. **Provenance check.** Reviewer reads the top-level `run_inputs`
+   block (§6.2) and matches each field to the paper's method section:
+   model identifier, API call date window, decoding params, frozen
+   prompt template SHAs, sampling manifest SHA, upstream artifact
+   hashes, Tier-B backup hash.
+3. **Sample-level plausibility.** Reviewer skims 5-10 records from the
+   committed Tier-A `pilot_raw_responses.jsonl` (~5 MB total) to see
+   real T1 / T2 / T3 prompt → output behavior on representative cases.
+
+The canonical row-content hash is computed format-agnostically (parquet
+byte-identity is fragile across pyarrow / pandas / compression library
+versions):
 
 ```python
 canonical_table_hash = sha256(
@@ -884,19 +956,35 @@ canonical_table_hash = sha256(
 )
 ```
 
-`scripts/replay_factor_values.py` writes `canonical_table_hash` into
-`factor_provenance.json`; reproducibility is verified by hash equality. The
-`canonical_table_hash` **is** the reproducibility guarantee — parquet
-byte-identity is not pursued (it would only add a brittle library-version pin
-for no analytical benefit).
+The `canonical_table_hash` **is** the reproducibility guarantee for Path
+A — parquet byte-identity is not pursued (it would only add a brittle
+library-version pin for no analytical benefit).
 
-**Missing-cache policy (v0.3 per E-9).** Confirmatory replay **hard-fails** on
-any missing, corrupt, or hash-mismatched raw response (a duplicate is
-structurally impossible — the Tier-B SQLite primary key prevents it). A
-separate diagnostic mode `replay_factor_values.py --allow-missing` may write
-incomplete artifacts for triage, but it **cannot overwrite** the committed
-`pilot_factor_values.parquet`; it writes to `pilot_factor_values.partial.parquet`
-with a separate provenance file.
+**Path B — author-internal audit / bug-fix path (optional replay).**
+`scripts/replay_factor_values.py` reads the Tier-A pilot JSONL + the
+Tier-B SQLite cache (restored from the private Kaggle backup) + frozen
+prompt configs + `factor_schema.yaml`, and regenerates
+`pilot_factor_values.parquet` + `factor_provenance.json` **without
+re-calling V4 Pro**. This exists so the author can revise post-processing
+code (parser / collapse_map / scoring) without paying ~$200-400 to
+re-call the full-CLS phase, and so a specific cell can be traced back
+to its raw response on demand. It is **not** a reviewer-facing SLA.
+
+When Path B is invoked, it **hard-fails** on any missing, corrupt,
+duplicate, or hash-mismatched raw response — across both stores. Tier
+B's composite-key uniqueness (§6.1) prevents Tier-B duplicates; Tier A
+is a plain committed JSONL **without a key constraint**, so the replay
+script must validate Tier-A uniqueness over the same logical cache key
+(the v0.3 claim that duplicates are "structurally impossible" was wrong
+for Tier A). A separate diagnostic mode
+`replay_factor_values.py --allow-missing` may write incomplete
+artifacts for triage, but it **cannot overwrite** the committed
+`pilot_factor_values.parquet`; it writes to
+`pilot_factor_values.partial.parquet` with a separate provenance file.
+
+If Tier B is unavailable (private backup lost), Path B is degraded or
+unavailable; **Path A is unaffected** — the reviewer-facing
+reproducibility claim does not depend on Tier B.
 
 ### 6.4 Storage & backup
 
@@ -904,13 +992,16 @@ with a separate provenance file.
   normal git. Small, so no Git LFS (LFS is for large files, not KB-scale
   records).
 - **Tier B** (`data/cache/ws0_5_response_cache.sqlite`, ~1.5-5 GB) —
-  git-ignored (the existing `data/cache/` rule already covers it). It is a
-  regenerable cache, so it does not travel with the repo; reproducibility
-  travels through the committed artifacts (`cls_event_type_index.parquet`,
-  `pilot_factor_values.parquet`, `factor_provenance.json`) plus sha-locks.
-  An uncompressed SQLite of ~1M text records is ~3-5 GB; either store
-  `response_text` as a per-row zstd blob (~1.5 GB) or accept the larger
-  file — a local choice, not load-bearing.
+  git-ignored (the existing `data/cache/` rule already covers it). Its
+  role in this design is **author-internal**: input to the optional
+  Path-B replay (§6.3) — the means to revise post-processing code
+  without paying ~$200-400 to re-call full-CLS, and to trace a specific
+  cell back to its raw response on demand. It is **not** part of the
+  reviewer-facing reproducibility path; if Tier B is lost, the
+  reviewer-facing Path A (hash + provenance + Tier-A sample) is
+  unaffected. An uncompressed SQLite of ~1M text records is ~3-5 GB;
+  either store `response_text` as a per-row zstd blob (~1.5 GB) or
+  accept the larger file — a local choice, not load-bearing.
 - **Backup.** Re-running the full-CLS phase costs ~$200-400, so the Tier-B
   SQLite is backed up to a **private** Kaggle dataset (the free tier
   comfortably holds a 1.5-5 GB private dataset; `kaggle datasets version`
@@ -921,6 +1012,32 @@ with a separate provenance file.
 No Git LFS is used anywhere in WS0.5: Tier A is small → normal git; Tier B is
 git-ignored → private external backup. The v0.3 `ws0_5_storage_preflight.py`
 LFS-quota preflight is **dropped** — there is no LFS quota to preflight.
+
+### 6.5 Paper-level reproducibility disclosure (companion to Path A)
+
+The artifacts in §6.1-6.4 only support reproducibility if the paper itself
+discloses the matching information. The pilot paper / pre-registration
+must include:
+
+1. **Reproducibility statement / section** pointing to
+   `factor_provenance.json`, `pilot_factor_values.parquet`,
+   `canonical_table_hash`, the verifier script
+   (`scripts/verify_canonical_hash.py`), and the Tier-A sample
+   (`pilot_raw_responses.jsonl`).
+2. **Method section** describing the §3-§5 pipeline (T1 / T2 / T3
+   prompts, factor schema, sampling rules) such that every claim is
+   matchable to a `run_inputs` field or a committed config file.
+3. **Limitations** disclosing: ① DeepSeek V4 Pro is a closed API and
+   the exact snapshot may become inaccessible in the future; ② API
+   non-determinism (the same prompt may yield different responses
+   across calls); ③ the Tier-B full response cache is privately
+   archived (CLS source-text copyright) and not publicly redistributed
+   but is available to verifiers on reasonable request.
+
+These three items align with the NeurIPS / ARR / ICLR norm for
+closed-API LLM experiments — a path to verify rather than bit-identical
+replay (see
+`refine-logs/reviews/WS0_5_DESIGN/llm_reproducibility_norms_20260522.md`).
 
 ## 7. Budget accounting + safety rails (Issue #8)
 
@@ -978,17 +1095,22 @@ checkpoint `data/factors/tuning_logs/<task>_checkpoint.json`:
   "round_idx": <int>,
   "incumbent_prompt_sha": "<sha of current best prompt>",
   "incumbent_dev_score": <float>,
-  "budget_totals_USD": <float>,
+  "pricing_snapshot_id": "<pricing date + rate ids pinned at run start>",
+  "meter_totals_by_task_phase": {
+    "<task>/<phase>": {"tokens_in": <int>, "tokens_out": <int>, "usd": <float>}
+  },
   "last_checkpoint_at": "ISO8601"
 }
 ```
 
 If the loop is interrupted (crash or hard budget-rail halt), restarting
-re-reads the checkpoint and resumes from the next round; at most one round is
-lost, and the meter restarts from `budget_totals_USD`. The heavy
-`pilot_factor_inference` / full-CLS phases need no checkpoint of their own —
-the §6.1 SQLite cache is itself the resume state (a re-run skips ids already
-present).
+re-reads the checkpoint and resumes from the next round; at most one round
+is lost, and the meter is **restored from `meter_totals_by_task_phase`**
+(full state, not just a scalar total) so the §7.2 per-task/phase report
+stays correct across a resume. The heavy `pilot_factor_inference` /
+full-CLS phases need no checkpoint of their own — the §6.1 SQLite cache is
+itself the resume state (a re-run skips ids already present on the
+composite cache key).
 
 ## 8. Deliverables
 
@@ -1011,12 +1133,16 @@ config/factors/
   entity_extraction_autotune_config.yaml
   signal_profile_autotune_config.yaml
 
+src/r5a/backends/
+  metered_deepseek_client.py                    # E-10; metered V4 Pro client — all WS0.5 V4 Pro calls route through it; persists meter snapshots compatible with §7.3 checkpoint and §7.2 report
+
 scripts/
   ws0_5_cls_author_coverage.py                  # T3 Track B coverage probe
   build_target_alias_table.py                   # E-6; AKShare master data → tiered target_aliases.json
   ws0_5_auto_tune_loop.py                       # §4 train/dev/test auto-tune driver
   ws0_5_discriminant_report.py                  # S-6; VIF (4 factors) + 4×4 Pearson correlation matrix
-  replay_factor_values.py                       # raw_responses → parquet (no API calls); canonical row-hash + hard-fail-on-missing per E-9
+  verify_canonical_hash.py                      # §6.3 Path A; reviewer integrity check — recomputes canonical_table_hash and compares to factor_provenance.json
+  replay_factor_values.py                       # §6.3 Path B (author-internal); raw_responses → parquet, no API calls; hard-fails on missing/corrupt/duplicate cache when invoked
   budget_summary.py                             # E-10; dumps the §7.1 meter → markdown report
   check_pilot_cells.py                          # WS0.5 stub; WS4 full implementation
   ws0_5_compute_pilot_factors.py                # orchestrator: pilot 430-case factor inference
@@ -1052,14 +1178,14 @@ WS0.5 closes when **ALL** of:
 3. Target alias table (`target_aliases.json`) built from the AKShare master snapshot committed; §5.3 LLM-augmentation smoke run and its admit/reject decision recorded
 4. T3 Track B coverage report committed; mapping table OR documented abandonment
 5. For each of the 3 tasks: `<task>_autotune_config.yaml` committed; `<task>_tuning_log.jsonl` shows the loop terminated (dev score reached `target_threshold`, or plateau, or `max_rounds`); the final sealed-`test` score is recorded as the official threshold result (§4)
-6. **`pilot_factor_values.parquet` reproducible from the Tier-A pilot JSONL + Tier-B SQLite cache + frozen code SHAs** (Issue #4); reproducibility verified via `canonical_table_hash` (v0.3 per E-9); confirmatory replay hard-fails on missing/corrupt cache
+6. **Reviewer-facing reproducibility complete** (Path A, §6.3): `factor_schema.yaml` + the three frozen prompt template yamls + `factor_provenance.json` (with the top-level `run_inputs` block + `canonical_table_hash`) + Tier-A `pilot_raw_responses.jsonl` all committed; `scripts/verify_canonical_hash.py` confirms the committed `pilot_factor_values.parquet` matches `canonical_table_hash`. Path-B internal-audit replay from Tier-A + Tier-B cache remains available (hard-fails on missing/corrupt/duplicate cache when invoked) but is **not** a reviewer SLA — if Tier B is lost, Path A is unaffected
 7. **`factor_schema.yaml` committed** — factor names, dtypes, binning/collapse rules, EventType → super_type mapping, missing-value policy, perturbation-eligibility fields, the Target Salience field (`target_salience` = `log1p` of pre-cutoff all-event-type CLS mention count, §3.3.2) + the §3.3.1 centrality-gate threshold, the recurrence confirmatory variable `log1p_recurrence_count` + its non-confirmatory within-super_type sampling bin (§5.2) (Issue #5 + v0.3 patches)
 8. **`data/factors/ws0_5_quota_report.json` committed** — plan §6.3 quotas + §6.4 n_eff target/min counts + C_FO funnel + C_NoOp host coverage + post-cutoff mix preservation (Issue #5)
 9. **`scripts/check_pilot_cells.py` committed at spec+stub level** — function signature + IO schema + check-logic pseudocode in docstring; WS4 implements (Issue #5)
 10. **`data/factors/ws0_5_discriminant_report.json` committed** — VIF on the four confirmatory factors + a 4×4 Pearson correlation matrix + the max-VIF go / sensitivity / revise verdict (per S-6)
 11. **Tier-B response cache (`data/cache/ws0_5_response_cache.sqlite`) built and backed up** to a private Kaggle dataset; its sha256 + the backup upload date recorded in `factor_provenance.json` (per E-8)
 12. Plan §5.1A WS0.5 section updated from "scope TBD" to one-paragraph pointer at this memo + factor_schema.yaml path
-13. `budget_summary_report.md` committed — actual WS0.5 spend (dumped from the §7.1 meter), per task/phase, vs the expected spend; pricing snapshot date + rates in the report header (per E-10)
+13. **`src/r5a/backends/metered_deepseek_client.py` committed** — the §7.1 metered client that all WS0.5 V4 Pro calls route through; and `budget_summary_report.md` committed — actual WS0.5 spend (dumped from the §7.1 meter), per task/phase, vs the expected spend; pricing snapshot date + rates in the report header (per E-10)
 14. PENDING.md "WS0.5 — Thales alignment design" moved to Recently closed; plan §14.4 sign-off checklist WS0.5 row ticked ✓
 
 ## 10. Schedule

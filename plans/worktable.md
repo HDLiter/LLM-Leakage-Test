@@ -29,7 +29,8 @@
 | **E** | pilot N=780 → main run N=2,560 | D 的产物 + exit gate |
 
 **既成事实**:WS0 基本完成;WS1 代码建好 + 全模型冒烟通过 + AutoDL 云开好 +
-Path E 探针集建好(均不在重开区)。WS0.5 设计完成(memo v0.4),代码未动、
+Path E 探针集建好(均不在重开区)。WS0.5 设计完成(memo v0.4 含 2026-05-23
+B-3 校准:基建主题文字与 reviewer-vs-author 路径分家对齐),代码未动、
 签字搁置。WS2–WS5 未开工。
 
 ---
@@ -58,8 +59,8 @@ Path E 探针集建好(均不在重开区)。WS0.5 设计完成(memo v0.4),代�
 
 | ID | 工作项 | 依赖(前置) | 可动? |
 |---|---|---|---|
-| B-3 | 基建主题 Pass-2 漂移审(E-6/E-8/E-9/E-10 memo 文字) | 无 | ✅ 可动(应在 B-2 实现前做) |
-| B-2 | WS0.5 design-agnostic 基建(实体管线 / replay 缓存 / 复现 / 计量 client) | B-3 | ⛔ 待 B-3 |
+| B-3 | 基建主题 Pass-2 漂移审(E-6/E-8/E-9/E-10 memo 文字) | 无 | ✔ **完成**(2026-05-23):8 must-fix + 1 wording 落到 memo v0.4 cont.;附 §6 reproducibility 重心校准(reviewer-vs-author 路径分家);drift report `refine-logs/reviews/WS0_5_DESIGN/pass2_infra_drift_review.md` + repro-norms 调研 `.../llm_reproducibility_norms_20260522.md` |
+| B-2 | WS0.5 design-agnostic 基建(实体管线 / replay 缓存 / 复现 / 计量 client) | B-3 ✔ | ✅ 可动 |
 | B-1 | WS1 云上可并行项(Stage 2.7 hidden states 等) | 无(WS1 已建好+冒烟) | ✅ 可动;pilot 正式跑见 WS4 |
 
 ### 块 C / D / E
@@ -151,7 +152,10 @@ flowchart TD
 - **R-1a / R-1b / R-1c / R-1d** —— 4 个因子各自的实现设计。可与 R-4a 并行
   (各因子的实现细节不取决于 multiplicity 规模);其中 **R-1d Template
   Rigidity 零 spec、用户视为重点因子**,是最实打实的起点。
-- **B-3** 基建漂移审(轻、独立)。
+- **B-2** WS0.5 design-agnostic 基建(B-3 已完成解锁;现在 memo 文字与
+  reviewer-aligned 设计对齐,可照 memo 实现 4 个基建模块:metered DeepSeek
+  client / SQLite cache / Tier-A JSONL / `verify_canonical_hash.py` +
+  `replay_factor_values.py`)。
 - **B-1** WS1 云上可并行项。
 
 > R-1a-d 与 R-4a 互不依赖,可并行。R-1e 因为「选哪几个进 confirmatory」会

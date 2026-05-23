@@ -80,6 +80,26 @@ position。(转向前的 "Task Design Gates / 任务分解抗泄露" 论点已�
 转向时降级 —— 任务分解假设至多作为后续探索性工作,不进本研究的
 confirmatory scope;理由是因子家族已大、再加任务变体易致 p-hacking。)
 
+<!-- TODO[CROSS_SYNTH 🟡-1, approved 2026-05-23]:
+在本段后新增一段 Kong et al. 2026 (arXiv:2602.14233) 作 field-level position
+anchor。要点:
+- Kong 是 ICML 节奏的 position paper,综述 2023-2025 顶会 164 篇 LLM-in-finance
+  论文(Figure 2),发现 look-ahead bias 仅 26.8% 提及、survivorship bias 仅
+  1.2%、no single bias >28%;50 人 practitioner user study 中 74% 报告评估
+  工具匮乏、50% 把"工具/框架缺乏"列为最大瓶颈。
+- Kong §2.1.1 "Parametric Knowledge Leakage" 是他们 Sin #1 Look-Ahead Bias
+  的两大 channel 之一(另一为外部知识检索泄露 §2.1.2),这正是本研究
+  R5A 中心 channel。
+- 本研究 = Kong §2.1.1 这一 channel 在中文金融语料 + 16-model split-tier
+  fleet 上的因子受控 empirical instantiation。Kong 给 field-level
+  diagnosis + framework(自己不做 benchmark);我们给 case-level
+  measurement(具体 estimand + 因子 + 操作化)。两层互补。
+草稿与详细论证见:
+  refine-logs/reviews/CROSS_SYNTH_20260523/synthesis_findings.md §A.🟡-1
+  以及该 session 的对话记录 🟡-1 第 (3) 节。
+落地此 TODO 时同步更新 memory lit_landscape.md(见同份 synthesis §C.1)。
+-->
+
 ### 2.4 中文优先,英文为 stretch goal
 
 benchmark 做中文 CLS 新闻(量化项目用的就是中文新闻)。英文对等数据集是
@@ -263,6 +283,26 @@ n_eff 矩阵、混合模型具体规格落地、bootstrap 实施细节。
 **[R-5 重开] 待定:** 采样过滤器专题 —— 可交易实体过滤、新闻长度过滤
 (超长讲话 / 一句话简讯的处理)、反直觉/难预测案例的过滤(双刃,需真实
 股价识别)。
+
+<!-- TODO[CROSS_SYNTH 🟡-4(c), approved 2026-05-23]:
+R-5 完成后,在本节新增专门的"抽样分布策略"段(不止"过滤器"),内容:
+- 当前 §4.7 只覆盖准入过滤(filter out 哪些案例不进),不覆盖抽样分布
+  (从合法池里按什么分布抽 N 条进 pilot / main)。这是 R-5 scope gap。
+- 三种候选策略(R-5 决定):
+  1. 案例随机抽 —— 会偏向高曝光实体(因为高曝光实体在语料里出现条数多),
+     间接复制 Kong (2026) §2.2 警告的 media-coverage bias。
+  2. 实体均衡抽(每实体 ≤k 条)—— 反过来过度代表低曝光实体,
+     破坏 Target Salience(§4.1)的自然分布。
+  3. 按 Target Salience 分层抽(高/中/低各 N/3)—— 合理但需明示。
+- 显式回应 Kong 2026 §2.2 警告:本研究 sampling 通过 [R-5 决定的策略]
+  保证非按 prominence 排序,因此不引入 Kong 警告的幸存者偏差。
+- 同步:R-1c clean-room 复审 Target Salience metric 时也需把 sampling-factor
+  互动作为 sanity-check input(Kong §2.2 间接相关)。
+TODO 起源 + 完整论证 + Kong §2.2 原文引用:
+  refine-logs/reviews/CROSS_SYNTH_20260523/synthesis_findings.md §A.🟡-4 修正版
+  与该 session 对话 🟡-4(用户 2026-05-23 指出此 scope gap)。
+-->
+
 
 ---
 

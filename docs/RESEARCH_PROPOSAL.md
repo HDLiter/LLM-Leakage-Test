@@ -143,6 +143,22 @@ memory `project_english_expansion`)。
 > §4 描述当前冻结设计的**现状**。其中标 **[R-x 重开中]** 的部分,其操作化
 > 细节正在结构化重开(§9);此处内容是占位与现状记录,非定稿。
 
+> **R-0 架构 anchor(2026-05-23 PM late 关闭)**:§4 全部 case-level
+> factor metric 在 **R-0 决定的 corpus 架构容器**上计算。容器要点(完整
+> 定义见 `docs/DECISION_20260518_ws0_5_thales_alignment.md` §4.5):
+> - 4 层:**S0 源 / L1 entity-mention `(article_id, target_entity_id)`
+>   long-form / L2 subject-target / L3 benchmark-eligible views**;
+> - 流水线:**entity match → topic-classify(范围 R-1b 决定)/ subject
+>   ID → L2 tradability check(point-in-time)→ factor metrics → R-5
+>   sampling → perturbations → operators → estimands**;
+> - factor metrics 在 L1 / L2 / L3 上算,**严格在 operators 之前**(R-4a
+>   L1↔L3 边界锁);
+> - factor construct(mention / subject / tradable-subject / tradable-
+>   mention)+ family 粒度 + 窗口 = **R-1b / R-1c session 决定**,R-0 不
+>   预锁。
+>
+> 后续 §4.1.1-§4.1.4 的具体因子实现待 R-1a / R-1b / R-1c / R-1d 落定。
+
 ### 4.1 四个 confirmatory 因子 [R-1 重开中]
 
 confirmatory family = **5 estimand × 4 factor = 20 个系数**,多重比较用
@@ -275,14 +291,34 @@ n_eff 矩阵、混合模型具体规格落地、bootstrap 实施细节。
 设计未充分利用这一点。待彻底调查:实验者是否 / 如何用真实收益(作协变量 /
 难度指标 / 采样过滤标准 / 验证层)。本项与 §4.3 扰动、§4.7 采样深度纠缠。
 
-### 4.7 采样与准入过滤 [R-5 重开中]
+### 4.7 采样与准入过滤 [R-5 重开中;R-0 架构容器 2026-05-23 closed]
 
-**现状:** 一个全局案例准入预过滤要求每个案例有一个**中心的、可交易的**
-标的实体(否则无涨跌可预测)。
+**R-0 容器**(见 `docs/DECISION_20260518_ws0_5_thales_alignment.md` §4.5):
 
-**[R-5 重开] 待定:** 采样过滤器专题 —— 可交易实体过滤、新闻长度过滤
-(超长讲话 / 一句话简讯的处理)、反直觉/难预测案例的过滤(双刃,需真实
-股价识别)。
+- **唯一 base pool = Pool B** = `L2 ∩ (tradable_at_event=true) ∩
+  (text_length ∈ [min, max]) ∩ (is_bundle=false)`。这是当前唯一被 R-0
+  架构完全支持的 benchmark base pool。
+- **universal admissibility filter**(每个 P_predict 主体必过):
+  `tradable_at_event=true`(段 (a) 客体 vs 主体区分:non-tradable rows
+  保留在 L1 / L2 作为 Salience / Recurrence 分母客体,但作为 P_predict
+  主体强制过滤 —— 否则模型只能调用 post-listing 记忆,prompt-level
+  leakage 入口);`text_length ∈ [min, max]`;`is_bundle=false`(一次性
+  多条新闻播报默认 flag,不进 L2;不拆分作为 B-2 实现选项)。
+- **3 个可选分布策略**(R-5 全权 stack on B,**不强制叠加**):**Pool G**
+  salience / recurrence 分层;**Pool H** entity-balanced / capped(Kong
+  2026 §2.2 anti-survivorship 工具);**Pool I** cutoff-balanced(支撑
+  Cutoff Exposure case×model panel)。
+- **架构扩展位**(R-5 / R-2 / R-6 实操确认必要时再激活):**Pool D**
+  mention + tradable(需扩 L1 candidate tradable 列;tradable 是机械
+  结构化操作,扩展成本有界);**Pool E** outcome-verifiable subpool
+  (C_FO 用,R-2 + R-6 决定 C_FO 机制后激活);**Pool F** mixed panel
+  (D / E 任一激活后自然有内容)。
+
+**[R-5 重开] 待定:** 分布策略选(row-random / G / H / I / 组合 —— **R-5
+全权,不锁**);per-article cap 与 dedupe 规则(段 (a) 同 article 多
+target 进 benchmark 的统计独立性问题);text_length 阈值;反直觉/难预测
+案例过滤(需真实股价识别,R-6 子决策);是否触发 Pool D / E / F 架构
+扩展。
 
 <!-- TODO[CROSS_SYNTH 🟡-4(c), approved 2026-05-23]:
 R-5 完成后,在本节新增专门的"抽样分布策略"段(不止"过滤器"),内容:
@@ -410,12 +446,13 @@ clean-room-first 方法(先白板独立分析,再对照既往 reviewer 意见)�
 
 | 编号 | 重开对象 |
 |---|---|
-| R-1 | 4 个 confirmatory 因子:各自的实现方法 → 然后选择(Template Rigidity 从零设计) |
-| R-2 | 6 个扰动:各自实现构思 → 然后保留几个 / 哪几个进 confirmatory |
+| R-0 | ✅ closed 2026-05-23 PM late — Corpus 架构(4 层 S0/L1/L2/L3 views + 6 阶段 entity-first pipeline + 通用 admissibility + Pool B base + G/H/I optional 分布策略;arch-vs-session 锁:perturbation-specific eligibility 留 R-2/R-6)。完整 lock-in 见 `docs/DECISION_20260518_ws0_5_thales_alignment.md` §4.5;此 §4.1 / §4.7 已 anchor 引用 |
+| R-1 | 4 个 confirmatory 因子:各自的实现方法 → 然后选择(Template Rigidity 从零设计);R-0 已解锁 R-1b / R-1c 的 construct 选择空间 |
+| R-2 | 6 个扰动:各自实现构思 → 然后保留几个 / 哪几个进 confirmatory;perturbation-specific eligibility flag 由本 session 在 R-0 HOOK1 / HOOK2 占位上落地 |
 | R-3 | 负对照的充分性 |
 | R-4a | ✅ closed 2026-05-23 — 框架级 8 条(无 family correction / main-primary-supporting-robustness 标签 / design memo 措辞 / Gwet's AC1 / etc.,见 §4.4) |
 | R-4b | pilot 具体数字(power、n_eff、混合模型规格落地、bootstrap),仍开放,等 R-1e / R-2 / R-3 / R-5 |
-| R-5 | 采样准入过滤器(可交易实体 / 新闻长度 / 反直觉案例) |
+| R-5 | 采样准入过滤器 + 分布策略(R-0 已 expose Pool B + G/H/I + D/E/F 扩展位;within-pool 分布 R-5 全权决定) |
 | R-6 | 预测目标 & 是否 / 如何使用真实收益 |
 
 权威清单与每项细节见 `refine-logs/reviews/WALKTHROUGH_PASS1/pending_items.md`。本报告的

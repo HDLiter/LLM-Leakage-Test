@@ -44,10 +44,11 @@ revision_basis: |
     Statistician: APPROVE-WITH-MINOR-PATCHES — same S-1 wording patch as ML-engineer's E-1 (`refine-logs/reviews/WS0_5_DESIGN/ws0_5_round2_statistician_review.md`); resolved by the E-1 patch above.
   Per runbook §5: 1× APPROVE + 2× APPROVE-WITH-MINOR-PATCHES → minor patches applied in-place to v0.3, no round-3 re-review.
   v0.4 (2026-05-20): user-directed simplification of §4 only. Replaced the heavy "Scheme Y" auto-tune framework (limited-exposure Ladder gate, paired McNemar / permutation tests, cross-task alpha spending, MDE preflight, 7-way fixture split, manifest lock, run-state resume) with a plain train/dev/test split: tune on `train`, rank candidates on `dev`, evaluate the final prompt once on a sealed `test` split. Rationale: a prompt is a measurement instrument; the per-round accept decision is an optimization step, not a confirmatory statistical claim, so it needs no hypothesis test. The sealed-test-set protection — the only necessary overfitting defense — is kept. v0.4 supersedes round-1 issues E-1/E-2/E-3/E-4/S-1/S-2/S-3/S-4/S-7 (all §4-machinery). Non-§4 round-1/2 issues remain in force. Downstream cleanup: §7.1 budget config rename, §7.4 trimmed to lightweight checkpoint, §8 deliverables (removed `ws0_5_mde_preflight.py`, `manifest.lock.yaml`, `mde_report.json`, `run_state.json`; `*_autotune_manifest.yaml` → `*_autotune_config.yaml`), §9 closure condition #5 simplified, §10 schedule, §11 risks R-W05-1/3/7. Not Codex-re-reviewed (removes machinery, adds no claim).
+  v0.4 cont. (2026-05-23 PM late, R-0 Corpus Architecture closure — still v0.4): R-1b kickoff walk-through (2026-05-23 PM) had surfaced that three sub-decisions originally framed as R-1b factor-specific — 4-layer corpus stratification, pipeline reorder, and benchmark sampling source layer — are not factor-specific. They are upper-level architectural decisions framing R-1b / R-1c / R-5 / R-2 data dependencies in a shared container. Promoted to R-0 (precedes any factor session). New §4.5 added (R-0 Corpus Architecture, ~250 lines) locking: (a) 4-layer model S0 source / L1 entity-mention `(article_id, target_entity_id)` long-form / L2 subject-target / L3 benchmark-eligible views — only steps that change the row unit promoted to layers, event type / tradability / outcome verifiability / span quality stay as columns or view filters; (b) 6-stage pipeline entity match first → topic-classify (range deferred to R-1b) / subject ID → tradability check on L2 only (point-in-time, annotation not filter) → factor metrics → R-5 sampling → perturbations → operators → estimands; entity-first saves 40-60% of LLM topic-classify cost over §5.2 Phase R1's full-CLS approach; (c) universal admissibility = `tradable_at_event=true` ∧ `text_length ∈ [min, max]` ∧ `is_bundle=false`, every benchmark P_predict subject must pass; non-tradable rows kept in L1 / L2 as factor-computation object but filtered at R-5 as subject (P_predict validity vs anti-survivorship clarified — anti-survivorship is sampling distribution choice not historical-tradable filter); (d) sampling pool inventory Pool B sole base + Pool G / H / I optional distribution strategies on top of B (no mandate to use any — Kong 2026 §2.2 is sanity-check input not mandate), Pool D / E / F reserved as architecture extensions with B-2 schema slots; (e) §3.3.1 central-tradable global pre-filter formally lifted to R-5 admissibility at L3 base view; §5.1 / §5.2 Recurrence pipeline (full-CLS topic-first + mention-based + fixed window) recast as one R-1b candidate among several — §5.2 Phase R1 full-CLS topic-classify superseded by entity-first ordering, no-dedup and `log1p(0)=0` principles preserved verbatim; §6.2 `factor_provenance.json` `run_inputs` schema gains R-0 hash requirements (S0 source hash + entity alias table hash + disambiguation rule hash + topic-classifier hashes + subject-ID hashes + tradability snapshot + sampling manifest + layer/view definition hash) finalized at B-2; §6.3 Path A reviewer-path must verify layer/view hashes not only factor table hash; Tier B contents recalibrated because entity-first removes the dominant Path B re-call cost driver. Three downstream principles also recorded: `recurrence_count = 0` legal across all layers, no-dedup exposure legal both inter- and intra-article (via `mention_count_in_article` attribute on a single L1 row, not multiple rows), article cluster traceability preserved via shared `article_id` (R-5 / R-4b consume; rule itself not locked here). Memory `feedback_arch_vs_session_scope` written 2026-05-23 from this session — generalization that R-0 / framework-level decisions only lock universal admissibility, perturbation / factor / operator-specific eligibility flags are session-specific even when Codex whiteboard writes them out in full. Whiteboard audit trail: `refine-logs/reviews/REOPEN_R1_R6/R0_corpus_arch/whiteboard_analysis.md` (Codex Pass A, 545 lines, 2026-05-23 19:13); user walk-through tightened Codex on non-tradable-rows handling, arch-vs-session scope separation, and sampling distribution left fully open to R-5. R-0 closure unblocks R-1b / R-1c / R-5 reopen sessions and B-2 `run_inputs.per_task` finalization. Not Codex-re-reviewed — adds an architecture container above the existing prose, supersedes specifically named portions, lifts no new statistical claim.
   v0.4 cont. (2026-05-23 PM, final-pass Codex audit + rubber-duck walk-through with user — still v0.4): after the B-3 drift audit + §6 reproducibility calibration (recorded in the next paragraph) were complete and committed (`dd9a328`), one final integrity gate was run before opening B-2 (WS0.5 infra implementation): (a) a Codex "整体质量审 + 第一性原理简化审" on the 4 design-agnostic infra themes (§5 E-6 / §6 E-8/E-9 / §7 E-10 / §8 / §9 infra-related closure items), producing 3 must-fix / 4 recommend / 5 flag-only findings (`refine-logs/reviews/WS0_5_DESIGN/infra_quality_pass_20260523.md`); (b) a section-by-section rubber-duck walk-through with the user, where the user described each component's intent in their own words and the agent compared against the memo — surfacing both decision→text drift and net-simplification opportunities the Codex pass had not framed. Combined outcome: **§7 token-meter subsystem fully removed (user first-principles)**. Replaced by three layers of cost protection, each doing exactly its named function: (1) §6.1 SQLite cache UNIQUE constraint (prevents retry-bug duplicate calls), (2) §4 `max_rounds=10` (bounds auto-tune iterations), (3) DeepSeek API key prepaid balance cap configured pre-run (hard halt — API returns 402 when balance hits zero). No app-side soft/hard multiplier rails. Caching wrapper is **provider-agnostic** (DeepSeek + OpenRouter same wrapper — slug column `requested_model_slug` already handles multi-provider). §6.1 SQLite per-record schema reworked to 11 columns: drops `prompt_template_path` (redundant with `prompt_template_git_sha` + `run_inputs.prompt_template_shas`), `input_sha256` (covered by `cls_item_id` + `prompt_template_git_sha`), `decoding_params` raw dict (run-wide constant in `run_inputs`), `model_snapshot_unavailable` (derivable as `model_snapshot IS NULL`), `tokens_in` / `tokens_out` (no meter); adds `phase`, `cls_item_id`, `decoding_params_sha` (key part), `provider_headers` (durable trace when snapshot unavailable). §6.2 `factor_provenance.json`: per-cell triple `prompt_sha` / `parser_version` / `transformation_sha` consolidated — `prompt_sha` / `parser_version` removed (covered by `run_inputs.prompt_template_shas` per task), `transformation_sha` moved to `factor_schema.yaml` per factor; `pricing_snapshot` removed (no per-call cost tracking); **`model_id` (single string) and `decoding_params` (single dict) flagged as wrong-shaped — pipeline runs multiple models (V4 Pro for T1, possibly V4 Flash for T2, Claude+Codex dual-agent for alias-gen smoke) with potentially per-task `thinking_effort`. Schema reshaped to `per_task` dict; concrete field set marked illustrative and finalized at B-2 implementation start.** §6.4: Path B startup adds explicit Tier-B sha256 verification step (compute local sha256, compare against `factor_provenance.tier_b_cache_sha256`, halt on mismatch). §6.5: limitations item 4 added — compute disclosure derived post-hoc from `SELECT COUNT(*) FROM cache GROUP BY task` + DeepSeek monthly account statement, no per-call ledger artifact; "method ↔ run_inputs match" updated to "per-task method ↔ per-task run_inputs entry match". §7 chapter shrinks from ~75 lines to ~15 lines. §8 deliverables: -3 files (`metered_deepseek_client.py`, `budget_summary.py`, `budget_summary_report.md`, `<task>_checkpoint.json`); +1 file (`data/factors/ws0_5_alias_smoke_report.md` — Smoke A LLM-alias review + admit/reject decision + Smoke B R4-miss characterization; closes §5.3 / §9 #3 artifact-path gap); `caching_client.py` conditional (if wrapper is a separate module rather than a decorator on existing clients, B-2 decides); `check_pilot_cells.py` downgraded from independent closure gate to spec-stub deliverable. §9 closure: 14 → 11 conditions — old #6 + #7 merged (schema requirement absorbed into reviewer-facing reproducibility gate), old #9 (`check_pilot_cells.py` stub) removed from closure (kept in §8 spec), old #13 (metered client + budget report) deleted; new operational sub-clause folded into #9 (was #11): "DeepSeek / OpenRouter API key prepaid balance cap configured pre-run". §11 R-W05-6 rewritten: "2× / 5× safety rail catches accidents" → "three-layer cost protection (cache UNIQUE / max_rounds / API key prepaid cap) covers retry-bug / loop-runaway / new-prompt-burn failure modes". User-proposed §5 redesigns (4-layer corpus stratification, pipeline reorder with subject-only Recurrence semantics, LLM subject ID, preprocessing filters, LLM-tagged alias risk) — substantial cross-boundary architectural shifts intersecting R-1b / R-1c / R-5 reopen scope — held out of this session and recorded in `refine-logs/reviews/WS0_5_DESIGN/walkthrough_findings_20260523.md` as input to those reopen sessions, so as not to drift §5 prose ahead of clean-room R-1 work. Three user mental-model re-anchors recorded (R3 fixed window is C-2 settled; §5.3 LLM disambiguation does not enter main path; Tier-B is load-bearing cost protection during running, not "personal convenience"). Not Codex-re-reviewed — the changes are net-simplifying, lift no claim, and the further audit value is the walk-through itself (LLM-driven re-audit would invite reviewer ratcheting per memory `feedback_review_complexity`). The session's driving principle was `feedback_minimal_design` applied at the file-format level — each component does exactly its named function; redundant fields, duplicate rails, and machinery without a specific failure mode it catches are removed.
   v0.4 cont. (2026-05-23, B-3 infra-drift audit + §6 reproducibility calibration — still v0.4): WS0.5 memo Pass-2 drift audit (B-3 in worktable) found 8 must-fix + 1 wording drift in the 4 design-agnostic infra themes (E-6 / E-8 / E-9 / E-10); Codex repro-norms research (`refine-logs/reviews/WS0_5_DESIGN/llm_reproducibility_norms_20260522.md`) found no NeurIPS / ICML / ICLR / ARR / ACL / EMNLP venue treats full raw-response cache or hard-fail replay as a closed-API LLM reproducibility hard requirement, so the §6 prose that elevated an author-internal bug-fix tool to a public exit gate was recalibrated. Drift fixes: §5.2 R3 "salient entity" → "extracted entity surface (`value`, `type`; no `salience=core` requirement here)"; §5.3 LLM disambiguation re-scoped to diagnostic smoke only (does not enter the per-match count path of the main pipeline; R4 refinement form deferred to follow-up work, not nailed down here); §6.1 Tier-B SQLite uniqueness key changed from single-column `cls_item_id` to composite `(rendered_prompt_sha256, requested_model_slug, decoding_params_sha)` with `task` / `phase` / `cls_item_id` / `prompt_template_git_sha` kept as indexed columns for resume queries; §6.2 `factor_provenance.json` gains a top-level `run_inputs` block recording run-wide model / API / date / params / sampling-manifest / upstream-artifact hashes once (count-factor cells point to `run_inputs` rather than carrying their own copy); §6.3 reorganized into two explicit reproducibility paths — **Path A reviewer-facing default** (canonical_table_hash integrity + run_inputs provenance + Tier-A sample plausibility; needs only the repo) and **Path B author-internal optional** (replay from Tier-A + Tier-B + frozen code, used for post-processing bug-fix without paying ~$200-400 to re-call full-CLS); Path B retains hard-fail on missing / corrupt / **duplicate** (the v0.4 "duplicate structurally impossible" claim was wrong for Tier-A JSONL which has no key constraint); §6.4 Tier-B bullet repositioned as author-internal input to Path B (Path A is unaffected if Tier-B is lost); §6.5 added — paper-level reproducibility disclosure expectations (reproducibility statement + method-to-`run_inputs` match + closed-API limitations per NeurIPS / ARR / ICLR norms); §7.3 auto-tune checkpoint stores full `meter_totals_by_task_phase` (per-task/phase tokens + USD) instead of a scalar `budget_totals_USD`, so the §7.2 per-task/phase report stays correct across a crash-resume; §8 adds `src/r5a/backends/metered_deepseek_client.py` (the §7.1 metered client — previously decided but missing from deliverables) and `scripts/verify_canonical_hash.py` (Path A reviewer integrity check); closure #6 redefined from "reproducible from cache + frozen code" to "reviewer-facing reproducibility complete" (Path A — schema + prompt yamls + provenance + Tier-A + canonical-hash check passes); closure #13 extended to require the metered client module committed alongside the budget report. The calibration applies the minimal-design principle (memory `feedback_minimal_design`): each component does only its named function (reviewer path serves reviewers, cache + replay serves the author, they do not back each other up). Not Codex-re-reviewed — a calibration that net-simplifies and lifts the publication exit gate to align with venue norms; adds no new statistical claim.
   v0.4 cont. (2026-05-20, continued review session — still v0.4): user is reviewing the 14 non-§4 round-1/2 issues (C-1..C-5, E-5..E-10, S-5/S-6/S-8). C-1 reopened and redesigned §3.3 — the case-admissibility test (a central, tradable target) is promoted to a GLOBAL sampling pre-filter (§3.3.1) applied to every case and every factor; Target Salience (§3.3.2) becomes a pure scorer, `log1p` of the target's CLS mention count. Removes the v0.3 `context_gate` veto + `target_validity_low` flag (collapsed into the pre-filter's centrality test — the same text-local signal was used twice), the `static_reach` 1/2/3 ordinal + family mapping table, and the market-metadata snapshot dependency (§3.3.4 deleted; `r5a_market_metadata_snapshot.json` + `build_market_metadata_snapshot.py` dropped from §8; §10 S1 trimmed; §12 Target-Salience class-1/2 open item closed). Rationale: market cap / index membership measures firm size, not fame, and misclassifies small-but-heavily-covered targets; a corpus mention count is the direct quantitative prominence proxy and reuses the §5 recurrence pipeline at near-zero cost. Supersedes the v0.3 C-1 patch. C-2 + user review then replaced the per-case recurrence window `[T−24mo, T)` with a fixed pre-cutoff window `[corpus_start, earliest_model_cutoff)`, shared by both Recurrence (§5) and Target Salience (§3.3.2) — the two factors now differ only by the event-family filter. This dissolves C-2 (model-visibility — `recurrence_count_visible_to_model` removed) and E-5 (recurrence now computable for all 430 cases incl. post-cutoff controls — no `not_applicable_post_cutoff`), and renames the primary recurrence variable `pre_case_cls_family_recurrence` → `cls_family_recurrence`. C-3: the recurrence confirmatory variable becomes the continuous `log1p_recurrence_count` — the within-super_type percentile, the median-split binary, the 4-way interpretation rules, and the `absolute_high_recurrence` parallel field are all removed; magnitude is the construct, and the event-family base-rate confound is handled by within-super_type stratified sampling plus super_type as a regression covariate, not by a percentile transform. A non-confirmatory within-super_type sampling bin remains for the plan §6.4 n_eff design. This also dissolves E-7/S-5 (the confirmatory variable has no bin → no bin-flip; the LOO/bootstrap bin-stability machinery and `ws0_5_bin_stability.py` are removed). C-4: an empirical probe (`scripts/cls_dup_probe.py`, 1.2M CLS items) found only 0.48% intra-day duplication — mostly legitimate rolling tickers — so the no-dedup recurrence count is used directly and all v0.3 C-4 dedup sensitivity fields (`recurrence_count_clustered`, `recurrence_count_first_per_day`, `duplicate_ratio`) are dropped. C-5: the §3.4 signal_profile smoke comparison gains a third arm — an independent two-pass (Authority predicted without conditioning on Modality, ported from Thales v5 Split-Independent); if it is selected, Authority is an independent measurement and the conditioning caveat is dropped (the caveat is now contingent on the smoke outcome). E-6: a Codex methods review (`refine-logs/reviews/WS0_5_DESIGN/entity_disambig_methods_20260520.md`) found the LLM-on-critical-path entity pipeline both over- and under-engineered; §5.2 Phase R2-R4 are redesigned to a deterministic master-data pipeline — Phase R2 builds a tiered alias table from AKShare securities master data (codes / official names / former names with effective dates), Phase R4 resolves matches by deterministic evidence tiers, risk is rule-scored against a broader collision universe. The LLM alias-gen + LLM per-match-confirm steps leave the main path (the v0.3 E-6 ambiguity-override rules + versioned cache key are moot); §5.3 becomes a one-off user-reviewed smoke testing whether LLM alias generation / disambiguation adds enough recall to be admitted as a human-reviewed tier-3. E-8: the replay cache is consolidated from the v0.3 three-tier sharded-JSONL + `shard_index.parquet` + `run_state.json` scheme into two objects — a committed ~5 MB `pilot_raw_responses.jsonl` (Tier A, normal git) and a single git-ignored SQLite DB `data/cache/ws0_5_response_cache.sqlite` (Tier B, full-CLS + auto-tune, which natively serves as cache + key index + resume state); no Git LFS anywhere; the `ws0_5_storage_preflight.py` LFS preflight is dropped; the SQLite is backed up to a private Kaggle dataset (sha in `factor_provenance.json`). E-9: replay reproducibility keeps the `canonical_table_hash` content check and the hard-fail-on-missing/corrupt-cache rule, but drops the pyarrow-version-pinning + `replay_environment.lock.json` gold-plating (the content hash is already the reproducibility guarantee; byte-identical parquet is an unneeded stricter goal). E-10: the budget subsystem collapses into one metered DeepSeek client (`src/`) — it meters tokens/cost per call, so the per-task token estimate falls out of the smokes + auto-tune runs that precede the heavy S4 phase (no separate `ws0_5_token_estimator.py` dry-run), the live total drives the 2×/5× safety rails, and the run-end dump is the budget report; the separate `budget_ledger_*.jsonl` + buffered writer + §7.2 `LedgerEntry` schema and the pricing daily-refresh/epoch machinery are removed; resume was already covered by the v0.4 §7.3 checkpoint + the E-8 SQLite. S-6: a Codex literature review (`refine-logs/reviews/WS0_5_DESIGN/collinearity_diagnostics_20260520.md`) confirms the v0.3 five-diagnostic discriminant suite is over-built by 2-3 items; §3.3.3 is cut to the field-standard minimum — VIF on the four confirmatory factors + a 4×4 Pearson correlation matrix, empirical max-VIF thresholds (≤5 / 5-10 / ≥10); condition number, partial/residual correlations, and the GVIF apparatus are dropped, and mixed-model singular-fit/convergence is reclassified as a separate analysis-stage model-fit check. S-8: confirmed already resolved — v0.4's §4 rewrite had already replaced the stale "bootstrap CI gate" wording in §11 R-W05-1/3/7. **All 14 round-1/2 issues are now resolved**: 10 produced memo edits (C-1..C-5, E-6, E-8, E-9, E-10, S-6); 3 dissolved as byproducts (E-5 via the C-2 window change, E-7 & S-5 via the C-3 continuous-variable change); 1 confirmed already-resolved (S-8). The review's consistent direction was simplification — each reviewer-driven heavyweight mechanism was cut to a minimal correct form. Awaiting user sign-off.
-status: v0.4 — 14-issue round-1/2 review + B-3 infra-drift audit (Pass-2 on E-6/E-8/E-9/E-10) + §6 reproducibility-model calibration + final-pass Codex audit (3 must-fix / 4 recommend / 5 flag-only) + rubber-duck walk-through with user (2026-05-23) complete (further net-simplified — §7 token meter subsystem fully removed per user first-principles); awaiting user sign-off + WS0.5 closure
+status: v0.4 — 14-issue round-1/2 review + B-3 infra-drift audit (Pass-2 on E-6/E-8/E-9/E-10) + §6 reproducibility-model calibration + final-pass Codex audit (3 must-fix / 4 recommend / 5 flag-only) + rubber-duck walk-through with user (2026-05-23) + R-0 Corpus Architecture closure (2026-05-23 PM late, new §4.5; supersedes parts of §3.3.1 / §5.2 / §6.2) complete; awaiting user sign-off + WS0.5 closure (R-0 unblocks R-1b / R-1c / R-5 reopen + B-2 `run_inputs.per_task` finalization)
 authority: |
   Resolves the WS0.5 scope-TBD placeholder in plans/phase7-pilot-implementation.md §5.1A
   (revisions v2.2 / v2.3 / v2.4) and the matching open item in PENDING.md (line 37-48).
@@ -251,6 +252,20 @@ issues, scandal stocks) as low-salience. A corpus mention count, by contrast,
 rises with actual news coverage regardless of market cap.
 
 #### 3.3.1 Case Admissibility Pre-filter (GLOBAL — applies to every sampled case)
+
+> **R-0 supersession note (2026-05-23 PM late)**: the central +
+> tradable test described here is preserved as the universal R-5
+> admissibility filter, but architecturally lifted to **the L3 base
+> view from which R-5 samples** (see §4.5.A / §4.5.B / §4.5.C). The
+> filter is no longer outside the layer model. The `admit_case()`
+> pseudocode below remains illustrative of the centrality +
+> tradability logic; R-1b / R-5 implementation reconfigures it as the
+> L1 → L2 (subject ID) + L2 → L3 (view) composition. The
+> non-tradable-rows handling rule also changes: R-0 keeps
+> non-tradable rows in L1 / L2 (for Salience / Recurrence
+> denominator) and filters at R-5 admissibility (P_predict subject
+> validity); §3.3.1's "reject before any factor is computed" framing
+> conflated these two roles.
 
 This filter runs at sampling time on every candidate case — all four
 confirmatory factors and the negative controls alike. A case is admitted only
@@ -570,7 +585,269 @@ only the disagreements. Roughly ~$30-40 V4 Pro per task → ~$100-120 for the
 three tasks. (Down from v0.3's 3000-item 7-way split — the simple 3-way split
 needs less labeled data because there are no extra holdout layers.)
 
+## 4.5 R-0 Corpus Architecture (closed 2026-05-23 PM late)
+
+> **Reopen origin**: R-1b kickoff walk-through (2026-05-23 PM) surfaced
+> that three sub-decisions originally framed as factor-specific —
+> "4-layer corpus stratification", "pipeline reorder", and "benchmark
+> sampling source layer" — are not factor-specific. They are
+> upper-architectural decisions framing R-1b, R-1c, R-5, and R-2's data
+> dependencies in a shared container. Promoted to R-0 (precedes any
+> factor session).
+>
+> **Authority**: this section is R-0's lock-in. It supersedes portions
+> of §3.3.1 / §5.2 / §6.2 prose where the prototype reflected a
+> single-construct commitment. Downstream R-1b / R-1c / R-5 / R-2 / B-2
+> sessions implement against this architecture; their session-specific
+> choices sit *within* this container, not upstream of it.
+>
+> **Audit trail**: Codex Pass A whiteboard
+> (`refine-logs/reviews/REOPEN_R1_R6/R0_corpus_arch/whiteboard_analysis.md`,
+> 545 lines, 2026-05-23 19:13). User walk-through revisions tightened
+> Codex's framing on (a) the non-tradable-rows handling, (b) the
+> arch-vs-session scope separation (perturbation eligibility back to
+> R-2 / R-6), and (c) sampling distribution strategy left fully open
+> to R-5 (no mandate).
+
+### 4.5.0 TL;DR
+
+R-0 locks an architecture **container**, not a benchmark recipe. It locks:
+
+- A four-layer model: **S0 source / L1 entity-mention / L2 subject-target
+  / L3 benchmark-eligible views**. L1 and L2 are `(article_id,
+  target_entity_id)` long-form rows; same article appearing multiple times
+  in L1 (one row per target) is the expected shape.
+- A six-stage pipeline: **entity match → topic-classify (range deferred to
+  R-1b) / subject ID → tradability check (L2 only) → factor metrics → R-5
+  sampling → perturbations → operators → estimands**.
+- A universal admissibility set every benchmark P_predict subject must
+  pass: **`tradable_at_event=true` ∧ `text_length ∈ [min, max]` ∧
+  `is_bundle=false`**.
+- One base sampling pool: **Pool B = L2 ∩ universal admissibility**;
+  three optional distribution-strategy hooks (G / H / I) on top of B;
+  architecture extension slots for Pool D / E / F reserved but not
+  pre-built.
+
+R-0 explicitly does **not** lock:
+
+- Factor construct choices (mention vs subject vs tradable-subject vs
+  tradable-mention; family granularity; lookup window). R-1b / R-1c
+  decisions.
+- Sampling distribution (row-random vs stratified vs entity-balanced;
+  per-article dedupe rule; thresholds). R-5 decision.
+- Perturbation-specific eligibility flags (`outcome_verifiable`,
+  `text_reversibility`, `entity_span_quality`, etc.). R-2 / R-6
+  decisions. R-0 only reserves two architecture hooks (pre-sampling
+  subpool admissibility + post-sampling per-case eligibility) without
+  predefining which perturbation uses which hook or what column names
+  they take. (Memory: `feedback_arch_vs_session_scope`.)
+- The count or identity of confirmatory factors / perturbations /
+  estimands. R-4a already declined to lock these; R-0 inherits.
+
+### 4.5.A Four-layer model
+
+| Layer | Unit | Definition | Required columns | Optional columns (B-2 / downstream-session decided) |
+|---|---|---|---|---|
+| **S0** Source | `article_id` (one CLS item) | Raw source. Original posts, reposts, follow-ups preserved; no dedup at source. | `article_id`, `published_at`, `text`, `text_length`, `is_bundle` | Other source-level metadata |
+| **L1** Entity-Mention | `(article_id, target_entity_id)` long-form row | One row per (article, A-share entity) pair the article mentions. Multi-entity articles produce multiple rows. **No `tradable_at_event` field at L1.** | `article_id`, `target_entity_id`, `mention_count_in_article`, `event_type` / `event_super_type` (if topic-classify has run) | `entity_span_quality` (R-2 may add) |
+| **L2** Subject-Target | `(article_id, target_entity_id)` where `is_subject=true` | Subset of L1 where the target is the article's subject / central economic actor. | `is_subject`, `tradable_at_event` | `subject_confidence`, `subject_rule_or_model_version` (B-2 decides if produced; not required for L2 existence), `outcome_verifiable` (R-2 / R-6 may add), other perturbation-eligibility columns |
+| **L3** Views | Same row unit as L2; not a new unit | Standard view combinations over L2. Base view = `L2 ∩ (tradable_at_event=true) ∩ (text_length ∈ [min, max]) ∩ (is_bundle=false)`. | — (derived) | Subpool views added when R-2 triggers them |
+
+**Design principle**: only steps that change the *row unit* are promoted
+to layers. Event type, tradability, outcome verifiability, span quality
+are columns / flags / view filters. Promoting them to layers silently
+commits R-1b / R-1c / R-5 to specific construct choices that R-0 declines
+to make.
+
+**Bundle articles** (一次性多条新闻播报 — CLS items packing multiple
+flashes) are flagged at S0 (`is_bundle=true`), do not get promoted to L2
+(default `is_subject=false`), but do contribute to L1 mention counts and
+hence Salience / Recurrence denominators. The architecture supports an
+S0-stage bundle splitter as a B-2 implementation option; current default
+is flag-without-split.
+
+**Non-tradable rows are kept** in L1 and L2 (as objects of factor
+metric computation) but **filtered out at R-5 admissibility** (as
+P_predict subjects). Asking the model to predict an entity that was not
+tradable at the article's publication time is a prompt-level data
+leakage entry point: the model can only retrieve memorized post-listing
+information. This is distinct from survivorship bias (Kong 2026 §2.2):
+anti-survivorship is about constructing the evaluation universe from
+current-day perspective, addressed by R-5's sampling distribution
+choice (Pool G / H), not by filtering by historical tradability.
+
+### 4.5.B Pipeline order
+
+```mermaid
+flowchart TD
+    S0["S0 Source Layer<br/>~1.0M-1.3M CLS items<br/>+ text_length + is_bundle"]
+    EM["Stage 1: entity match"]
+    L1["L1 Entity-Mention<br/>(article_id, target_entity_id)<br/>no tradable field"]
+    TC["Stage 2a: topic-classify<br/>(range = R-1b family decided)"]
+    SID["Stage 2b: subject ID"]
+    L2["L2 Subject-Target"]
+    TR["Stage 3: tradability check<br/>(L2 only, point-in-time)"]
+    L3["L3 Views<br/>(universal admissibility intersection)"]
+    FM["Stage 4: factor metrics<br/>(L1 / L2 / L3, before operators)"]
+    R5["Stage 5: R-5 sampling<br/>+ sealed pilot / test split"]
+    HOOK["Stage 5.5 / 6.5: perturbation-specific eligibility<br/>(R-2 / R-6 fills in IF needed)"]
+    PERT["Stage 7: L2 perturbations"]
+    OP["Stage 8: L3 operators"]
+    EST["Stage 9: L4 estimands + statistics"]
+
+    S0 --> EM --> L1
+    L1 --> TC
+    L1 --> SID --> L2
+    L2 --> TR --> L3
+    L1 --> FM
+    L2 --> FM
+    L3 --> FM
+    FM --> R5
+    L3 --> R5
+    HOOK -.optional pattern.-> R5
+    R5 --> HOOK
+    HOOK -.optional pattern.-> PERT
+    PERT --> OP --> EST
+```
+
+**Six hard pipeline constraints**:
+
+1. **Entity match first.** Precedes any LLM-based stage. Reason: the
+   largest LLM cost (topic-classify on ~1M CLS items) drops 40-60% when
+   first filtered to entity-relevant articles (~0.4M-0.8M). Supersedes
+   §5.2 Phase R1 "full-CLS topic classification".
+2. **Tradability check on L2 only, point-in-time, annotation not
+   filter.** L1 has no `tradable_at_event` column. Tradability is a
+   structured join evaluated at the article's `published_at`; added as
+   an L2 column. Actual filtering happens at R-5 admissibility via the
+   L3 base view.
+3. **Topic-classify position locked, range deferred.** Stage 2a runs
+   between entity match and factor metric computation. *Which* articles
+   are classified depends on R-1b's family granularity choice and is
+   R-1b's decision. R-0 does not lock the range.
+4. **Subject ID on L1 rows.** Produces L2. Implementation
+   (deterministic cascade / LLM grouped-by-article / LLM per-row) is a
+   B-2 choice, not R-0. Bundle articles default `is_subject=false`.
+5. **Factor metrics strictly before operators.** R-4a L1↔L3 boundary
+   lock. No factor metric may depend on operator outputs (P_predict /
+   P_logprob / P_extract). This is the R-1d cross-synth lesson:
+   template rigidity cannot be defined as "P_predict output variance",
+   or the cause-measurement loop closes on itself.
+6. **Perturbation-specific eligibility stays in R-2 / R-6 territory.**
+   R-0 reserves two architectural hooks (pre-sampling subpool
+   admissibility for sparse-eligibility perturbations; post-sampling
+   per-case eligibility for apply-where-possible perturbations) but
+   does not define which perturbation uses which hook, what columns
+   they add, or which stage they fit in. R-2 / R-6 sessions fill in.
+
+### 4.5.C Sampling pool inventory
+
+| Pool / Strategy | Status | Description |
+|---|---|---|
+| **Pool B** — L2 ∩ universal admissibility | ✅ Sole base pool currently supported | All R-5 sampling draws from here unless an extension is triggered. |
+| Pool G — salience / recurrence stratified | ✅ Optional distribution strategy | Stack on Pool B. Balances low-salience / low-recurrence representation. |
+| Pool H — entity-balanced / capped | ✅ Optional distribution strategy | Stack on Pool B. Anti-media-coverage-bias tool (Kong 2026 §2.2). |
+| Pool I — cutoff-balanced | ✅ Optional distribution strategy | Stack on Pool B. Supports Cutoff Exposure case×model panel. |
+| Pool D — mention + tradable (L1-tradable view) | ⚠️ Architecture extension required | Not currently supported (L1 has no tradable column). If R-5 or R-1b triggers a need for mention-construct benchmark cases with tradable validity, the architecture extends by adding `tradable_at_event` to a candidate subset of L1 rows. Tradability is a mechanical structured join, so the extension cost is bounded; B-2 schema reserves the slot. |
+| Pool E — outcome-verifiable subpool | 🚫 R-2 / R-6 territory | C_FO eligibility; defined only when C_FO mechanism is locked. |
+| Pool F — mixed panel | ⚠️ Conditional on D / E | Becomes meaningful when D or E is activated. |
+
+**R-0 sampling rule**: distribution-strategy choice (row-random / G /
+H / I / combination) is **not** locked. R-5 has full discretion. Kong
+§2.2 survivorship warning is a sanity-check input, not a mandate.
+
+### 4.5.D Cross-cutting principles
+
+- **`recurrence_count = 0` is a legal value.** `log1p(0) = 0` enters
+  the model directly; never treated as missing. No layer / pool /
+  filter may delete 0-recurrence cases by default.
+- **No-dedup exposure counting is legal.** Inter-article (same target
+  in many articles) and intra-article (same target mentioned multiple
+  times, recorded as `mention_count_in_article` attribute on a single
+  L1 row) are both preserved. Whether to dedup in any specific factor
+  metric is a downstream-session call.
+- **Article cluster traceability is preserved.** L1 rows derived from
+  the same article share `article_id`. R-5 sampling rules and R-4b
+  mixed-model cluster-SE specifications consume this relationship.
+  R-0 does not lock the cluster handling rule (per-article cap;
+  random-effects clustering; mixed-panel design) — these are R-5 /
+  R-4b calls.
+- **Counts and identities not locked.** R-4a already declined to lock
+  the number of confirmatory factors / perturbations / estimands. R-0
+  inherits and reinforces this.
+
+### 4.5.E Supersession of earlier memo prose
+
+These prior sections retain audit value but are no longer authoritative
+where they conflict with §4.5. Downstream sessions implement against
+§4.5.
+
+- **§3.3.1 Case Admissibility Pre-filter.** The central-tradable
+  global pre-filter is **formally lifted to R-5 admissibility applied
+  at the L3 base view**. Mechanism preserved (every sampled case must
+  have a central, tradable target); architectural placement changes
+  (no longer a §3 sampling-stage filter outside the layer model; now
+  a property of the L3 base view from which R-5 samples). The
+  `admit_case()` pseudocode remains illustrative of the centrality +
+  tradability test; R-1b / R-5 implementation reconfigures it as the
+  L1 → L2 subject ID + L2 → L3 view composition.
+- **§3.3.2 Target Salience metric.** The
+  `log1p(cls_target_mention_count)` formulation with shared
+  earliest-cutoff window is **one R-1c candidate**, not the locked
+  R-1c construct. R-1c session selects the construct (which layer
+  counts; denominator unit — article vs L1 row; window; window-sharing
+  with R-1b; complement-family handling). R-0 only guarantees
+  architecture support for all candidate options.
+- **§5.1 / §5.2 Recurrence pipeline.** The full-CLS-topic-first +
+  mention-based recurrence + fixed-window choices in §5.2 represent
+  the **pre-R-0 single-construct prototype**. R-1b session selects the
+  construct (mention / subject / tradable-mention / tradable-subject;
+  family grain; window). The §5.2 pipeline as written (Phase R1
+  full-CLS topic-classify first) **is superseded by R-0's entity-first
+  ordering**; R-1b session redesigns the actual Recurrence pipeline
+  against R-0's layer / view container. The `no-dedup` and
+  `log1p(0)=0` principles (§5.1) survive verbatim.
+- **§6.2 `factor_provenance.json` `run_inputs`.** Schema continues
+  illustrative pending B-2 finalization. R-0 adds these required
+  provenance entries: S0 source snapshot hash, entity alias table
+  hash, disambiguation rule hash, topic-classifier prompt / model /
+  cache hash, subject-ID prompt / model / cache hash or rule hash,
+  tradability master snapshot hash, sampling manifest hash, layer /
+  view definition hash. B-2 finalizes concrete schema; reviewer-Path A
+  must verify the layer / view hashes (not only the factor table
+  hash).
+- **§6.3 Two reproducibility paths.** Path A / Path B split is
+  preserved. Tier B contents are recalibrated because entity-first
+  removes the full-CLS topic-classify cost line (the dominant Path B
+  re-call cost driver in v0.4 prose). B-2 updates Tier B backup
+  rationale and scope accordingly.
+
+### 4.5.F Downstream session input
+
+| Session | R-0 constraint | Choice space (downstream decides) |
+|---|---|---|
+| R-1a Cutoff Exposure | Case traceable to article_id / published_at / target_entity_id / layer membership; metric independent of operator outputs | Case event date = `published_at` vs in-text event date; per-model cutoff manifest source |
+| R-1b Historical Family Recurrence | No-dedup; `log1p(0)=0` legal; count from L1 / L2 / L3 not operators; topic-classify range follows family choice | **Construct**: mention (L1) / subject (L2) / tradable mention (L3 view over L1, triggers Pool D extension; tradability is mechanical so extension is bounded) / tradable subject (L3 view over L2); **family granularity**: target-only / target × event_super_type / target × raw event type / multi-grain robustness; **lookup window**: corpus_start → which cutoff; window-sharing with R-1c |
+| R-1c Target Salience | Same L1↔L3 boundary as R-1b | **Construct**: same options as R-1b; **denominator**: article count vs L1 row count; **window**: pre-cutoff fixed / other; window-sharing with R-1b; complement-family count for cross-factor dedup |
+| R-1d Template Rigidity | Pure text features only; can be computed on L1 or L2 | Full spec (factor designed from literature) |
+| R-2 Perturbations | HOOK1 / HOOK2 placement reserved; no perturbation-specific column predefined; L1↔L3 boundary respected | Each perturbation's eligibility flag / column / view; HOOK pattern selection; primary / supporting / robustness status; C_FO mechanism (in-place replacement vs T+1/T+5 real return) — coupled with R-6 |
+| R-5 Sampling | Base pool = Pool B; article_id traceable; non-tradable subjects excluded as P_predict subjects | Distribution strategy (row-random / G / H / I / combination — no mandate); per-article cap and dedupe rule; threshold values (text_length min/max; entity cap); whether to trigger Pool D / E / F extension |
+| B-2 Implementation | Layer / view / provenance hash list per §4.5.E; HOOK schema slots reserved | `run_inputs.per_task` concrete schema; subject ID implementation; topic-classifier target-conditioned refinement; caching wrapper form; Tier B backup cadence; `provider_headers` storage form |
+
 ## 5. Historical Family Recurrence — data contract (Issue #7)
+
+> **R-0 supersession note (2026-05-23 PM late)**: the pipeline and
+> construct choices described in §5 below represent the pre-R-0
+> single-construct prototype. R-1b session redesigns the actual
+> Recurrence pipeline against R-0's container (§4.5). Specifically:
+> §5.2 Phase R1 full-CLS topic-classify is superseded by §4.5's
+> entity-first ordering; the mention-based count construct is one
+> R-1b candidate among four (mention / subject / tradable-mention /
+> tradable-subject); the fixed pre-cutoff window is one R-1b choice
+> among several. Principles that survive R-0 verbatim: no-dedup
+> exposure count (§5.1), `log1p(0)=0` legal value (§5.1), §5.3
+> deterministic-first disambiguation. The text below is preserved for
+> audit; downstream implementation follows §4.5 + R-1b session.
 
 ### 5.1 Construct
 

@@ -56,6 +56,53 @@
   确保架构足够 expressively 容纳所有合理候选)。kickoff
   `.scratch/session_kickoff_r0_corpus_arch.md`。是 R-1b/c/R-5 + R-2 数据
   依赖的共同上游。
+  - **R-0 closed 2026-05-23 PM late**(audit trail:
+    `refine-logs/reviews/REOPEN_R1_R6/R0_corpus_arch/whiteboard_analysis.md`
+    Codex Pass A 白板 545 行 + 用户 7 段切片走查)。锁住的是**架构容器**:
+    1. **4 层模型**:S0 源 / L1 entity-mention `(article_id, target_entity_id)`
+       long-form / L2 subject-target / L3 benchmark-eligible views;
+       只有改变 row unit 的步骤升格为层,event type / tradability /
+       outcome verifiability / span quality 都做列 / flag / view。
+    2. **6 阶段 entity-first pipeline**:entity match → topic-classify
+       (范围 R-1b 决定)/ subject ID → L2 tradability check (point-in-time)
+       → factor metrics(严在 operators 之前,R-4a L1↔L3 边界)→ R-5
+       sampling → perturbations → operators → estimands。entity-first 比
+       §5.2 Phase R1 full-CLS topic-classify 节约 40-60% LLM 成本。
+    3. **通用 admissibility**:`tradable_at_event=true` ∧ `text_length ∈
+       [min, max]` ∧ `is_bundle=false`,每个 P_predict 主体必过。客体 vs
+       主体区分:non-tradable rows 保留在 L1/L2(Salience/Recurrence 分母
+       客体),但作为 P_predict 主体强制过滤(否则 prompt-level leakage 入口)。
+       anti-survivorship 不是过滤历史 tradable,而是 R-5 抽样分布选择(G/H)。
+    4. **Pool inventory**:**Pool B**(L2 ∩ universal admissibility)=
+       sole base pool;**G / H / I** 分布策略(salience-stratified /
+       entity-balanced / cutoff-balanced)可选叠加,**R-5 全权决定是否叠加
+       与组合**,row-random 也合法(Kong 2026 §2.2 是 sanity-check 不是
+       mandate);**Pool D / E / F** 架构扩展位(R-5 / R-2 / R-6 实操确认
+       必要时激活,B-2 schema 留扩展槽)。
+    5. **supersession**:§3.3.1 central-tradable 全局 pre-filter 形式上抬
+       到 R-5 admissibility 在 L3 base view 上;§5.1/§5.2 Recurrence 管线
+       的 full-CLS topic-first + mention-based + fixed window 选择**变成
+       R-1b 候选之一**(`no-dedup` + `log1p(0)=0` 原则保留);§6.2
+       `factor_provenance.json` 需加 layer/view hash 清单(B-2 finalize);
+       §6.3 Path A reviewer-path 必须 verify layer/view hashes。
+    + **arch-vs-session 锁**(memory `feedback_arch_vs_session_scope`,
+      2026-05-23 写):R-0 / framework-level 决定只锁 universal admissibility;
+      perturbation/factor/operator-specific eligibility(outcome_verifiable /
+      text_reversibility / entity_span_quality / temporal_anchor_recoverability
+      等)都留对应 session,即使 Codex whiteboard 写完整也要剥离,只留两个
+      架构 hook(pre-sampling subpool admissibility + post-sampling per-case
+      eligibility)。
+    + **元层观察**:Codex 阶段 1 独立得出与用户 walkthrough §A.1/§A.2 高度
+      接近的方案(4 层 + entity-first),但 Codex 比 user walkthrough 把每
+      个 commitment 都退一步留给下游 —— Layer 4 降为 view、tradable 不硬
+      筛、construct 不锁。用户在走查时进一步收紧(non-tradable rows 客体
+      vs 主体区分;tradable check 仅在 L2;perturbation-specific eligibility
+      回 R-2/R-6;sampling 分布不强制)。两端独立推 + 用户 push back 的
+      clean-room-first 协议本轮再次坐实有效。
+    + **下游解锁**:R-1b(用户点名重点)/ R-1c / R-5 / B-2 `run_inputs.per_task`
+      schema finalize。R-2 仍部分卡 R-6(C_FO 机制);R-3 / R-4b 仍卡上游。
+    + lock-in 见 `docs/DECISION_20260518_ws0_5_thales_alignment.md` §4.5;
+      `docs/RESEARCH_PROPOSAL.md` §4.1 顶部 anchor + §4.7 已更新。
 - **R-1 因子**:4 个 confirmatory 因子,每个的实现方法 → 然后 4 个的选择。
   - Cutoff Exposure:实现简单(日期+manifest),重点是选择确认。
   - Historical Family Recurrence:实现有 WS0.5 §5 管线(待 clean-room 复审);

@@ -1,6 +1,44 @@
 # Cross-synthesis findings — 2026-05-23 PM
 
-> **Purpose**: Synthesize three structural inputs that landed in the last
+> **⚠️ SUPERSEDED — 本文 A 节原版 menu 含 4 处误读, 不要直接采纳里面的具体
+> 提议**(2026-05-23 PM, 用户在逐项 triage 中纠正,详见 commit `f55d8ca`
+> message 内 Decisions audit 段 + 该 session 对话记录)。
+>
+> **误读类型 = 系统性偏差**:agent 看到漂亮 framework(Kong 2026 Structural
+> Validity Framework)就倾向于强对齐到我们 benchmark, 没看清 Kong 是
+> deployment-claim framework, 我们是 characterization benchmark, 两者
+> framing 错配。具体误读点:
+> - **🟡-2** "在 §6 加 Kong 5-check 1:1 mapping 表" — 错对齐(已 ✗ 撤销)
+> - **🟡-3** 原版 "Kong entity substitution → R-1d Template Rigidity 设计
+>   起点" — 双错(test 精神理解错 + factor 用算子结果定义违反 L1/L2/L4
+>   边界);修正版 = R-2 新候选扰动 C_ES(已 ✓ 修正版)
+> - **🟡-4** 原版 "Kong §2.2 → Target Salience metric endorsement" — 方向
+>   反了(Kong 是 warn sampling 不是 endorse metric);修正版 = R-1c
+>   sanity-check + R-5 sampling 策略扩展(已 ✓ 选 3 + 扩展)
+> - **🟢-2 / 🟢-3** 同 🟡-2 类问题(强行对齐 framework)— 已 ✗ 撤销
+>
+> **仍 valid 部分**:
+> - **F 节 (Kong vs 我们 7 条真实分歧)** — 用户从未否认, 防未来 session
+>   再走"对齐 Kong"的路。
+> - **B 节 (R-1x reopen session 准备)** — 大部分已被 worktable TODO 吸收,
+>   但作为原始 routing 记录有 reference 价值。
+> - **G 节 (PDF 重复处置)** — 已执行 ✓。
+> - **C 节 memory 更新** — 已执行 ✓ 但 framing 弱化(不给 Kong anchor 地位)。
+>
+> **真实结论权威源**:
+> - `commit f55d8ca` message 内 Decisions audit 段 (approved / rejected /
+>   flag-only 完整审记)
+> - `plans/worktable.md` §2 R-2 行后 4 个 TODO 段(🟡-3 / 🟡-4 / 🟡-5)+
+>   §6 跨阶段挂账 Kong references mining 行
+> - `docs/RESEARCH_PROPOSAL.md` §2.3 末 TODO(🟡-1)+ §4.7 末 TODO(🟡-4c)
+> - memory `lit_landscape.md` Local collection + Consensus #5 新增
+>
+> 本文保留作 audit trail + 教训记录(系统性偏差自审),**不**作 R-1x kickoff
+> input 权威源(权威源见 worktable TODO + commit message)。
+
+---
+
+> **Purpose** (原 session 自述,保留作历史): Synthesize three structural inputs that landed in the last
 > 48 hours and were never read together. Output = prioritized
 > ready-to-action menu for the user to triage (✓ / ✗ / 推后); each accepted
 > item dispatches to a follow-up session. **This session does not change any

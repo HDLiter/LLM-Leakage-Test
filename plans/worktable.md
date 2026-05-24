@@ -12,7 +12,7 @@
 > **本表只维护「依赖」与「可动?」**(可动性由依赖推导,不单独维护一份会漂移的
 > 状态字段)。已完成 / 进行中的事实另见 §1 与各行备注。
 >
-> **最后更新**:2026-05-23 PM(基建主题 final-pass 完成)
+> **最后更新**:2026-05-23 PM late(R-1b kickoff 走查衍生 R-0 上层架构决策)
 
 ---
 
@@ -22,7 +22,7 @@
 
 | 块 | 内容 | 与其它块的关系 |
 |---|---|---|
-| **A** | 操作化层结构化重开 R-1…R-6(全程 **clean-room-first**) | 当前焦点;结论喂 C |
+| **A** | 操作化层结构化重开 R-0 corpus 架构 + R-1…R-6(全程 **clean-room-first**) | 当前焦点;结论喂 C |
 | **B** | 并行轨道:design-agnostic 基建 + WS1 | 与 A 同时跑;边界=建能力,**不锁定义、不签 WS0.5 memo** |
 | **C** | 重开收尾:`RESEARCH_PROPOSAL.md` §4/§6 定稿 | A 全部完成后的**单点闸门**,gate 住 D |
 | **D** | 实现工作流 WS0.5 / WS2 / WS3 / WS4 / WS5 | C 之后开工 |
@@ -58,14 +58,15 @@ clean-room 独立推出比 frozen 简单 + B 子领域实然比 A 更轻),应用
 | ID | 工作项 | 依赖(前置) | 可动? |
 |---|---|---|---|
 | **R-4a** | **方法论审计**:框架级 8 条(无 family correction / 标签词 / 「预注册」措辞改 design memo / Gwet's AC1 / etc.) | 无 | **✔ closed 2026-05-23**(audit `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/`) |
+| **R-0** | **Corpus Architecture**(2026-05-23 R-1b kickoff 走查衍生):CLS 语料分层模型 + 全局 pipeline 阶段顺序 + 抽样 pool 候选;**只 expose 架构空间,不替 factor / R-5 拍 construct / 时间窗口 / sampling** | 无 | ✅ 可动 —— kickoff `.scratch/session_kickoff_r0_corpus_arch.md` |
 | R-6 | 预测目标 & 是否/如何用真实收益(含 parked C_FO/C_SR 漂移调查) | 无(R-4a 给的容量答案是"不锁数,加新 estimand 要替换或开新 design memo") | ✅ 可动(2026-05-23 解封) |
-| R-1a | Cutoff Exposure:实现 + 选择确认 | 无(实现简单:日期+manifest) | ✅ 可动 |
-| R-1b | Historical Family Recurrence:实现 | 无(有 WS0.5 §5 管线待 clean-room 复审;family 粒度未定) | ✅ 可动 |
-| R-1c | Target Salience:实现 | 无(有 WS0.5 §3.3 待 clean-room 复审) | ✅ 可动 |
-| R-1d | Template Rigidity:从零设计 | 无(**零 spec**,从文献起;用户视为重点因子) | ✅ 可动 |
+| R-1a | Cutoff Exposure:实现 + 选择确认 | 无(实现简单:日期+manifest;case 本身来源会受 R-0 影响,但 metric 不依赖) | ✅ 可动 |
+| R-1b | Historical Family Recurrence:实现 | **R-0**(架构容器决定 R-1b construct / 工作语料层可选范围) | ⛔ 待 R-0 |
+| R-1c | Target Salience:实现 | **R-0**(同上;复用 R-1b/R-0 框架) | ⛔ 待 R-0 |
+| R-1d | Template Rigidity:从零设计 | 无(**零 spec**,从文献起;用户视为重点因子;纯文本特征,不依赖 R-0) | ✅ 可动 |
 | R-1e | 因子最终选择确认(R-4a 不锁数 → 选哪几个由实现+pilot 实证证据决定) | R-1a · R-1b · R-1c · R-1d(R-4a 依赖已解除) | ⛔ 待 R-1a-d |
-| R-2 | 6 扰动实现构思 → 选保留几个进 primary(重审 C_NoOp;C_FO vs C_SR 漂移见 `.scratch/cfo_csr_history_findings.md`) | R-6(C_FO 机制选择,R-4a 依赖已解除) | ⛔ 待 R-6 |
-| R-5 | 采样准入过滤器(可交易实体 / 新闻长度 / 反直觉案例) | R-6(反直觉案例需真实股价,R-4a 依赖已解除) | ⛔ 待 R-6 |
+| R-2 | 6 扰动实现构思 → 选保留几个进 primary(重审 C_NoOp;C_FO vs C_SR 漂移见 `.scratch/cfo_csr_history_findings.md`) | R-6(C_FO 机制选择)+ **R-0**(C_anon/C_FO 数据依赖落在 R-0 架构的某层) | ⛔ 待 R-0 + R-6 |
+| R-5 | 采样:R-0 expose 的 pool 候选里选 + within-pool 分布 + 准入过滤器(可交易实体 / 新闻长度 / 反直觉案例) | **R-0**(pool 候选)+ R-6(反直觉案例需真实股价) | ⛔ 待 R-0 + R-6 |
 | R-3 | 负对照充分性 | R-1e · R-2(需知最终因子 / 扰动) | ⛔ 待上游 |
 | R-4b | pilot 具体统计(power 计算 / n_eff 矩阵 / 混合模型规格落地 / bootstrap 实施)—— R-4a 已锁 TOST/SESOI、scenario-based MC power 等框架 | R-1e · R-2 · R-3 · R-5(操作化定了才能算 power;R-4a 框架已就位) | ⛔ 待上游 |
 
@@ -164,6 +165,7 @@ clean-room 独立推出比 frozen 简单 + B 子领域实然比 A 更轻),应用
 ```mermaid
 flowchart TD
     R4a["R-4a 方法论审计 ✔ closed"]
+    R0["R-0 Corpus Architecture"]
     R6["R-6 预测目标/真实收益"]
     R1a["R-1a Cutoff Exposure"]
     R1b["R-1b Recurrence"]
@@ -185,6 +187,10 @@ flowchart TD
     WS5["WS5 统计+预注册"]
     MAIN["main run N=2560"]
 
+    R0 --> R1b
+    R0 --> R1c
+    R0 --> R2
+    R0 --> R5
     R1a --> R1e
     R1b --> R1e
     R1c --> R1e
@@ -221,31 +227,36 @@ flowchart TD
 
 ---
 
-## 4. 现在能动的(2026-05-23 PM,R-4a closed 后)
+## 4. 现在能动的(2026-05-23 PM late,R-0 加进 worktable 后)
 
-无前置、立即可启动:
+**首要**(R-1b/c/R-5 + R-2 数据依赖共同上游):
 
-- **R-1d Template Rigidity 设计** —— **零 spec、用户视为重点因子**,是
-  R-1 系列里最实打实的起点。建议走 clean-room codex(模板参照
-  `.scratch/codex_prompt_r4a_whiteboard.md`)。
-- **R-1a / R-1b / R-1c** —— 3 个因子各自的实现设计。R-1b Recurrence(用户
-  点名作下一步实验管线搭建)、R-1c Salience 各有 WS0.5 §5 / §3.3 现成管线
-  待 clean-room 复审;R-1a Cutoff Exposure 实现简单。
-- **R-6 预测目标 & 真实收益**(2026-05-23 解封)。可接 parked C_FO/C_SR 漂移
-  调查(`refine-logs/reviews/REOPEN_R1_R6/cfo_csr_history_findings.md`);
+- **R-0 Corpus Architecture** —— R-1b kickoff 走查衍生,从原 6 个决策点
+  里把「分层模型 / pipeline 阶段顺序 / 抽样 pool 候选」三点提升为上层架构
+  决策。R-0 不替 factor / R-5 拍 construct / 时间窗口 / sampling 拍板,
+  只 expose 架构空间。kickoff `.scratch/session_kickoff_r0_corpus_arch.md`。
+
+无前置、立即可启动(R-0 之外):
+
+- **R-1d Template Rigidity 设计** —— **零 spec、用户视为重点因子**,纯
+  文本特征,不依赖 R-0;是 R-1 系列里最实打实的起点。建议走 clean-room
+  codex(模板参照 `.scratch/codex_prompt_r4a_whiteboard.md`)。
+- **R-1a Cutoff Exposure** —— 实现简单(日期+manifest),case 来源会受
+  R-0 影响,但 metric 本身不依赖。
+- **R-6 预测目标 & 真实收益**(2026-05-23 解封)。可接 parked C_FO/C_SR
+  漂移调查(`refine-logs/reviews/REOPEN_R1_R6/cfo_csr_history_findings.md`);
   kickoff 已写好 `.scratch/session_kickoff_r6.md`。
-- **B-2** WS0.5 design-agnostic 基建(B-3 + B-3+ 全部解锁)。memo 文字与
-  reviewer-aligned 设计 + §7 teardown 后的精简设计**全部对齐**,可照 memo 实现
-  4 个基建模块:**provider-agnostic caching wrapper**(DeepSeek + OpenRouter 共用)
-  / SQLite cache(11 列 schema)/ Tier-A JSONL / `verify_canonical_hash.py` +
-  `replay_factor_values.py`(含 Tier-B sha256 startup verify)。**第一件事**:
-  finalize `run_inputs.per_task` 具体 schema(memo §6.2 标"示意",B-2 落)。
-  **不实现**(已删):metered client / budget_summary / per-round checkpoint。
+- **B-2** WS0.5 design-agnostic 基建 —— **`run_inputs.per_task` schema
+  部分待 R-0**(R-0 决定后才能 finalize 该字段引用什么 corpus-layer /
+  factor metric);**其余 4 个模块可动**:provider-agnostic caching wrapper
+  / SQLite cache(11 列 schema)/ Tier-A JSONL / `verify_canonical_hash.py`
+  + `replay_factor_values.py`(含 Tier-B sha256 startup verify)。**不实现**
+  (已删):metered client / budget_summary / per-round checkpoint。
 - **B-1** WS1 云上可并行项。
 
-> R-1a-d 各自实现细节独立,可并行。**R-1e 选因子由 R-1a-d 实现 + pilot 实证
-> 决定**(R-4a 不锁因子数,把"哪几个进 primary"留给数据)。R-2 与 R-5 仍待
-> R-6(C_FO 机制选择 / 反直觉案例需真实股价)。
+> **R-1b / R-1c / R-5 / R-2 待 R-0**。R-1a / R-1d 可与 R-0 并行。R-1e 选
+> 因子由 R-1a-d 实现 + pilot 实证决定(R-4a 不锁因子数,把"哪几个进
+> primary"留给数据)。R-2 / R-5 仍待 R-6(C_FO 机制 / 反直觉案例需真实股价)。
 
 > **实现价值清单**(operator / perturbation / factor 三轴,哪些去实现 /
 > 简版 / 暂缓 / 不做):见 §7。

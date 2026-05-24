@@ -47,6 +47,15 @@
 
 ## 重开范围 —— 严格限定"框架与实现之间的操作化层"
 
+- **R-0 Corpus Architecture(2026-05-23 PM late 衍生)** —— R-1b kickoff
+  走查时,用户指出原 6 个决策点里的「4-layer corpus stratification」
+  「pipeline reorder」「benchmark 抽样从哪层抽」其实是**对所有下游 factor
+  / R-5 都奏效的上层架构决策**,应该先于任一 factor session 敲定。提升为
+  独立 R-0 项,scope 严限:**只 expose 架构空间,不替 factor 拍 construct /
+  时间窗口,也不替 R-5 拍 sampling**(三者均由下游各自 session 决定;R-0
+  确保架构足够 expressively 容纳所有合理候选)。kickoff
+  `.scratch/session_kickoff_r0_corpus_arch.md`。是 R-1b/c/R-5 + R-2 数据
+  依赖的共同上游。
 - **R-1 因子**:4 个 confirmatory 因子,每个的实现方法 → 然后 4 个的选择。
   - Cutoff Exposure:实现简单(日期+manifest),重点是选择确认。
   - Historical Family Recurrence:实现有 WS0.5 §5 管线(待 clean-room 复审);

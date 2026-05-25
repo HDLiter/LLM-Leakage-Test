@@ -85,7 +85,7 @@ clean-room-first + push-back 协议本轮再次坐实有效。
 | **R-0** | **Corpus Architecture**(2026-05-23 R-1b kickoff 走查衍生):CLS 语料分层模型 + 全局 pipeline 阶段顺序 + 抽样 pool 候选;**只 expose 架构空间,不替 factor / R-5 拍 construct / 时间窗口 / sampling** | 无 | **✔ closed 2026-05-23 PM late**(lock-in 见 `docs/DECISION_20260518_ws0_5_thales_alignment.md` §4.5;audit `refine-logs/reviews/REOPEN_R1_R6/R0_corpus_arch/whiteboard_analysis.md` + pending_items R-0 closed 块) |
 | R-6 | 预测目标 & 是否/如何用真实收益(含 parked C_FO/C_SR 漂移调查) | 无(R-4a 给的容量答案是"不锁数,加新 estimand 要替换或开新 design memo") | ✅ 可动(2026-05-23 解封) |
 | R-1a | Cutoff Exposure:实现 + 选择确认 | 无(实现简单:日期+manifest;case 本身来源会受 R-0 影响,但 metric 不依赖) | ✅ 可动 |
-| R-1b | Historical Family Recurrence:实现(R-0 expose 4 construct 候选:mention/subject/tradable-mention/tradable-subject;family 粒度 + 窗口由本 session 决定;tradable-mention 触发 Pool D 架构扩展)| ~~R-0~~(已 closed) | ✅ **可动 2026-05-23 PM late**(R-0 解锁;用户点名重点;kickoff 起草中)|
+| R-1b | Historical Family Recurrence:实现 + lock-in | ~~R-0~~(已 closed) | **✔ closed 2026-05-24** → `refine-logs/reviews/REOPEN_R1_R6/R1b_recurrence/R1b_DECISIONS.md`;R-1c / R-1e / R-5 Pool G / B-2 schema 解锁 |
 | R-1c | Target Salience:实现(R-0 expose construct + 分母 = article 数 vs L1 row 数选择)| ~~R-0~~(已 closed) | ✅ **可动 2026-05-23 PM late** |
 | R-1d | Template Rigidity:从零设计 | 无(**零 spec**,从文献起;用户视为重点因子;纯文本特征,不依赖 R-0) | ✅ 可动 |
 | R-1e | 因子最终选择确认(R-4a 不锁数 → 选哪几个由实现+pilot 实证证据决定) | R-1a · R-1b · R-1c · R-1d(R-4a 依赖已解除) | ⛔ 待 R-1a-d |
@@ -251,48 +251,41 @@ flowchart TD
 
 ---
 
-## 4. 现在能动的(2026-05-23 PM late,R-0 closed 后)
+## 4. 现在能动的(2026-05-24,R-1b closed 后)
 
-**新解锁**(R-0 closure 2026-05-23 PM late):
+**新解锁**(R-1b closure 2026-05-24):
 
-- **R-1b Historical Family Recurrence**(用户点名重点)—— R-0 expose 4
-  construct 候选(mention / subject / tradable-mention / tradable-subject;
-  tradable-mention 触发 Pool D 架构扩展)+ family 粒度 + 窗口由本 session
-  决定。kickoff 待起草(task #7 下游)。
-- **R-1c Target Salience** —— R-0 expose construct + 分母选择(article
-  数 vs L1 row 数)。可与 R-1b 并行;两者是否共窗口 / 共粒度 = R-1c
-  session 决定。
-- **R-5 Sampling**(前半可动)—— R-0 expose Pool B + G/H/I + D/E/F 扩展位。
-  本 session 决定:within-pool 分布(row-random / G / H / I / 组合,R-0
-  不强制叠加)+ per-article cap / dedupe 规则 + 阈值。反直觉案例过滤仍待
-  R-6 真实股价。
-- **B-2 `run_inputs.per_task` schema finalize** —— R-0 给了 layer/view
-  hash 清单(S0 / entity alias table / disambig rule / topic hashes /
-  subject-ID hashes / tradability snapshot / sampling manifest / layer
-  view definition),B-2 finalize 具体字段。这是 B-2 启动第一件事。
+- **R-1c Target Salience** —— R-1b 给的锚点是 "**必须遵守 R-0/R-4a 基础架构,
+  其它一律参考**"(R-1c session 完全自决 construct / window / 分母 / event 折叠 /
+  是否加 tradable filter / 是否 complement-family 去重)。R-1c 必须做的 standing
+  discriminant check 输入口径见 `R1b_DECISIONS.md §5.3 / §8`。
+- **B-2 `run_inputs.per_task.historical_family_recurrence` schema** —— R-1b
+  完整字段需求 + provenance hashes + 必报告 A/B count delta 见
+  `R1b_DECISIONS.md §6`;字段名 / 风格 / 与其它 R-X session 输出的整合留
+  B-2 整体 session。
+- **R-5 sampling 的 Pool G 分层依据** —— 若 R-5 启用 Pool G(recurrence-
+  stratified),用 R-1b `log1p_recurrence_count`(tradable-filtered)分层;
+  R-5 **不应**偷换成别的口径。R-5 不动 Pool B / Pool D dormant 假设。
 
-**仍可动**(R-0 之外,前已立即可启动):
+**仍可动**(R-1b 之外,前已立即可启动):
 
-- **R-1d Template Rigidity 设计** —— **零 spec、用户视为重点因子**,纯
-  文本特征,不依赖 R-0;是 R-1 系列里最实打实的起点。建议走 clean-room
-  codex(模板参照 `.scratch/codex_prompt_r4a_whiteboard.md`)。
+- **R-5 Sampling**(前半:within-pool 分布 + per-article cap / dedupe 规则)
+- **R-1d Template Rigidity 设计** —— **零 spec、用户视为重点因子**,纯文本
+  特征,不依赖 R-0/R-1b;是 R-1 系列里最实打实的起点。
 - **R-1a Cutoff Exposure** —— 实现简单(日期+manifest),case 来源受 R-0
   影响,但 metric 本身不依赖。
 - **R-6 预测目标 & 真实收益**(2026-05-23 解封)。可接 parked C_FO/C_SR
-  漂移调查(`refine-logs/reviews/REOPEN_R1_R6/cfo_csr_history_findings.md`);
-  kickoff 已写好 `.scratch/session_kickoff_r6.md`。
+  漂移调查;kickoff 已写好 `.scratch/session_kickoff_r6.md`。
 - **B-2 其它 4 个模块**(provider-agnostic caching wrapper / SQLite cache
   11 列 schema / Tier-A JSONL / `verify_canonical_hash.py` +
-  `replay_factor_values.py` 含 Tier-B sha256 startup verify)。**不实现**
-  (已删):metered client / budget_summary / per-round checkpoint。
+  `replay_factor_values.py` 含 Tier-B sha256 startup verify)。
 - **B-1** WS1 云上可并行项。
 
 **仍卡上游**:
 
-- **R-2**(扰动选择)仍卡 R-6(C_FO 机制需 R-6 真实收益决定);R-0 解锁了
-  R-2 的部分 perturbation-specific eligibility flag 在 HOOK1/HOOK2 上落
-  地的位置,但 R-2 主体决策依赖 R-6
-- **R-1e**(因子最终选择)仍卡 R-1a-d 实现
+- **R-2**(扰动选择)仍卡 R-6(C_FO 机制需 R-6 真实收益决定)
+- **R-1e**(因子最终选择)仍卡 R-1a / R-1c / R-1d 实现(R-1b 已 close 但
+  Recurrence 是否进 primary 由 pilot 数据决定,R-1b 不预承诺)
 - **R-3 / R-4b** 仍卡上游(R-1e / R-2 / R-3 / R-5 全部落定后)
 
 > **实现价值清单**(operator / perturbation / factor 三轴,哪些去实现 /
@@ -356,7 +349,7 @@ flowchart TD
 | 组件 | 现状 | 价值 | 推荐 |
 |---|---|---|---|
 | Cutoff Exposure | 实现简单(日期 + manifest);Path E 验证 | **核心** —— 整个 temporal route 物理基础 | ✅ **必实现** |
-| Historical Family Recurrence | WS0.5 §5 管线待 clean-room 复审;family 粒度未定 | **主候选** —— 对应 repetition memorization(Carlini 2023 数据点) | ✅ **实现**(用户点名 R-1b);family 粒度先选 粗(标的级)/ 细(标的×event_super_type)两档,lookup 窗口 90/365 天两档,在 pilot 看哪档有信号,不预设阈值 |
+| Historical Family Recurrence | **R-1b ✔ closed 2026-05-24** → `refine-logs/reviews/REOPEN_R1_R6/R1b_recurrence/R1b_DECISIONS.md` | **主候选** —— outcome-leakage proxy(关联记忆) | ✅ **lock-in 见 DECISIONS.md** |
 | Target Salience | WS0.5 §3.3 待 clean-room 复审 | **主候选** —— prominence-mediated memorization | ✅ 实现 |
 | Template Rigidity | **零 spec**(用户视为重点) | **主候选** —— 中文金融新闻强模板化(财报 / 监管公告) | ✅ **先做 R-1d 设计**(用户点名下一步),再实现 |
 | Bloc 3 标注(事件类型 / 披露 / 阶段 / 时段) | WS0.5 管线本就标注 | exploratory stratification | ✅ 沿用,不单独实现 |

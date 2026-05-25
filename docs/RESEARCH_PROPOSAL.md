@@ -153,22 +153,21 @@ memory `project_english_expansion`)。
 >   sampling → perturbations → operators → estimands**;
 > - factor metrics 在 L1 / L2 / L3 上算,**严格在 operators 之前**(R-4a
 >   L1↔L3 边界锁);
-> - factor construct(mention / subject / tradable-subject / tradable-
->   mention)+ family 粒度 + 窗口 = **R-1b / R-1c session 决定**,R-0 不
->   预锁。
+> - factor construct + family 粒度 + 窗口:**R-1b / R-1c session 决定**,
+>   R-0 不预锁;R-1b ✔ closed 2026-05-24 → `refine-logs/reviews/REOPEN_R1_R6/R1b_recurrence/R1b_DECISIONS.md`(canonical lock-in)。
 >
-> 后续 §4.1.1-§4.1.4 的具体因子实现待 R-1a / R-1b / R-1c / R-1d 落定。
+> 后续 §4.1.1-§4.1.4 的具体因子实现:R-1b ✔ closed;R-1a / R-1c / R-1d 待落定。
 
-### 4.1 四个 confirmatory 因子 [R-1 重开中]
+### 4.1 四个 confirmatory 因子 [R-1a / R-1c / R-1d 待定;R-1b ✔ closed 2026-05-24]
 
-confirmatory family = **5 estimand × 4 factor = 20 个系数**,多重比较用
-Westfall-Young stepdown max-T 控制。4 个因子刻画泄露的三个驱动通道 ——
+confirmatory family = **5 estimand × 4 factor = 20 个系数**(候选规模;R-1e
+最终选哪几个由 pilot 数据决定)。4 个因子刻画泄露的三个驱动通道 ——
 **时间访问、重复、显著性**:
 
 | 因子 | Bloc | 测什么(WHY) |
 |---|---|---|
 | **Cutoff Exposure** | 0 时间暴露(case×model) | 模型 cutoff 相对案例事件日期的位置。最直接的泄露通道:事件在 cutoff 前,模型训练时就*可能*见过它和它的结果。 |
-| **Historical Family Recurrence** | 1 重复(case-level) | (标的 × 事件家族)模式在 cutoff 前 CLS 里复现多少次。重复强化记忆。 |
+| **Historical Family Recurrence** | 1 重复(case-level) | (标的 × 事件家族)模式在 cutoff 前 CLS 里复现多少次。**outcome-leakage proxy**:模型用记住的"事件 → 涨跌方向"关联代替对眼前文本的推理,涨跌(收益)是隐含变量。**R-1b ✔ closed 2026-05-24** → `refine-logs/reviews/REOPEN_R1_R6/R1b_recurrence/R1b_DECISIONS.md`。 |
 | **Target Salience** | 2 显著性(case-level) | 标的实体有多"出名"(cutoff 前 CLS 提及数的 log)。越出名,预训练里关于它的文本越多。 |
 | **Template Rigidity** | 1 重复(case-level) | 文章有多"模板化 / 套话"。高度模板化的新闻可被套模板匹配而非读内容。 |
 
@@ -177,10 +176,7 @@ Cutoff Exposure 的交互项**(β3)—— 即假设"高复现 / 高显著 / 高�
 *放大* cutoff 暴露带来的泄露"。这是一个有原则的混淆控制选择(交互项差掉
 "案例难度"污染),代价是 20 个系数里 15 个是交互项、对样本量苛刻。
 
-**[R-1 重开] 待定:** 每个因子的具体实现方法(尤其 Template Rigidity 目前
-**无任何实现 spec** —— flag ④),以及"是否就选这 4 个因子"(原则:实现优先
-于选择);Historical Family Recurrence 的 "family" 粒度(标的 × super_type)
-亦待定。**[R-4 重开]** β1/β3 统计结构待方法复审。
+**[R-1 重开] 待定**:R-1b 已 closed(canonical 见上表 link);**R-1a Cutoff Exposure / R-1c Target Salience / R-1d Template Rigidity** 实现方法待定(尤其 Template Rigidity 目前 **无任何实现 spec** —— flag ④)。"是否就选这 4 个因子"由 R-1e 根据 pilot 实证证据决定(原则:实现优先于选择)。**[R-4 重开]** β1/β3 统计结构方法层已由 R-4a 锁定(无 family-wise multiplicity correction、per-estimand 混合模型分别建、TOST/SESOI=0.15 限 BL2 等 8 条);具体 power 数字与混合模型规格落地待 R-4b。
 
 ### 4.2 算子 [部分锚定]
 

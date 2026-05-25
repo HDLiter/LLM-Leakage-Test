@@ -103,10 +103,19 @@
       schema finalize。R-2 仍部分卡 R-6(C_FO 机制);R-3 / R-4b 仍卡上游。
     + lock-in 见 `docs/DECISION_20260518_ws0_5_thales_alignment.md` §4.5;
       `docs/RESEARCH_PROPOSAL.md` §4.1 顶部 anchor + §4.7 已更新。
-- **R-1 因子**:4 个 confirmatory 因子,每个的实现方法 → 然后 4 个的选择。
-  - Cutoff Exposure:实现简单(日期+manifest),重点是选择确认。
-  - Historical Family Recurrence:实现有 WS0.5 §5 管线(待 clean-room 复审);
-    "family" 粒度(标的×super_type)用户未真正想好。
+- **R-1b Historical Family Recurrence(R-0 解锁后第一个 closed factor session)** ——
+  在 R-0 锁定的 4 层容器内选 construct + family 粒度 + lookup window。
+  - **R-1b closed 2026-05-24** → canonical lock-in = `refine-logs/reviews/REOPEN_R1_R6/R1b_recurrence/R1b_DECISIONS.md`(time-static 决策清单);audit trail = 同目录 `whiteboard_analysis.md` + `construct_stress_test.md` + `construct_second_opinion_claude.md` + `bch_second_opinion_claude.md`。
+  - **下游解锁**:R-1c Target Salience / R-1e 因子最终选择 / R-5 Pool G 分层依据 / B-2 `historical_family_recurrence` schema 字段。R-1a / R-1d / R-2 / R-6 与 R-1b 正交不变;R-3 / R-4b 仍卡上游。
+  - **方法论 highlights**(R-1b 元层观察,只在此处记 —— DECISIONS.md 是 time-static 不放历史叙事):
+    - **stress-test 改判**:Codex Pass A 主白板初稿选 A 立场(pure text exposure proxy);owner 走查时 surface "Recurrence 是 outcome-leakage proxy 还是 pure exposure proxy" 的 meta-question(R-1b kickoff prompt 没显式 framing),Codex 二轮在 outcome-leakage framing 下推翻自己,改 B 立场。
+    - **dual-model blind 抉择**:Claude blind second opinion 选 A 立场,基于 5-estimand 覆盖矩阵(A 5/5 vs B 2/5);owner 反驳 Carlini anchor 论证(Carlini 测 verbatim text recall,我们测 outcome-association memorization,Carlini 是 analogy 不是 direct anchor)→ override Claude 采纳 Codex B 立场。
+    - **(b)(c)(h) Claude blind second opinion 全部与 Codex 收敛** → 双源验证 lock-in。
+    - **ratchet 论双源验证坐实**(R-1b 维度):保留 4 条 reviewer 推得对(C-2 fixed window / E-6 deterministic / R-0 entity-first / R-0 4 层);撤销 5 条 reviewer pile-on(C-3 percentile / C-4 dedup sensitivity / E-5 null marker / E-7 bin stability / E-6 v0.3 LLM-cache)。v0.4 + R-0 final form 已是干净 minimal-design。
+    - **documentation pattern 新立项目惯例**(见 memory `feedback_doc_for_llm_context` 2026-05-24 update):每个 R-X 决策 session 产 audit-trail + 一份 < 200 行 time-static `R{X}_DECISIONS.md`(canonical for downstream agents);其它文档只 reference DECISIONS.md, 不重复内容(single source of truth)。R-1b 是第一个按此 pattern 产出的 session。
+- **R-1 因子(原条目)**:4 个 confirmatory 因子,每个的实现方法 → 然后 4 个的选择。
+  - Cutoff Exposure(R-1a):实现简单(日期+manifest),重点是选择确认。
+  - Historical Family Recurrence(R-1b):**closed 2026-05-24,见上**。
   - Target Salience:实现有 WS0.5 §3.3(待 clean-room 复审)。
   - Template Rigidity:**零 spec**(flag ④)。从文献审视 → 设计。用户视为
     重要因子(唯一量化事件格式模板化)。

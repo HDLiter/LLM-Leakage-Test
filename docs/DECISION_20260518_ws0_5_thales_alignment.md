@@ -849,6 +849,15 @@ where they conflict with §4.5. Downstream sessions implement against
 > deterministic-first disambiguation. The text below is preserved for
 > audit; downstream implementation follows §4.5 + R-1b session.
 
+> **R-1b supersession note (2026-05-24)**: R-1b session has closed.
+> **Canonical R-1b lock-in = `refine-logs/reviews/REOPEN_R1_R6/R1b_recurrence/R1b_DECISIONS.md`**
+> (time-static decision sheet — downstream agents should read
+> DECISIONS.md, not §5 below). The mention-based construct prose in
+> §5.1 below is **superseded** by R-1b's chosen construct. §5.1
+> principles that survive R-1b verbatim: `log1p(0)=0` legality,
+> no-dedup exposure counting, focal-article exclusion, fixed-pre-cutoff
+> window framing. The full §5 text below is preserved as audit trail.
+
 ### 5.1 Construct
 
 **Primary confirmatory variable.** `cls_family_recurrence`. For each pilot case

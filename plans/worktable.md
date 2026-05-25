@@ -34,42 +34,16 @@ B-3 校准 + 2026-05-23 PM final-pass:整体质量审 + walk-through →
 §7 token-meter 整章删除 + §6.1 schema 收 11 列 + closure 14→11;
 reviewer-vs-author 路径分家全部落定),代码未动、签字搁置。WS2–WS5 未开工。
 
-**R-4a 方法论审计 2026-05-23 closed**(audit trail:
-`refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/whiteboard_analysis.md`
-+ `subfield_lit_scan.md`)。锁住框架级 8 条(详见 `RESEARCH_PROPOSAL.md`
-§4.4 + `pending_items.md` R-4a closed 块):无 family-wise multiplicity
-correction / 标签语言改 main-primary-supporting-robustness-appendix /
-「预注册」措辞改 design memo + sealed split + transparency artifact /
-扰动质量 Gwet's AC1 取代 ≥85% pass-rate hard gate / 混合模型 per-estimand
-分别建 / E_CMMD 重命名 Cross-Model Cutoff-Monotone Disagreement / etc.。
-**不锁** estimand 清单 / family 大小 / 因子总数 —— 留给 R-1/R-2/R-6 实现
-+ pilot 数据决定。R-6 因此解封。元层结论:**ratchet 论双源坐实**(A 的
-clean-room 独立推出比 frozen 简单 + B 子领域实然比 A 更轻),应用 memory
-`feedback_review_complexity` 解药生效。
+**R-4a 方法论审计 2026-05-23 closed** → canonical lock-in =
+`refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/R4a_DECISIONS.md`
+(time-static 决策清单;methodology highlights 见 `pending_items.md`
+R-4a closed 块)。下游解锁 R-6(parked C_FO/C_SR 漂移可接);R-4b 仍 open。
 
-**R-0 Corpus Architecture 2026-05-23 PM late closed**(audit trail:
-`refine-logs/reviews/REOPEN_R1_R6/R0_corpus_arch/whiteboard_analysis.md`
-Codex Pass A 白板 545 行 + 用户 7 段切片走查;lock-in 见
-`docs/DECISION_20260518_ws0_5_thales_alignment.md` §4.5)。锁住的是**架构容器**:
-4 层模型(S0 / L1 entity-mention pair-level / L2 subject-target / L3 views)+
-6 阶段 entity-first pipeline(entity match → topic-classify [range R-1b
-决定] / subject ID → L2 tradability check point-in-time → factor metrics
-before operators → R-5 sampling → perturbations → operators → estimands)
-+ universal admissibility(tradable=true / text_length / ¬is_bundle,客体
-vs 主体区分:non-tradable rows 保留作 Salience/Recurrence 分母,但作
-P_predict 主体强制过滤;anti-survivorship 是 R-5 抽样分布选择不是历史
-tradable 过滤)+ Pool inventory(Pool B sole base + G/H/I 可选分布策略不
-强制叠加 + D/E/F 架构扩展位)。**不锁**:factor construct(mention /
-subject / tradable-mention / tradable-subject;family 粒度;窗口)、
-sampling 分布、perturbation-specific eligibility flag —— 全部留对应 R-X
-session。**arch-vs-session 锁**(memory `feedback_arch_vs_session_scope`
-2026-05-23 写):R-0 / framework-level 决定只锁 universal admissibility,
-其它 session-specific 即使 Codex whiteboard 写完整也剥离。**下游解锁**:
-R-1b(用户点名重点)/ R-1c / R-5 / B-2 `run_inputs.per_task` schema
-finalize。元层观察:Codex 阶段 1 与用户 walkthrough §A.1/§A.2 独立得出
-高度相近方案,Codex 把每个 commitment 都退一步留给下游(Layer 4 降为
-view、tradable 不硬筛、construct 不锁),用户在走查时进一步收紧 ——
-clean-room-first + push-back 协议本轮再次坐实有效。
+**R-0 Corpus Architecture 2026-05-23 PM late closed** → canonical lock-in =
+`refine-logs/reviews/REOPEN_R1_R6/R0_corpus_arch/R0_DECISIONS.md`
+(time-static 决策清单;methodology highlights 见 `pending_items.md`
+R-0 closed 块)。下游解锁 R-1b(2026-05-24 ✔ closed)/ R-1c / R-5 / B-2
+`run_inputs.per_task` schema finalize。
 
 ---
 
@@ -81,8 +55,8 @@ clean-room-first + push-back 协议本轮再次坐实有效。
 
 | ID | 工作项 | 依赖(前置) | 可动? |
 |---|---|---|---|
-| **R-4a** | **方法论审计**:框架级 8 条(无 family correction / 标签词 / 「预注册」措辞改 design memo / Gwet's AC1 / etc.) | 无 | **✔ closed 2026-05-23**(audit `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/`) |
-| **R-0** | **Corpus Architecture**(2026-05-23 R-1b kickoff 走查衍生):CLS 语料分层模型 + 全局 pipeline 阶段顺序 + 抽样 pool 候选;**只 expose 架构空间,不替 factor / R-5 拍 construct / 时间窗口 / sampling** | 无 | **✔ closed 2026-05-23 PM late**(lock-in 见 `docs/DECISION_20260518_ws0_5_thales_alignment.md` §4.5;audit `refine-logs/reviews/REOPEN_R1_R6/R0_corpus_arch/whiteboard_analysis.md` + pending_items R-0 closed 块) |
+| **R-4a** | **方法论审计** | 无 | **✔ closed 2026-05-23** → `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/R4a_DECISIONS.md` |
+| **R-0** | **Corpus Architecture** | 无 | **✔ closed 2026-05-23 PM late** → `refine-logs/reviews/REOPEN_R1_R6/R0_corpus_arch/R0_DECISIONS.md` |
 | R-6 | 预测目标 & 是否/如何用真实收益(含 parked C_FO/C_SR 漂移调查) | 无(R-4a 给的容量答案是"不锁数,加新 estimand 要替换或开新 design memo") | ✅ 可动(2026-05-23 解封) |
 | R-1a | Cutoff Exposure:实现 + 选择确认 | 无(实现简单:日期+manifest;case 本身来源会受 R-0 影响,但 metric 不依赖) | ✅ 可动 |
 | R-1b | Historical Family Recurrence:实现 + lock-in | ~~R-0~~(已 closed) | **✔ closed 2026-05-24** → `refine-logs/reviews/REOPEN_R1_R6/R1b_recurrence/R1b_DECISIONS.md`;R-1c / R-1e / R-5 Pool G / B-2 schema 解锁 |

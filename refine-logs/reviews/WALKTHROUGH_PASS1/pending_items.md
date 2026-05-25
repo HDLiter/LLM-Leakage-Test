@@ -56,53 +56,30 @@
   确保架构足够 expressively 容纳所有合理候选)。kickoff
   `.scratch/session_kickoff_r0_corpus_arch.md`。是 R-1b/c/R-5 + R-2 数据
   依赖的共同上游。
-  - **R-0 closed 2026-05-23 PM late**(audit trail:
-    `refine-logs/reviews/REOPEN_R1_R6/R0_corpus_arch/whiteboard_analysis.md`
-    Codex Pass A 白板 545 行 + 用户 7 段切片走查)。锁住的是**架构容器**:
-    1. **4 层模型**:S0 源 / L1 entity-mention `(article_id, target_entity_id)`
-       long-form / L2 subject-target / L3 benchmark-eligible views;
-       只有改变 row unit 的步骤升格为层,event type / tradability /
-       outcome verifiability / span quality 都做列 / flag / view。
-    2. **6 阶段 entity-first pipeline**:entity match → topic-classify
-       (范围 R-1b 决定)/ subject ID → L2 tradability check (point-in-time)
-       → factor metrics(严在 operators 之前,R-4a L1↔L3 边界)→ R-5
-       sampling → perturbations → operators → estimands。entity-first 比
-       §5.2 Phase R1 full-CLS topic-classify 节约 40-60% LLM 成本。
-    3. **通用 admissibility**:`tradable_at_event=true` ∧ `text_length ∈
-       [min, max]` ∧ `is_bundle=false`,每个 P_predict 主体必过。客体 vs
-       主体区分:non-tradable rows 保留在 L1/L2(Salience/Recurrence 分母
-       客体),但作为 P_predict 主体强制过滤(否则 prompt-level leakage 入口)。
-       anti-survivorship 不是过滤历史 tradable,而是 R-5 抽样分布选择(G/H)。
-    4. **Pool inventory**:**Pool B**(L2 ∩ universal admissibility)=
-       sole base pool;**G / H / I** 分布策略(salience-stratified /
-       entity-balanced / cutoff-balanced)可选叠加,**R-5 全权决定是否叠加
-       与组合**,row-random 也合法(Kong 2026 §2.2 是 sanity-check 不是
-       mandate);**Pool D / E / F** 架构扩展位(R-5 / R-2 / R-6 实操确认
-       必要时激活,B-2 schema 留扩展槽)。
-    5. **supersession**:§3.3.1 central-tradable 全局 pre-filter 形式上抬
-       到 R-5 admissibility 在 L3 base view 上;§5.1/§5.2 Recurrence 管线
-       的 full-CLS topic-first + mention-based + fixed window 选择**变成
-       R-1b 候选之一**(`no-dedup` + `log1p(0)=0` 原则保留);§6.2
-       `factor_provenance.json` 需加 layer/view hash 清单(B-2 finalize);
-       §6.3 Path A reviewer-path 必须 verify layer/view hashes。
-    + **arch-vs-session 锁**(memory `feedback_arch_vs_session_scope`,
-      2026-05-23 写):R-0 / framework-level 决定只锁 universal admissibility;
-      perturbation/factor/operator-specific eligibility(outcome_verifiable /
-      text_reversibility / entity_span_quality / temporal_anchor_recoverability
-      等)都留对应 session,即使 Codex whiteboard 写完整也要剥离,只留两个
-      架构 hook(pre-sampling subpool admissibility + post-sampling per-case
-      eligibility)。
-    + **元层观察**:Codex 阶段 1 独立得出与用户 walkthrough §A.1/§A.2 高度
-      接近的方案(4 层 + entity-first),但 Codex 比 user walkthrough 把每
-      个 commitment 都退一步留给下游 —— Layer 4 降为 view、tradable 不硬
-      筛、construct 不锁。用户在走查时进一步收紧(non-tradable rows 客体
-      vs 主体区分;tradable check 仅在 L2;perturbation-specific eligibility
-      回 R-2/R-6;sampling 分布不强制)。两端独立推 + 用户 push back 的
+  - **R-0 closed 2026-05-23 PM late** → canonical lock-in =
+    `refine-logs/reviews/REOPEN_R1_R6/R0_corpus_arch/R0_DECISIONS.md`
+    (time-static 决策清单);audit trail = 同目录 `whiteboard_analysis.md`
+    Codex Pass A 白板 545 行 + 用户 7 段切片走查 deltas。
+  - **下游解锁**:R-1b(用户点名重点,2026-05-24 ✔ closed)/ R-1c / R-5 /
+    B-2 `run_inputs.per_task` schema finalize。R-2 仍部分卡 R-6(C_FO 机制);
+    R-3 / R-4b 仍卡上游。
+  - **方法论 highlights**(R-0 元层观察,只在此处记 —— DECISIONS.md 是
+    time-static 不放历史叙事):
+    - **arch-vs-session 锁原则诞生**(memory `feedback_arch_vs_session_scope`
+      2026-05-23 写):本 session 把 perturbation-specific eligibility flag
+      (outcome_verifiable / text_reversibility / entity_span_quality /
+      temporal_anchor_recoverability 等)从架构层剥离回 R-2 / R-6;架构层
+      只锁 universal admissibility + 两个 hook(pre-sampling subpool
+      admissibility + post-sampling per-case eligibility)。这条原则之后
+      generalizes 到所有 framework-level session(R-4a 同源应用)。
+    - **Codex Pass A vs user walkthrough 双源收敛**:Codex 阶段 1
+      独立得出与用户 walkthrough §A.1/§A.2 高度接近的方案(4 层 +
+      entity-first)。Codex 比 user walkthrough 把每个 commitment 都退
+      一步留给下游(Layer 4 降为 view、tradable 不硬筛、construct 不锁);
+      用户走查时进一步收紧(non-tradable rows 客体 vs 主体区分;tradable
+      check 仅在 L2;perturbation-specific eligibility 回 R-2/R-6;
+      sampling 分布不强制)。两端独立推 + 用户 push back 的
       clean-room-first 协议本轮再次坐实有效。
-    + **下游解锁**:R-1b(用户点名重点)/ R-1c / R-5 / B-2 `run_inputs.per_task`
-      schema finalize。R-2 仍部分卡 R-6(C_FO 机制);R-3 / R-4b 仍卡上游。
-    + lock-in 见 `docs/DECISION_20260518_ws0_5_thales_alignment.md` §4.5;
-      `docs/RESEARCH_PROPOSAL.md` §4.1 顶部 anchor + §4.7 已更新。
 - **R-1b Historical Family Recurrence(R-0 解锁后第一个 closed factor session)** ——
   在 R-0 锁定的 4 层容器内选 construct + family 粒度 + lookup window。
   - **R-1b closed 2026-05-24** → canonical lock-in = `refine-logs/reviews/REOPEN_R1_R6/R1b_recurrence/R1b_DECISIONS.md`(time-static 决策清单);audit trail = 同目录 `whiteboard_analysis.md` + `construct_stress_test.md` + `construct_second_opinion_claude.md` + `bch_second_opinion_claude.md`。
@@ -146,38 +123,32 @@
       仍最下游,需要 R-1e / R-2 / R-3 / R-5 全部落定。
   - 用户决定 **2026-05-23 起新 session 先做 R-4a**;kickoff =
     `.scratch/session_kickoff_r4.md`。R-6 因此暂停,待 R-4a 后再接。
-  - **R-4a closed 2026-05-23**(双源证据 audit trail:
-    `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/whiteboard_analysis.md`
-    白板独立分析 + `subfield_lit_scan.md` 15 篇代表作文献扫描)。锁住的是
-    **框架级 8 条**,具体 estimand/factor/family 大小不锁,留 R-1/R-2/R-6
-    实现 + pilot 数据决定:
-    1. **无 family-wise multiplicity correction** —— 主报 effect size + 95%
-       CI(per-estimand 混合模型聚类稳健 SE)。子领域 15/15 不做正式校正。
-    2. **标签语言** main / primary / supporting / robustness / appendix
-       (子领域 confirmatory/exploratory 0 命中)。
-    3. **「预注册」措辞改 design memo + sealed pilot/test split +
-       transparency artifact**(子领域 15/15 无正式预注册)。
-    4. **混合模型 per-estimand 分别建**,case/model/pair 聚类;case-level
-       aggregate(如 E_CMMD)用 case-level inference。
-    5. **扰动质量改报 Gwet's AC1 + accuracy**(per-perturbation × event-type
-       矩阵),取消 ≥85% pass-rate hard gate;失败=方法节 caveat 非
-       exclusion。AntiLeakBench 2025 是 3-annotator + AC1 最强同行参照。
-    6. **baseline_confidence 退出 primary 只做 sensitivity**;
-       model_capability 协变量同样 sensitivity。
-    7. **TOST/SESOI=0.15 限定 BL2 等价检验**,不扩散主系数。
-    8. **Scenario-based MC power**(基于 pilot 效应/方差/eligibility/缺失
-       模拟),解绑 Westfall-Young。
-    + **E_CMMD 重命名**:Cross-Model **Cutoff-Monotone** Disagreement
-      (claim 层与 memorization 解释解耦)。
-    + **元层结论**:ratchet 论坐实 —— A 的 clean-room(不喂用户 ratchet
-      memory)独立推出比 frozen 简单 + B 子领域实然比 A 更轻 = 双源证据
-      表明当前 frozen 复杂度来自 reviewer pile-on,正是 memory
-      `feedback_review_complexity` 标定的失效模式。
-  - **R-4b 仍 open**(等 R-1e / R-2 / R-3 / R-5 落定);scenario-based MC
-    power、n_eff 矩阵、混合模型具体规格 = R-4b 范围。
-  - **R-6 解封**(R-4a 给的容量答案是"不锁数,加新 estimand 要替换或开新
-    design memo"); parked C_FO/C_SR 漂移调查可接,详见 [parked]
-    `refine-logs/reviews/REOPEN_R1_R6/cfo_csr_history_findings.md`。
+  - **R-4a closed 2026-05-23** → canonical lock-in =
+    `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/R4a_DECISIONS.md`
+    (time-static 决策清单 — 8 框架级 lock + E_CMMD 定义 + 负对照具体处理
+    + scope boundary + downstream session anchor);audit trail = 同目录
+    `whiteboard_analysis.md` 阶段 1 白板独立分析(从"目的"自推该用什么)
+    + `subfield_lit_scan.md` 15 篇 2022-2026 代表作扫描双源证据。
+  - **下游解锁**:R-6 因 R-4a 给的容量接口(加新 estimand = 替换 primary
+    格子或开新 design memo)解封,可接 parked C_FO/C_SR 漂移调查
+    (`refine-logs/reviews/REOPEN_R1_R6/cfo_csr_history_findings.md`);
+    R-4b 仍 open 等 R-1e / R-2 / R-3 / R-5 全部落定。
+  - **方法论 highlights**(R-4a 元层观察,只在此处记 —— DECISIONS.md 是
+    time-static 不放历史叙事):
+    - **ratchet 论双源坐实**:A 的 clean-room(不喂用户 ratchet memory)
+      独立推出比 frozen 更简单的方案 + B 的子领域 lit scan 实然显示子领域
+      做法比 frozen 更轻 = 双源证据表明 frozen 的复杂度来自 reviewer
+      pile-on,正是 memory `feedback_review_complexity` 标定的失效模式。
+      clean-room-first 协议解药再次生效。
+    - **子领域 lit scan 主导做法**(15 篇 2022-2026 代表作):正式
+      multiplicity correction 0/15、正式预注册 0/15、confirmatory/
+      exploratory family label 0/15。AntiLeakBench 2025 是当前最强同行
+      参照(3-annotator + Gwet's AC1 + accuracy)。
+    - **E_CMMD 重命名的具体过程**:claim 层与 memorization 解释解耦 ——
+      "跨模型分歧"是 case-level 行为信号,只有与其它 estimand 在同一
+      因子方向上**收敛**时才上升到 memorization characterization;
+      命名里若带 "memorization" 读者会把分歧本身当已识别记忆,新名 = Cross-Model
+      **Cutoff-Monotone** Disagreement。
 - **R-5 采样过滤器专题**:用户要求单开讨论。包含 ① 可交易实体 filter
   (已存在 WS0.5 §3.3.1 案例准入预过滤,但在重开区,一并重审)② 新闻长度
   filter(**新增** —— 超长讲话 / 一句话简讯;当前设计无长度过滤)③ 反直觉

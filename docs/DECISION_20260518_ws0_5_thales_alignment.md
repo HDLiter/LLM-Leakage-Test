@@ -587,27 +587,18 @@ needs less labeled data because there are no extra holdout layers.)
 
 ## 4.5 R-0 Corpus Architecture (closed 2026-05-23 PM late)
 
-> **Reopen origin**: R-1b kickoff walk-through (2026-05-23 PM) surfaced
-> that three sub-decisions originally framed as factor-specific —
-> "4-layer corpus stratification", "pipeline reorder", and "benchmark
-> sampling source layer" — are not factor-specific. They are
-> upper-architectural decisions framing R-1b, R-1c, R-5, and R-2's data
-> dependencies in a shared container. Promoted to R-0 (precedes any
-> factor session).
+> **⚠ STATUS banner (2026-05-25)**: R-0 lock-in 的 canonical 单点来源 =
+> `refine-logs/reviews/REOPEN_R1_R6/R0_corpus_arch/R0_DECISIONS.md`
+> (time-static,< 200 行,所有下游 agent / R-X session 只读这一份)。
 >
-> **Authority**: this section is R-0's lock-in. It supersedes portions
-> of §3.3.1 / §5.2 / §6.2 prose where the prototype reflected a
-> single-construct commitment. Downstream R-1b / R-1c / R-5 / R-2 / B-2
-> sessions implement against this architecture; their session-specific
-> choices sit *within* this container, not upstream of it.
+> 下面 §4.5.A–§4.5.F 的 body **保留作 audit trail**,记录 R-0 closure 当时
+> 的整段推理与措辞,**不再是下游 canonical 入口**。若与 R0_DECISIONS.md 出现
+> 任何 conflict,以 R0_DECISIONS.md 为准。同一 lock-in 内容在两处出现是
+> consolidation pattern 的预期形态(WS0.5 §5 对 R-1b 的处理同此 pattern)。
 >
-> **Audit trail**: Codex Pass A whiteboard
+> **Audit trail co-files**:Codex Pass A whiteboard
 > (`refine-logs/reviews/REOPEN_R1_R6/R0_corpus_arch/whiteboard_analysis.md`,
-> 545 lines, 2026-05-23 19:13). User walk-through revisions tightened
-> Codex's framing on (a) the non-tradable-rows handling, (b) the
-> arch-vs-session scope separation (perturbation eligibility back to
-> R-2 / R-6), and (c) sampling distribution strategy left fully open
-> to R-5 (no mandate).
+> 545 lines, 2026-05-23 19:13)+ 用户 7 段切片走查 deltas。
 
 ### 4.5.0 TL;DR
 

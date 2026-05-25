@@ -144,19 +144,17 @@ memory `project_english_expansion`)。
 > 细节正在结构化重开(§9);此处内容是占位与现状记录,非定稿。
 
 > **R-0 架构 anchor(2026-05-23 PM late 关闭)**:§4 全部 case-level
-> factor metric 在 **R-0 决定的 corpus 架构容器**上计算。容器要点(完整
-> 定义见 `docs/DECISION_20260518_ws0_5_thales_alignment.md` §4.5):
-> - 4 层:**S0 源 / L1 entity-mention `(article_id, target_entity_id)`
->   long-form / L2 subject-target / L3 benchmark-eligible views**;
-> - 流水线:**entity match → topic-classify(范围 R-1b 决定)/ subject
->   ID → L2 tradability check(point-in-time)→ factor metrics → R-5
->   sampling → perturbations → operators → estimands**;
-> - factor metrics 在 L1 / L2 / L3 上算,**严格在 operators 之前**(R-4a
->   L1↔L3 边界锁);
-> - factor construct + family 粒度 + 窗口:**R-1b / R-1c session 决定**,
->   R-0 不预锁;R-1b ✔ closed 2026-05-24 → `refine-logs/reviews/REOPEN_R1_R6/R1b_recurrence/R1b_DECISIONS.md`(canonical lock-in)。
+> factor metric 在 **R-0 决定的 corpus 架构容器**上计算。容器把"从源
+> 语料到 P_predict 主体"的路径拆成四层(S0 源 / L1 entity-mention /
+> L2 subject-target / L3 benchmark-eligible views)与六阶段
+> entity-first pipeline,并锁定 universal admissibility 与一个唯一
+> base sampling pool(Pool B);具体 factor construct / family 粒度 /
+> 窗口 / 抽样分布则由对应 R-X session 在容器内自决。Canonical
+> lock-in(time-static): `refine-logs/reviews/REOPEN_R1_R6/R0_corpus_arch/R0_DECISIONS.md`。
 >
-> 后续 §4.1.1-§4.1.4 的具体因子实现:R-1b ✔ closed;R-1a / R-1c / R-1d 待落定。
+> 后续 §4.1.1-§4.1.4 的具体因子实现:R-1b ✔ closed 2026-05-24 →
+> `refine-logs/reviews/REOPEN_R1_R6/R1b_recurrence/R1b_DECISIONS.md`;
+> R-1a / R-1c / R-1d 待落定。
 
 ### 4.1 四个 confirmatory 因子 [R-1a / R-1c / R-1d 待定;R-1b ✔ closed 2026-05-24]
 
@@ -211,64 +209,45 @@ confirmatory(用户点名重审 C_NoOp)。
 差)、E_CTS(校准尾部意外度)、E_FO(假结果抵抗)、E_NoOp(无关插入
 敏感度)。
 
-**[R-4a 锁定 2026-05-23]** 基于 clean-room 白板独立分析 + 15 篇子领域代表作
-文献扫描双源证据(audit trail:
-`refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/`),锁定**框架级
-8 条**:
+**[R-4a ✔ closed 2026-05-23]** 基于 clean-room 白板独立分析 + 15 篇子领域
+代表作文献扫描双源证据,锁住**框架级方法论 8 条** + **E_CMMD 定义** +
+**负对照具体处理**(BL2 TOST/SESOI / 同-cutoff ratio reading / BL1
+grouped-CV-by-case,见 §4.5) + **R-4a → R-6 estimand 容量接口**。canonical
+lock-in(time-static): `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/R4a_DECISIONS.md`。
 
-1. **无 family-wise multiplicity correction**。主报 effect size + 95% CI
-   (per-estimand 混合模型给出聚类稳健 SE)。子领域 15 篇代表作 0 篇做正式
-   校正(Bonferroni / Holm / Westfall-Young);FDR/BH 仅出现在 2026 新理论
-   预印本。本研究主张为人群层面 characterization,不是 hypothesis testing,
-   因此不做 family-wise α 控制。
-2. **标签语言**:**main / primary / supporting / robustness / appendix**
-   (对齐子领域同行),不再用 confirmatory/exploratory(子领域 0 命中)。
-3. **「预注册」措辞改 design memo + sealed pilot/test split + transparency
-   artifact**(见 §6)。子领域 15 篇 0 篇做正式预注册。
-4. **混合模型 per-estimand 分别建**,case/model/pair 聚类;case-level
-   aggregate(如 E_CMMD)用 case-level inference,不再套 model random
-   effect。
-5. **扰动质量审计改报 Gwet's AC1 + accuracy**(per-perturbation × event-type
-   矩阵)。**取消** ≥85% pass-rate hard gate;失败 = 方法节 caveat,非
-   exclusion。AntiLeakBench 2025 的 3-annotator + Gwet's AC1 + accuracy 是
-   子领域最强同行参照。Gwet's AC1 在 prevalence 高的场景下比 Cohen's kappa
-   稳定(避免 kappa paradox)。
-6. **baseline_confidence 退出 primary,只做 sensitivity**;model_capability
-   协变量同样 sensitivity,不写"控制了能力剩下就是泄露"。
-7. **TOST/SESOI=0.15 限定 BL2 等价检验**(见 §4.5),不扩散到主系数。
-8. **Scenario-based MC power 模拟**(基于 pilot 估计的 effect size / 方差 /
-   eligibility / 缺失结构),解绑 Westfall-Young。
+8 条框架决定的覆盖面:主报路径(effect size + CI per estimand)、tier
+labels(main / primary / supporting / robustness / appendix)、pre-registration
+路径(design memo + sealed split + transparency artifact,见 §6)、每个
+estimand 独立建模 + 聚类、扰动质量审计(Gwet's AC1 + accuracy)、
+baseline_confidence / model_capability 走 sensitivity、TOST/SESOI=0.15 服务
+BL2 等价检验、scenario-based MC power simulation。E_CMMD = Cross-Model
+**Cutoff-Monotone** Disagreement,claim 层与 memorization 解释解耦 ——
+只有与其它 estimand 收敛时才上升到 memorization characterization。
 
-**E_CMMD 重命名**:Cross-Model **Cutoff-Monotone** Disagreement(原
-"Memorization Disagreement"),claim 层与 memorization 解释解耦 —— 只有
-与其他 estimand 收敛时才上升到 memorization characterization。
-
-**[R-1 / R-2 / R-6 重开] 待定**(component-level,留给实现 + pilot 数据):
-具体哪些 estimand 进 primary、primary family 大小(S8 / S10 / S12 等)、
-哪些因子(数量与具体哪几个)、C_FO 机制(就地换值 vs 文末追加真实收益)、
-P_predict 输出 schema(direction-only / + confidence / + memory_flag /
-+ evidence)。
+**[R-1 / R-2 / R-6 重开] 待定**(R-4a scope 之外的 component-level,留给
+实现 + pilot 数据):具体哪些 estimand 进 primary、primary family 大小
+(S8 / S10 / S12 等)、哪些因子(数量与具体哪几个)、C_FO 机制(就地换值
+vs 文末追加真实收益)、P_predict 输出 schema(direction-only / + confidence
+/ + memory_flag / + evidence)。
 
 **[R-4b] 仍开放**(等 R-1e / R-2 / R-3 / R-5 落定):power 计算具体数字、
 n_eff 矩阵、混合模型具体规格落地、bootstrap 实施细节。
 
 ### 4.5 负对照 [R-3 重开中;R-4a 锁定具体处理方式 2026-05-23]
 
+R-4a 锁的负对照具体处理(详见 `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/R4a_DECISIONS.md` §3):
+
 - **BL2 post-cutoff 负对照** —— 700 个 ≥2026-02-01 的案例(晚于全队最晚
-  cutoff);事件在所有模型 cutoff 之后 → 泄露信号应近零。
-  - **[R-4a]** 用 **TOST(Two One-Sided Tests)等价检验,SESOI = 0.15**
-    (Smallest Effect Size Of Interest,标准化效应)。通过 = 95% CI 完全
-    落在 [-0.15, +0.15] 内 → "效应可忽略",比"不显著"强很多。仅限 BL2
-    与负对照,不扩散到主系数。
+  cutoff);事件在所有模型 cutoff 之后 → 泄露信号应近零。通过路径走 TOST
+  (Two One-Sided Tests)等价检验,SESOI = 0.15(标准化效应),通过条件
+  = 95% CI 完全落在 [-0.15, +0.15] 内。
 - **同-cutoff 证伪对** —— GLM-4-9B ↔ GPT-4.1(同 cutoff、不同架构),查
-  信号是否来自架构差异。
-  - **[R-4a]** 看主 estimand 上的差异 ratio:**ratio > 0.5 加 caveat,不
-    自动 fail**(架构混杂占信号一半以上时加 caveat,但 architecture noise
-    不能闭合识别 → 早期预警机制,非 hard gate)。
+  信号是否来自架构差异。reading 路径走主 estimand 差异 ratio:ratio ≤ 0.5
+  → cutoff-driven reading 维持;ratio > 0.5 → architecture-noise
+  early-warning caveat 附在结果上。
 - **BL1 元数据 / text-light challenger** —— 简单文本/元数据特征是否能
-  拟合到接近 LLM 水平。
-  - **[R-4a]** 用 **grouped-CV-by-case** 交叉验证(同一原文派生的多行不能
-    横跨 fold),否则数据泄露。
+  拟合到接近 LLM 水平。交叉验证走 grouped-CV-by-case(同一原文派生的多行
+  share fold)。
 - 另有 C_NoOp_placebo、BL3(非金融中文新闻负对照,stretch)。
 
 **[R-3 重开] 待定:** 负对照整体充分性、C_NoOp_placebo 具体实现、BL3 中文
@@ -289,26 +268,14 @@ n_eff 矩阵、混合模型具体规格落地、bootstrap 实施细节。
 
 ### 4.7 采样与准入过滤 [R-5 重开中;R-0 架构容器 2026-05-23 closed]
 
-**R-0 容器**(见 `docs/DECISION_20260518_ws0_5_thales_alignment.md` §4.5):
-
-- **唯一 base pool = Pool B** = `L2 ∩ (tradable_at_event=true) ∩
-  (text_length ∈ [min, max]) ∩ (is_bundle=false)`。这是当前唯一被 R-0
-  架构完全支持的 benchmark base pool。
-- **universal admissibility filter**(每个 P_predict 主体必过):
-  `tradable_at_event=true`(段 (a) 客体 vs 主体区分:non-tradable rows
-  保留在 L1 / L2 作为 Salience / Recurrence 分母客体,但作为 P_predict
-  主体强制过滤 —— 否则模型只能调用 post-listing 记忆,prompt-level
-  leakage 入口);`text_length ∈ [min, max]`;`is_bundle=false`(一次性
-  多条新闻播报默认 flag,不进 L2;不拆分作为 B-2 实现选项)。
-- **3 个可选分布策略**(R-5 全权 stack on B,**不强制叠加**):**Pool G**
-  salience / recurrence 分层;**Pool H** entity-balanced / capped(Kong
-  2026 §2.2 anti-survivorship 工具);**Pool I** cutoff-balanced(支撑
-  Cutoff Exposure case×model panel)。
-- **架构扩展位**(R-5 / R-2 / R-6 实操确认必要时再激活):**Pool D**
-  mention + tradable(需扩 L1 candidate tradable 列;tradable 是机械
-  结构化操作,扩展成本有界);**Pool E** outcome-verifiable subpool
-  (C_FO 用,R-2 + R-6 决定 C_FO 机制后激活);**Pool F** mixed panel
-  (D / E 任一激活后自然有内容)。
+R-0 架构在采样层的两件事:**唯一 base pool = Pool B**(`L2 ∩
+universal admissibility`,即 `tradable_at_event=true ∧ text_length ∈
+[min, max] ∧ is_bundle=false`,每个 P_predict 主体必过)+ **可选分布
+策略层**(Pool G salience-stratified / Pool H entity-balanced / Pool I
+cutoff-balanced 任意叠加,row-random 也合法);Pool D / E / F 是
+架构扩展位,R-5 / R-2 / R-6 实操确认必要时激活。non-tradable rows 在
+L1 / L2 保留作 Salience / Recurrence 分母客体,过滤只在 P_predict
+主体一侧。Canonical lock-in(time-static):`refine-logs/reviews/REOPEN_R1_R6/R0_corpus_arch/R0_DECISIONS.md`。
 
 **[R-5 重开] 待定:** 分布策略选(row-random / G / H / I / 组合 —— **R-5
 全权,不锁**);per-article cap 与 dedupe 规则(段 (a) 同 article 多
@@ -442,11 +409,11 @@ clean-room-first 方法(先白板独立分析,再对照既往 reviewer 意见)�
 
 | 编号 | 重开对象 |
 |---|---|
-| R-0 | ✅ closed 2026-05-23 PM late — Corpus 架构(4 层 S0/L1/L2/L3 views + 6 阶段 entity-first pipeline + 通用 admissibility + Pool B base + G/H/I optional 分布策略;arch-vs-session 锁:perturbation-specific eligibility 留 R-2/R-6)。完整 lock-in 见 `docs/DECISION_20260518_ws0_5_thales_alignment.md` §4.5;此 §4.1 / §4.7 已 anchor 引用 |
+| R-0 | ✅ closed 2026-05-23 PM late → `refine-logs/reviews/REOPEN_R1_R6/R0_corpus_arch/R0_DECISIONS.md` |
 | R-1 | 4 个 confirmatory 因子:各自的实现方法 → 然后选择(Template Rigidity 从零设计);R-0 已解锁 R-1b / R-1c 的 construct 选择空间 |
 | R-2 | 6 个扰动:各自实现构思 → 然后保留几个 / 哪几个进 confirmatory;perturbation-specific eligibility flag 由本 session 在 R-0 HOOK1 / HOOK2 占位上落地 |
 | R-3 | 负对照的充分性 |
-| R-4a | ✅ closed 2026-05-23 — 框架级 8 条(无 family correction / main-primary-supporting-robustness 标签 / design memo 措辞 / Gwet's AC1 / etc.,见 §4.4) |
+| R-4a | ✅ closed 2026-05-23 → `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/R4a_DECISIONS.md` |
 | R-4b | pilot 具体数字(power、n_eff、混合模型规格落地、bootstrap),仍开放,等 R-1e / R-2 / R-3 / R-5 |
 | R-5 | 采样准入过滤器 + 分布策略(R-0 已 expose Pool B + G/H/I + D/E/F 扩展位;within-pool 分布 R-5 全权决定) |
 | R-6 | 预测目标 & 是否 / 如何使用真实收益 |

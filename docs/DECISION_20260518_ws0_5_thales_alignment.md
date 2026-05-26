@@ -225,6 +225,21 @@ Bloc 3 adjunct/covariate**, not a new confirmatory factor.
 
 ### 3.3 Bloc 2 — Target Salience + Case Admissibility Pre-filter (Issue #2; §3.3 redesigned per C-1)
 
+> **R-1c supersession note (2026-05-25)**: R-1c session has closed.
+> **Canonical R-1c lock-in = `refine-logs/reviews/REOPEN_R1_R6/R1c_target_salience/R1c_DECISIONS.md`**
+> (time-static decision sheet — downstream agents should read DECISIONS.md,
+> not §3.3 below). The Target Salience metric prose in §3.3.2 below is
+> **superseded** by R-1c's chosen construct (L1 mention, target only, no
+> tradable filter, no `salience` filter, no denominator, focal article
+> kept in count). §3.3.1 case admissibility pre-filter is **superseded**
+> by R-0 / R-5 (lifted to L3 base view + R-5 admissibility). §3.3.3
+> discriminant check threshold sustained (VIF ≥ 10 / |r| ≥ 0.90);
+> fallback is now **Option C — no metric-level fallback; R-1e factor
+> selection handles discriminant trigger**. §3.3.2 principles that
+> survive R-1c verbatim: `log1p(count)` transform, `log1p(0)=0` legality,
+> fixed pre-cutoff window. The full §3.3 text below is preserved as audit
+> trail.
+
 Target is a **manifest INPUT** to `P_predict`, not LLM-inferred at operator time
 (per `R5A_OPERATOR_SCHEMA.md` line 81). WS0.5 must produce, at
 sampling/manifest-freeze time, (a) a deterministic rule that admits a case and

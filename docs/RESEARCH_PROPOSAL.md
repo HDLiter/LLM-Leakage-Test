@@ -154,27 +154,37 @@ memory `project_english_expansion`)。
 >
 > 后续 §4.1.1-§4.1.4 的具体因子实现:R-1b ✔ closed 2026-05-24 →
 > `refine-logs/reviews/REOPEN_R1_R6/R1b_recurrence/R1b_DECISIONS.md`;
-> R-1a / R-1c / R-1d 待落定。
+> R-1c ✔ closed 2026-05-25 →
+> `refine-logs/reviews/REOPEN_R1_R6/R1c_target_salience/R1c_DECISIONS.md`;
+> R-1a / R-1d 待落定。
 
-### 4.1 四个 confirmatory 因子 [R-1a / R-1c / R-1d 待定;R-1b ✔ closed 2026-05-24]
+### 4.1 confirmatory 因子(当前候选 4 个;最终数由 pilot power 定)[R-1a / R-1d 待定;R-1b ✔ closed 2026-05-24;R-1c ✔ closed 2026-05-25]
 
-confirmatory family = **5 estimand × 4 factor = 20 个系数**(候选规模;R-1e
-最终选哪几个由 pilot 数据决定)。4 个因子刻画泄露的三个驱动通道 ——
-**时间访问、重复、显著性**:
+**confirmatory 因子数 = power-bounded,不预设魔数**(2026-05-26 决定):最终
+confirmatory 数由 **pilot + R-4b power** 决定(N=2560 对交互项能稳健 confirm
+几个)。frozen 时代的 "5 estimand × 4 factor = 20 系数" 是 Step 2 多 agent
+review 的候选规模示意,**非硬约束** —— R-4a §4 已把因子总数解锁交 R-1e + pilot。
+当前已设计 / 在设计的 confirmatory candidate 有 **4 个**(下表),候选池正在
+**factor pool 重审**中扩大(see `refine-logs/reviews/REOPEN_R1_R6/factor_pool_brainstorm.md`);
+未选中的候选进 exploratory(照常计算 + 报告,撑 benchmark coverage,不浪费)。
+
+下表 4 个当前 candidate 刻画泄露的三个驱动通道 —— **时间访问、重复、显著性**:
 
 | 因子 | Bloc | 测什么(WHY) |
 |---|---|---|
 | **Cutoff Exposure** | 0 时间暴露(case×model) | 模型 cutoff 相对案例事件日期的位置。最直接的泄露通道:事件在 cutoff 前,模型训练时就*可能*见过它和它的结果。 |
 | **Historical Family Recurrence** | 1 重复(case-level) | (标的 × 事件家族)模式在 cutoff 前 CLS 里复现多少次。**outcome-leakage proxy**:模型用记住的"事件 → 涨跌方向"关联代替对眼前文本的推理,涨跌(收益)是隐含变量。**R-1b ✔ closed 2026-05-24** → `refine-logs/reviews/REOPEN_R1_R6/R1b_recurrence/R1b_DECISIONS.md`。 |
-| **Target Salience** | 2 显著性(case-level) | 标的实体有多"出名"(cutoff 前 CLS 提及数的 log)。越出名,预训练里关于它的文本越多。 |
+| **Target Salience** | 2 显著性(case-level) | 标的实体在模型预训练 corpus 里的累计曝光强度;CLS L1 mention count 是 best-available proxy(framing C)。越曝光,模型预训练时见过越多关于它的文本。**R-1c ✔ closed 2026-05-25** → `refine-logs/reviews/REOPEN_R1_R6/R1c_target_salience/R1c_DECISIONS.md`。 |
 | **Template Rigidity** | 1 重复(case-level) | 文章有多"模板化 / 套话"。高度模板化的新闻可被套模板匹配而非读内容。 |
 
-**统计结构:** 对 Cutoff Exposure 测主效应(β1);对其余 3 个因子测**与
-Cutoff Exposure 的交互项**(β3)—— 即假设"高复现 / 高显著 / 高模板化会
-*放大* cutoff 暴露带来的泄露"。这是一个有原则的混淆控制选择(交互项差掉
-"案例难度"污染),代价是 20 个系数里 15 个是交互项、对样本量苛刻。
+**统计结构:** 对 Cutoff Exposure 测主效应(β1);对其余因子测**与 Cutoff
+Exposure 的交互项**(β3)—— 即假设"高复现 / 高显著 / 高模板化会 *放大*
+cutoff 暴露带来的泄露"。这是一个有原则的混淆控制选择(交互项差掉"案例难度"
+污染),代价是交互项对样本量苛刻 —— **这正是 confirmatory 数交 R-4b power
+定、而非预设的原因**:confirmatory 因子越多 → 交互项越多 → 给定 N=2560 每个
+检出力越低,power 计算会划出能稳健 confirm 的上界。
 
-**[R-1 重开] 待定**:R-1b 已 closed(canonical 见上表 link);**R-1a Cutoff Exposure / R-1c Target Salience / R-1d Template Rigidity** 实现方法待定(尤其 Template Rigidity 目前 **无任何实现 spec** —— flag ④)。"是否就选这 4 个因子"由 R-1e 根据 pilot 实证证据决定(原则:实现优先于选择)。**[R-4 重开]** β1/β3 统计结构方法层已由 R-4a 锁定(无 family-wise multiplicity correction、per-estimand 混合模型分别建、TOST/SESOI=0.15 限 BL2 等 8 条);具体 power 数字与混合模型规格落地待 R-4b。
+**[R-1 重开] 待定**:R-1b / R-1c 已 closed(canonical 见上表 link);**R-1a Cutoff Exposure / R-1d Template Rigidity** 实现方法待定(尤其 Template Rigidity 目前 **无任何实现 spec** —— flag ④)。"是否就选这 4 个因子"由 R-1e 根据 pilot 实证证据决定(原则:实现优先于选择;R-1c 已显式 Option C — discriminant trigger 时由 R-1e 决定 Salience 是否进 primary,可能降级)。**[R-4 重开]** β1/β3 统计结构方法层已由 R-4a 锁定(无 family-wise multiplicity correction、per-estimand 混合模型分别建、TOST/SESOI=0.15 限 BL2 等 8 条);具体 power 数字与混合模型规格落地待 R-4b。
 
 ### 4.2 算子 [部分锚定]
 
@@ -295,8 +305,9 @@ R-5 完成后,在本节新增专门的"抽样分布策略"段(不止"过滤器")
   3. 按 Target Salience 分层抽(高/中/低各 N/3)—— 合理但需明示。
 - 显式回应 Kong 2026 §2.2 警告:本研究 sampling 通过 [R-5 决定的策略]
   保证非按 prominence 排序,因此不引入 Kong 警告的幸存者偏差。
-- 同步:R-1c clean-room 复审 Target Salience metric 时也需把 sampling-factor
-  互动作为 sanity-check input(Kong §2.2 间接相关)。
+- 同步:~~R-1c clean-room 复审 Target Salience metric~~ ✔ closed 2026-05-25;
+  R-1c §8.5 已把 Salience × sampling 互动 + Kong §2.2 sanity-check 作为
+  R-5 input note(canonical 见 R1c_DECISIONS.md §8.5)。
 TODO 起源 + 完整论证 + Kong §2.2 原文引用:
   refine-logs/reviews/CROSS_SYNTH_20260523/synthesis_findings.md §A.🟡-4 修正版
   与该 session 对话 🟡-4(用户 2026-05-23 指出此 scope gap)。
@@ -336,8 +347,10 @@ hedged 的 "cutoff-monotone(非因果)" 措辞,并配同-cutoff 证伪对兜底�
 一份 markdown,落到 git repo,有具体 commit SHA。内容:研究问题、候选
 estimand 清单、候选因子清单、扰动 inventory、模型 fleet、case 准入规则、
 pilot 后**允许修订**哪些(metric 实现细节、effect-size 估计、扰动
-inventory 微调、模型替换)和**不允许修订**哪些(estimand 框架级定义、
-core operator 集合、primary 因子总数原则上不在 pilot 后追加)。
+inventory 微调、模型替换、**从已声明候选池里选定 confirmatory 因子的身份
+与数量** —— 数量由 R-4b power 定,不预设魔数)和**不允许修订**哪些(estimand
+框架级定义、core operator 集合、**追加候选池外的新因子**(追加须开新 design
+memo))。即:候选池 pilot 前锁(可 >4),pilot 后从池里选 / 降级、不追加池外。
 
 ### 6.2 Sealed pilot / test split
 

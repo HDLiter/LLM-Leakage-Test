@@ -302,6 +302,8 @@ Under the new framework, the confirmatory/exploratory partition applies to **est
 
 **Total confirmatory coefficients**: 5 estimands × 4 factors = **20** (unchanged from Step 2 Stats recommendation).
 
+> **⚠ SUPERSEDED (2026-05-26)**: 这里的 "4 factors / 20 coefficients (unchanged)" 是 frozen v6.2 的 Step 2 多 agent review recommendation,**不是 power 计算输出**。R-4a §4 已把 "confirmatory 因子总数 + 身份" 解锁交给 R-1e + pilot;用户 2026-05-26 进一步决定 **confirmatory 数 = power-bounded,不预设魔数**(由 pilot + R-4b 算 N=2560 能稳健 confirm 几个交互项)。候选因子池可 >4(见 `../REOPEN_R1_R6/factor_pool_brainstorm.md`),pilot 后选最强的、其余进 exploratory。**本表的 "4 / 20" 仅作历史候选规模示意,非硬约束。** §2 factor 表的 "frozen in v6.2" 同此处理。
+
 ### Proposed exploratory estimands
 
 | Estimand | Reason for exploratory status |

@@ -12,7 +12,7 @@
 > **本表只维护「依赖」与「可动?」**(可动性由依赖推导,不单独维护一份会漂移的
 > 状态字段)。已完成 / 进行中的事实另见 §1 与各行备注。
 >
-> **最后更新**:2026-05-23 PM late(R-0 Corpus Architecture closed;R-1b / R-1c / R-5 / B-2 解锁)
+> **最后更新**:2026-05-25(R-1c Target Salience closed;R-1a / R-1d / R-1e / R-5 / B-2 可动)
 
 ---
 
@@ -42,8 +42,15 @@ R-4a closed 块)。下游解锁 R-6(parked C_FO/C_SR 漂移可接);R-4b 仍 open
 **R-0 Corpus Architecture 2026-05-23 PM late closed** → canonical lock-in =
 `refine-logs/reviews/REOPEN_R1_R6/R0_corpus_arch/R0_DECISIONS.md`
 (time-static 决策清单;methodology highlights 见 `pending_items.md`
-R-0 closed 块)。下游解锁 R-1b(2026-05-24 ✔ closed)/ R-1c / R-5 / B-2
-`run_inputs.per_task` schema finalize。
+R-0 closed 块)。下游解锁 R-1b(2026-05-24 ✔ closed)/ R-1c(2026-05-25 ✔ closed)
+/ R-5 / B-2 `run_inputs.per_task` schema finalize。
+
+**R-1c Target Salience 2026-05-25 closed** → canonical lock-in =
+`refine-logs/reviews/REOPEN_R1_R6/R1c_target_salience/R1c_DECISIONS.md`
+(time-static 决策清单;methodology highlights 见 `pending_items.md`
+R-1c closed 块)。下游解锁:R-1e 因子最终选择路径(Option C 显式把 Salience
+降级路径交 R-1e);R-5 Pool G 可切到 R-1c metric 分层;B-2 `target_salience`
+schema 字段;R-4b 追加 R-1b retrospective tail-leverage check。
 
 ---
 
@@ -60,7 +67,7 @@ R-0 closed 块)。下游解锁 R-1b(2026-05-24 ✔ closed)/ R-1c / R-5 / B-2
 | R-6 | 预测目标 & 是否/如何用真实收益(含 parked C_FO/C_SR 漂移调查) | 无(R-4a 给的容量答案是"不锁数,加新 estimand 要替换或开新 design memo") | ✅ 可动(2026-05-23 解封) |
 | R-1a | Cutoff Exposure:实现 + 选择确认 | 无(实现简单:日期+manifest;case 本身来源会受 R-0 影响,但 metric 不依赖) | ✅ 可动 |
 | R-1b | Historical Family Recurrence:实现 + lock-in | ~~R-0~~(已 closed) | **✔ closed 2026-05-24** → `refine-logs/reviews/REOPEN_R1_R6/R1b_recurrence/R1b_DECISIONS.md`;R-1c / R-1e / R-5 Pool G / B-2 schema 解锁 |
-| R-1c | Target Salience:实现(R-0 expose construct + 分母 = article 数 vs L1 row 数选择)| ~~R-0~~(已 closed) | ✅ **可动 2026-05-23 PM late** |
+| R-1c | Target Salience:实现 + lock-in | ~~R-0~~(已 closed) | **✔ closed 2026-05-25** → `refine-logs/reviews/REOPEN_R1_R6/R1c_target_salience/R1c_DECISIONS.md`;R-1e / R-5 Pool G / B-2 schema / R-4b 追加 retrospective tail-leverage 解锁 |
 | R-1d | Template Rigidity:从零设计 | 无(**零 spec**,从文献起;用户视为重点因子;纯文本特征,不依赖 R-0) | ✅ 可动 |
 | R-1e | 因子最终选择确认(R-4a 不锁数 → 选哪几个由实现+pilot 实证证据决定) | R-1a · R-1b · R-1c · R-1d(R-4a 依赖已解除) | ⛔ 待 R-1a-d |
 | R-2 | 6 扰动实现构思 → 选保留几个进 primary(重审 C_NoOp;C_FO vs C_SR 漂移见 `.scratch/cfo_csr_history_findings.md`);perturbation-specific eligibility flag 在 R-0 HOOK1/HOOK2 占位落地 | R-6(C_FO 机制选择)+ ~~R-0~~(已 closed,但 R-2 仍需 R-6 才能动 C_FO) | ⛔ 待 R-6(R-0 解锁部分:C_anon / C_NoOp 等不依赖 R-6 的扰动可先动) |
@@ -225,27 +232,29 @@ flowchart TD
 
 ---
 
-## 4. 现在能动的(2026-05-24,R-1b closed 后)
+## 4. 现在能动的(2026-05-25,R-1c closed 后)
 
-**新解锁**(R-1b closure 2026-05-24):
+**新解锁**(R-1c closure 2026-05-25):
 
-- **R-1c Target Salience** —— R-1b 给的锚点是 "**必须遵守 R-0/R-4a 基础架构,
-  其它一律参考**"(R-1c session 完全自决 construct / window / 分母 / event 折叠 /
-  是否加 tradable filter / 是否 complement-family 去重)。R-1c 必须做的 standing
-  discriminant check 输入口径见 `R1b_DECISIONS.md §5.3 / §8`。
-- **B-2 `run_inputs.per_task.historical_family_recurrence` schema** —— R-1b
-  完整字段需求 + provenance hashes + 必报告 A/B count delta 见
-  `R1b_DECISIONS.md §6`;字段名 / 风格 / 与其它 R-X session 输出的整合留
-  B-2 整体 session。
-- **R-5 sampling 的 Pool G 分层依据** —— 若 R-5 启用 Pool G(recurrence-
-  stratified),用 R-1b `log1p_recurrence_count`(tradable-filtered)分层;
-  R-5 **不应**偷换成别的口径。R-5 不动 Pool B / Pool D dormant 假设。
+- **B-2 `run_inputs.per_task.target_salience` schema** —— R-1c 完整字段需求 +
+  provenance hashes + 必报告 A/B count delta 见 `R1c_DECISIONS.md §9`;字段名 /
+  风格留 B-2 整体 session。
+- **R-5 Pool G 分层依据切换** —— 若 R-5 启用 Pool G 且 salience-stratified,
+  用 R-1c `log1p_target_salience`(R1c_DECISIONS.md §8.5);若 recurrence-
+  stratified 仍用 R-1b。R-5 全权决定是否启用 Pool G + 用哪个 metric。
+- **R-4b retrospective tail-leverage hook** —— R-1c 引入 pre-commit tail-
+  leverage appendix(winsorize / percentile),R-4b 在 pilot 后**追加** R-1b
+  retrospective tail-leverage check(同形式),维持 paper §robustness 段
+  一致性。不算 R-1b 重开。
+- **R-1e Salience 降级路径** —— R-1c Option C 显式把 "discriminant trigger
+  时 Salience 是否进 primary" 留给 R-1e + pilot 数据决定。R-1e 决策空间已含
+  "R-1c 降级到 supporting / exploratory" 路径。
 
-**仍可动**(R-1b 之外,前已立即可启动):
+**仍可动**(R-1c 之外,前已立即可启动):
 
 - **R-5 Sampling**(前半:within-pool 分布 + per-article cap / dedupe 规则)
 - **R-1d Template Rigidity 设计** —— **零 spec、用户视为重点因子**,纯文本
-  特征,不依赖 R-0/R-1b;是 R-1 系列里最实打实的起点。
+  特征,不依赖 R-0/R-1b/R-1c;是 R-1 系列里最实打实的起点。
 - **R-1a Cutoff Exposure** —— 实现简单(日期+manifest),case 来源受 R-0
   影响,但 metric 本身不依赖。
 - **R-6 预测目标 & 真实收益**(2026-05-23 解封)。可接 parked C_FO/C_SR
@@ -258,8 +267,18 @@ flowchart TD
 **仍卡上游**:
 
 - **R-2**(扰动选择)仍卡 R-6(C_FO 机制需 R-6 真实收益决定)
-- **R-1e**(因子最终选择)仍卡 R-1a / R-1c / R-1d 实现(R-1b 已 close 但
-  Recurrence 是否进 primary 由 pilot 数据决定,R-1b 不预承诺)
+- **R-1e**(因子最终选择)仍卡 R-1a / R-1d 实现(R-1b / R-1c 已 close 但
+  Recurrence / Salience 是否进 primary 由 pilot 数据决定;R-1c Option C 显式
+  把降级路径留给 R-1e)
+
+> **Factor pool 重审(2026-05-26 起,brainstorm 流动中)**:R-1c closed 后用户
+> 重审整个 confirmatory factor 候选池 —— 确认 **confirmatory 数 power-bounded
+> (不预设魔数,由 pilot+R-4b 定;"4" 是 frozen over-framing 残留)、候选池可 >4、
+> pilot 后只选/降级、不追加池外新因子**(sealed split 防 selection 污染)。候选清单 + 概念工具
+> (Type1/Type2 判据、粒度轴、泄露机制链 6 环节、directional-label 红线、A vs B)
+> + 被埋/被拒候选见 `refine-logs/reviews/REOPEN_R1_R6/factor_pool_brainstorm.md`
+> (living,非 lock-in)。**candidate-pool review** 计划 R-1a + R-1d 设计完后开,
+> 届时把 factor 池 + estimand 池 + 诊断池结构化落正式 lock-in。
 - **R-3 / R-4b** 仍卡上游(R-1e / R-2 / R-3 / R-5 全部落定后)
 
 > **实现价值清单**(operator / perturbation / factor 三轴,哪些去实现 /

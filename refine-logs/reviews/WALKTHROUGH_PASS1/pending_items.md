@@ -90,10 +90,21 @@
     - **(b)(c)(h) Claude blind second opinion 全部与 Codex 收敛** → 双源验证 lock-in。
     - **ratchet 论双源验证坐实**(R-1b 维度):保留 4 条 reviewer 推得对(C-2 fixed window / E-6 deterministic / R-0 entity-first / R-0 4 层);撤销 5 条 reviewer pile-on(C-3 percentile / C-4 dedup sensitivity / E-5 null marker / E-7 bin stability / E-6 v0.3 LLM-cache)。v0.4 + R-0 final form 已是干净 minimal-design。
     - **documentation pattern 新立项目惯例**(见 memory `feedback_doc_for_llm_context` 2026-05-24 update):每个 R-X 决策 session 产 audit-trail + 一份 < 200 行 time-static `R{X}_DECISIONS.md`(canonical for downstream agents);其它文档只 reference DECISIONS.md, 不重复内容(single source of truth)。R-1b 是第一个按此 pattern 产出的 session。
+- **R-1c Target Salience(R-1b 解锁后第二个 closed factor session)** ——
+  在 R-0 4 层容器 + R-1b construct framework 下选 Salience 的 framing / construct / family / window / tradable filter / discriminant fallback / robustness。
+  - **R-1c closed 2026-05-25** → canonical lock-in = `refine-logs/reviews/REOPEN_R1_R6/R1c_target_salience/R1c_DECISIONS.md`(time-static 决策清单);audit trail = 同目录 `whiteboard_analysis.md`(Codex)+ `whiteboard_analysis_claude.md`(Claude sub-agent)+ `whiteboard_analysis_stage1_codex_draft.md`。
+  - **下游解锁**:R-1e 因子最终选择(R-1c Option C 显式把降级路径交给 R-1e)/ R-5 Pool G 分层依据可切到 R-1c metric / B-2 `target_salience` schema 字段 / R-4b 追加 R-1b retrospective tail-leverage check。R-1a / R-1d / R-2 / R-6 与 R-1c 正交不变;R-3 仍卡上游。
+  - **方法论 highlights**(R-1c 元层观察,只在此处记 —— DECISIONS.md 是 time-static 不放历史叙事):
+    - **双白板并行(Codex + Claude sub-agent 用同一 prompt)**:首次在 R-X session 同时跑两个独立 agent(此前 R-0 / R-1b 是 Codex 主 + Claude blind second opinion 顺序模式)。双源在 8 决策点上 **6/8 收敛**(framing C / L1 mention / target only / log1p(count) / 共享 fixed window / 不加 tradable),验证了 R-1c upstream lock(R-0 / R-4a / R-1b)的清晰度。
+    - **真分歧定位精准**:双源在 (7) fallback metric 和 (8) robustness slot 上分歧 —— Codex 选 complement-super_type fallback + tail-leverage pre-commit;Claude 选残差化 fallback + L1-vs-L2 conditional。owner 走查时拒绝两边的 metric fallback 提议(Codex 因 family 维度前后不一致 + B-2 扩 topic-classify;Claude 因仍是 metric-level fallback 越界 R-1c session scope),引入第三选项 **Option C(R-1e 降级,无 metric fallback)**。
+    - **owner-driven framework move(Option C)**:由 owner 在走查中提议 "fallback 能不能是看别的因子",从 abstract 部分推出 R-1e level fallback 合法(R-4a §4 允许因子数与身份由 R-1e 决定),具体 surface 为 "R-1c session 不锁 metric fallback,discriminant trigger 时 R-1e 降级 R-1c slot"。Codex 在白板末尾隐含同意这条 ultimate backstop("如果 fallback 仍超阈值,R-1e 应把两者视作经验冗余,选择或降级其中一个"),Option C 等于把它提前到第一档。这是 **clean-room-first 不仅 surface 已被 reviewer 认可的方向,owner 走查还能 ratchet 出双源未 surface 的 framework move**。
+    - **ratchet 论双源验证再坐实**(R-1c 维度):双源都拒绝 WS0.5 §3.3.2 现状 prototype 的 ordinal salience / market-cap-based 框架(Codex 旧提案)+ Baidu Baike fallback + complement-family / non-CLS proxy fallback;双源都采 framing C + L1 mention + log1p(count)。WS0.5 §3.3.2 v0.4 现状的 C-1 / C-2 / C-3 / S-6 reversal 方向 reviewer "推得对",但其 fallback 候选(complement / Baidu Baike)仍是 reviewer pile-on,被 R-1c Option C 一并撤销。
+    - **focal_article_policy 在 R-1c 与 R-1b 走相反方向**:R-1b 排除同 article_id(framing 是历史复现,自身不能算 "自己复现自己");R-1c 不排除(framing C 是 model 预训练曝光,case 自身文章在窗口内时也是 exposure)。这是 **framing 决定 boundary 细节** 的实例,不是不一致。
+    - **R-1 系列 robust 风格分家(Framework D)**:R-1c 选 1 个 pre-commit tail-leverage appendix,不 mirror R-1b 的 0 pre-commit + 1 conditional 风格。R-1c L1 mention + target only 比 R-1b L2 subject + tradable + target × super_type 尾部更 acute,distribution robustness 更必要。R-4b 追加 R-1b retrospective tail-leverage(不算 R-1b 重开,算 R-4b implementation choice)以维持 paper §robustness 段一致性。
 - **R-1 因子(原条目)**:4 个 confirmatory 因子,每个的实现方法 → 然后 4 个的选择。
   - Cutoff Exposure(R-1a):实现简单(日期+manifest),重点是选择确认。
   - Historical Family Recurrence(R-1b):**closed 2026-05-24,见上**。
-  - Target Salience:实现有 WS0.5 §3.3(待 clean-room 复审)。
+  - Target Salience(R-1c):**closed 2026-05-25,见上**。
   - Template Rigidity:**零 spec**(flag ④)。从文献审视 → 设计。用户视为
     重要因子(唯一量化事件格式模板化)。
 - **R-2 扰动**:6 个扰动各自的实现构思 → 然后保留几个 / 哪几个进

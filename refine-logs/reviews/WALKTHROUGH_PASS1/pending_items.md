@@ -101,8 +101,18 @@
     - **ratchet 论双源验证再坐实**(R-1c 维度):双源都拒绝 WS0.5 §3.3.2 现状 prototype 的 ordinal salience / market-cap-based 框架(Codex 旧提案)+ Baidu Baike fallback + complement-family / non-CLS proxy fallback;双源都采 framing C + L1 mention + log1p(count)。WS0.5 §3.3.2 v0.4 现状的 C-1 / C-2 / C-3 / S-6 reversal 方向 reviewer "推得对",但其 fallback 候选(complement / Baidu Baike)仍是 reviewer pile-on,被 R-1c Option C 一并撤销。
     - **focal_article_policy 在 R-1c 与 R-1b 走相反方向**:R-1b 排除同 article_id(framing 是历史复现,自身不能算 "自己复现自己");R-1c 不排除(framing C 是 model 预训练曝光,case 自身文章在窗口内时也是 exposure)。这是 **framing 决定 boundary 细节** 的实例,不是不一致。
     - **R-1 系列 robust 风格分家(Framework D)**:R-1c 选 1 个 pre-commit tail-leverage appendix,不 mirror R-1b 的 0 pre-commit + 1 conditional 风格。R-1c L1 mention + target only 比 R-1b L2 subject + tradable + target × super_type 尾部更 acute,distribution robustness 更必要。R-4b 追加 R-1b retrospective tail-leverage(不算 R-1b 重开,算 R-4b implementation choice)以维持 paper §robustness 段一致性。
+- **R-1a Cutoff Exposure(R-1b/R-1c 解锁后第三个 closed factor session)** ——
+  全 fleet 唯一 case×model 因子,承载主效应 β1。
+  - **R-1a closed 2026-05-27(机制锁;cutoff 中心值 provisional 待探针验证)** → canonical lock-in = `refine-logs/reviews/REOPEN_R1_R6/R1a_cutoff_exposure/R1a_DECISIONS.md`(time-static);audit trail = 同目录 `whiteboard_codex.md`(单 Codex 白板)+ `cutoff_deep_research_gpt.md`(GPT deep research 16 模型 cutoff 可信度)+ `cutoff_probe_protocol_codex.md`(黑白盒通用验证探针协议)。
+  - **锁定**:event date = published_at(日精度)/ cutoff = fleet yaml(归当月末,与 R-1b/c min(cutoff) 同源,Llama-3 2023-03 不变)/ metric = **tanh((published−cutoff signed 连续月)/w),w=2 月主 + 1/3/6 稳健性**/ sign = pre-cutoff 正 / case×model cross join 存 `delta_days`+`cutoff_exposure` / 二元 pre/post 按符号现切作 BL2 负对照 / in-text event date 子集(确定性抽取)作唯一 robustness / Path-E + 黑白盒行为探针作**验证轨**(不喂指标、报警触发人工复核)。
+  - **下游解锁**:R-1e(Cutoff Exposure 作 β1 载体,几乎必进 primary)/ R-4b(case×model 进混合模型 + cutoff 误分类模拟)/ R-5 Pool I(cutoff-balanced)。R-1d 与 R-1a 正交不变;探针建+跑排进 fleet 部署。
+  - **方法论 highlights**(只在此处记 —— DECISIONS.md time-static 无 history):
+    - **单 Codex 白板足矣**:决策量小,5/6 决策点 Codex 与 CC 独立读直接收敛(杀鸡不用牛刀;R-1c 双白板是因 8 决策点有真分歧)。唯一分歧(连续化用 log vs tanh)被 owner 更优方案取代。
+    - **owner-driven 设计改进三连**(均比 agent 初版更对):① **tanh 替 log** —— owner 的 LLM 语料时间性模型(历史=当代记得一样好、未来都一样)要求 S 曲线两端饱和,log 远端不压平不符;② **厘清"中心 vs 宽度"** —— owner 质疑 per-model w,推出"中心 per-model 合法(cutoff 日期是模型事实),宽度全局,中心不确定走灵敏度不进 w";③ **黑白盒通用探针** —— owner 提把第 5 条 Path-E 验证从白盒扩到黑白盒通用 + 报警 gate。
+    - **deep research 暴露 manifest 不可靠** → "中心值 provisional + 验证轨":Qwen3 2025-01 无任何来源(实 ~2024-10)、DeepSeek 2026-04 是发布日代理(实 ~2025-05,差近一年)、GLM-4 弱证据、Claude 官方三处矛盾(May/Aug 2025/Jan 2026)。knowledge vs training cutoff 区分坐实"中心偏保守 → 泄露估计偏低不偏高"口径。
+    - **clean-room-first 再坐实**:Codex 白板独立 + CC 独立读 5/6 收敛验证 upstream lock(R-0/R-4a/R-1b)清晰;owner 走查 ratchet 出三个 agent 未 surface 的设计改进(tanh / 中心-宽度分离 / 通用探针)。
 - **R-1 因子(原条目)**:4 个 confirmatory 因子,每个的实现方法 → 然后 4 个的选择。
-  - Cutoff Exposure(R-1a):实现简单(日期+manifest),重点是选择确认。
+  - Cutoff Exposure(R-1a):**closed 2026-05-27,见上**。
   - Historical Family Recurrence(R-1b):**closed 2026-05-24,见上**。
   - Target Salience(R-1c):**closed 2026-05-25,见上**。
   - Template Rigidity:**零 spec**(flag ④)。从文献审视 → 设计。用户视为

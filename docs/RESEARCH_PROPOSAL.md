@@ -156,9 +156,11 @@ memory `project_english_expansion`)。
 > `refine-logs/reviews/REOPEN_R1_R6/R1b_recurrence/R1b_DECISIONS.md`;
 > R-1c ✔ closed 2026-05-25 →
 > `refine-logs/reviews/REOPEN_R1_R6/R1c_target_salience/R1c_DECISIONS.md`;
-> R-1a / R-1d 待落定。
+> R-1a ✔ closed 2026-05-27(机制锁;cutoff 中心值待探针验证)→
+> `refine-logs/reviews/REOPEN_R1_R6/R1a_cutoff_exposure/R1a_DECISIONS.md`;
+> R-1d 待落定。
 
-### 4.1 confirmatory 因子(当前候选 4 个;最终数由 pilot power 定)[R-1a / R-1d 待定;R-1b ✔ closed 2026-05-24;R-1c ✔ closed 2026-05-25]
+### 4.1 confirmatory 因子(当前候选 4 个;最终数由 pilot power 定)[R-1d 待定;R-1a ✔ closed 2026-05-27;R-1b ✔ closed 2026-05-24;R-1c ✔ closed 2026-05-25]
 
 **confirmatory 因子数 = power-bounded,不预设魔数**(2026-05-26 决定):最终
 confirmatory 数由 **pilot + R-4b power** 决定(N=2560 对交互项能稳健 confirm
@@ -172,7 +174,7 @@ review 的候选规模示意,**非硬约束** —— R-4a §4 已把因子总数
 
 | 因子 | Bloc | 测什么(WHY) |
 |---|---|---|
-| **Cutoff Exposure** | 0 时间暴露(case×model) | 模型 cutoff 相对案例事件日期的位置。最直接的泄露通道:事件在 cutoff 前,模型训练时就*可能*见过它和它的结果。 |
+| **Cutoff Exposure** | 0 时间暴露(case×model) | 模型 cutoff 相对案例事件日期的位置。最直接的泄露通道:事件在 cutoff 前,模型训练时就*可能*见过它和它的结果。**R-1a ✔ closed 2026-05-27**(tanh(发文日−cutoff,signed,w=2月);机制锁,cutoff 中心值待探针验证)→ `refine-logs/reviews/REOPEN_R1_R6/R1a_cutoff_exposure/R1a_DECISIONS.md`。 |
 | **Historical Family Recurrence** | 1 重复(case-level) | (标的 × 事件家族)模式在 cutoff 前 CLS 里复现多少次。**outcome-leakage proxy**:模型用记住的"事件 → 涨跌方向"关联代替对眼前文本的推理,涨跌(收益)是隐含变量。**R-1b ✔ closed 2026-05-24** → `refine-logs/reviews/REOPEN_R1_R6/R1b_recurrence/R1b_DECISIONS.md`。 |
 | **Target Salience** | 2 显著性(case-level) | 标的实体在模型预训练 corpus 里的累计曝光强度;CLS L1 mention count 是 best-available proxy(framing C)。越曝光,模型预训练时见过越多关于它的文本。**R-1c ✔ closed 2026-05-25** → `refine-logs/reviews/REOPEN_R1_R6/R1c_target_salience/R1c_DECISIONS.md`。 |
 | **Template Rigidity** | 1 重复(case-level) | 文章有多"模板化 / 套话"。高度模板化的新闻可被套模板匹配而非读内容。 |
@@ -184,7 +186,7 @@ cutoff 暴露带来的泄露"。这是一个有原则的混淆控制选择(交�
 定、而非预设的原因**:confirmatory 因子越多 → 交互项越多 → 给定 N=2560 每个
 检出力越低,power 计算会划出能稳健 confirm 的上界。
 
-**[R-1 重开] 待定**:R-1b / R-1c 已 closed(canonical 见上表 link);**R-1a Cutoff Exposure / R-1d Template Rigidity** 实现方法待定(尤其 Template Rigidity 目前 **无任何实现 spec** —— flag ④)。"是否就选这 4 个因子"由 R-1e 根据 pilot 实证证据决定(原则:实现优先于选择;R-1c 已显式 Option C — discriminant trigger 时由 R-1e 决定 Salience 是否进 primary,可能降级)。**[R-4 重开]** β1/β3 统计结构方法层已由 R-4a 锁定(无 family-wise multiplicity correction、per-estimand 混合模型分别建、TOST/SESOI=0.15 限 BL2 等 8 条);具体 power 数字与混合模型规格落地待 R-4b。
+**[R-1 重开] 待定**:R-1a / R-1b / R-1c 已 closed(canonical 见上表 link;R-1a 机制锁,cutoff 中心值待探针验证 — 见 R1a_DECISIONS §6/§11);**R-1d Template Rigidity** 实现方法待定(目前 **无任何实现 spec** —— flag ④)。"是否就选这 4 个因子"由 R-1e 根据 pilot 实证证据决定(原则:实现优先于选择;R-1c 已显式 Option C — discriminant trigger 时由 R-1e 决定 Salience 是否进 primary,可能降级)。**[R-4 重开]** β1/β3 统计结构方法层已由 R-4a 锁定(无 family-wise multiplicity correction、per-estimand 混合模型分别建、TOST/SESOI=0.15 限 BL2 等 8 条);具体 power 数字与混合模型规格落地待 R-4b。
 
 ### 4.2 算子 [部分锚定]
 

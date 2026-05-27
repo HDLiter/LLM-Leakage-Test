@@ -12,7 +12,7 @@
 > **本表只维护「依赖」与「可动?」**(可动性由依赖推导,不单独维护一份会漂移的
 > 状态字段)。已完成 / 进行中的事实另见 §1 与各行备注。
 >
-> **最后更新**:2026-05-25(R-1c Target Salience closed;R-1a / R-1d / R-1e / R-5 / B-2 可动)
+> **最后更新**:2026-05-27(R-1a Cutoff Exposure 机制 closed,cutoff 中心值待探针;R-1d / R-1e / R-5 / B-2 可动)
 
 ---
 
@@ -52,6 +52,16 @@ R-1c closed 块)。下游解锁:R-1e 因子最终选择路径(Option C 显式把
 降级路径交 R-1e);R-5 Pool G 可切到 R-1c metric 分层;B-2 `target_salience`
 schema 字段;R-4b 追加 R-1b retrospective tail-leverage check。
 
+**R-1a Cutoff Exposure 2026-05-27 机制 closed** → canonical lock-in =
+`refine-logs/reviews/REOPEN_R1_R6/R1a_cutoff_exposure/R1a_DECISIONS.md`
+(机制 time-static 锁定;**cutoff 中心值 provisional 待探针验证**;methodology
+highlights 见 `pending_items.md` R-1a closed 块)。锁定 metric =
+tanh((published−cutoff signed 连续月)/w),w=2 月主 + 1/3/6 稳健性。下游解锁:
+R-1e(Cutoff Exposure 作 β1 载体);R-5 Pool I(cutoff-balanced);R-4b(case×model
+进混合模型 + cutoff 误分类模拟)。**cutoff 验证探针**(黑白盒通用 dated-fact QA +
+白盒 Path-E)协议已设计(`R1a_cutoff_exposure/cutoff_probe_protocol_codex.md`),
+建+跑排进 fleet 部署。
+
 ---
 
 ## 2. 工作项表
@@ -65,7 +75,7 @@ schema 字段;R-4b 追加 R-1b retrospective tail-leverage check。
 | **R-4a** | **方法论审计** | 无 | **✔ closed 2026-05-23** → `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/R4a_DECISIONS.md` |
 | **R-0** | **Corpus Architecture** | 无 | **✔ closed 2026-05-23 PM late** → `refine-logs/reviews/REOPEN_R1_R6/R0_corpus_arch/R0_DECISIONS.md` |
 | R-6 | 预测目标 & 是否/如何用真实收益(含 parked C_FO/C_SR 漂移调查) | 无(R-4a 给的容量答案是"不锁数,加新 estimand 要替换或开新 design memo") | ✅ 可动(2026-05-23 解封) |
-| R-1a | Cutoff Exposure:实现 + 选择确认 | 无(实现简单:日期+manifest;case 本身来源会受 R-0 影响,但 metric 不依赖) | ✅ 可动 |
+| R-1a | Cutoff Exposure:实现 + 选择确认 | ~~无~~(已 closed) | **✔ 机制 closed 2026-05-27** → `refine-logs/reviews/REOPEN_R1_R6/R1a_cutoff_exposure/R1a_DECISIONS.md`;cutoff 中心值 provisional 待探针;R-1e / R-5 Pool I / R-4b 误分类模拟解锁 |
 | R-1b | Historical Family Recurrence:实现 + lock-in | ~~R-0~~(已 closed) | **✔ closed 2026-05-24** → `refine-logs/reviews/REOPEN_R1_R6/R1b_recurrence/R1b_DECISIONS.md`;R-1c / R-1e / R-5 Pool G / B-2 schema 解锁 |
 | R-1c | Target Salience:实现 + lock-in | ~~R-0~~(已 closed) | **✔ closed 2026-05-25** → `refine-logs/reviews/REOPEN_R1_R6/R1c_target_salience/R1c_DECISIONS.md`;R-1e / R-5 Pool G / B-2 schema / R-4b 追加 retrospective tail-leverage 解锁 |
 | R-1d | Template Rigidity:从零设计 | 无(**零 spec**,从文献起;用户视为重点因子;纯文本特征,不依赖 R-0) | ✅ 可动 |
@@ -255,8 +265,10 @@ flowchart TD
 - **R-5 Sampling**(前半:within-pool 分布 + per-article cap / dedupe 规则)
 - **R-1d Template Rigidity 设计** —— **零 spec、用户视为重点因子**,纯文本
   特征,不依赖 R-0/R-1b/R-1c;是 R-1 系列里最实打实的起点。
-- **R-1a Cutoff Exposure** —— 实现简单(日期+manifest),case 来源受 R-0
-  影响,但 metric 本身不依赖。
+- ~~**R-1a Cutoff Exposure**~~ —— **机制 closed 2026-05-27**(见 `R1a_DECISIONS.md`);
+  cutoff 中心值待探针验证(downstream,排进 fleet)。新解锁 R-1e / R-5 Pool I /
+  R-4b cutoff 误分类模拟。**新挂账:cutoff 验证探针细化 session**(协议已设计,
+  `R1a_cutoff_exposure/cutoff_probe_protocol_codex.md`)。
 - **R-6 预测目标 & 真实收益**(2026-05-23 解封)。可接 parked C_FO/C_SR
   漂移调查;kickoff 已写好 `.scratch/session_kickoff_r6.md`。
 - **B-2 其它 4 个模块**(provider-agnostic caching wrapper / SQLite cache
@@ -341,7 +353,7 @@ flowchart TD
 
 | 组件 | 现状 | 价值 | 推荐 |
 |---|---|---|---|
-| Cutoff Exposure | 实现简单(日期 + manifest);Path E 验证 | **核心** —— 整个 temporal route 物理基础 | ✅ **必实现** |
+| Cutoff Exposure | **R-1a ✔ 机制 closed 2026-05-27** → `refine-logs/reviews/REOPEN_R1_R6/R1a_cutoff_exposure/R1a_DECISIONS.md`(tanh,w=2月;cutoff 中心值待探针)| **核心** —— 整个 temporal route 物理基础 | ✅ **必实现** |
 | Historical Family Recurrence | **R-1b ✔ closed 2026-05-24** → `refine-logs/reviews/REOPEN_R1_R6/R1b_recurrence/R1b_DECISIONS.md` | **主候选** —— outcome-leakage proxy(关联记忆) | ✅ **lock-in 见 DECISIONS.md** |
 | Target Salience | WS0.5 §3.3 待 clean-room 复审 | **主候选** —— prominence-mediated memorization | ✅ 实现 |
 | Template Rigidity | **零 spec**(用户视为重点) | **主候选** —— 中文金融新闻强模板化(财报 / 监管公告) | ✅ **先做 R-1d 设计**(用户点名下一步),再实现 |

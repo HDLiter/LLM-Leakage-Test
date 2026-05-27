@@ -139,7 +139,7 @@ R-0 锁的是**架构容器**,不替下游 session 拍 construct。R-0 **不**�
 
 | Session | R-0 constraint | Choice space (downstream decides) |
 |---|---|---|
-| R-1a Cutoff Exposure | Case 可追溯 article_id / published_at / target_entity_id / layer membership;metric 独立于 operator 输出 | Case event date = `published_at` vs in-text event date;per-model cutoff manifest 来源 |
+| **R-1a Cutoff Exposure** | **✔ closed 2026-05-27**(机制锁;cutoff 中心值 provisional 待探针验证)→ `../R1a_cutoff_exposure/R1a_DECISIONS.md` | — |
 | **R-1b Historical Family Recurrence** | **✔ closed 2026-05-24** → `../R1b_recurrence/R1b_DECISIONS.md`(canonical lock-in) | — |
 | R-1c Target Salience | L1↔L3 边界同 R-1b;no-dedup 合法;`log1p(0)=0` 合法 | Construct(mention L1 / subject L2 / tradable variants);denominator(article count vs L1 row count);window(pre-cutoff 固定 / 其它);与 R-1b 共享窗口或独立;complement-family 处理 |
 | R-1d Template Rigidity | 纯文本特征;可在 L1 或 L2 上算;不得依赖 operator 输出 | Full spec(从文献起设计) |

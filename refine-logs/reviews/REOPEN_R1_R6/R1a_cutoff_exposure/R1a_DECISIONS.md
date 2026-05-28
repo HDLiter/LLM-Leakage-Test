@@ -1,6 +1,9 @@
 # R-1a Cutoff Exposure — final decisions
 
-**Status**: 机制(metric machinery)**LOCKED 2026-05-27**;各模型 cutoff **中心值 PROVISIONAL**(待 cutoff-probe 验证 + owner sign-off,见 §6 / §11)
+**Status**: **REOPENED AS DRAFT 2026-05-28** —— 机制(tanh, w=2)原 LOCKED 2026-05-27,但 cutoff-probe 走查中(2026-05-28)owner 提出新增 case-level **Information Novelty (N)** factor(承 cutoff probe L10"答案不可由先验推断"准则推到 case 层);cutoff 与 novelty **大概率联合调试**,故 R-1a 重开 draft,**与 novelty 共同 freeze**。
+- cutoff 与 R-4 construct-validity 深审(in-flight 2026-05-27/28)联动:novelty 可能是 R-4 框架那个"真正 factor"的强候选(对照 cutoff = post-cutoff-null 验证锚)。
+- 各模型 cutoff 中心值仍 provisional 待 cutoff-probe 验证(§6 / §11);probe 设计本身已完成(L1–L10,见 `.scratch/cutoff_probe_decisions_running.md`)。
+- 新 session 见 `.scratch/session_kickoff_novelty_factor.md`(pending,本对话末撰)。
 **Audit trail**(下游 agent 不需要读;只在需要 debate / 看推导过程时翻):
 - `whiteboard_codex.md` —— Codex clean-room 白板(6 决策点独立分析)
 - `cutoff_deep_research_gpt.md` —— GPT deep research 对 16 模型 cutoff 可信度调查

@@ -84,6 +84,21 @@
 
 ---
 
+## LLMLagBench: Identifying Temporal Training Boundaries in Large Language Models
+**Authors & Year:** Pęzik et al. (2025), PELCRA / University of Łódź — arXiv:2511.12116v1 (15 Nov 2025; preprint, no venue as of 2026-05)
+
+**Summary:** A "freshness" benchmark that estimates the earliest probable temporal boundary of an LLM's training data by quizzing it on date-anchored recent-news events. 1,713 manually curated **English general-news** questions spanning 2021–2025 (~7/week), evaluated on 40 models (Grok-4, Claude Sonnet 4, GPT-4o, Llama 3.x, DeepSeek-V3, …). This is the closest external prior work to our R-1a cutoff-verification probe.
+
+**Key methods/findings**
+- Faithfulness score (0–2) per question → time-ordered curve; **PELT changepoint detection** (handles *multiple* changepoints) locates the boundary; **refusal rate tracked separately**; LLM-judge calibrated to humans (Cohen's κ 0.81 / 0.83).
+- Empirically estimated horizons run **well before** declared/release dates for several models (Claude Sonnet 4: declared 2025.01 vs estimated 2024.04; DeepSeek-V3 family ~2023.09–2024.07). Some models show partial / multi-stage boundaries, not a single cliff.
+- **Results public, questions withheld**: per-model estimates live in the Space's `data/model_metadata.json` (declared-vs-estimated cutoff fields); the 1,713-question set is withheld to prevent contamination (request via pelcra@uni.lodz.pl).
+- English **general** news only — explicitly excludes finance/sports; future work targets region-specific (Polish) versions.
+
+**Insight for our project:** Closest external prior art for the cutoff-verification probe, and a borrowable method template: date-anchored event-QA → changepoint, refusal tracked separately, judge calibrated to humans. **Differentiators we keep:** (1) Chinese financial-news domain (they have none); (2) we *verify a known manifest* (narrow→wide), they *discover from scratch* (wide + PELT) on 40 models; (3) cutoff is our exposure ruler — probe is verification-only (never edits manifest, never feeds the metric). Directly usable now: their public per-model estimates corroborate ours where versions match (Llama-3.1-8B estimated = declared 2023.12), and — more importantly — their "estimated ≪ declared" pattern independently backs our premise that manifests/release dates overstate effective knowledge, so exposure should stay conservative. Their English questions could seed our general-knowledge track (most of our fleet predates the 2025-11 benchmark → contamination-safe), but likely can't be republished. Caveat: preprint, not peer-reviewed → treat as directional.
+
+---
+
 ## DatedGPT: Preventing Lookahead Bias with Time-Aware Pretraining
 **Authors & Year:** Yan et al. (2026)
 

@@ -70,6 +70,7 @@
 - [DatedGPT](DatedGPT Preventing Lookahead Bias.pdf)
 - [Fake Date Tests](Fake Date Tests LLM Macro Forecasting.pdf)
 - [Language Models Represent Space and Time](Language Models Represent Space Time.pdf)
+- [LLMLagBench: Identifying Temporal Training Boundaries in LLMs](LLMLagBench Temporal Training Boundaries.pdf)
 - [Look-Ahead-Bench](Look-Ahead-Bench Standardized Benchmark.pdf)
 - [Set the Clock](Set the Clock Temporal Alignment LMs.pdf)
 - [The Memorization Problem in LLMs’ Economic Forecasts](Memorization Problem LLMs Economic Forecasts.pdf)

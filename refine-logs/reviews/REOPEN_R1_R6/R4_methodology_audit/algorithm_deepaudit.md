@@ -118,6 +118,8 @@ Pedagogical order (浅→深),不按 kickoff 的 A/B/C/D:
 3. 在 (1)+(2) 基础上做正式辩论(framework + estimand 去留)。
 4. framework 锁定后做下一轮 walkthrough(完成本次后续 #5/#7/#9/#11/#12 + 整体一致性扫)。
 
+**2026-05-30 增补**:novelty factor session(R-1d)+ codex 第一性原理 review 把 agenda 第 2/3 条**具体化**了 —— 自我证伪 null 判据时发现"过狠"多半是 **estimand 范式未定(resistance vs prediction-lift)+ E_FO 命名漂移**造的假争议,不是判据本身过狠。下一轮 walkthrough 的开放条目(**P0** estimand 范式 / **P1** 命名拆解 / **P2** null 精确措辞 / **P3** 任务信息集 / **P4** 目标-horizon-ground truth / **P5** novelty 归宿 / **P6** false alpha claim 边界 / **P7** 因子是否同时调制能力与记忆)全部编入 `R4_next_construct_validity_agenda.md`,与上面残项合并,**均不在本轮拍板**。novelty 共识 = 不当主因子;最终归宿 gated on P0+P3,故 R-1a 维持 DRAFT 不 close。
+
 ---
 
 ## 9. 元层(放此处不放 DECISIONS)

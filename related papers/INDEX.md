@@ -34,6 +34,10 @@
 - [Data Contamination Can Cross Language Barriers](Data Contamination Cross Language Barriers.pdf)
 - [Generalization or Memorization](Generalization or Memorization Data Contamination.pdf)
 - [How Much are LLMs Contaminated? LLMSanitize](How Much are LLMs Contaminated LLMSanitize.pdf)
+- [No Memorization, No Detection: Output-Distribution Contamination Detection in Small LMs (2603.03203)](No Memorization No Detection Output-Distribution Contamination.pdf) *(added 2026-05-31; verbatim vs learned 两 regime → 保留两类 estimand)*
+- [Spiking the Training Data to Correct for Test Set Contamination (2605.24818)](Spiking Training Data Test Set Contamination.pdf) *(added 2026-05-31; paired-model counterfactual ≈ cutoff 估计)*
+- [Learned or Memorized? Quantifying Memorization Advantage in Code LLMs (2604.13997)](Learned or Memorized Memorization Advantage Code LLMs.pdf) *(added 2026-05-31; memorization advantage = lift 框架)*
+- [PAM: Prior Aware Memorization — Distinguishing Memorization from Generalization (2602.18733)](PAM Prior Aware Memorization.pdf) *(added 2026-05-31; lift-over-prior,P0 near-mandatory;55–90% "被记住"实为常见)*
 - [How Can I Publish My LLM Benchmark Without Giving the True Answers Away?](Publish Benchmark Without Answers.pdf)
 - [Investigating Data Contamination](Investigating Data Contamination in Modern Benchmarks.pdf)
 - [LastingBench](LastingBench Knowledge Leakage.pdf)
@@ -80,6 +84,12 @@
 - [Time Machine GPT](Time Machine GPT.pdf)
 - [Lookahead Bias in Pretrained Language Models](Lookahead Bias in Pretrained LMs.pdf)
 - [Caution Ahead: Numerical Reasoning and Look-ahead Bias in AI Models](Caution Ahead Numerical Reasoning Look-ahead.pdf)
+- [KTD-Fin: From Knowing to Doing — A Memory-Controlled Benchmark for LLM Trading Agents (2605.28359)](KTD-Fin Memory-Controlled Benchmark Trading Agents.pdf) *(added 2026-05-31; **直接竞品**,同 A 股 CSI300,数据侧打码 vs 我们模型侧 cutoff 锚)*
+- [FinCAD: Summoning the Oracle to Slay It — Mitigating Look-Ahead Bias in Backtesting (2605.24564)](FinCAD Mitigating Look-Ahead Bias Backtesting.pdf) *(added 2026-05-31; "parametric look-ahead bias" 命名;per-entity/date 记忆度 ↔ Factor 层)*
+- [FutureSim: Replaying World Events to Evaluate Adaptive Agents (2605.15188)](FutureSim Replaying World Events Adaptive Agents.pdf) *(added 2026-05-31; cutoff 当 holdout 并发独立用;Brier-vs-no-prediction baseline)*
+- [TempoMed-Bench: LLMs Lack Temporal Awareness of Medical Knowledge (2605.13045)](TempoMed-Bench Temporal Awareness Medical Knowledge.pdf) *(added 2026-05-31; **cutoff 渐变非阶跃**→只能为 memory_lift/resistance 辩护读 0)*
+- [Janus-Q: Event-Type Annotated News Dataset with CAR (2602.19919)](Janus-Q Event-Type News Dataset CAR.pdf) *(added 2026-05-31; 62,400 篇 + 10 类事件类型 + CAR;事件类型因子现成 taxonomy)*
+- [Evaluating Counterfactual Strategic Reasoning in LLMs (2603.19167)](Evaluating Counterfactual Strategic Reasoning LLMs.pdf) *(added 2026-05-31; counterfactual-variant resistance 先例)*
 - [RealTime QA: What's the Answer Right Now?](RealTime QA.pdf)
 - [Seeing the Goal, Missing the Truth: Human Accountability for AI Bias](Seeing the Goal Missing the Truth Human Accountability for AI Bias.pdf)
 - [AI's Predictable Memory in Financial Analysis](AIs Predictable Memory Financial Analysis.md) *(HTML→markdown, paywalled PDF unavailable)*

@@ -20,7 +20,11 @@
 
 | arXiv | 标题 | 日期 | 重叠 | 我们怎么不同 |
 |---|---|---|---|---|
-| **2605.28359** | KTD-Fin: Memory-Controlled Benchmark for LLM Trading Agents | 2026-05-27 | **同 A 股(CSI300)+同 cutoff 威胁模型** → 抹掉"首个 A 股记忆基准"first-of-kind | 他们数据侧打码(匿名 ticker/date)+评交易 agent+Barra 归因;我们模型侧 cutoff 锚+跨 cutoff fleet+新闻→涨跌+四层框架+预注册。**互补,须加 vs KTD-Fin 段** |
+| **2605.28359** | KTD-Fin: Memory-Controlled Benchmark for LLM Trading Agents | 2026-05-27 | **同 A 股(CSI300)+同 cutoff 威胁模型** → 抹掉"首个 A 股记忆基准"first-of-kind | 他们数据侧打码(4 级:bright/stock-blind/date-blind/blinded;**date-blind=真 ticker+真日期换相对日索引 `day_-3`,非删除**)+评交易 agent+Barra 归因;我们模型侧 cutoff 锚+跨 cutoff fleet+新闻→涨跌+四层框架+预注册。**互补,须加 vs KTD-Fin 段**。**注:他们的"date"是输入字段(可打码),与我们的"cutoff=模型训练截止点"是两种不同的时间,不冲突** |
+
+> **KTD-Fin 已读全文(2026-05-31)关键结果 + mask-year 问题**:
+> - **headline**:控制记忆(blinded × Barra 归因)后**选股技能基本塌成被动因子收益** —— 10 模型表面收益亮眼(Qwen3.6-plus +85%、Claude +59% 等,均跑赢 CSI300 +37%),但 Barra 拆解(Table 5)**选股 alpha 跨度 +0.2%~−77.8%,9/10 为负,仅 Claude Opus 4.7 ≈0(+0.2%)**。最干净塌缩:memory-only 模式 bright −0.16%(靠 ticker 先验乱交易亏钱)→ blinded **恰好 0.00%**(ticker 抹掉即持币不动)。结论=收益≠技能,LLM 交易"knowing(背)非 doing(做)"。
+> - **mask-year 能否增强效果?→ KTD-Fin 证据是反方向**:(a) §3.3+Appendix A 实测 "**ticker 把手、非日历把手,携带主导预训练先验**":date-blind 下品牌/板块先验原样保留,stock-blind 下 rationale 塌成泛泛填充;(b) §4.3 探针 date±7天恢复最高仅 16%、joint 仅 1.5%(日期通道信号弱);(c) **结果表无 date-blind 性能列**(只 bright/blinded),date-blind 效应**他们没量化**。→ **对我们:mask 实体身份(C_anon)是强招、mask 日期是弱招;但 KTD-Fin 是纯价格无文本任务,date-blind 性能空白 = 我们 C_temporal/F_temporal 可填的洞,惟预期 date 通道偏弱**。
 | **2603.26797** | MemGuard-Alpha: ...Cross-Model Disagreement | 2026-03-26 | 公开占先 "CMMD" 名+思路 | **坐实 E_CMMD 砍对**;US S&P-100/英文/检测-过滤工程管线(非受控 benchmark) |
 | **2601.13770** | Look-Ahead-Bench: Standardized Look-ahead Bias for Finance LLMs | 2026-01-20 | 同 genre(标准化 look-ahead benchmark) | 用 alpha 衰减(混 regime)非 cutoff null;非因子受控;小英文 fleet;无预注册;无中文。**alpha-decay = lift 极先例,引** |
 | **2512.23847** | A Test of Lookahead Bias in LLM Forecasts | 2025-12-29 | 量化新闻→收益泄露,分离记忆 vs 信号 | 单 prompt 观察性诊断(LAP=MIA 分回归);我们 cutoff 硬锚+fleet(识别更干净)。**LAP×准确率=lift 极典范,引/可借作一个算子对标** |

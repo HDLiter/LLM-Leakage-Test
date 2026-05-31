@@ -165,11 +165,17 @@ Estimands are the analytical quantities that enter the statistical model. Each e
 
 ### 5.2 Cross-model family (P_predict, no perturbation)
 
+> **⚠️ SUPERSEDED — E_CMMD CUT(2026-05-31 R-4 construct-validity session)**。E_CMMD 已**砍**:
+> (a) 招牌属性 "cutoff-monotone" 在源头无文献出处;(b) 识别力弱、代码仍 stub;(c) 唯一卖点
+> (黑盒覆盖)已被会聚效度(P_predict 抗扰动 × P_logprob 两通道)接管;(d) 2026-05-31 arxiv 查新
+> 坐实 MemGuard-Alpha(arXiv 2603.26797)已公开占先 "CMMD = Cross-Model Memorization Disagreement"
+> 名+思路。**本节整段 retire**;canonical 见 `../REOPEN_R1_R6/R4_methodology_audit/four_layer_candidate_pools.md` §4.4。
+
 | ID | Estimand | Formula | Old ID | Analytical meaning |
 |---|---|---|---|---|
-| **E_CMMD** | Cross-Model Memorization Disagreement | Cutoff-monotone disagreement pattern across the full fleet on P_predict outputs | D1 | Whether models that had temporal access to the event converge on predictions that earlier-cutoff models systematically miss. |
+| ~~**E_CMMD**~~ | ~~Cross-Model Memorization Disagreement~~ | ~~Cutoff-monotone disagreement pattern across the full fleet on P_predict outputs~~ | D1 | **CUT(2026-05-31)** — 见上 supersede 注。 |
 
-**Note**: E_CMMD is the only behavioral estimand that requires **no perturbation**. It exploits the fleet's natural cutoff structure as a quasi-experiment.
+**Note**: ~~E_CMMD is the only behavioral estimand that requires no perturbation.~~ (CUT)
 
 ### 5.3 Perturbation-based family (P_predict + perturbations)
 
@@ -177,8 +183,8 @@ All of these share the same operator (P_predict) and follow the same logic: run 
 
 | ID | Estimand | Formula | Old ID | Perturbation | Analytical meaning |
 |---|---|---|---|---|---|
-| **E_FO** | False Outcome Resistance | P_predict(original, m) − P_predict(C_FO(text), m) | D5-FO | C_FO | Does the model ignore visible counterfactual evidence? High delta = slot-anchor memorization. |
-| **E_SR** | Semantic Reversal Resistance | P_predict(original, m) − P_predict(C_SR(text), m) | D5-SR | C_SR | Does the model resist polarity reversal? High delta = cached directional conclusion. |
+| **E_FO** | False Outcome Resistance | P_predict(original, m) − P_predict(C_FO(text), m) | D5-FO | C_FO | Does the model ignore visible counterfactual evidence? High delta = slot-anchor memorization. **⚠️ 2026-05-31:C_FO 操作化存疑(见 ../REOPEN_R1_R6/R4_methodology_audit/four_layer_candidate_pools.md §2.1),E_FO 主-backbone 资格动摇,去留挪扰动 decision。** |
+| **E_SR** | Semantic Reversal Resistance | P_predict(original, m) − P_predict(C_SR(text), m) | D5-SR | C_SR | Does the model resist polarity reversal? High delta = cached directional conclusion. **⚠️ 2026-05-31:E_SR 上位为主记忆 backbone 候选(C_SR 更干净/普适)。** |
 | **E_NoOp** | NoOp Sensitivity | P_predict(original, m) − P_predict(C_NoOp(text), m) | D6 | C_NoOp | Does irrelevant clutter change the prediction? High sensitivity = brittle template matching. |
 | **E_EAD_t** | Target Entity Dependency | P_predict(original, m) − P_predict(C_anon_target(text), m) | D7-target | C_anon (target) | How much does the prediction depend on knowing the target's identity? |
 | **E_EAD_nt** | Non-target Entity Distraction | P_predict(original, m) − P_predict(C_anon_nontarget(text), m) | D7-nontarget | C_anon (non-target) | How much does competing-entity identity distract the prediction? |

@@ -6,6 +6,14 @@
 
 **This file is the audit trail. `R4a_DECISIONS.md` was NOT updated this session per user.**
 
+> **⚠️ 部分 SUPERSEDED(2026-05-31 R-4 构念效度 session)**:本文件 §4/§5 把 **E_FO 推为"主记忆
+> estimand"**;该 lean 在 2026-05-31 **动摇** —— C_FO 扰动两种操作化(改文内结局槽 / 文末追加矛盾
+> 结局)都存疑(前者退化成 C_SR、后者造自相矛盾文本 + 引 look-ahead),故建在 C_FO 上的 E_FO 主
+> backbone 资格不稳,**可能让位给 E_SR**。C_FO 去留 + E_SR/E_FO 谁当 backbone **挪到后面扰动 decision**。
+> §2 的 **E_CMMD CUT** lean 已被 2026-05-31 arxiv 查新坐实(MemGuard-Alpha 2603.26797 公开占先
+> CMMD 名+思路)→ 升为定调。canonical 现状以
+> `four_layer_candidate_pools.md`(四池总表)+ `R4_construct_validity_decisions.md`(本轮定调)为准。
+
 ---
 
 ## 1. 走过的算法 / 没走的算法

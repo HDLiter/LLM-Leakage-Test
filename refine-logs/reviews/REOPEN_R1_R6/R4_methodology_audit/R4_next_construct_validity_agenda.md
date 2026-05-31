@@ -1,8 +1,13 @@
 # R-4 下一轮构念效度讨论大纲(开放议程)
 
-**Status**: **OPEN — 议程,非决策。不在本轮拍板**;供 R-4 下一轮 walkthrough 一条一条敲定(owner 要求逐条敲、不二选一)。
+> **⚠️ P0 段 SUPERSEDED 2026-05-31** by `R4_construct_validity_decisions.md`(定调)+ `.scratch/session_kickoff_p0_estimand_paradigm.md`(P0 kickoff)。
+> 本文件 P0 原写成"resistance vs prediction-lift 两范式逐条敲、不二选一";该框架已**溶解** —— **resistance 是框架实存的唯一主量,prediction-lift 不是可平起平坐挑选的仪器,而是"动机→测量"那道桥的名字**。
+> **P0 scope 以 kickoff 为准,下方 §P0 正文仅留作 audit trail,勿据其开 session。** P2–P7 仍是有用的 scope 提示(但 null 判据已按 `R4_construct_validity_decisions.md` D2 分层,见各条)。
+
+**Status**: **P0 SUPERSEDED(见顶部 banner);P2–P7 仍 OPEN — 议程,非决策**;供 R-4 下一轮 walkthrough 逐条敲定。
 **来源**: novelty factor session(R-1d,2026-05-30,主对话 4 轮第一性原理推理)+ codex clean-room review(`.scratch/codex_runs/20260530-fpscope/final_detailed.md`)。
 **上游**: 接 `algorithm_deepaudit.md` §8 agenda 第 2/3 条(自我证伪 null 判据 + estimand 去留辩论);承 construct-validity 框架(数据集=测量仪器,cutoff=验证锚,post-cutoff null=效度锚)。
+**下游(2026-05-31 R-4 session 已把一批 leans 升为定调)**: `R4_construct_validity_decisions.md`(D1–D9)+ `four_layer_candidate_pools.md`(四池)。
 
 ---
 
@@ -21,13 +26,23 @@ novelty session 想给 benchmark 加一个 case-level「信息新颖度 / 答案
 
 ## 开放条目(建议顺序,可调)
 
-### P0 — 核心 estimand 范式 【先决,其余全 gated on 它】
+### P0 — 核心 estimand 范式 【SUPERSEDED 2026-05-31 → 见 `session_kickoff_p0_estimand_paradigm.md`】
+
+> **⚠️ 以下 7 行是 2026-05-30 的旧框架,已被溶解,留作 audit trail。** 当前 P0 scope:
+> **resistance 是框架实存的唯一主量**(E_FO/E_SR/E_NoOp 全是 same-case clean↔扰动 差值);
+> **"prediction-lift" 不是可平起平坐挑的仪器**,而是"动机 false-alpha ↔ 测量行为指纹"那道桥的名字;
+> 真正要敲的是 **(Q1)** resistance 怎么和"一般方向先验"分开 + **(Q2)** 到 false-alpha 那座桥是纯论证还是要碰真实收益 + **(Q3)** prediction-lift 只剩 exploratory/因子角色吗 + **(Q4)** §4.6 改不改。完整开场白见 kickoff。
+
+<details><summary>旧框架(audit trail,勿据此开 session)</summary>
+
 - 张力:**resistance 范式**(官方:抗扰动对比量、不碰股价、null 天然≈0)vs **prediction-lift 范式**(预测真实结局的 pre/post 准确率差、需 ground truth、直接对上 false alpha 动机)。
 - 两者测**不同的记忆指纹**,不是同一个量的两种算法。
 - 待敲(逐条过,**不预先二选一**):
   - resistance 范式单独能不能扛主记忆 claim?它离「虚假 alpha」动机隔几层?
   - prediction-lift 范式的代价(ground truth、撞 §4.6、能力混淆)各有多重?
   - 要不要并存(resistance 当主、干净;prediction-lift 当「桥到 false alpha」的佐证)?并存的统计 / 叙事成本?
+
+</details>
 
 ### P1 — 命名漂移拆解 【无论 P0 怎么定都要做】
 - E_FO 在 `MEASUREMENT_FRAMEWORK.md` L180 = False Outcome **Resistance**;在 novelty session 口头 = Future Outcome **prediction**。**同名两物。**

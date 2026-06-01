@@ -7,6 +7,21 @@ memorization benchmark(R5A)**:用四层框架(Factor / Perturbation / Operator
 / Estimand)、16 模型 split-tier fleet、两阶段自适应预注册,刻画泄露如何随
 案例层面的因子变化。成文研究问题见 `docs/RESEARCH_PROPOSAL.md`。
 
+## ⭐ 与用户交流:白话优先,展开术语(2026-05-31 用户硬性要求)
+和用户对话时**不要直接甩内部代号/术语**——这些代号是 agent 之间的简写,
+用户不该被迫反向解码。规则:
+- **每个概念第一次出现,先用白话中文讲清它是什么,代号最多作括注跟在后面。**
+  例:不要写「F_salience 拨杆」,要写「标的显著度(某只股票/板块在新闻里被
+  提及得多不多)这个旋钮(代号 F_salience)」。
+- 涉及的典型代号(出现就得展开):因子 F_*(F_salience/F_recur/F_entval/
+  F_cutoff…)、扰动 C_*(C_SR/C_FO/C_anon/C_NoOp…)、算子 P_*(P_predict/
+  P_logprob)、指标 E_*(E_SR/E_FO/E_PCSG…)、决策编号 D1–D9、resistance、
+  memory_lift / lift-over-prior / raw_score、null / 分层 null、会聚效度、
+  confirmatory / exploratory、Type A 闸门、manipulation check 等。
+- **宁可话长,也别让用户解码。术语密度过高 = 把沟通成本转嫁给用户。**
+- 适用范围:所有**面向用户**的交流。**内部文档**(docs/、refine-logs/、
+  代码注释)仍用紧凑代号——它们是给 agent 读的 context,展开反而稀释。
+
 ## 当前阶段(2026-05-22)
 Pass-1 全实验走查完成:研究问题与四层框架确认 sound;框架与实现之间的
 「操作化层」(因子 / 扰动 / estimand / 预测目标 / 采样 / pilot 统计)进入

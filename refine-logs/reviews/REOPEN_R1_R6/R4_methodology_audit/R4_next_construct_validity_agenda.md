@@ -44,7 +44,7 @@ novelty session 想给 benchmark 加一个 case-level「信息新颖度 / 答案
 
 </details>
 
-### P1 — 命名漂移拆解 【无论 P0 怎么定都要做】
+### P1 — 命名漂移拆解 【CLOSED 2026-06-02 → `P1_DECISIONS.md`】
 - E_FO 在 `MEASUREMENT_FRAMEWORK.md` L180 = False Outcome **Resistance**;在 novelty session 口头 = Future Outcome **prediction**。**同名两物。**
 - 待敲:把 `raw_outcome_score` / `memory_lift` / `false_outcome_resistance` 三个量各起名;逐处核对 algorithm_deepaudit / MEASUREMENT_FRAMEWORK / proposal 里每个「E_FO」指哪个。
 

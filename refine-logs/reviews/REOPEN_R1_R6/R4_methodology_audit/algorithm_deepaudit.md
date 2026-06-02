@@ -72,6 +72,7 @@ Pedagogical order (浅→深),不按 kickoff 的 A/B/C/D:
 上一轮 audit 我曾说"E_CMMD 是唯一能上黑盒的时间 estimand"——**错**。
 
 - **E_FO = 行为 + 黑盒可跑 + per-model + post-cutoff null 干净**(post-cutoff 模型没见过真结局 → 没东西可抵抗 → null 归零;且 null **对时代漂移、对纯推理混淆都稳**)。它给出黑盒记忆覆盖,比 E_CMMD 干净得多。
+  > **⚠️ 命名消歧(P1,2026-06-02)**:此处 E_FO = **假结局抵抗**(False Outcome Resistance),FO ≠ Future Outcome。"模型没见过真结局"指 C_FO 机制——模型若未记住真实结局,面对假结局时无从抵抗;**不是**说 E_FO 在预测真实涨跌(那个概念叫"真实涨跌对照",已由 P0 降级为 pilot 旁证)。
 - **会聚效度(convergent validity)三角**:E_FO(行为通道)× E_PCSG(惊讶度通道),两个完全不同的算子都过 null + 都随曝光升 → 收敛 = 强构念效度。**不需要 E_CMMD 充当第三条**。
 
 ---

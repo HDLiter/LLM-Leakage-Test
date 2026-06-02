@@ -27,13 +27,13 @@
 - 文献坐实:偏见 catalog 16 族,机制统一 = "拿语料先验顶替眼前文本"(见 `bias_catalog.md`)。
 
 ### D2 — 分层 null(取代"cutoff 后一刀切读零")
-- `memory_lift` / resistance / E_PCSG → post-cutoff **≈ 0**;
-- `raw_score`(原始预测准确率)→ post-cutoff **≠ 0**(基准率+乐观+地域偏见在);
+- E_PCSG → post-cutoff **≈ 0**(模型没见过 cutoff 后的新闻 → 熟悉度差归零);
+- 模型预测(P_predict 在原文上的输出)→ post-cutoff **≠ 0**(基准率+乐观+地域偏见在);
 - 持续偏见 → **≠ 0 且正面去量**。
 - 外部佐证:2603.03203 / 2604.13997(两量并存)、2603.21658(抗扰动=记忆有机制根据)、
   TempoMed-Bench 2605.13045(cutoff 渐变非阶跃 → 只能为"记忆差值读 0"辩护,不能为 raw_score)。
 
-> **⚠️ resistance 那一行收紧(P0,2026-06-01)**:本条把 `resistance` 和 `memory_lift`/`E_PCSG` 一起列进『post ≈ 0』,读着像定论。按 P0:**干净的 post-cutoff ≈ 0 锚只落在熟悉度通道(E_PCSG/E_CTS,照确切结局记忆)**;**抗扰动族(resistance)主要照成见型记忆,跨 cutoff 强弱不预测,不给它安 post-cutoff 归零判据**。本行『resistance → ≈ 0』实为『pre−post 抵抗(memory_lift)能照出确切结局记忆』这个**假说**,非已知事实,别当 confirmatory 判据。正本 `P0_DECISIONS.md` §0/§1/§5-P2。
+> **⚠️ resistance 那一行收紧(P0,2026-06-01)**:本条把 `resistance` 和 `memory_lift`/`E_PCSG` 一起列进『post ≈ 0』,读着像定论。按 P0:**干净的 post-cutoff ≈ 0 锚只落在熟悉度通道(E_PCSG/E_CTS,照确切结局记忆)**;**抗扰动族(resistance)主要照成见型记忆,跨 cutoff 强弱不预测,不给它安 post-cutoff 归零判据**。本行『resistance → ≈ 0』实为『pre−post 抵抗能照出确切结局记忆』这个**假说**,非已知事实,别当 confirmatory 判据。正本 `P0_DECISIONS.md` §0/§1/§5-P2。**术语(P1,2026-06-02)**:`memory_lift` 已退役为非正式术语,正式指代用 E_PCSG;`raw_score` 改称"模型预测"。见 `P1_DECISIONS.md`。
 
 ### D3 — resistance 正名;"两范式二选一"降级
 - 框架实存主量 = resistance(E_FO/E_SR/E_NoOp 全是 `P_predict(原)−P_predict(扰动)`)。
@@ -118,3 +118,11 @@
 - `MEASUREMENT_FRAMEWORK.md` §5.2(E_CMMD 整段 retire)+ §5.3(E_FO/E_SR backbone 注)。
 - `algorithm_deepaudit.md` 头部(§4/§5 E_FO 主-backbone lean 动摇;E_CMMD CUT 升定调)。
 - memory `project_construct_validity_framing` / `research-status` / `lit_landscape` 更新。
+
+### P1 命名漂移拆解(2026-06-02 追加)
+
+- `R4_construct_validity_decisions.md` D2(本文件):memory_lift → E_PCSG、raw_score → 模型预测。
+- `algorithm_deepaudit.md` §4:E_FO 消歧注。
+- `four_layer_candidate_pools.md` §5:raw_score → 模型预测。
+- `R4_next_construct_validity_agenda.md`:P1 标 CLOSED。
+- 新增:`P1_DECISIONS.md`(canonical)+ `P1_audit_trail.md`。

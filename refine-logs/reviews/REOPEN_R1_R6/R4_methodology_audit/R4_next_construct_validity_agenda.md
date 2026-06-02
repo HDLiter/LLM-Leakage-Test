@@ -48,34 +48,26 @@ novelty session 想给 benchmark 加一个 case-level「信息新颖度 / 答案
 - E_FO 在 `MEASUREMENT_FRAMEWORK.md` L180 = False Outcome **Resistance**;在 novelty session 口头 = Future Outcome **prediction**。**同名两物。**
 - 待敲:把 `raw_outcome_score` / `memory_lift` / `false_outcome_resistance` 三个量各起名;逐处核对 algorithm_deepaudit / MEASUREMENT_FRAMEWORK / proposal 里每个「E_FO」指哪个。
 
-### P2 — post-cutoff null 的精确措辞 【gated on P0】
-- 不是「绝对归零 vs 松绑」二选一,是**分量**:`raw_score` 的 null = 能力 baseline(≠0);`memory_lift` / resistance 的 null ≈ 0。
-- construct-validity 框架「null 须读 ~0」对后者成立、**不用推翻**;主对话此前「松绑判据 / R-4 收下」是被命名漂移误导的**错表述**,作废。
-- 待敲:每个 estimand 标清 null 该读什么;BL2(700 post-cutoff)在各范式下验证 raw baseline 还是 lift≈0。
+### P2 — post-cutoff null 的精确措辞 【ABANDONED 2026-06-02】
+> **弃因**:在实验前逐个估计量钉死"post-cutoff 该读几"没有道理——那是实验要去测的,不是事前规格。
+> 此外,"post-cutoff"这个词用在 E_PCSG 上不准确:E_PCSG 是两个 cutoff 不同的模型之间的差值,不存在单一的"post-cutoff 模式";BL2(事件在所有模型 cutoff 之后)那批案例的差值预期 ≈ 0,是对 BL2 子集的分析预期,不是 E_PCSG 本身的属性。E_CTS(绝对熟悉度)的 logprob 也不可能归零——中文财经文本的结构模式本身就给出一定熟悉度。
+> P0 / P1 已把分层 null 的框架定清(E_PCSG 有干净锚、resistance 不预测 cutoff 行为、模型预测 ≠ 0);逐估计量精确数值留实验结果。原议题的命名漂移部分已被 P1 吸收。
 
-### P3 — 任务信息集协议 【gated on P0,且能翻盘 P5】
-- article-only(只喂当前文章)vs 允许文章前的公共历史。
-- 若 **article-only**:模型从**参数**调更早新闻 A 推 B,可能算 memorization 而非合法能力 → **B2 合法性翻盘 → novelty 部分复活**。仅在 prediction-lift 范式下 B2 才是问题。
-- 待敲:锁任务信息集;据此重判 B2 / novelty。
+### P3 — 任务信息集协议 【ABANDONED 2026-06-02,并入 R-6】
+> **弃因**:P0 定了主量 = resistance(抗扰动),不是预测准确率。在 resistance 下,模型用参数记忆推出什么不重要,重要的是面对扰动变体时预测变不变——"信息集怎么定→影响什么算记忆"这个争论不再咬人。剩下的实操问题(P_predict prompt 带不带上下文)是 prompt 工程,归 R-6。
 
 ### P4 — 预测目标 / horizon / ground truth 【R-6 范围,P0 逼其前置】
 - prediction-lift 范式需真实涨跌 ground truth + horizon + 收益口径 → 撞 §4.6「confirmatory estimand 不与真实股价对照」;resistance 范式不需要。
 - 待敲:目标标签(情感 / 方向 / 收益)、horizon、ground truth 来源;§4.6 改不改。
 
-### P5 — novelty 最终归宿 【gated on P0 + P3】
-- 共识:novelty **不当主因子**。
-- 残留:弱 novelty 作退化-case 清洗 / sensitivity(机械恒等 / 日历已知 / Q4=年报−前三季 / 标签文中明示)—— 归 WS0 数据卫生,**非 factor**。
-- 复活条件:P3 锁 article-only **且** P0 走 prediction-lift → B2 相关性回来,novelty 可能需部分重启。
-- 待敲:P0/P3 敲定后,定 novelty 是「纯清洗」还是「部分因子」;`R1a_DECISIONS.md` / `cutoff_probe_DECISIONS.md` 的 DRAFT 头据此 close 或重写。
+### P5 — novelty 最终归宿 【ABANDONED 2026-06-02,并入 R-5】
+> **弃因**:P0 走 resistance 范式 + P3 abandoned → 复活条件不满足,novelty 不当因子已成定论。退化案例(机械恒等 / 日历已知 / 标签文中明示等)是否需要采样过滤,归 R-5(采样)决策。
 
-### P6 — false alpha 作为 research claim 的锚定与边界
-- pre−post 是 proposal §2.2 false alpha 动机要的那座桥。
-- 风险:benchmark 不跑组合 / 不算收益 / 不做风险调整 → **不能 claim「测 false alpha 本身」**,只能「测会导致 false alpha 的记忆抬升代理」。
-- 待敲:§2.2 补桥的精确措辞;主 claim 边界(characterization 别滑成 application)。
+### P6 — false alpha 作为 research claim 的锚定与边界 【ABANDONED 2026-06-02,P0 已回答】
+> **弃因**:P0 §2 已完整回答——桥 = 纯论证、红线 = "测会导致虚假收益的记忆"(不是"测虚假收益本身")、承重词 = 记忆/抗扰动族、三通道 checklist 留结果分析。§2.2 的实际措辞是写论文时的事,不需要独立设计 session。
 
-### P7 — 因子是否同时调制能力与记忆 【影响所有 confirmatory factor】
-- recurrence / salience / template rigidity 不能默认「主要调制 C(记忆)」;它们 post-cutoff 也可能提高能力 / 表面熟悉度。
-- 待敲:每个 confirmatory 因子验证它调制的是 `memory_lift` 还是 `raw_score`(接 algorithm_deepaudit §5 对 Template Rigidity 机制存疑)。
+### P7 — 因子是否同时调制能力与记忆 【ABANDONED 2026-06-02,resistance 差分 + 各因子 session 已覆盖】
+> **弃因**:resistance = 配对差值(原文 − 扰动变体),纯能力部分在差分中扣掉——模型能力强但不记忆,应跟着扰动走而非抵抗。剩余边角(模板刚性的"表面捷径"机制存疑)已在 R-1d scope 内,要求先过机制论证才进 confirmatory。不需要独立 session。
 
 ### 并入:algorithm_deepaudit §8 原 agenda 残项
 - #5 TOST/SESOI=0.15 来历 + 标准化、#7 Gwet AC1、#9 power MC sim、#11 同-cutoff 证伪 ratio、#12 tier labels 统计含义、整体一致性扫(§6 frozen 残余清理)。

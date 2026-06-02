@@ -8,7 +8,7 @@
 >
 > **上游**:`factor_pool_brainstorm.md`(因子层)+ `MEASUREMENT_FRAMEWORK.md`(四层术语)
 > + `algorithm_deepaudit.md`(estimand leans)+ `R4_next_construct_validity_agenda.md`(P0–P7)。
-> **本轮新增**:记忆是一族(偏见 catalog)、分层 null、resistance 正名、PC/CI/IDS/采样离散度
+> **本轮新增**:记忆是一族(偏见 catalog)、无记忆基线(各指标基线不同)、resistance 正名、PC/CI/IDS/采样离散度
 > = 算子衍生变量×指标比较(非新层)、真实收益三种命、行情因子族、C_FO 走弱、E_CMMD 砍。
 
 ---
@@ -29,7 +29,7 @@
 `F_` 因子 / `C_` 扰动 / `P_` 算子 / `E_` 指标。
 
 **三条被本轮改写的全局判据**(贯穿所有指标,见 §5):
-1. **分层 null** —— 不"一刀切读零"。
+1. **无记忆基线**(各测量指标的基线不同) —— 不"一刀切读零"。
 2. **会聚效度** —— 两个不同算子都过锚才算强。
 3. **衍生变量 tier 可得性** —— CI/IDS 依赖的算子衍生变量只白盒 logprob 有,黑盒确认性只用离散方向(PC)。
 
@@ -251,7 +251,7 @@
 
 ## 5. 三个被改写的全局判据(贯穿所有指标)
 
-1. **分层 null**(取代"cutoff 后一刀切读零"):
+1. **无记忆基线**(各测量指标的基线不同,取代"cutoff 后一刀切读零"):
    - E_PCSG cutoff 后读 **≈ 0**(模型没见过 cutoff 后的新闻 → 熟悉度差归零);
    - 抗扰动差值:post-cutoff 行为**不预测**(成见型记忆可能仍在;「pre−post 抵抗能照出确切结局记忆」= 假说,见 `P0_DECISIONS.md` §0/§1);
    - 模型预测(P_predict 在原文上的输出)读 **≠ 0**(基准率+乐观+地域偏见都在);

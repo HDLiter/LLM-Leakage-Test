@@ -87,7 +87,7 @@
 - [KTD-Fin: From Knowing to Doing — A Memory-Controlled Benchmark for LLM Trading Agents (2605.28359)](KTD-Fin Memory-Controlled Benchmark Trading Agents.pdf) *(added 2026-05-31; **直接竞品**,同 A 股 CSI300,数据侧打码 vs 我们模型侧 cutoff 锚)*
 - [FinCAD: Summoning the Oracle to Slay It — Mitigating Look-Ahead Bias in Backtesting (2605.24564)](FinCAD Mitigating Look-Ahead Bias Backtesting.pdf) *(added 2026-05-31; "parametric look-ahead bias" 命名;per-entity/date 记忆度 ↔ Factor 层)*
 - [FutureSim: Replaying World Events to Evaluate Adaptive Agents (2605.15188)](FutureSim Replaying World Events Adaptive Agents.pdf) *(added 2026-05-31; cutoff 当 holdout 并发独立用;Brier-vs-no-prediction baseline)*
-- [TempoMed-Bench: LLMs Lack Temporal Awareness of Medical Knowledge (2605.13045)](TempoMed-Bench Temporal Awareness Medical Knowledge.pdf) *(added 2026-05-31; **cutoff 渐变非阶跃**→只能为 memory_lift/resistance 辩护读 0)*
+- [TempoMed-Bench: LLMs Lack Temporal Awareness of Medical Knowledge (2605.13045)](TempoMed-Bench Temporal Awareness Medical Knowledge.pdf) *(added 2026-05-31; **cutoff 渐变非阶跃**→只能为 E_PCSG 辩护读 0,不能为模型预测)*
 - [Janus-Q: Event-Type Annotated News Dataset with CAR (2602.19919)](Janus-Q Event-Type News Dataset CAR.pdf) *(added 2026-05-31; 62,400 篇 + 10 类事件类型 + CAR;事件类型因子现成 taxonomy)*
 - [Evaluating Counterfactual Strategic Reasoning in LLMs (2603.19167)](Evaluating Counterfactual Strategic Reasoning LLMs.pdf) *(added 2026-05-31; counterfactual-variant resistance 先例)*
 - [RealTime QA: What's the Answer Right Now?](RealTime QA.pdf)

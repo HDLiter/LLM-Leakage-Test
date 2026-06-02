@@ -16,11 +16,14 @@ memorization benchmark(R5A)**:用四层框架(Factor / Perturbation / Operator
 - 涉及的典型代号(出现就得展开):因子 F_*(F_salience/F_recur/F_entval/
   F_cutoff…)、扰动 C_*(C_SR/C_FO/C_anon/C_NoOp…)、算子 P_*(P_predict/
   P_logprob)、指标 E_*(E_SR/E_FO/E_PCSG…)、决策编号 D1–D9、resistance、
-  memory_lift / lift-over-prior / raw_score、null / 分层 null、会聚效度、
+  模型预测、无记忆基线、会聚效度、
   confirmatory / exploratory、Type A 闸门、manipulation check 等。
 - **宁可话长,也别让用户解码。术语密度过高 = 把沟通成本转嫁给用户。**
-- 适用范围:所有**面向用户**的交流。**内部文档**(docs/、refine-logs/、
-  代码注释)仍用紧凑代号——它们是给 agent 读的 context,展开反而稀释。
+- 适用范围:所有**面向用户**的交流。
+- **内部文档可读性规则**(docs/、refine-logs/、代码注释):可以用已建立的
+  缩写/代号,但**必须注重可读性**——① 术语在每份文档首次出现时必须有解释;
+  ② 不能在文档里凭空造对话中没出现过的新缩写(术语先在对话中建立共识);
+  ③ 缩写和真实含义之间必须能看出联系,否则换名。
 
 ## 当前阶段(2026-05-22)
 Pass-1 全实验走查完成:研究问题与四层框架确认 sound;框架与实现之间的

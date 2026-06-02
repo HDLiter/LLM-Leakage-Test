@@ -24,7 +24,7 @@ E_FO 的 FO = False Outcome(假结局),不是 Future Outcome(未来结局)。
 | **正式名** | 模型预测 |
 | **Code tag** | `prediction` |
 | **定义** | P_predict 在不施扰动的原文上的输出(方向判断、打分或其他形式;具体格式待 R-6 锁) |
-| **分层 null** | post-cutoff ≠ 0(基准率 + 各种偏见都在) |
+| **无记忆基线** | post-cutoff ≠ 0(基准率 + 各种偏见都在) |
 | **不是什么** | 不是记忆信号;不是抗扰动差值;不是扣过先验的增量 |
 | **旧名** | `raw_score`、`raw_outcome_score`、"原始预测准确率"——已关闭文档不追溯改,新文档一律用"模型预测" |
 

@@ -50,7 +50,7 @@
 | **F_cutoff** | Cutoff Exposure 截止点暴露 | ⑥ | 模型 cutoff 相对事件日的位置。最直接泄露通道,**也是验证锚**(不同 KIND) | R-1a ✅(tanh,w=2月;中心值待探针) |
 | **F_recur** | Historical Family Recurrence 历史家族复现 | ① | (标的×事件家族)在 cutoff 前 CLS 复现多少次。outcome-leakage 代理 | R-1b ✅ |
 | **F_salience** | Target Salience 标的显著性 | ① | 标的实体在语料累计曝光强度(CLS mention count 代理)。**也是偏见强度旋钮** | R-1c ✅ |
-| **F_template** | Template Rigidity 模板刚性 | ③ | 文章多"套路化"——可被套模板匹配而非读内容 | R-1d 设计中(机制存疑:记忆 vs 表面熟悉度,须先论证) |
+| **F_template** | Template Rigidity 模板刚性 | ③ | 文章有多大比例由 CLS 语料库高频文本片段(模板骨架)组成 | R-1d ✅ closed 2026-06-02(进 R-1e 候选池;操作化 open items 待 pilot 前用户审计;原"记忆 vs 表面熟悉度闸门" **superseded**) |
 | **F_temporal** | Temporal Anchor Recoverability 时间线索强度 | ⑥ | 新闻的时间锚有多明显 / 多可移除。**= C_temporal 的派生二级因子**,同时也是独立 primary 因子 | 已在框架(本轮明确 F_temporal 命名) |
 
 ### 1.2 候选 — Type 1(corpus-intrinsic),低成本不踩红线

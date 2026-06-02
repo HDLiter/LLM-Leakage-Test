@@ -203,6 +203,17 @@
 - [Financial Entity Linking at JPMorgan (arXiv 2411.02695)](JEL Financial Entity Linking JPMorgan.pdf)
 - [Chinese Financial NER (Information Sciences, S0020025522015444)](https://www.sciencedirect.com/science/article/abs/pii/S0020025522015444) *(referenced only; paywalled, PDF unavailable)*
 
+## Text Template-ness / Boilerplate Measurement
+
+*Collected for R-1d Template Rigidity factor design (2026-06-02). Codex lit scan: `temp/lit_scan_template_measurement_20260602.md`. Direction note: [notes/Text Template-ness and Boilerplate Measurement.md](notes/Text Template-ness and Boilerplate Measurement.md).*
+
+- [Rusty-DAWG: Measuring n-gram Novelty via Suffix Arrays (Meister et al. 2024, arXiv 2406.13069)](Rusty-DAWG N-gram Novelty.pdf) — **n-novelty**: share of n-grams absent from reference corpus; complement measure (1 − n-novelty ≈ template-ness); scalable DAWG indexes
+- [Web2Text: Deep Structured Boilerplate Removal (Vogels et al. 2018, arXiv 1801.02607)](Web2Text Boilerplate Removal.pdf) — CNN+HMM over DOM/text features for web page boilerplate detection; metric = percent tokens/blocks labeled boilerplate
+- [BoilerNet: Automated and Blind Boilerplate Removal (Leonhardt et al. 2020, arXiv 2004.14294)](BoilerNet Neural Boilerplate Detection.pdf) — Neural sequence labeling over HTML tags/words for boilerplate/content separation
+- [Textual Analysis and International Financial Reporting (Lang & Stice-Lawrence 2015)](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2407572) *(referenced only; SSRN login required)* — **most directly relevant**: operationalizes 10-K boilerplate with **tetragram share** (4-gram phrases in many docs → score = share of words in boilerplate-tetragram sentences); also stickiness, redundancy, specificity; **our R-1d method adapted from this**
+- [The Evolution of 10-K Textual Disclosure (Dyer, Lang & Stice-Lawrence 2017)](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2741682) *(referenced only; SSRN login required)* — follow-up applying same tetragram/boilerplate metrics longitudinally
+- [Is There a Formula for Formulaic Language? (Forsyth & Grabowski 2015)](https://www.degruyterbrill.com/document/doi/10.1515/psicl-2015-0019/html) *(referenced only; paywalled)* — tests formulaicity indices: VPR, Herfindahl-Hirschman, Simpson diversity, Shannon entropy, **Hapaxity** (reliance on inflexible subsequences)
+
 ## Regression & Collinearity Diagnostics
 
 *Collected for the WS0.5 S-6 collinearity-diagnostics methods review (Codex, 2026-05-20). Direction note (full bibliography): [notes/Collinearity and Non-Redundancy Diagnostics.md](notes/Collinearity and Non-Redundancy Diagnostics.md).*

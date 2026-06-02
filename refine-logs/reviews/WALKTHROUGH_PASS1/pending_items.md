@@ -115,8 +115,15 @@
   - Cutoff Exposure(R-1a):**closed 2026-05-27,见上**。
   - Historical Family Recurrence(R-1b):**closed 2026-05-24,见上**。
   - Target Salience(R-1c):**closed 2026-05-25,见上**。
-  - Template Rigidity:**零 spec**(flag ④)。从文献审视 → 设计。用户视为
-    重要因子(唯一量化事件格式模板化)。
+  - Template Rigidity:**R-1d closed 2026-06-02(定义锁 + 进 R-1e 候选池;
+    操作化参数 open,pilot 前须过用户审计闸门)** → canonical lock-in =
+    `refine-logs/reviews/REOPEN_R1_R6/R1d_template_rigidity/R1d_DECISIONS.md`。
+    定义 = CLS 语料高频 n-gram 覆盖率(文章多大比例由模板骨架组成);
+    操作化 = jieba 分词 + 语料级 DF 查表 + Top-K% 聚合(参数待 empirical
+    testing + 用户审计);参考语料 = L1 去重文章集。R-4 反馈:无记忆基线
+    闸门不适合因子准入(supersedes 构念效度框架中的 F_template 闸门)。
+    方法论:零 spec 从对话中设计;用户贡献两条关键洞察(n-gram 频率 =
+    骨架操作化;泛化替代通道替换失效的槽位替代通道)。
 - **R-2 扰动**:6 个扰动各自的实现构思 → 然后保留几个 / 哪几个进
   confirmatory。用户点名要重审 C_NoOp。C_FO/C_NoOp 实现(WS3 `c_fo_rules
   .yaml` 等)尚未建。

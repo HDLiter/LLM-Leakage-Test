@@ -111,7 +111,28 @@ log1p_target_salience[case] = log1p(target_salience_count[case])
 | Slot | **Appendix**(不进 main / primary / supporting / robustness 槽)|
 | 测的是 | "primary β3 是否被极少数 mega-target 主导" — paper transparency baseline |
 
-### 7.2 R-1 系列 robust 风格 = Framework D(Distinct)
+### 7.2 名称聚合级别敏感性(R-1f 溢出,pre-commit appendix)
+
+> **来源**:R-1f Entity Age 设计时发现,模型 token 级记忆绑定到具体名称
+> 字符串——"ST海虹"和"海虹控股"在 tokenizer 里是不同序列。同理,
+> "ST海虹"的 mention 在 token 层不直接强化"海虹控股"的曝光频率信号。
+> 详见 R1f_DECISIONS.md §6。
+
+| 字段 | 值 |
+|---|---|
+| 做法 | 在三个名称聚合级别上分别重算 target_salience_count,重跑 β3 |
+| 级别 ① | **Entity 级**(当前主规格:同一 target_entity_id 的所有 L1 mention,不区分名称形式) |
+| 级别 ② | **字面名级**:只计 L1 rows 中与 focal case 使用**完全相同 surface_name** 的 mention |
+| 级别 ③ | **Core_name 级**:只计 L1 rows 中 surface_name 的 core_name(人工审核标注)与 focal case **相同**的 mention |
+| 前提 | ER 管线记录 surface_name(R1f_DECISIONS.md §8) |
+| Pre-commit vs conditional | **Pre-commit** |
+| Slot | **Appendix** |
+| 成本 | 近零(名称-时段表已建,换 group-by 即可) |
+| 测的是 | 主规格(entity_id 级)是否因跨名称变体聚合而膨胀了 salience;如果三级一致,结论对名称粒度稳健 |
+
+**不改主规格**:R-1c 主变量仍为 entity_id 级 `log1p_target_salience`(已 locked)。
+
+### 7.3 R-1 系列 robust 风格 = Framework D(Distinct)
 
 R-1c L1 mention + target only 比 R-1b L2 subject + tradable + target × super_type **尾部更 acute**(mega vs 普通的 log1p 差距 ~4 vs ~1.5-2),distribution robustness 在 R-1c 是 paper transparency baseline,故 R-1c 走 Framework D —— 1 个 pre-commit tail-leverage appendix(R-1b 仍维持其 0 pre-commit + 1 conditional 风格)。Cross-corpus 外部信号(若团队后续愿意建)留 paper §future work 段。
 

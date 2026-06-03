@@ -151,7 +151,28 @@ R-1c session 起跑时,R-1b 给的约束清单:
 | 不激活 | **不报,连 prose 都不写**(不是预先 commit 的 robustness) |
 | Slot | **Appendix**(不是 main / primary / supporting / robustness 槽) |
 
-### 7.2 显式不在 R-1b 范围内的 construct(不进任何 slot)
+### 7.2 名称聚合级别敏感性(R-1f 溢出,pre-commit appendix)
+
+> **来源**:R-1f Entity Age 设计时发现,模型 token 级记忆绑定到具体名称
+> 字符串——"ST海虹"和"海虹控股"在 tokenizer 里是不同序列。同理,
+> "ST海虹"的 recurrence count 不直接强化"海虹控股"的关联记忆信号。
+> 详见 R1f_DECISIONS.md §6。
+
+| 字段 | 值 |
+|---|---|
+| 做法 | 在三个名称聚合级别上分别重算 recurrence_count,重跑 β3 |
+| 级别 ① | **Entity 级**(当前主规格:同一 target_entity_id 的所有 mention,不区分名称形式) |
+| 级别 ② | **字面名级**:只计 reference rows 中与 focal case 使用**完全相同 surface_name** 的 mention |
+| 级别 ③ | **Core_name 级**:只计 reference rows 中 surface_name 的 core_name(人工审核标注)与 focal case **相同**的 mention |
+| 前提 | ER 管线记录 surface_name(R1f_DECISIONS.md §8) |
+| Pre-commit vs conditional | **Pre-commit** |
+| Slot | **Appendix** |
+| 成本 | 近零(名称-时段表已建,换 group-by 即可) |
+| 测的是 | 主规格(entity_id 级)是否因跨名称变体聚合而膨胀了 recurrence;如果三级一致,结论对名称粒度稳健 |
+
+**不改主规格**:R-1b 主变量仍为 entity_id 级 `log1p_recurrence_count`(已 locked)。
+
+### 7.3 显式不在 R-1b 范围内的 construct(不进任何 slot)
 
 - **Unfiltered L2 subject**:回答的是 surface text exposure 而非关联记忆,与本 construct 立场不一致
 - **L1 mention(任何形式)**:回答的是宽 mention salience 而非主体关联记忆;若需 mention-based salience 留 R-1c session

@@ -5,20 +5,16 @@
 > **candidate-pool review session**(计划在 R-1a / R-1d 设计完后开)。随时可加/改;
 > candidate-pool review 时基于它产出正式 lock-in。
 > **不严谨是故意的** —— 这是想法地图,不是承诺。下游 agent 别把它当 canonical decision。
->
-> 缘起:R-1c closed 后,用户问 "因子数到底锁不锁死 4 个 / 能不能 >4 候选选 ≤4",
-> 引出对整个 factor pool 的重审。两个 agent 挖了早期 archive(见"被埋"段)。
 
 ---
 
 ## 0. 预算 / 框架约束(先记死边界)
 
-- **confirmatory 数 = power-bounded,不预设魔数**(用户 2026-05-26 选 (b)):最终 confirmatory factor 数由 **pilot + R-4b power** 决定 —— N=2560 对交互项(factor × cutoff)能稳健 confirm 几个,那个数就是上限(可能 4,可能 5-6)。**理由**:frozen v6.2 的 "4 factor" 是 Step 2 多 agent review 收敛的 recommendation,不是 power 计算输出;把它当硬上限是 over-framing(memory `feedback_review_complexity` 的 reviewer-ratchet 模式),无理由当魔数尊重
+- **confirmatory 数 = power-bounded,不预设魔数**:最终 confirmatory factor 数由 **pilot + R-4b power** 决定 —— N=2560 对交互项(factor × cutoff)能稳健 confirm 几个,那个数就是上限(可能 4,可能 5-6)
   - 仍有**软压力**:叙事聚焦(10 个 confirmatory 通道讲不清)+ R-4a 锁的 "不做 family-wise multiplicity correction"(family 大小不被统计惩罚,所以唯一硬约束是 power 而非 multiplicity)
 - **候选池可以 > 4** —— pilot 前(Stage 1)声明候选池;pilot 后从池里**选 / 降级**,**不追加池外新因子**(追加要开新 design memo,R-4a→R-6 接口路径 b)
 - **sealed split 防 selection 污染**:pilot 上做 selection(exploratory,不耗 confirmatory alpha)→ main 上 confirm 选定的那几个(fresh data)。selection 规则 Stage 1 预先声明
 - **未选中的候选不浪费**:进 exploratory(照常计算+报告+可视化,撑 benchmark coverage),或诊断/负对照
-- 注:MEASUREMENT_FRAMEWORK §9 "5×4=20 unchanged" 是 frozen v6.2 残留,已被 R-4a §4 解锁("因子总数+身份 = R-1e+pilot")+ 本决定 supersede —— **2026-05-26 已修**(§9 加 supersession note;RESEARCH_PROPOSAL §4.1/§6.1 改 power-driven 措辞)
 
 ---
 
@@ -98,8 +94,6 @@
 
 1. **Type A "先验良性" 判断要不要正式重开** —— A 组(A1/A2/A3 + A4/文本方向)全族能否进 confirmatory 的总闸门
 2. **directional-label 方案** —— ④⑤ 两族(多空比/文本方向/可预测性/部分对称性)共享;须查 **Thales/CLS 语料是否已有合法 sentiment 标注**;否则规则 or 外部 judge
-3. **candidate-pool review timing** —— 用户定:R-1a + R-1d 设计完后开一轮,把 factor 池 + estimand 池 + 诊断池一次性结构化落文档(那时才 lock,现在保持流动)
-4. ~~drift 待修~~ **2026-05-26 已修(选 (b))**:MEASUREMENT_FRAMEWORK §9 加 supersession note;RESEARCH_PROPOSAL §4.1(标题+开头+统计结构段)+ §6.1 改 power-bounded 措辞;worktable §4 pointer 同步。**R-4a §4 不动** —— 它本来就是 "因子总数+身份 = R-1e+pilot",与 (b) 一致,不是 over-framing 源头(frozen v6.2 才是)
 
 ---
 

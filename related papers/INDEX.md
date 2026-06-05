@@ -157,6 +157,20 @@
 - [When LLMs Go Abroad: Foreign Bias in AI Financial Predictions](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5440116) *(referenced only; SSRN PDF download returned 403 on 2026-05-07)*
 
 
+## Market-Outcome Labeling & News-Return Operationalization (R-1k/l/m 行情族因子)
+
+*Collected for the R-1k/l/m market case-label factors (F_mktdir / F_mktmag / F_mktcap), 2026-06-04 (two Codex search passes + two verification workflows). Direction note: [notes/Market-Outcome Labeling and News-Return Operationalization.md](notes/Market-Outcome Labeling and News-Return Operationalization.md). Headline: window + direction-encoding are task-dependent conventions, NOT settled standards; the neutral-band value has no authoritative numeric anchor.*
+
+- [Can ChatGPT Forecast Stock Price Movements? (Lopez-Lira & Tang 2023)](Lopez-Lira ChatGPT Stock Returns.pdf) — **window-mapping precedent** (publication-time → trading window, verbatim; itself raw-return-primary). *(also under Financial NLP)*
+- [Astock: A-Share Stock-Specific News Dataset (Zou et al., FinNLP 2022)](Astock A-Share Stock-Specific News Dataset.pdf) — A-share 3-class **quantile** precedent (Eq.1 a/b/c/d=20/40/60/20); we take the 3-class form, reject the ~40% discard
+- [StockNet: Stock Movement Prediction from Tweets (Xu & Cohen, ACL 2018)](StockNet Stock Movement Prediction from Tweets.pdf) — most-cited (384) fixed-threshold benchmark (±0.55/−0.5%, US); **anchor for our ±0.5% neutral band**
+- [CMIN: Causality-Guided Multi-Memory Interaction Network (Luo et al., ACL 2023)](CMIN Causality-Guided Stock Movement Prediction.pdf) — CSI300 + US; **binary rise/fall** (corrects the mis-cited "CMIN ±1% 3-class")
+- [FNSPID: Financial News Dataset in Time Series (2024)](FNSPID Financial News Dataset Time Series.pdf) — large-scale **binary** UP/DOWN, no neutral band
+- [Roll 1984: A Simple Implicit Measure of the Effective Bid-Ask Spread (JF 39(4))](Roll 1984 Implicit Bid-Ask Spread.pdf) — microstructure **noise-floor basis** for the neutral band (bid-ask bounce → negative serial covariance)
+- [Qi 2023: Effectiveness of Price Limits, China ChiNext (PLOS ONE)](Qi 2023 Price Limits China ChiNext.pdf) — A-share ±limit **delayed price discovery** → magnitude censoring
+- Referenced only (paywalled / book): MacKinlay 1997 JEL (event-study CAR; abnormal=actual−normal); Kothari & Warner 2007 (short vs long horizon); Barber & Odean 2008 RFS (news-day/attention window); Fama-Fisher-Jensen-Roll 1969 IER (event-study origin); Chen et al. 2008 China Econ Rev (SSE limit magnet); López de Prado 2018 (triple-barrier, vol-scaled); surveys Loughran-McDonald 2016/2020, Kearney-Liu 2014, Xing-Cambria-Welsch 2018, Kumar-Ravi 2016, Du-Xing-Mao-Cambria ACM CSUR 2024 — **financial-NLP background, NOT window/threshold/limit authorities**
+
+
 ## Prompting & Reasoning Techniques
 
 - [CHiLL](CHiLL Zero-Shot Feature Extraction Clinical.pdf)

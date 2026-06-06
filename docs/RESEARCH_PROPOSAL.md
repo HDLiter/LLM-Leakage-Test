@@ -166,9 +166,11 @@ memory `project_english_expansion`)。
 confirmatory 数由 **pilot + R-4b power** 决定(N=2560 对交互项能稳健 confirm
 几个)。frozen 时代的 "5 estimand × 4 factor = 20 系数" 是 Step 2 多 agent
 review 的候选规模示意,**非硬约束** —— R-4a §4 已把因子总数解锁交 R-1e + pilot。
-当前已设计 / 在设计的 confirmatory candidate 有 **4 个**(下表),候选池正在
-**factor pool 重审**中扩大(see `refine-logs/reviews/REOPEN_R1_R6/factor_pool_brainstorm.md`);
-未选中的候选进 exploratory(照常计算 + 报告,撑 benchmark coverage,不浪费)。
+下表列出 **4 个**核心 confirmatory candidate;candidate-pool review 已完成(R-1g…R-1w),
+候选池据此扩大 / 定 verdict,汇总索引见
+`refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/four_layer_candidate_pools.md` §1
+(逐因子 canonical = 各 `R1*_DECISIONS.md`);未选中的候选进 exploratory(照常计算 + 报告,
+撑 benchmark coverage,不浪费)。
 
 下表 4 个当前 candidate 刻画泄露的三个驱动通道 —— **时间访问、重复、显著性**:
 

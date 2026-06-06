@@ -1,9 +1,11 @@
-# Factor Pool Brainstorm(living note,非 lock-in)
+# Factor Pool Brainstorm(ARCHIVED — 历史 brainstorm,非当前 spec)
 
-> **status**:living brainstorm 工件,**不是** time-static DECISIONS。放在 REOPEN_R1_R6/
-> 作为 R-1 重开系列的 factor-pool 层工件(跨 R-1a/b/c/d/e),喂未来的
-> **candidate-pool review session**(计划在 R-1a / R-1d 设计完后开)。随时可加/改;
-> candidate-pool review 时基于它产出正式 lock-in。
+> **⛔ ARCHIVED**:因子候选池 review 已完(R-1g…R-1w,2026-06-05)。本文件**服役完毕**,
+> 仅留作"被埋 / 被拒候选 + 概念工具(Type1/2 判据、粒度轴、泄露机制链 6 环节、
+> directional-label 红线、A vs B)"的历史出处,**不是当前 spec**。
+> **当前权威**:逐因子结局 = 各 `REOPEN_R1_R6/R1*_DECISIONS.md`;汇总索引 =
+> `REOPEN_R1_R6/R4_methodology_audit/four_layer_candidate_pools.md` §1。
+> 下游 agent 请读那一组,不要把本文件当 candidate 池现状。
 > **不严谨是故意的** —— 这是想法地图,不是承诺。下游 agent 别把它当 canonical decision。
 
 ---

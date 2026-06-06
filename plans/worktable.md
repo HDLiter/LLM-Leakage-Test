@@ -12,7 +12,7 @@
 > **本表只维护「依赖」与「可动?」**(可动性由依赖推导,不单独维护一份会漂移的
 > 状态字段)。已完成 / 进行中的事实另见 §1 与各行备注。
 >
-> **最后更新**:2026-05-27(R-1a Cutoff Exposure 机制 closed,cutoff 中心值待探针;R-1d / R-1e / R-5 / B-2 可动)
+> **最后更新**:2026-06-05(**R-1 因子层全 closed**:R-1a-d/f 机制 + 候选池 review R-1g…R-1x;下一个可动 = **R-6**(解开 R-2);R-1e 待 pilot;R-5 / R-2 非-C_FO 部分 / B-2 可动)
 
 ---
 
@@ -62,6 +62,11 @@ R-1e(Cutoff Exposure 作 β1 载体);R-5 Pool I(cutoff-balanced);R-4b(case×mode
 白盒 Path-E)协议已设计(`R1a_cutoff_exposure/cutoff_probe_protocol_codex.md`),
 建+跑排进 fleet 部署。
 
+**R-1d Template Rigidity 2026-06-02 closed + 因子候选池 review R-1g…R-1x 2026-06-05 全 closed**
+→ **因子层(机制 + 候选池准入)整层落定**。canonical = 各 `REOPEN_R1_R6/R1*_DECISIONS.md`;
+汇总索引(单一真相)= `REOPEN_R1_R6/R4_methodology_audit/four_layer_candidate_pools.md` §1。
+R-1 因子层对 **R-1e** 的依赖已清空、**只剩 pilot 数据**(选 / 降级)。下一个可动重开 = **R-6**。
+
 ---
 
 ## 2. 工作项表
@@ -78,8 +83,9 @@ R-1e(Cutoff Exposure 作 β1 载体);R-5 Pool I(cutoff-balanced);R-4b(case×mode
 | R-1a | Cutoff Exposure:实现 + 选择确认 | ~~无~~(已 closed) | **✔ 机制 closed 2026-05-27** → `refine-logs/reviews/REOPEN_R1_R6/R1a_cutoff_exposure/R1a_DECISIONS.md`;cutoff 中心值 provisional 待探针;R-1e / R-5 Pool I / R-4b 误分类模拟解锁 |
 | R-1b | Historical Family Recurrence:实现 + lock-in | ~~R-0~~(已 closed) | **✔ closed 2026-05-24** → `refine-logs/reviews/REOPEN_R1_R6/R1b_recurrence/R1b_DECISIONS.md`;R-1c / R-1e / R-5 Pool G / B-2 schema 解锁 |
 | R-1c | Target Salience:实现 + lock-in | ~~R-0~~(已 closed) | **✔ closed 2026-05-25** → `refine-logs/reviews/REOPEN_R1_R6/R1c_target_salience/R1c_DECISIONS.md`;R-1e / R-5 Pool G / B-2 schema / R-4b 追加 retrospective tail-leverage 解锁 |
-| R-1d | Template Rigidity:从零设计 | 无(**零 spec**,从文献起;用户视为重点因子;纯文本特征,不依赖 R-0) | ✅ 可动 |
-| R-1e | 因子最终选择确认(R-4a 不锁数 → 选哪几个由实现+pilot 实证证据决定) | R-1a · R-1b · R-1c · R-1d(R-4a 依赖已解除) | ⛔ 待 R-1a-d |
+| R-1d | Template Rigidity:从零设计 | ~~无~~ | **✔ closed 2026-06-02** → `R1d_template_rigidity/R1d_DECISIONS.md`;进 R-1e 候选池(操作化 open items 待 pilot 前用户审计) |
+| R-1g…x | 因子候选池快速评审(f/g/h/i/k/l/m/u/v/w/x 进池 · j/n/o/p/q/r/s/t DROP) | R-0 / R-4(已解锁) | **✔ closed 2026-06-05** → 汇总索引 `R4_methodology_audit/four_layer_candidate_pools.md` §1;逐因子 `R1*_DECISIONS.md` |
+| R-1e | 因子最终选择确认(从候选池选 / 降级,数 power-bounded) | ~~R-1a-d~~(因子层已全 closed)· **pilot 数据** | ⛔ **待 pilot**(因子层依赖已清,选 / 降级靠实证) |
 | R-2 | 6 扰动实现构思 → 选保留几个进 primary(重审 C_NoOp;C_FO vs C_SR 漂移见 `.scratch/cfo_csr_history_findings.md`);perturbation-specific eligibility flag 在 R-0 HOOK1/HOOK2 占位落地 | R-6(C_FO 机制选择)+ ~~R-0~~(已 closed,但 R-2 仍需 R-6 才能动 C_FO) | ⛔ 待 R-6(R-0 解锁部分:C_anon / C_NoOp 等不依赖 R-6 的扰动可先动) |
 | R-5 | 采样:R-0 expose 的 Pool B + G/H/I + D/E/F 扩展位;within-pool 分布(R-0 不强制叠加 G/H/I,row-random 合法)+ 准入过滤器 + per-article cap/dedupe 规则;反直觉案例过滤仍需 R-6 真实股价 | ~~R-0~~(已 closed)+ R-6(反直觉案例) | ✅ **可动 2026-05-23 PM late**(前半 within-pool 分布 + dedupe 规则不依赖 R-6;反直觉案例段待 R-6)|
 | R-3 | 负对照充分性 | R-1e · R-2(需知最终因子 / 扰动) | ⛔ 待上游 |
@@ -242,7 +248,7 @@ flowchart TD
 
 ---
 
-## 4. 现在能动的(2026-05-25,R-1c closed 后)
+## 4. 现在能动的(2026-06-05,R-1 因子层全 closed 后)
 
 **新解锁**(R-1c closure 2026-05-25):
 
@@ -263,14 +269,11 @@ flowchart TD
 **仍可动**(R-1c 之外,前已立即可启动):
 
 - **R-5 Sampling**(前半:within-pool 分布 + per-article cap / dedupe 规则)
-- **R-1d Template Rigidity 设计** —— **零 spec、用户视为重点因子**,纯文本
-  特征,不依赖 R-0/R-1b/R-1c;是 R-1 系列里最实打实的起点。
-- ~~**R-1a Cutoff Exposure**~~ —— **机制 closed 2026-05-27**(见 `R1a_DECISIONS.md`);
-  cutoff 中心值待探针验证(downstream,排进 fleet)。新解锁 R-1e / R-5 Pool I /
-  R-4b cutoff 误分类模拟。**新挂账:cutoff 验证探针细化 session**(协议已设计,
-  `R1a_cutoff_exposure/cutoff_probe_protocol_codex.md`)。
-- **R-6 预测目标 & 真实收益**(2026-05-23 解封)。可接 parked C_FO/C_SR
-  漂移调查;kickoff 已写好 `.scratch/session_kickoff_r6.md`。
+- ~~**R-1 因子层(R-1a-d/f + 候选池 g…x)**~~ —— **全 closed 2026-06-05**;对 R-1e 只剩 pilot
+  依赖。cutoff 验证探针(`R1a_cutoff_exposure/cutoff_probe_protocol_codex.md`)downstream、排进 fleet。
+- **R-6 预测目标 & 真实收益** —— **推荐下一个**(已解锁,且卡着 R-2 的 C_FO)。R-4 / P0 已把
+  "真实收益三种命"铺好,R-6 只剩"预测目标定稿 + C_FO 真实收益裁决"两件;kickoff(refresh 2026-06-05)
+  = `.scratch/session_kickoff_r6.md`。
 - **B-2 其它 4 个模块**(provider-agnostic caching wrapper / SQLite cache
   11 列 schema / Tier-A JSONL / `verify_canonical_hash.py` +
   `replay_factor_values.py` 含 Tier-B sha256 startup verify)。
@@ -279,18 +282,17 @@ flowchart TD
 **仍卡上游**:
 
 - **R-2**(扰动选择)仍卡 R-6(C_FO 机制需 R-6 真实收益决定)
-- **R-1e**(因子最终选择)仍卡 R-1a / R-1d 实现(R-1b / R-1c 已 close 但
-  Recurrence / Salience 是否进 primary 由 pilot 数据决定;R-1c Option C 显式
-  把降级路径留给 R-1e)
+- **R-1e**(因子最终选择)仍卡 **pilot 数据**(因子层 R-1a-d/f + 候选池 g…x 已全 closed;
+  选哪几个进 primary / 哪些降级,由 pilot 实证决定)
 
-> **Factor pool 重审(2026-05-26 起,brainstorm 流动中)**:R-1c closed 后用户
-> 重审整个 confirmatory factor 候选池 —— 确认 **confirmatory 数 power-bounded
-> (不预设魔数,由 pilot+R-4b 定;"4" 是 frozen over-framing 残留)、候选池可 >4、
-> pilot 后只选/降级、不追加池外新因子**(sealed split 防 selection 污染)。候选清单 + 概念工具
-> (Type1/Type2 判据、粒度轴、泄露机制链 6 环节、directional-label 红线、A vs B)
-> + 被埋/被拒候选见 `refine-logs/reviews/REOPEN_R1_R6/factor_pool_brainstorm.md`
-> (living,非 lock-in)。**candidate-pool review** 计划 R-1a + R-1d 设计完后开,
-> 届时把 factor 池 + estimand 池 + 诊断池结构化落正式 lock-in。
+> **Factor pool 重审:已完(R-1g…R-1x,2026-06-05 closed)**:全部候选 confirmatory
+> 因子过完,每个定候选池准入结局(进候选池 / DROP)。原则:**confirmatory 数 power-bounded
+> (不预设魔数,由 pilot+R-4b 定)、候选池可 >4、pilot 后只选/降级、不追加池外新因子**
+> (sealed split 防 selection 污染)。**汇总索引(单一真相)** =
+> `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/four_layer_candidate_pools.md` §1;
+> **逐因子 canonical** = 各 `REOPEN_R1_R6/R1*_DECISIONS.md`。概念工具(Type1/2 判据、粒度轴、
+> 泄露机制链 6 环节、directional-label 红线、A vs B)+ 被埋/被拒候选历史见
+> `REOPEN_R1_R6/_archive/factor_pool_brainstorm.md`(archived)。下一步:**R-1e** 在 pilot 后选/降级。
 - **R-3 / R-4b** 仍卡上游(R-1e / R-2 / R-3 / R-5 全部落定后)
 
 > **实现价值清单**(operator / perturbation / factor 三轴,哪些去实现 /

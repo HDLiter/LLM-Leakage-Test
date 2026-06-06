@@ -162,9 +162,9 @@ R-2 扰动 inventory + perturbation-specific eligibility 与 R-1c 正交(R-2 仍
 
 ### 8.4 R-4b(pilot 后具体统计)—— 追加 R-1b retrospective tail-leverage
 
-**R-4b implementation choice**:在 pilot 后顺手对 R-1b 也做 retrospective tail-leverage check,**与 R-1c 同 winsorize / percentile 形式**。维持 paper §robustness 段一致性。这**不算 R-1b 重开**(R-1b §7.1 锁的 conditional appendix 不动;tail-leverage 是 R-4b implementation 范围,R-4b open)。
+**R-4b implementation choice**:pilot 后对 R-1b 也做 retrospective tail-leverage check,**与 R-1c 同 winsorize / percentile 形式**,维持 paper §robustness 段一致性。归 R-4b implementation 范围(R-1b §7.1 的 conditional appendix 维持原样)。
 
-**预评估**:R-1b 尾部 mild(super_type 折叠天然缓解,mega vs 普通 log1p 差距 ~1.5-2);R-1b retrospective check 大概率结果稳健,不会触发 caveat reading。
+**预评估**:R-1b 尾部 mild(super_type 折叠天然缓解,mega vs 普通 log1p 差距 ~1.5-2);retrospective check 大概率稳健,不会触发 caveat reading。
 
 ### 8.5 R-5(Sampling)—— sanity-check note
 

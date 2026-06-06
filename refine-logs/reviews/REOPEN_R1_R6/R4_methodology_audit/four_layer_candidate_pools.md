@@ -1,15 +1,12 @@
 # 四层候选池总表(Factor / Perturbation / Operator / Estimand)
 
-> **status**:living candidate-pool 工件,**非 time-static DECISIONS**。
-> 这是 2026-05-30/31 R-4 构念效度 session 的产出,把因子 / 扰动 / 算子 / 指标
-> 四层一次性摊开,作为下一轮 **candidate-pool review + P0–P7 walkthrough** 的输入。
-> 随时可加 / 改;下游 agent **别当 canonical decision**。正式 lock-in 在 candidate-pool
-> review 时产出干净的 DECISIONS。
+> **status**:四层(因子 / 扰动 / 算子 / 指标)候选池总表 —— 一张**索引 / 地图**,非 canonical DECISIONS。
+> - **L1 因子层已定稿**(§1):每个因子结局见表,canonical = 各 `R1*_DECISIONS.md`。
+> - **L2 扰动 / L3 算子 / L4 指标仍为 living 候选池**:随时可加 / 改,正式 lock-in 在各自
+>   review 时产出干净 DECISIONS;下游 agent 别把这三层当 canonical decision。
 >
-> **上游**:`factor_pool_brainstorm.md`(因子层)+ `MEASUREMENT_FRAMEWORK.md`(四层术语)
-> + `algorithm_deepaudit.md`(estimand leans)+ `R4_next_construct_validity_agenda.md`(P0–P7)。
-> **本轮新增**:记忆是一族(偏见 catalog)、无记忆基线(各指标基线不同)、resistance 正名、PC/CI/IDS/采样离散度
-> = 算子衍生变量×指标比较(非新层)、真实收益三种命、行情因子族、C_FO 走弱、E_CMMD 砍。
+> **上游**:`MEASUREMENT_FRAMEWORK.md`(四层术语)+ `algorithm_deepaudit.md`(estimand leans)
+> + `R4_next_construct_validity_agenda.md`(P0–P7)。因子层 brainstorm 已 archive(见 `_archive/`)。
 
 ---
 
@@ -42,77 +39,89 @@
 > main confirm;未选中进 exploratory(照常算+报告)。
 > 泄露机制链 6 环节(找 gap 用):①曝光量 ②曝光时长 ③可记忆性 ④方向先验捷径
 > ⑤可推断性 ⑥时间定位。
+>
+> **因子层 candidate-pool review 已定稿**:每个因子的结局见下表"结局 / 状态"列,canonical
+> 决策在各 `REOPEN_R1_R6/R1{a–x}_*/R1*_DECISIONS.md`(下游因子层取 DECISIONS 为准,本表只作索引)。
+> 进候选池者由 R-1e 在 pilot 后选 / 降级;DROP 者不进任何池。
 
-### 1.1 已锁机制(R-1a/b/c closed;R-1d 设计中)
+### 1.1 已锁机制(confirmatory 因子,各走完整 factor session)
 
 | 码 | 因子 | 环节 | 测什么 | 状态 |
 |---|---|---|---|---|
-| **F_cutoff** | Cutoff Exposure 截止点暴露 | ⑥ | 模型 cutoff 相对事件日的位置。最直接泄露通道,**也是验证锚**(不同 KIND) | R-1a ✅(tanh,w=2月;中心值待探针) |
-| **F_recur** | Historical Family Recurrence 历史家族复现 | ① | (标的×事件家族)在 cutoff 前 CLS 复现多少次。outcome-leakage 代理 | R-1b ✅ |
-| **F_salience** | Target Salience 标的显著性 | ① | 标的实体在语料累计曝光强度(CLS mention count 代理)。**也是偏见强度旋钮** | R-1c ✅ |
-| **F_template** | Template Rigidity 模板刚性 | ③ | 文章有多大比例由 CLS 语料库高频文本片段(模板骨架)组成 | R-1d ✅ closed 2026-06-02(进 R-1e 候选池;操作化 open items 待 pilot 前用户审计;原"记忆 vs 表面熟悉度闸门" **superseded**) |
-| **F_temporal** | Temporal Anchor Recoverability 时间线索强度 | ⑥ | 新闻的时间锚有多明显 / 多可移除。**= C_temporal 的派生二级因子**,同时也是独立 primary 因子 | 已在框架(本轮明确 F_temporal 命名) |
+| **F_cutoff** | Cutoff Exposure 截止点暴露 | ⑥ | 模型 cutoff 相对事件日的位置。最直接泄露通道,**也是验证锚**(不同 KIND) | R-1a — β1 载体,几乎必进 primary(tanh,w=2月;中心值待探针) |
+| **F_recur** | Historical Family Recurrence 历史家族复现 | ① | (标的×事件家族)在 cutoff 前 CLS 复现多少次。outcome-leakage 代理 | R-1b — 进 R-1e 候选池 |
+| **F_salience** | Target Salience 标的显著性 | ① | 标的实体在语料累计曝光强度(CLS mention count 代理)。**也是偏见强度旋钮** | R-1c — 进 R-1e 候选池 |
+| **F_template** | Template Rigidity 模板刚性 | ③ | 文章有多大比例由 CLS 语料库高频文本片段(模板骨架)组成 | R-1d — 进 R-1e 候选池(操作化 open items 待 pilot 前用户审计) |
+| **F_temporal** | Temporal Anchor Recoverability 时间线索强度 | ⑥ | 新闻的时间锚有多明显 / 多可移除(C_temporal 扰动的派生二级因子) | 准入随 R-2 / C_temporal session 定,不在本因子层 review |
 
-### 1.2 候选 — Type 1(corpus-intrinsic),低成本不踩红线
+### 1.2 纯结构 / 纯文本候选(Type 1,不踩红线)
 
-> **范围说明(用户 2026-05-31)**:全部候选因子(§1.2–§1.5)的最终取舍**挪到后面"因子扩展
-> decision"**,本轮只登记、不拍。年/日历(F_datebin)等同此处理。
+| 码 | 因子 | 环节 | 测什么 | 结局 |
+|---|---|---|---|---|
+| **F_age** | 实体 age / 曝光时长 | ② | 模型积累实体记忆的时间窗(corpus span 最纯,优于上市时长 metadata) | R-1f — 进 R-1e 候选池 |
+| **F_density** | 事实密度 | ③ | 数字 / 实体 / 日期 / 因果断言密度(纯文本,极低成本) | R-1g — 进候选池 |
+| **F_datebin** | 确切日期分桶 / 年-日历 | ⑥ | 年 / 季 / 日历期(模型对特定期记忆深;纯 metadata) | R-1h — 进候选池(pilot 无时期 bump 降 exploratory) |
+| **F_len** | 文本长度 / 体量 | ③ | 总信息量(≠密度) | R-1i — 进候选池(pilot 无独立信号降为控制变量) |
+| **F_breadth** | 标的广度 | ①③ | 一条新闻涉及多少个不同可交易标的(信号稀释;article 级,L2 去重 tradable 计数) | R-1x — 进候选池(pilot 查与 F_len / F_density 共线) |
+| **F_symmetry** | 事件多空对称性 | ④ | 事件类单向(破产必跌)vs 双向(财报可涨可跌);结构属性,不踩 directional 红线 | R-1j — **DROP**(切缝无非任意标准,被 F_topic / F_textdir 夹死) |
 
-| 码 | 因子 | 环节 | 测什么 |
-|---|---|---|---|
-| **F_age** | 实体 age / 曝光时长 | ② | 模型积累实体记忆的时间窗(corpus span 实现最纯,优于上市时长 metadata) |
-| **F_density** | 事实密度 | ③ | 数字 / 实体 / 日期 / 因果断言的密度(纯文本,极低成本) |
-| **F_datebin** | 确切日期分桶 / 年-日历 | ⑥ | 年份 / 季度 / 日历(模型对特定期记忆深;纯 metadata)。**挪因子扩展 decision** |
-| **F_len** | 文本长度 / 体量 | ③ | 总信息量(≠密度;早期降为 control,可重看升格) |
-| **F_symmetry** | 事件多空对称性 | ④ | 事件类天然单向(破产必跌)vs 双向(财报可涨可跌)。结构属性,**不踩 directional 红线** |
+### 1.3 directional-label 红线族 — 纸面因子全 DROP(R-1n 另留一个 exploratory 反身化身)
 
-### 1.3 候选 — 卡 directional-label 红线(命运绑"语料有无合法 sentiment 标注")
+> 红线:这族都需一个"看涨 / 看跌 / 可预测性"的方向打分,须**独立于 P_predict**,禁真实股价
+> (ex-post)/ fleet 输出。各纸面因子或踩此红线、或冗余于已有因子,无独立干净地盘 → 全 DROP。
+> "答对吃不吃记忆""文本方向"这些"因子被 DROP 后仍想测的机制",归 estimand 层(扰动抵抗)/ 已有因子,不另设因子。
+> **唯一例外**:R-1n 的反身化身 **F_predict**(模型自判方向作 case 分箱)是 exploratory 因子(见末行);
+> 它取自算子 P_predict,F_predict↔P_predict 命名配对刻意。被 DROP 的"结果可预测性"(R-1p)**不占因子代号**。
 
-> 红线:这族都需要一个"看涨/看跌/可预测性"的方向打分,**必须独立于 P_predict**
-> (否则混入模型 bias 且与被测任务循环)。合法来源:规则/词典(噪声大)、Thales 已有
-> sentiment 标注(若有,最干净,**待查语料 schema**)、外部 judge(非 fleet 模型)。
-> **禁**:真实股价(ex-post)、fleet 模型输出。
+| 码 | 因子 | 环节 | 测什么 | 结局 |
+|---|---|---|---|---|
+| **F_textdir** | 文本方向信息 | ④ | case 客观传利好 / 利空 | R-1n — 纸面因子 **DROP**(反身化身见末行 F_predict) |
+| **F_corpusbal** | 语料多空失衡比 | ④ | 该事件类语料多 / 空样本比 | R-1o — **DROP** |
+| — | 结果可预测性 | ⑤ | 结果能否不靠记忆推出 | R-1p — **DROP**(它是因变量 / 扰动抵抗的回归纵轴、拿答案标答案;**不占因子代号**) |
+| **F_surprise** | 事件意外性 | ⑤ | 事件发生的不可预期 | R-1q — **DROP**(撞 F_template,且 metric 微妙) |
+| **F_predict** | 模型自判方向(反身) | ⑤ | 拿模型自判方向(取自算子 P_predict)给 case 分箱 | R-1n 反身化身 — **exploratory**(反身内生,pilot 试) |
 
-| 码 | 因子 | 环节 | 测什么 / 难点 |
-|---|---|---|---|
-| **F_textdir** | 文本方向信息 | ④ | 这条 case 客观传利好 / 利空(A vs B 区分的 A 文本版) |
-| **F_corpusbal** | 语料多空失衡比 | ④ | 该事件类语料里多 / 空样本比 |
-| **F_predict** | 结果可预测性 | ⑤ | 结果能否不靠记忆推出(pilot 有"中频比高频更脆"反直觉) |
-| **F_surprise** | 事件意外性 | ⑤ | 事件**发生**的不可预期(≠结果方向;需语料事前定义该类是否常被预告) |
+### 1.4 A 组方向先验 — 障碍在 Type A 闸门上游已夹死
 
-### 1.4 候选 — A 组方向先验(命运绑"Type A 良性闸门")
+> 这族想测"事件 / 实体 / 时期自带方向先验"(降息利多、茅台常涨、某期成长占优)。共同结局:
+> 作因子变量要么测量天生反身、要么冗余于已有因子(F_topic / F_datebin),障碍都在 Type A
+> 良性闸门**上游**(走不到闸门那一步)→ DROP(非 pending)。"模型靠不靠先验顶替读正文"的
+> 科学问题归**扰动抵抗**(C_SR/C_FO 后预测不变 = 用先验代替读文本 = 泄露)+ 客观历史(§1.6 R-1w)。
 
-> 总闸门:早期把"方向先验记忆"整体判成"良性背景能力",A 组因此蒸发。
-> **推翻它的钥匙**:先验是良性还是泄露捷径,取决于"模型是否用先验代替读文本",
-> 而这**可用 C_SR/C_FO 扰动抵抗测**(扰动后不变 = 用先验代替读文本 = 泄露)。
+| 码 | 因子 | 环节 | 测什么 | 结局 |
+|---|---|---|---|---|
+| **F_entval** | 实体 valence 先验 | ④ | 实体名带方向("茅台常涨"),≠中性 F_salience | R-1r — **DROP**(测量天生 模型×实体 反身) |
+| **F_structdir** | 结构方向先验 | ④ | event-class→方向("降息利多");categorical | R-1s — **DROP**(冗余 F_topic / 踩 F_textdir 红线) |
+| **F_regime** | regime 风格记忆 | ⑥ | 时期→市场风格("2020 后成长占优") | R-1t — **DROP**(风格无权威定义 + 冗余 F_datebin) |
+| **F_topic** | topic / 事件类型 | ④⑤混 | 事件类型(无序分类) | R-1u — 进候选池(pilot 查与 F_template/F_recur 共线) |
+| **F_industry** | industry / 行业 | ④ | 行业归属(纯归属,无序分类) | R-1v — 进候选池(pilot 查共线) |
 
-| 码 | 因子 | 环节 | 测什么 / 难点 |
-|---|---|---|---|
-| **F_entval** | 实体 valence 先验 | ④ | 实体名带方向("茅台常涨"),≠中性 F_salience。须白盒激活探针或语料共现比,**禁 LLM 输出** |
-| **F_structdir** | 结构方向先验 | ④ | event-class→方向("降息利多")。categorical |
-| **F_regime** | regime 风格记忆 | ⑥ | 时期→市场风格("2020 后成长占优")。regime 标签需 ex-ante 定义 |
-| **F_topic** | topic / 事件类型 | ④⑤混 | 事件类型(categorical 吃系数预算;与 F_template/F_recur 重叠) |
-| **F_industry** | industry / 行业 | ④ | 行业归属→板块方向先验(纯归属干净但弱;真实趋势需股价 ex-post) |
+### 1.5 行情(结果驱动)因子族
 
-### 1.5 🆕 行情(结果驱动)因子族 — 本轮新增
+> 定位:真实收益当**案例标签**(在 L1 内,零成本拉 A 股行情),问"什么样结果的 case 更易被记住",
+> **不**让模型预测结果。与报道语料族(F_salience/F_recur)正交(收益由市场生成、报道量是不同
+> 生成过程),给交互分析独立变异;仅 F_mktcap×F_salience 角落 pilot 顺手 sanity-check。
+> 与 §1.3 红线**无关**(红线针对"文本传达的方向";这里恰是真实股价当 case 标签,合法且便宜)。
 
-> **定位**:真实收益从"预测目标"(危险,撞能力混淆)挪到"**案例标签**"(安全,在 L1 内,
-> 零成本拉 A 股行情)。问的是"**什么样结果的 case 更容易被记住**",**不是**让模型预测结果。
-> **正交性(本轮修正)**:行情族与报道语料族(F_salience/F_recur)是**正交的两个轴** ——
-> 收益方向/幅度由市场生成,与媒体报道量是不同的生成过程,给交互分析提供**独立变异**
-> (上一轮"共线"caveat 降级;仅 F_mktcap×F_salience 这个角落 pilot 顺手 sanity-check,
-> 不改"正交轴"立场)。
+| 码 | 因子 | 环节 | 测什么 | 结局 |
+|---|---|---|---|---|
+| **F_mktdir** | 结果方向(涨/跌) | ④ | 导致上涨的新闻是否更易被记住 | R-1k — 进候选池 |
+| **F_mktmag** | 结果幅度(涨得猛不猛) | ③④ | 涨得猛的股票是否更易被记住 | R-1l — 进候选池 |
+| **F_mktcap** | 市值 | ②③ | 市值高的股票是否更易被记住 | R-1m — 进候选池 |
 
-| 码 | 因子 | 环节 | 测什么 |
-|---|---|---|---|
-| **F_mktdir** | 结果方向(涨/跌) | ④ | 导致**上涨**的新闻是不是更容易被记住 |
-| **F_mktmag** | 结果幅度(涨得猛不猛) | ③④ | **涨得猛**的股票是不是更容易被记住 |
-| **F_mktcap** | 市值 | ②③ | **市值高**的股票是不是更容易被记住 |
+> 操作化(窗口 / 基准 / 方向编码 / 阈值 / 涨跌停)定稿见各 R-1k/l/m DECISIONS;pilot 也测
+> "方向×大小"合一的带符号 r 形式。
 
-> 注:F_mktdir/mag 是"案例标签",与 §1.3 的 directional 红线**无关**(红线针对的是"文本传达的
-> 方向",来源不能是真实股价;这里恰恰**就是**真实股价当 case 标签,合法且便宜)。
+### 1.6 标的历史价格行为族(R-1w,R-1r 催生)
 
-### 1.6 明确不是因子(归 estimand / 诊断 / 负对照,不占因子预算)
+> 用标的**客观真实历史价格**(后复权)当合法 case 标签,承载 R-1r 无法测量的"实体方向先验"
+> 科学问题(实体过往是不是常涨 / 常被大波动,而非"模型觉得它常涨")。
+
+| 因子 | 测什么 | 结局 |
+|---|---|---|
+| 标的历史价格行为 | 方向 / 大小 / 波动 × {published_at, cutoff} 双锚,共 6 候选 | R-1w — 进候选池(pilot 选 / 降级;spec 见同目录 `R1w_operationalization_spec.md`) |
+
+### 1.7 明确不是因子(归 estimand / 诊断 / 负对照,不占因子预算)
 
 | 想法 | 类型 | 归宿 |
 |---|---|---|

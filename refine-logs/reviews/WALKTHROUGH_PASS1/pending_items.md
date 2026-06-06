@@ -124,6 +124,11 @@
     闸门不适合因子准入(supersedes 构念效度框架中的 F_template 闸门)。
     方法论:零 spec 从对话中设计;用户贡献两条关键洞察(n-gram 频率 =
     骨架操作化;泛化替代通道替换失效的槽位替代通道)。
+  - **因子候选池 candidate-pool review(R-1g…R-1x):closed 2026-06-05** —— R-1a/b/c/d/f
+    已锁机制之外的全部候选因子快速过完,每个定候选池准入结局(进候选池 / DROP)。
+    **汇总索引(单一真相)= `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/four_layer_candidate_pools.md` §1**;
+    canonical 逐因子决策 = 各 `REOPEN_R1_R6/R1{g…x}_*/R1*_DECISIONS.md`。verdict 不在此处复述
+    (避免多副本漂移)。下游解锁:**R-1e** 在 pilot 后从候选池选 / 降级。
 - **R-2 扰动**:6 个扰动各自的实现构思 → 然后保留几个 / 哪几个进
   confirmatory。用户点名要重审 C_NoOp。C_FO/C_NoOp 实现(WS3 `c_fo_rules
   .yaml` 等)尚未建。

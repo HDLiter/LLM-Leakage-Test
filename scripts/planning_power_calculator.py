@@ -4,12 +4,12 @@ This is a closed-form planner for design-time scenario sweep, NOT the
 §8.8 Monte-Carlo simulation. For prereg-grade power claims see the
 §8.8 MC simulator (deferred to post-pilot; needs pilot `hat(beta)` +
 `hat(Sigma)` to calibrate). Per
-`refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/DECISIONS.md`
+`archive/r4_r5a_lineage/refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/DECISIONS.md`
 decision #3 (the "two-tool model"): keep this calculator closed-form
 and pin the post-pilot MC simulator separately so the two cannot be
 confused. Cross-reference: plan §8.8.
 
-Per Tier-0 #10 (`refine-logs/reviews/R5A_DESIGN_REVIEW_20260427/SYNTHESIS.md`)
+Per Tier-0 #10 (`archive/r4_r5a_lineage/refine-logs/reviews/R5A_DESIGN_REVIEW_20260427/SYNTHESIS.md`)
 + Statistical lens §1: the prior simulation hard-coded `N_model = 9` and
 must be updated to the actual design:
 

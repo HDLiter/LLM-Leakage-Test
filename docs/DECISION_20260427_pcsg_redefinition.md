@@ -5,7 +5,7 @@ phase: Phase 7
 authority: supersedes R5A_FROZEN_SHORTLIST.md §1 PCSG definition; extends fleet roster
 related_docs:
   - archive/r4_r5a_lineage/refine-logs/reviews/WS1_CODE_REVIEW/stats_lens.md (origin of M1 issue)
-  - refine-logs/reviews/PCSG_PAIR_HUNT/open_source_landscape.md (fleet candidate scan)
+  - archive/r4_r5a_lineage/refine-logs/reviews/PCSG_PAIR_HUNT/open_source_landscape.md (fleet candidate scan)
   - plans/ws1-cloud-execution.md
   - plans/phase7-pilot-implementation.md
 status: SIGNED — implementation in progress
@@ -145,7 +145,7 @@ timestamps.
 - `scripts/build_cutoff_probe_set.py` — sample **2,160 articles** (60/month × 36 months 2023-01..2025-12; the 1,440 figure in this memo's first draft was an arithmetic error preserved in §2.4 and corrected here on 2026-04-29)
 - `scripts/run_cutoff_probe.py` — call P_logprob and P_extract
 - `data/pilot/cutoff_probe/month_stratified_scores.parquet` — output
-- `src/r5a/analysis/cutoff_probe.py` — knee detection on the curve (current threshold-based detector to be replaced by piecewise WLS + bootstrap CI; tracked as Tier-0 implementation item per `refine-logs/reviews/R5A_DESIGN_REVIEW_20260427/SYNTHESIS.md` §5)
+- `src/r5a/analysis/cutoff_probe.py` — knee detection on the curve (current threshold-based detector to be replaced by piecewise WLS + bootstrap CI; tracked as Tier-0 implementation item per `archive/r4_r5a_lineage/refine-logs/reviews/R5A_DESIGN_REVIEW_20260427/SYNTHESIS.md` §5)
 
 Path E runs alongside the main WS1 pilot on the same cloud instance;
 estimated +1.5h GPU time, +1 day engineering.

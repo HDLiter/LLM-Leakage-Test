@@ -17,13 +17,13 @@
 # and `operator_inferred` values as inputs to the path-E empirical cutoff
 # probe rather than ground truth. See
 # docs/DECISION_20260427_pcsg_redefinition.md and
-# refine-logs/reviews/PCSG_PAIR_HUNT/open_source_landscape.md.
+# archive/r4_r5a_lineage/refine-logs/reviews/PCSG_PAIR_HUNT/open_source_landscape.md.
 #
 # Llama-3-8B-Instruct + Llama-3.1-8B-Instruct were added 2026-04-29 as
 # the second confirmatory PCSG temporal pair (vendor-stated cutoffs:
 # 2023-03 vs 2023-12). They run bf16 because no clean same-maintainer
 # AWQ pair exists for Llama-3 + 3.1 (verification §3 of
-# refine-logs/reviews/PCSG_PAIR_HUNT/llama_family_verification_20260429.md).
+# archive/r4_r5a_lineage/refine-logs/reviews/PCSG_PAIR_HUNT/llama_family_verification_20260429.md).
 # Their Chinese-finance instruction-following is too weak for confirmatory
 # P_predict (verification §6), so they carry `p_predict: null` and are
 # excluded from E_CMMD / E_OR / E_NoOp / E_extract.

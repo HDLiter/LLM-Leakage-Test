@@ -1,6 +1,6 @@
 """WS1 fleet provenance pinner.
 
-Per Tier-0 #2 (`refine-logs/reviews/R5A_DESIGN_REVIEW_20260427/SYNTHESIS.md`)
+Per Tier-0 #2 (`archive/r4_r5a_lineage/refine-logs/reviews/R5A_DESIGN_REVIEW_20260427/SYNTHESIS.md`)
 + plan §10.1: confirmatory runs MUST NOT carry `<TBD>` placeholders for
 `tokenizer_sha` or `hf_commit_sha`. Run this script after
 `huggingface-cli download` finishes for each white-box model on the

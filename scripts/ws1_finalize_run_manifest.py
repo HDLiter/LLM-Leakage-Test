@@ -1,13 +1,13 @@
 """WS1 RunManifest finalizer.
 
-Per Tier-0 #4 (`refine-logs/reviews/R5A_DESIGN_REVIEW_20260427/SYNTHESIS.md`)
+Per Tier-0 #4 (`archive/r4_r5a_lineage/refine-logs/reviews/R5A_DESIGN_REVIEW_20260427/SYNTHESIS.md`)
 + Operational §6: a confirmatory cloud run is non-reproducible without
 a single artifact joining together pinned fleet + main traces + Path E
 output + pcsg_pairs hash + vLLM runtime digest + sub-artifact hashes. This
 script writes that artifact (`RunManifest`).
 
 2026-04-30 R2 amendments
-(`refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/DECISIONS.md`):
+(`archive/r4_r5a_lineage/refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/DECISIONS.md`):
 
   - decision #1 — confirmatory mode runs an 11-clause hard-fail check
     (`_confirmatory_hard_fail`) before constructing the manifest. Each

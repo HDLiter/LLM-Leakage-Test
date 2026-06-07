@@ -11,9 +11,9 @@ authority: |
 related_docs:
   - docs/DECISION_20260427_pcsg_redefinition.md (PCSG cross-version definition + Path E + pcsg_pairs registry)
   - docs/DECISION_20260429_gate_removal.md (strict-majority denominator rule + "fleet expansion alone does not require shortlist amendment" — invoked here)
-  - refine-logs/reviews/PCSG_PAIR_HUNT/llama_family_verification_20260429.md (Codex MCP verification of all Llama family claims)
-  - refine-logs/reviews/PCSG_PAIR_HUNT/open_source_landscape.md (original 2026-04-26 OSS landscape scan, §3.8 Llama family + §7.1 Recommendation B)
-  - refine-logs/reviews/R5A_DESIGN_REVIEW_20260427/SYNTHESIS.md (C2 second PCSG pair as Tier-1 remediation; A4 cutoff provenance attack; A2 Path E knee artifact attack; A3 AWQ-vs-fp16 pooling attack)
+  - archive/r4_r5a_lineage/refine-logs/reviews/PCSG_PAIR_HUNT/llama_family_verification_20260429.md (Codex MCP verification of all Llama family claims)
+  - archive/r4_r5a_lineage/refine-logs/reviews/PCSG_PAIR_HUNT/open_source_landscape.md (original 2026-04-26 OSS landscape scan, §3.8 Llama family + §7.1 Recommendation B)
+  - archive/r4_r5a_lineage/refine-logs/reviews/R5A_DESIGN_REVIEW_20260427/SYNTHESIS.md (C2 second PCSG pair as Tier-1 remediation; A4 cutoff provenance attack; A2 Path E knee artifact attack; A3 AWQ-vs-fp16 pooling attack)
 status: SIGNED — implementation deferred to the next Tier-0 batch
 ---
 
@@ -39,7 +39,7 @@ issues that a single design move can address:
    `quant_scheme` field labels but does not remove the bias.
 
 A 2026-04-29 Codex MCP verification of the Llama family
-(`refine-logs/reviews/PCSG_PAIR_HUNT/llama_family_verification_20260429.md`)
+(`archive/r4_r5a_lineage/refine-logs/reviews/PCSG_PAIR_HUNT/llama_family_verification_20260429.md`)
 confirmed that **Llama-3-8B-Instruct + Llama-3.1-8B-Instruct** is the
 only open-weight pair in the OSS landscape that simultaneously
 satisfies: vendor-stated cutoff differential (~9 months: March 2023

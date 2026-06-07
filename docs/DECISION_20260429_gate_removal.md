@@ -9,7 +9,7 @@ authority: |
   amends DECISION_20260427_pcsg_redefinition.md §2.5 (WS6 trigger language).
 related_docs:
   - docs/DECISION_20260427_pcsg_redefinition.md (PCSG redefinition + Path E + WS6 conditional; this memo amends its §2.5 WS6 trigger)
-  - refine-logs/reviews/R5A_DESIGN_REVIEW_20260427/SYNTHESIS.md (Round 1 design review that surfaced the gate ambiguity)
+  - archive/r4_r5a_lineage/refine-logs/reviews/R5A_DESIGN_REVIEW_20260427/SYNTHESIS.md (Round 1 design review that surfaced the gate ambiguity)
   - refine-logs/reviews/R5A_STEP2/R5A_FROZEN_SHORTLIST.md (frozen scope; amendments header updated to point here)
   - plans/phase7-pilot-implementation.md (master plan; §7.1, §7.1A, §13 affected)
 status: SIGNED — committed alongside the Tier-0 documentation batch
@@ -262,7 +262,7 @@ extraction; tracked as a separate operational task.
 This memo is committed alongside the rest of the Tier-0 documentation
 batch (PCSG denominator policy, WS6 Path C execution path, BL2 Option I
 sample expansion). Together they constitute the design corrections
-arising from R5A Round 1 design review (`refine-logs/reviews/R5A_DESIGN_REVIEW_20260427/`).
+arising from R5A Round 1 design review (`archive/r4_r5a_lineage/refine-logs/reviews/R5A_DESIGN_REVIEW_20260427/`).
 
 After commit, the next blocker is the Tier-0 implementation batch
 (items 1-6 + 10 in `SYNTHESIS.md` §5): RunManifest closure, fleet-pin

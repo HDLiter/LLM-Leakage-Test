@@ -3,9 +3,9 @@ title: Tier-R2-0 Implementation Plan — Cloud-Spend Gate Closure + Bundled Rena
 date: 2026-04-30
 target_commit: 8350d9e (branch main)
 review_inputs:
-  - refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/SYNTHESIS.md
-  - refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/DECISIONS.md
-  - refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/lens_{A,B,C,D,E}_*.md
+  - archive/r4_r5a_lineage/refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/SYNTHESIS.md
+  - archive/r4_r5a_lineage/refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/DECISIONS.md
+  - archive/r4_r5a_lineage/refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/lens_{A,B,C,D,E}_*.md
 plan_review_inputs:
   - .scratch/codex_prompts_plan_review/SYNTHESIS.md (cross-lens plan review, 5 Codex xhigh threads)
   - .scratch/codex_prompts_plan_review/REPORT_{sequencing,scope,file_accuracy,tests,risk}.md
@@ -1286,7 +1286,7 @@ Write the following content to `.scratch/commit_msg_tier_r2_0.txt`:
 ```
 R2 Tier-0 patch: cloud-spend gate closure + bundled renames
 
-Sources: refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/
+Sources: archive/r4_r5a_lineage/refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/
   - SYNTHESIS.md (R2-C1..R2-C6 cross-lens + R2-U1..R2-U18 single-lens)
   - DECISIONS.md (12 user-confirmed resolutions + Tier-R2-0/R2-1 breakdown)
   - .scratch/codex_prompts_plan_review/SYNTHESIS.md (post-plan review)

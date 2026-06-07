@@ -1,7 +1,7 @@
 """Pin RunManifest field set per DECISION_20260427 §3.2 +
 DECISION_20260429_gate_removal §2.6 + DECISION_20260429_llama_addition §3.2 +
 2026-04-30 R2 amendments
-(refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/DECISIONS.md
+(archive/r4_r5a_lineage/refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/DECISIONS.md
 decisions #1, #2, #5, #11).
 
 A confirmatory cloud run with a manifest missing any of these fields is

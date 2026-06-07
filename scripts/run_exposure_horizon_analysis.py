@@ -3,12 +3,12 @@ month-stratified Min-K% per model, and detect the empirical exposure
 horizon via piecewise-WLS with case-bootstrap CI.
 
 References:
-- `refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/DECISIONS.md`
+- `archive/r4_r5a_lineage/refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/DECISIONS.md`
   decision #5 (rename of `cutoff_observed` → `exposure_horizon_observed`,
   2026-04-30) — the analysis output keys and dataclass fields use
   `horizon_observed`/`horizon_ci_*` here.
 - Tier-0 #3 in
-  `refine-logs/reviews/R5A_DESIGN_REVIEW_20260427/SYNTHESIS.md` — the
+  `archive/r4_r5a_lineage/refine-logs/reviews/R5A_DESIGN_REVIEW_20260427/SYNTHESIS.md` — the
   piecewise-WLS detector specification.
 
 Run AFTER:

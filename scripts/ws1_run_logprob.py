@@ -18,7 +18,7 @@ Per-model invocation pattern (pilot, after WS4 builds the manifest):
         --output-dir data/pilot/logprob_traces
 
 Per-model invocation pattern (Path E empirical exposure-horizon probe;
-per `refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/DECISIONS.md`
+per `archive/r4_r5a_lineage/refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/DECISIONS.md`
 decision #5 — Path E no longer rides the `--smoke` flag, has its own
 output directory `data/pilot/exposure_horizon/traces/` and demands the
 2,160-case probe fixture):

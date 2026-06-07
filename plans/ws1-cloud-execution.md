@@ -15,7 +15,7 @@ quantization_decision:
   qwen2_5_family: AWQ-INT4 (5 sizes — official Qwen AWQ)
   qwen3_family:   AWQ-INT4 (4 sizes — official Qwen AWQ; 1.7B not available officially, skipped)
   glm_family:     fp16 (no official GLM-4-9B AWQ)
-  llama3_family:  bf16 (no clean same-maintainer AWQ pair for Llama-3 + 3.1; verification §3 of refine-logs/reviews/PCSG_PAIR_HUNT/llama_family_verification_20260429.md)
+  llama3_family:  bf16 (no clean same-maintainer AWQ pair for Llama-3 + 3.1; verification §3 of archive/r4_r5a_lineage/refine-logs/reviews/PCSG_PAIR_HUNT/llama_family_verification_20260429.md)
 budget_cap_usd: 45  # accommodates Llama (2 models × 1.5 hr Stage 2 + Path E + hidden-state ≈ 6 hr) and Stage 2.8 AWQ-vs-fp16 audit (Qwen2.5-7B bf16 × 780 cases ≈ 3 hr)
 ---
 
@@ -89,7 +89,7 @@ exposes no logprobs). P_logprob requires direct vLLM access.
 | Qwen2.5 quant | AWQ-INT4 (5 sizes: 1.5B, 3B, 7B, 14B, 32B; all Alibaba-official) | HF verified 2026-04-27 |
 | Qwen3 quant | AWQ-INT4 (4 sizes: 4B, 8B, 14B, 32B; all Alibaba-official). **Qwen3-1.7B-AWQ does not exist as Alibaba-official; skipped** to avoid mixing precision within-family | HF verified 2026-04-27 |
 | GLM quant | fp16 (no official AWQ) | Same as before |
-| Llama-3 / 3.1 quant | bf16 (no clean same-maintainer AWQ pair for 3.0 vs 3.1; mixing community AWQs would confound calibration) | Verification 2026-04-29 — `refine-logs/reviews/PCSG_PAIR_HUNT/llama_family_verification_20260429.md` §3 |
+| Llama-3 / 3.1 quant | bf16 (no clean same-maintainer AWQ pair for 3.0 vs 3.1; mixing community AWQs would confound calibration) | Verification 2026-04-29 — `archive/r4_r5a_lineage/refine-logs/reviews/PCSG_PAIR_HUNT/llama_family_verification_20260429.md` §3 |
 
 **E_PCSG (cross-version) validity**: relies on the `Qwen2Tokenizer`
 class being shared between Qwen2.5 and Qwen3 with byte-identical core

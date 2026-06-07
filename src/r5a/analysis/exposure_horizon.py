@@ -1,10 +1,10 @@
 """Path-E empirical exposure-horizon probe — analysis helpers.
 
-Per `refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/DECISIONS.md`
+Per `archive/r4_r5a_lineage/refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/DECISIONS.md`
 decision #5 (rename of `cutoff_observed` → `exposure_horizon_observed`,
 2026-04-30) and the original detector spec in
 `docs/DECISION_20260427_pcsg_redefinition.md` §2.4 + Tier-0 #3
-remediation in `refine-logs/reviews/R5A_DESIGN_REVIEW_20260427/SYNTHESIS.md`
+remediation in `archive/r4_r5a_lineage/refine-logs/reviews/R5A_DESIGN_REVIEW_20260427/SYNTHESIS.md`
 (C1 / Statistical §3): take a temporally-stratified Min-K%++ score and
 locate the breakpoint where the model's familiarity drops off sharply.
 The breakpoint is the model's empirical training-data exposure horizon.

@@ -464,7 +464,7 @@ class RunManifest(BaseModel):
       fleet eligibility rosters copied from the loaded fleet YAML.
 
     Historical rename rationale is tracked in
-    `refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/DECISIONS.md`,
+    `archive/r4_r5a_lineage/refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/DECISIONS.md`,
     especially decisions #1, #2, #5, and #11.
     """
 

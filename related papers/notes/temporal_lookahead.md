@@ -184,16 +184,18 @@
 ---
 
 ## Time Is Encoded in the Weights of Finetuned Language Models
-**Authors & Year:** Nylund et al. (2024)
+**Authors & Year:** Kai Nylund, Suchin Gururangan, Noah A. Smith (2024); ACL 2024 Long Papers pp.2571–2587; arXiv:2312.13401
 
-**Summary:** Recent work has proposed that language models perform computation by manipulating one-dimensional representations of concepts (“features”) in activation space. In contrast, we explore whether some language model representations may be inherently multi-dimensional. We begin by developing a rigorous definition of irreducible multi-dimensional features based on whether they can be decomposed into either independent or non-co-occurring lower-dimensional features.
+> **Correction 2026-06-06:** this entry's summary was previously mis-copied from Engels et al., *Not All Language Model Features Are Linear* (arXiv:2405.14860, sparse-autoencoder / multi-dimensional features). Corrected to the actual Nylund paper below.
+
+**Summary:** Fine-tuning a base model on text from a single time period and then subtracting the original pretrained weights yields a "time vector" — a direction in weight space that specializes the model to that period. Time vectors from different periods form a structured manifold (adjacent periods are closer in weight space), and interpolating along this structure can adapt a model to intermediate or future times without retraining.
 
 **Key methods/findings**
-- Motivated by these definitions, we design a scalable method that uses sparse autoencoders to automatically find multi-dimensional features in GPT-2 and Mistral 7B.
-- In contrast, we explore whether some language model representations may be inherently multi-dimensional.
-- Overall, our work argues that understanding multi-dimensional features is necessary to mechanistically decompose some model behaviors.
+- Time vector = (weights finetuned on a period) − (original pretrained weights); it specializes the model to that time period.
+- Time vectors are organized by a temporal structure in weight space (closer dates → nearer vectors), across tasks and model scales.
+- Interpolating / extrapolating along this temporal structure improves performance on intervening or later periods.
 
-**Insight for our project:** This paper is directly aligned with our setting because Chinese financial news is time sensitive. It supports CFLS scoring against publication dates, fake-date counterfactuals, and tests for evidence intrusion where DeepSeek-chat answers with post-cutoff knowledge not licensed by the supplied article. It also maps directly to evidence-intrusion scoring.
+**Insight for our project:** Mechanistic evidence that *temporal information is encoded in the model weights themselves* (not only in inputs) — supports treating cutoff / temporal exposure as a real property of the parameters, complementary to our Cutoff Exposure factor and the look-ahead estimands. Not a finance paper; cite as representation-level grounding only.
 
 ---
 

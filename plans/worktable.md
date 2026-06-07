@@ -79,14 +79,14 @@ R-1 因子层对 **R-1e** 的依赖已清空、**只剩 pilot 数据**(选 / 降
 |---|---|---|---|
 | **R-4a** | **方法论审计** | 无 | **✔ closed 2026-05-23** → `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/R4a_DECISIONS.md` |
 | **R-0** | **Corpus Architecture** | 无 | **✔ closed 2026-05-23 PM late** → `refine-logs/reviews/REOPEN_R1_R6/R0_corpus_arch/R0_DECISIONS.md` |
-| R-6 | 预测目标 & 是否/如何用真实收益(含 parked C_FO/C_SR 漂移调查) | 无(R-4a 给的容量答案是"不锁数,加新 estimand 要替换或开新 design memo") | ✅ 可动(2026-05-23 解封) |
+| R-6 | 预测目标 & 真实收益用法 + C_FO 去留 | — | **✔ closed 2026-06-06** → `refine-logs/reviews/REOPEN_R1_R6/R6_pred_target_cfo/R6_DECISIONS.md`:**C_FO 删**;P_predict 输出形式待算子分析;**会有一个涉及真实收益的记忆 estimand**(待 estimand 分析)。解锁 R-2 |
 | R-1a | Cutoff Exposure:实现 + 选择确认 | ~~无~~(已 closed) | **✔ 机制 closed 2026-05-27** → `refine-logs/reviews/REOPEN_R1_R6/R1a_cutoff_exposure/R1a_DECISIONS.md`;cutoff 中心值 provisional 待探针;R-1e / R-5 Pool I / R-4b 误分类模拟解锁 |
 | R-1b | Historical Family Recurrence:实现 + lock-in | ~~R-0~~(已 closed) | **✔ closed 2026-05-24** → `refine-logs/reviews/REOPEN_R1_R6/R1b_recurrence/R1b_DECISIONS.md`;R-1c / R-1e / R-5 Pool G / B-2 schema 解锁 |
 | R-1c | Target Salience:实现 + lock-in | ~~R-0~~(已 closed) | **✔ closed 2026-05-25** → `refine-logs/reviews/REOPEN_R1_R6/R1c_target_salience/R1c_DECISIONS.md`;R-1e / R-5 Pool G / B-2 schema / R-4b 追加 retrospective tail-leverage 解锁 |
 | R-1d | Template Rigidity:从零设计 | ~~无~~ | **✔ closed 2026-06-02** → `R1d_template_rigidity/R1d_DECISIONS.md`;进 R-1e 候选池(操作化 open items 待 pilot 前用户审计) |
 | R-1g…x | 因子候选池快速评审(f/g/h/i/k/l/m/u/v/w/x 进池 · j/n/o/p/q/r/s/t DROP) | R-0 / R-4(已解锁) | **✔ closed 2026-06-05** → 汇总索引 `R4_methodology_audit/four_layer_candidate_pools.md` §1;逐因子 `R1*_DECISIONS.md` |
 | R-1e | 因子最终选择确认(从候选池选 / 降级,数 power-bounded) | ~~R-1a-d~~(因子层已全 closed)· **pilot 数据** | ⛔ **待 pilot**(因子层依赖已清,选 / 降级靠实证) |
-| R-2 | 6 扰动实现构思 → 选保留几个进 primary(重审 C_NoOp;C_FO vs C_SR 漂移见 `.scratch/cfo_csr_history_findings.md`);perturbation-specific eligibility flag 在 R-0 HOOK1/HOOK2 占位落地 | R-6(C_FO 机制选择)+ ~~R-0~~(已 closed,但 R-2 仍需 R-6 才能动 C_FO) | ⛔ 待 R-6(R-0 解锁部分:C_anon / C_NoOp 等不依赖 R-6 的扰动可先动) |
+| R-2 | 反事实扰动家族设计 → 选保留几个进 primary(重审 C_NoOp;**C_FO 已删** 见 R6_DECISIONS;主 backbone 选择);perturbation-specific eligibility flag 在 R-0 HOOK1/HOOK2 占位落地 | ~~R-6~~(✔ closed:C_FO 删)+ ~~R-0~~ | ✅ **可动**(R-6 已解锁) |
 | R-5 | 采样:R-0 expose 的 Pool B + G/H/I + D/E/F 扩展位;within-pool 分布(R-0 不强制叠加 G/H/I,row-random 合法)+ 准入过滤器 + per-article cap/dedupe 规则;反直觉案例过滤仍需 R-6 真实股价 | ~~R-0~~(已 closed)+ R-6(反直觉案例) | ✅ **可动 2026-05-23 PM late**(前半 within-pool 分布 + dedupe 规则不依赖 R-6;反直觉案例段待 R-6)|
 | R-3 | 负对照充分性 | R-1e · R-2(需知最终因子 / 扰动) | ⛔ 待上游 |
 | R-4b | pilot 具体统计(power 计算 / n_eff 矩阵 / 混合模型规格落地 / bootstrap 实施)—— R-4a 已锁 TOST/SESOI、scenario-based MC power 等框架 | R-1e · R-2 · R-3 · R-5(操作化定了才能算 power;R-4a 框架已就位) | ⛔ 待上游 |
@@ -336,7 +336,7 @@ flowchart TD
 | 组件 | 现状 | 价值 | 推荐 |
 |---|---|---|---|
 | P_logprob | WS1 已建 + 冒烟通过 + AutoDL 开好 | **核心** —— logprob 路线物理基础 | ✅ 已实现 |
-| P_predict | WS2 未开工 | **核心** —— 所有行为类信号 | ✅ 实现 minimal schema = direction + confidence;memory_flag / evidence 留 optional 字段(不进主张),等 pilot 看是否有信息 |
+| P_predict | WS2 未开工 | **核心** —— 所有行为类信号 | ⏳ 输出 schema **待算子逐个分析**(本次文献倾向方向分类 + 信心仅诊断 + 不裸吐数值);R-6 只确立「做行为判断」|
 | P_extract | Path E 探针集已建(reuse) | 中 —— Path E 经验探针 load-bearing | ✅ 已实现,保留 |
 | P_schema | 未实现 | 边缘(已划 follow-up paper) | ❌ **不做** |
 
@@ -344,9 +344,9 @@ flowchart TD
 
 | 组件 | 现状 | 价值 | 推荐 |
 |---|---|---|---|
-| C_FO | 机制未定(parked R-2+R-6 漂移) | **主路径** —— counterfactual 信号子领域同行(Wu 2024 / Mirzadeh 2025)用法 | ✅ **先做"就地换值"最小版**;pilot 后由 R-6 决定是否升级 T+1/T+5 真实收益版 |
+| ~~C_FO~~ | **✔ 删 2026-06-06(R-6)** | — | ❌ **删**(与 C_SR 实操重合 + 适用窄 + 伪迹);目标由反事实扰动 × cutoff 前后 × 显著度承接,见 R6_DECISIONS |
 | C_NoOp | WS3 未开工(用户点名重审) | 中(robustness / brittleness 信号,非直接 memorization) | ✅ 实现,定位 supporting |
-| C_SR | 与 C_FO 实操几乎重合(parked) | 中 —— secondary to C_FO within counterfactual family | ⏸ **先不单独做**;等 C_FO + pilot,如 C_FO 不足且 C_SR 有区分性再说 |
+| C_SR | 反事实扰动候选(C_FO 已删) | 中 —— 反事实信号 | ⏳ 角色 / 是否 primary / 进不进 confirmatory 留 R-2(本文不预设扰动名单) |
 | C_anon | exploratory(E_EAD_t / E_EAD_nt);依赖 WS0.5 entity 管线 | 中 —— identity-keyed memory probe | ⚖️ **先做 L0 vs L4 binary**,不做 L0-L4 dose 梯度 |
 | C_temporal | exploratory | 边缘 —— Cutoff Exposure 因子已直接 measure | ❌ **先不做**;pilot 看 E_CMMD 强度后再说 |
 | C_ADG | reserve(只改 system prompt) | 边缘但成本极低 | ✅ **做 D4b primary**(no text cues),备用 |
@@ -363,7 +363,7 @@ flowchart TD
 
 ### 7.4 总账
 
-- ✅ **实现**:P_predict、C_FO(简版)、C_NoOp、C_ADG、Cutoff Exposure、
+- ✅ **实现**:P_predict、C_NoOp、C_ADG、Cutoff Exposure、
   Recurrence、Salience、Template Rigidity
 - ⚖️ **实现简版**:C_anon(L0 vs L4)、P_predict schema 留扩展位
 - ⏸ **暂缓**:C_SR、C_temporal(等 pilot 数据再说)
@@ -377,9 +377,9 @@ flowchart TD
 | Recurrence(✅ 实现) | R-1b |
 | Salience(✅ 实现) | R-1c |
 | Cutoff Exposure(✅ 实现) | R-1a |
-| C_FO 机制(简版 → R-6 后升级) | R-2 + R-6 交叉项 |
+| ~~C_FO~~ 已删(R-6) | — |
 | C_NoOp(supporting) | R-2 |
 | C_SR / C_temporal(暂缓) | R-2(裁剪后) |
 | C_anon binary | R-2 |
-| P_predict schema | R-6 + WS2 |
+| P_predict 输出形式 | 算子逐个分析 + WS2 |
 | 反直觉案例过滤 | R-5(R-6 后) |

@@ -129,15 +129,10 @@
     **汇总索引(单一真相)= `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/four_layer_candidate_pools.md` §1**;
     canonical 逐因子决策 = 各 `REOPEN_R1_R6/R1{g…x}_*/R1*_DECISIONS.md`。verdict 不在此处复述
     (避免多副本漂移)。下游解锁:**R-1e** 在 pilot 后从候选池选 / 降级。
-- **R-2 扰动**:6 个扰动各自的实现构思 → 然后保留几个 / 哪几个进
-  confirmatory。用户点名要重审 C_NoOp。C_FO/C_NoOp 实现(WS3 `c_fo_rules
-  .yaml` 等)尚未建。
-  - **2026-05-23 增补 — C_FO vs C_SR 漂移发现(parked)**:R-6 走查里挖出
-    C_FO 当前定义(就地换值)与 C_SR(就地翻极性)在实操上几乎重合;且老
-    CPT 时代的 FO 是「文末追加 T+1/T+5 真实收益」(用真实股价)——名字
-    留下、机制换了。C_FO 机制选择**同时绑定 R-6**(用不用真实收益)。完整
-    血缘 + 推荐下一步见 `refine-logs/reviews/REOPEN_R1_R6/cfo_csr_history_findings.md`。等 R-4
-    方法论审计落地后再接此项。
+- **R-2 扰动**:反事实扰动家族各自的实现构思 → 保留几个 / 哪几个进
+  confirmatory。用户点名要重审 C_NoOp。**[R-6 ✔ 2026-06-06] C_FO 已删**(就地换结果值
+  与 C_SR 实操重合 + 很多电报无可改结果、适用窄;见
+  `refine-logs/reviews/REOPEN_R1_R6/R6_pred_target_cfo/R6_DECISIONS.md`);C_NoOp 等实现(WS3)尚未建。
 - **R-3 negative controls**:BL2 / 同-cutoff 证伪对 / C_NoOp_placebo / BL1 /
   BL3 是否充分,展开分析。
 - **R-4 pilot 统计整体**(原 β1/β3,已扩大):用户要求**单开一个 session**
@@ -186,25 +181,15 @@
   (已存在 WS0.5 §3.3.1 案例准入预过滤,但在重开区,一并重审)② 新闻长度
   filter(**新增** —— 超长讲话 / 一句话简讯;当前设计无长度过滤)③ 反直觉
   /难预测案例过滤(**新候选**,用户提:利好不及预期等)—— 双刃:让跨模型
-  分歧信号更干净,但可能扔掉扰动类最强证据;且需真实股价才能识别,实为
-  R-6 子决策 ④ 可能的其它准入规则。
-- **R-6 预测目标 & ground-truth 使用(flag ⑥,已深化)** — **2026-05-23 暂停,
-  待 R-4a 方法论审计**(family 大小决定 R-6 能不能加新 estimand):当前冻结
-  设计 P_predict 仅输出方向(涨/跌/中性 + 0-100 信心),**不碰已实现收益、
-  无持有期、无 beta**;estimand 全是行为对比,从不与真实股价对照。关键
-  澄清:"模型不能用 hindsight"(schema §2.4,测量有效性规则)≠ "实验者
-  不能用真实结果做分析"(后者当前设计无此限制,只是没用)。两个 ground
-  truth:事件结果(C_FO 需要,会建立)vs 真实股价涨跌(完全没用)。
-  用户判断:金融语料优势 = 结果可验证,当前设计未充分利用。待彻底调查:
-  实验者是否/如何用真实收益(协变量 / 难度指标 / 过滤标准 / 验证层)。
-  **与 R-2 选扰动(C_FO 靠事件结果)、R-5 过滤器、框架设定深度纠缠** ——
-  R-6 偏上游(但比 R-4a 下游)。名实缺口:算子名 "alpha prediction" / 动机
-  "false alpha" 但 benchmark 不算 alpha;动机↔测量靠论证连接,proposal 须
-  显式架桥。
-  - **2026-05-22 走查发现(parked)**:C_FO 当前机制 ≠ 老 CPT 时代的「文末
-    追加 T+1/T+5 真实收益」机制;FO 机制选择本身既是 R-2 也是 R-6 的决定。
-    详见 `refine-logs/reviews/REOPEN_R1_R6/cfo_csr_history_findings.md`。kickoff 已写好
-    (`.scratch/session_kickoff_r6.md`),R-4a 落地后再接此 session。
+  分歧信号更干净,但可能扔掉扰动类最强证据;需真实股价识别 —— R-6 已确立会有一个
+  涉及真实收益的记忆指标(2026-06-06),R-5 可复用其收益标签 ④ 可能的其它准入规则。
+- **R-6 预测目标 & ground-truth 使用(flag ⑥)— ✔ closed 2026-06-06**
+  canonical = `refine-logs/reviews/REOPEN_R1_R6/R6_pred_target_cfo/R6_DECISIONS.md`。一个删除 + 两个待定:
+  - **删除 C_FO**:与 C_SR 实操重合 + 很多电报无可改结果、适用窄;目标由反事实扰动 ×
+    cutoff 前后 × 显著度切片承接;反事实扰动家族设计归 R-2。
+  - **待定 ① P_predict 输出形式**:留算子逐个分析(本次文献倾向方向分类、信心仅诊断、不裸吐数值)。
+  - **待定 ② 涉及真实收益的记忆 estimand**:确定会有;形态 / 是否 confirmatory / 识别方式留
+    estimand 逐个分析,基于本次文献。
 
 ## 后果
 

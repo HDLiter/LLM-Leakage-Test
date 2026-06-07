@@ -1,7 +1,8 @@
-# C_FO vs C_SR — 历史血缘 + 当前发现(暂存,待 R-4 后再决)
+# C_FO vs C_SR — 历史血缘(SUPERSEDED 2026-06-06)
 
-> 状态:**parked**——等 R-4 方法论审计落地(它决定 confirmatory family 大小 /
-> multiplicity 校正级别)之后,再回头接 R-2 时处理。
+> 状态:**SUPERSEDED / 历史存档**——R-6 已决定**删除 C_FO**(见
+> `refine-logs/reviews/REOPEN_R1_R6/R6_pred_target_cfo/R6_DECISIONS.md`)。本文仅作历史血缘
+> 记录,**不再是活议题**;文中「文末追加真实收益」等机制属已废弃的旧探索,勿当现行设计。
 
 ## 当前 session 触发
 

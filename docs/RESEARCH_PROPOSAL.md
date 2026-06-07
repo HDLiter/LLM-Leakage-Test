@@ -198,23 +198,25 @@ cutoff 暴露带来的泄露"。这是一个有原则的混淆控制选择(交�
 | **P_predict** | 给文章 + 冻结任务 prompt,取方向 + 信心 + 记忆自报标记 + 证据引用 | 黑盒即可 | confirmed,主力 |
 | P_extract / P_schema | masked span 补全 / CLS 前缀续写 | 黑盒即可 | reserve |
 
-算子层本身较稳定;但 P_predict 究竟"被要求预测什么"涉及 §4.6 [R-6]。
+算子层本身较稳定;P_predict 的具体输出形式 **待算子逐个分析拍板**(§4.6 [R-6];
+本次文献倾向方向分类、自报信心仅作诊断)。
 
 ### 4.3 扰动 [R-2 重开中]
 
-冻结清单 6 个扰动,其中 **C_FO 与 C_NoOp 为 confirmatory**(喂 E_FO / E_NoOp):
+原冻结清单含 6 个扰动。**[R-6 ✔ 2026-06-06] C_FO(假结果)已删** —— C_FO(就地把
+文中结果值换成假值)与 C_SR(语义反转)实操重合,且很多电报没有可改的「结果」段、
+适用面窄;其目标(case 结果记忆)由反事实扰动 ×「cutoff 前 vs 后」× 标的显著度切片
+承接。详见 `refine-logs/reviews/REOPEN_R1_R6/R6_pred_target_cfo/R6_DECISIONS.md`。
 
-- **C_FO(假结果)** —— 把文章里已核实的真实结果值换成具体的假值。测模型
-  是否无视眼前的反事实证据、吐出记忆里的真实结果。
+其余扰动:
 - **C_NoOp(无关插入)** —— 插入一句无关但貌似合理的短句。测记忆是否表现
-  为脆弱的模板匹配。注:设计自身定性 E_NoOp 为 **robustness / 模板脆弱性
-  信号,非直接记忆证据**,作为多信号收敛的一部分进 confirmatory family。
+  为脆弱的模板匹配。定性为 **robustness / 模板脆弱性信号,非直接记忆证据**。
+- **C_SR(语义反转)/ C_anon / C_temporal / C_ADG** —— 各自角色 + 谁进
+  confirmatory,见 R-2。
 
-其余 4 个(C_anon / C_SR / C_temporal / C_ADG)只喂探索性 estimand。
-C_FO 与 C_NoOp 的变体均经全量人工审计(4 维 rubric,kappa≥0.70)。
-
-**[R-2 重开] 待定:** 6 个扰动各自的实现构思,以及最终保留几个 / 哪几个进
-confirmatory(用户点名重审 C_NoOp)。
+**[R-2 重开] 待定:** 反事实扰动家族的**具体设计**(保留几个 / 哪几个进
+confirmatory、C_SR 角色、主 backbone 选择;用户点名重审 C_NoOp)。
+变体均经全量人工审计(4 维 rubric,kappa≥0.70)。
 
 ### 4.4 estimand 与统计结构 [R-4a 框架已定 2026-05-23;具体清单 R-1/R-2/R-6 重开中]
 
@@ -238,11 +240,14 @@ BL2 等价检验、scenario-based MC power simulation。E_CMMD = Cross-Model
 **Cutoff-Monotone** Disagreement,claim 层与 memorization 解释解耦 ——
 只有与其它 estimand 收敛时才上升到 memorization characterization。
 
-**[R-1 / R-2 / R-6 重开] 待定**(R-4a scope 之外的 component-level,留给
-实现 + pilot 数据):具体哪些 estimand 进 primary、primary family 大小
-(S8 / S10 / S12 等)、哪些因子(数量与具体哪几个)、C_FO 机制(就地换值
-vs 文末追加真实收益)、P_predict 输出 schema(direction-only / + confidence
-/ + memory_flag / + evidence)。
+**[R-1 / R-2 重开] 待定**(R-4a scope 之外的 component-level,留给实现 + pilot
+数据):具体哪些 estimand 进 primary、primary family 大小(S8 / S10 / S12 等)、
+哪些因子(数量与具体哪几个)。
+
+**[R-6 ✔ 2026-06-06]**:**C_FO 已删**(§4.3);**P_predict 输出形式**待算子逐个分析拍板
+(本次文献倾向方向分类、信心仅诊断、不让模型裸吐收益数值);**确定会有一个涉及真实收益
+的记忆 estimand**,其形态 / 是否 confirmatory / 识别方式待 estimand 逐个分析拍板(基于
+本次文献)。canonical:`refine-logs/reviews/REOPEN_R1_R6/R6_pred_target_cfo/R6_DECISIONS.md`。
 
 **[R-4b] 仍开放**(等 R-1e / R-2 / R-3 / R-5 落定):power 计算具体数字、
 n_eff 矩阵、混合模型具体规格落地、bootstrap 实施细节。
@@ -267,18 +272,19 @@ R-4a 锁的负对照具体处理(详见 `refine-logs/reviews/REOPEN_R1_R6/R4_met
 **[R-3 重开] 待定:** 负对照整体充分性、C_NoOp_placebo 具体实现、BL3 中文
 非金融语料可得性。
 
-### 4.6 预测目标与 ground truth [R-6 重开中]
+### 4.6 预测目标与 ground truth [R-6 ✔ closed 2026-06-06]
 
-**现状:** 当前冻结设计中,P_predict 只输出一个**方向判断**(涨/跌/中性 +
-0–100 信心 + 记忆自报标记 + 证据引用),且 prompt 明令禁止模型使用已实现
-收益。所有 confirmatory estimand 都是**行为对比**(跨模型分歧、扰动翻转、
-文本意外度),**从不与真实股价对照** —— 当前设计**不碰已实现收益、无持有
-期、无 beta 调整**。
+canonical:`refine-logs/reviews/REOPEN_R1_R6/R6_pred_target_cfo/R6_DECISIONS.md`;证据底稿 =
+同目录 `R6_evidence.md` + `R6_litsearch_master_table.md`(72 篇)。本轮一个删除(C_FO,见 §4.3)+ 两件结论级、具体留下游:
 
-**[R-6 重开] 待定:** 一个关键区分 —— "模型不能用 hindsight"(测量有效性
-规则)≠ "实验者不能用真实结果做分析"。金融语料的优势正是结果可验证;当前
-设计未充分利用这一点。待彻底调查:实验者是否 / 如何用真实收益(作协变量 /
-难度指标 / 采样过滤标准 / 验证层)。本项与 §4.3 扰动、§4.7 采样深度纠缠。
+**(a) 预测目标 / P_predict 形式(待算子逐个分析拍板):** 模型做行为判断,输出形式未锁定。
+本次文献倾向方向分类(不让模型裸吐收益数值)、自报信心仅作诊断不进主张、数值 / 幅度召回另作
+探针;档位 / 信心刻度 / memory_flag / evidence 取舍等留算子分析,基于本次文献。
+
+**(b) 真实收益的身份(待 estimand 逐个分析拍板):** 确定会有一个**用真实涨跌评估记忆的
+estimand**(非主预测目标、非主指标)。其形态、是否 confirmatory、如何去掉模型能力与新闻采样
+质量的噪音、用符号还是幅度等,留 estimand 逐个分析,基于本次文献(`R6_evidence.md` 真实收益
+评估部分 + 72 篇总表)。
 
 ### 4.7 采样与准入过滤 [R-5 重开中;R-0 架构容器 2026-05-23 closed]
 
@@ -294,7 +300,7 @@ L1 / L2 保留作 Salience / Recurrence 分母客体,过滤只在 P_predict
 **[R-5 重开] 待定:** 分布策略选(row-random / G / H / I / 组合 —— **R-5
 全权,不锁**);per-article cap 与 dedupe 规则(段 (a) 同 article 多
 target 进 benchmark 的统计独立性问题);text_length 阈值;反直觉/难预测
-案例过滤(需真实股价识别,R-6 子决策);是否触发 Pool D / E / F 架构
+案例过滤(需真实股价识别;R-6 已确立会有涉及真实收益的记忆指标,可复用其收益标签);是否触发 Pool D / E / F 架构
 扩展。
 
 <!-- TODO[CROSS_SYNTH 🟡-4(c), approved 2026-05-23]:

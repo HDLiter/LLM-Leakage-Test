@@ -2,13 +2,7 @@
 title: Phase 7 Pilot Implementation Plan / Phase 7 试运行实施计划
 stage: Phase 7
 date: 2026-04-17
-revision: v2.3
-revision_date: 2026-04-29
-revision_basis: |
-  v2.2 (2026-04-18): refine-logs/reviews/PHASE7_PILOT/SYNTHESIS.md + WS0.5 scope deferral (A09 softened).
-  v2.3 (2026-04-29): Tier-0 batch from R5A_DESIGN_REVIEW_20260427 — fleet count sweep (5→10 white-box, 9→14 total per docs/DECISION_20260427_pcsg_redefinition.md); gate removal (docs/DECISION_20260429_gate_removal.md) collapses §7.1A to S20 only; WS6 unconditional via WS1 Stage 2.7 Path C; BL2 post-cutoff bucket 20→350 (Option I); pilot total N 100→430.
-  v2.4 (2026-04-29): Llama addition (docs/DECISION_20260429_llama_addition.md) — split-tier fleet 12 white-box (10 full-operator + 2 P_logprob-only Llama) + 4 black-box = 16 models. P_predict-eligible = 14 (Llama excluded), P_logprob-eligible = 12. Second confirmatory PCSG temporal pair `temporal_llama_cross_version`.
-status: FINAL for scope the plan actually commits to; pending items tracked in root `PENDING.md`
+status: current-state working plan (操作化层待 R-1e / R-2 / pilot 定稿; pending items tracked in root `PENDING.md`)
 open_decisions_resolved:
   - "OPEN 1: B (Phase 7b contingency)"
   - "OPEN 2: A (zero-shot baseline)"
@@ -16,13 +10,11 @@ open_decisions_resolved:
 deferred_items_tracked_in_PENDING_md:
   - "OPEN 4: audit staffing"
   - "WS0.5: Thales alignment design (T1/T2/T3 verification + reuse-vs-rebuild decision)"
-status: DRAFT
 depends_on:
   - refine-logs/reviews/R5A_STEP2/R5A_FROZEN_SHORTLIST.md
   - refine-logs/reviews/R5A_STEP2/MEASUREMENT_FRAMEWORK.md
-  - refine-logs/reviews/R5A_FLEET_REVIEW/FLEET_REVIEW_R2_SYNTHESIS.md
+  - config/fleet/r5a_fleet.yaml
   - config/prompts/R5A_OPERATOR_SCHEMA.md
-supersedes: none
 owner: ML research engineering + statistics working draft
 ---
 
@@ -33,12 +25,14 @@ owner: ML research engineering + statistics working draft
 Phase 7 is the first implementation phase after the R5A conceptual freeze on 2026-04-16. The pilot is a **Stage 1 execution** in a two-stage adaptive pre-registration workflow. Its job is to prove that the frozen measurement stack can be executed, audited, and analyzed on real Chinese financial news at controlled scale. Its outputs are:
 
 - runnable operator and perturbation pipelines;
-- adjudicated quality-gate evidence for `C_FO` and `C_NoOp`;
+- adjudicated quality-gate evidence for the perturbation family (`C_NoOp`);
 - pilot effect-size estimates and covariance structure;
 - a power model for the 2,560-case main run;
 - a constrained Stage 2 decision surface that is frozen before Phase 8.
 
-Phase 7 is **not** the main benchmark and not a license to revise the frozen shortlist ad hoc. It exists to estimate operational variance, effect magnitudes, and gate failures under a pre-specified protocol. Because the current `src/` tree still reflects earlier single-model work, Phase 7 should build a parallel `src/r5a/` namespace instead of mutating the legacy pipeline into the new shape.
+Phase 7 is **not** the main benchmark. The R5A *conceptual* freeze fixed the four-layer framework and the nominal scope; the **operationalization layer** (factor / perturbation / estimand / prediction-target / sampling / statistics) was deliberately reopened in the structured R-0…R-6 reviews. So `R5A_FROZEN_SHORTLIST.md` is the **nominal** scope authority, but the actual confirmatory factor / perturbation / estimand inventory is **final only at R-1e + R-2 + pilot** — not frozen by this plan. Phase 7 exists to estimate operational variance, effect magnitudes, and gate failures under that to-be-finalized protocol. Because the current `src/` tree still reflects earlier single-model work, Phase 7 should build a parallel `src/r5a/` namespace instead of mutating the legacy pipeline into the new shape.
+
+> **Authority pointers.** Operationalization status / finalization is owned by `docs/RESEARCH_PROPOSAL.md` (§4/§6) and the live sequencing by `plans/worktable.md`. This plan is downstream of those; where they disagree, they win.
 
 ## 2. Scope
 
@@ -46,9 +40,9 @@ Phase 7 is **not** the main benchmark and not a license to revise the frozen sho
 
 | Area | Included in Phase 7 |
 |---|---|
-| Confirmatory operators | `P_logprob` on **12 P_logprob-eligible white-box models** (10 full-operator + 2 Llama P_logprob-only per `docs/DECISION_20260429_llama_addition.md`) and `P_predict` on all **14 P_predict-eligible models** (Llama excluded; total fleet is **16**) |
-| Confirmatory perturbations | `C_FO` and `C_NoOp`, including generation metadata and human audit. **Gate condition 3 removed 2026-04-29** (`docs/DECISION_20260429_gate_removal.md`); audit (condition 1) remains a per-artifact data-quality gate; coverage (condition 2) is descriptive only. |
-| Pilot execution | One default `N=430` pilot manifest from CLS-source Chinese financial news (80 pre-cutoff + 350 post-cutoff per BL2 Option I expansion 2026-04-29) |
+| Confirmatory operators | `P_logprob` on **12 P_logprob-eligible white-box models** (10 full-operator + 2 Llama P_logprob-only) and `P_predict` on all **14 P_predict-eligible models** (Llama excluded; total fleet is **16** split-tier, source of truth `config/fleet/r5a_fleet.yaml`) |
+| Confirmatory perturbations | `C_NoOp`, including generation metadata and human audit. Gate condition 3 removed 2026-04-29 (`docs/DECISION_20260429_gate_removal.md`); audit (condition 1) remains a per-artifact data-quality gate; coverage (condition 2) is descriptive only. |
+| Pilot execution | One default `N=780` pilot manifest from CLS-source Chinese financial news (80 pre-cutoff + 700 post-cutoff) |
 | Analysis | Pilot effect sizes, confirmatory-estimand correlation matrix, baseline-confidence sensitivity, post-cutoff negative control, simple baseline predictors, Stage 2 power simulation |
 | Reproducibility | model/version pinning, API fingerprint logging, seed/cache policy, manifest hashing, per-provider concurrency caps |
 | Documentation | Stage 1 pre-registration, Stage 2 pre-registration skeleton, decision memos required by pilot triggers |
@@ -62,32 +56,27 @@ Phase 7 is **not** the main benchmark and not a license to revise the frozen sho
 | English expansion | No bilingual or English corpus work |
 | Non-financial negative control | `BL3` is stretch only; it is not a Phase 8 gate unless a low-cost corpus is already available |
 | Large UI product work | No bespoke labeling platform beyond a lightweight local review app and audit export tools |
-| Model-fleet changes | Fleet was expanded twice during Phase 7 design: 2026-04-27 from 9 → 14 models (10 white-box + 4 black-box) per `docs/DECISION_20260427_pcsg_redefinition.md`; then 2026-04-29 from 14 → 16 models with 2 Llama P_logprob-only additions per `docs/DECISION_20260429_llama_addition.md`. P_predict-eligible fleet remains 14 (Llama excluded). No further fleet changes within Phase 7 unless a provider becomes unavailable and a separate `DECISION_*` memo is approved. |
+| Model-fleet changes | The fleet is fixed at the 16-model split-tier roster (12 white-box [10 full-operator + 2 Llama P_logprob-only] + 4 black-box; 14 P_predict-eligible, 12 P_logprob-eligible), source of truth `config/fleet/r5a_fleet.yaml`. No further fleet changes within Phase 7 unless a provider becomes unavailable and a separate `DECISION_*` memo is approved. |
 
-### 2.3 Why the default pilot size is 430 (80 pre-cutoff + 350 post-cutoff)
+### 2.3 Why the default pilot size is 780 (80 pre-cutoff + 700 post-cutoff)
 
-The pre-cutoff allocation (80 cases) is the original "default 100" arbitration
-point with the post-cutoff bucket separated, retaining the four constraints:
+The pre-cutoff allocation (80 cases) retains four constraints:
 
 1. The 80 pre-cutoff cases are large enough to estimate variance and cross-estimand correlation rather than only surfacing obvious bugs.
-2. They keep full `C_FO` and `C_NoOp` human audit feasible, including double review and adjudication, within one sprint.
-3. They limit black-box API spend and rerun overhead while still covering the 14-model fleet and both perturbations.
+2. They keep full `C_NoOp` human audit feasible, including double review and adjudication, within one sprint.
+3. They limit black-box API spend and rerun overhead while still covering the fleet and the perturbation family.
 4. They can satisfy the pilot effective sample-size requirement `min cell >= 15` after pre-specified bin collapsing for each confirmatory estimand × factor × model check.
 
-The post-cutoff allocation (350 cases) is sized to make the BL2 TOST
-equivalence test mathematically achievable at SESOI = 0.15
-(`docs/DECISION_20260429_gate_removal.md` §3.3 + Section 8.6). At
-n_post = 350, TOST power at true effect = 0 is approximately 60%; at n_post
-= 700 it is approximately 96%. The 350 figure is the conservative GO size; if
-Stage 2 power simulation shows 60% TOST is insufficient for the negative
-control's evidentiary role, expansion to 700 is allowed without a memo
-under the same Option I sample-size rebalance.
+The post-cutoff allocation (700 cases) is sized to make the BL2 TOST
+equivalence test comfortably achievable at SESOI = 0.15
+(`docs/DECISION_20260429_gate_removal.md` §3.3 + Section 8.6): at
+`n_post = 700`, simulated TOST power at true effect = 0 is approximately 96%.
 
 If the candidate pool cannot satisfy the pre-cutoff sample-size matrix at
 `N_pre = 80`, the first remedy is **not** to expand pre-cutoff. The first
 remedy is to rebalance the pre-cutoff bucket internally while preserving
 the total. Only if rebalancing fails should the team open a decision memo
-on pilot expansion. The post-cutoff 350 figure is independent of the
+on pilot expansion. The post-cutoff 700 figure is independent of the
 pre-cutoff rebalance rule.
 
 ## 3. Implementation Principles
@@ -121,24 +110,26 @@ Every run should be determined by a case manifest, fleet manifest, runtime confi
 
 ## 4. Workstream Map
 
-| WS | Goal | Primary outputs | Depends on | Parallelizable |
+> **Upstream block (READ FIRST — sequencing single source of truth = `plans/worktable.md` §2 block C/D + §3 dependency graph).** The intra-WS "Depends on" column below describes only the *internal* WS ordering. It is **not** a green light to start. The entire block-D implementation (WS0.5 / WS2 / WS3 / WS4 / WS5, and WS1 deep coding) is currently **BLOCKED upstream**: it is gated behind **C-1** (`docs/RESEARCH_PROPOSAL.md` §4/§6 operationalization finalize), which is itself gated behind the **R-1…R-6** reviews completing. WS0.5 carries the additional upstream dependencies **B-2 + R-1 + R-5**, and the final confirmatory factor selection (**R-1e**) is itself pilot-blocked. The columns below therefore describe *eventual* parallelism after the upstream block clears, not present readiness. Do not read "Depends on: WS0" as "runnable now."
+
+| WS | Goal | Primary outputs | Depends on (intra-WS only — see upstream block above) | Parallelizable (after upstream block clears) |
 |---|---|---|---|---|
-| WS0 | R5A scaffolding and manifests | `src/r5a/` skeleton, fleet/runtime configs, contracts, smoke-test harness | none | starts immediately |
-| WS0.5 | Thales alignment and factor pipelines (scope locked — see `docs/DECISION_20260518_ws0_5_thales_alignment.md` v0.4 + `config/factors/factor_schema.yaml`) | decision memo signed; implementation gates per memo §9 closure conditions (frozen prompts, factor schema, quota / discriminant / replay artifacts) | WS0 contracts freeze | parallel with WS1/WS2/WS3; must close before WS4 |
+| WS0 | R5A scaffolding and manifests | `src/r5a/` skeleton, fleet/runtime configs, contracts, smoke-test harness | none | — |
+| WS0.5 | Thales alignment and factor pipelines (design content-complete — see `docs/DECISION_20260518_ws0_5_thales_alignment.md` v0.4 + `config/factors/factor_schema.yaml`) | implementation gates per memo §9 closure conditions (frozen prompts, factor schema, quota / discriminant / replay artifacts); user sign-off shelved (签字搁置) | WS0 contracts freeze; additionally upstream B-2 + R-1 + R-5 | parallel with WS1/WS2/WS3; must close before WS4 |
 | WS1 | `P_logprob` pipeline | white-box logprob traces, `E_CTS`, `E_PCSG` tables | WS0 | parallel with WS0.5/WS2/WS3 after contracts freeze |
 | WS2 | `P_predict` pipeline | 14-model prediction records, parser, cache/fingerprint layer | WS0 | parallel with WS0.5/WS1/WS3 |
-| WS3 | `C_FO` + `C_NoOp` generation and audit | perturbation artifacts, audit app, adjudicated pass-rate tables | WS0; reads event-type labels from WS0.5 before C_FO rule schema freeze | parallel with WS0.5/WS1/WS2 |
-| WS4 | `N=100` pilot execution | frozen manifest, operator outputs, estimand tables, QC report | WS0.5, WS1, WS2, WS3 | limited; run orchestration depends on all four |
+| WS3 | `C_NoOp` generation and audit | perturbation artifacts, audit app, adjudicated pass-rate tables | WS0; reads event-type labels from WS0.5 | parallel with WS0.5/WS1/WS2 |
+| WS4 | `N=780` pilot execution | frozen manifest, operator outputs, estimand tables, QC report | WS0.5, WS1, WS2, WS3 | limited; run orchestration depends on all four |
 | WS5 | Pilot statistics and pre-registration | power simulation, baseline ablations, Stage 1 sign-in, Stage 2 skeleton | WS4 data complete | mostly sequential |
 
-The intended critical path is:
+The intended *internal* critical path (once the upstream block above clears) is:
 
 `WS0 -> (WS0.5 + WS1 + WS2 + WS3) -> WS4 -> WS5`
 
 The ML Engineer feasibility gate should occur twice:
 
 - after WS0 contracts/config freeze, before deep implementation starts;
-- after smoke tests in WS1-WS3, before the full 100-case pilot is launched.
+- after smoke tests in WS1-WS3, before the full 780-case pilot is launched.
 
 ## 5. Workstream Details
 
@@ -166,7 +157,7 @@ The ML Engineer feasibility gate should occur twice:
    - cache mode and seed policy.
 5. Freeze the manifest schema with hashable fields. A run manifest must include prompt versions, config hashes, model fingerprints, vLLM runtime digests for white-box endpoints, and git commit SHA of the repository.
 6. Add a smoke-test harness `scripts/smoke_phase7.py` that validates the fleet manifest, loads the runtime config, and checks one request path per provider.
-7. Before WS2 deep implementation is considered open, run a minimal nine-model `P_predict` feasibility smoke with the frozen zero-shot baseline prompt. The WS0 feasibility gate requires all 9 models to achieve strict-JSON parse success `>= 95%` on a 20-case smoke set, using adapter hardening only and no semantic prompt edits.
+7. Before WS2 deep implementation is considered open, run a minimal `P_predict` feasibility smoke across the 14 P_predict-eligible models with the frozen zero-shot baseline prompt. The WS0 feasibility gate requires all 14 models to achieve strict-JSON parse success `>= 95%` on a 20-case smoke set, using adapter hardening only and no semantic prompt edits.
 
 Decision point: if the WS0 interface review reveals that `src/llm_client.py` cannot be safely wrapped without invasive edits, treat it as legacy code and build provider adapters directly under `src/r5a/backends/`.
 
@@ -189,7 +180,7 @@ Decision point: if the WS0 interface review reveals that `src/llm_client.py` can
 
 ### Status
 
-**Scope locked.** The reuse-vs-rebuild decision, the deliverable list, the file layout, the auto-tune validation discipline, and the closure conditions for WS0.5 are recorded in:
+**Design content-complete (memo v0.4); user sign-off SHELVED (签字搁置).** The reuse-vs-rebuild decision, the deliverable list, the file layout, the auto-tune validation discipline, and the closure conditions for WS0.5 are *designed* and recorded in the files below, but the design has not received user sign-off and the implementation is upstream-blocked (see §4 upstream block: WS0.5 sits behind B-2 + R-1 + R-5). Authoritative status: `docs/DECISION_20260518_ws0_5_thales_alignment.md` + `plans/worktable.md`.
 
 - `docs/DECISION_20260518_ws0_5_thales_alignment.md` (decision memo, v0.4, 2026-05-20 — v0.3 passed Codex round-2; v0.4 simplified §4 auto-tune per user decision) — **authoritative**
 - `config/factors/factor_schema.yaml` (frozen factor names, dtypes, binning/collapse maps, missing-value policy, Target Salience metric = log CLS mention count, recurrence sensitivity fields, rank/tie/bin-stability policy) — **frozen**; produced as a closure-condition artifact per memo §9
@@ -213,11 +204,11 @@ The memo answers the three verification questions (T1/T2/T3 below) and locks:
 
 ### Open-item pointer
 
-`PENDING.md` "WS0.5 — Thales alignment design" was moved to `Recently closed` on 2026-05-19.
+WS0.5 status is owned by `plans/worktable.md` and `docs/DECISION_20260518_ws0_5_thales_alignment.md` (design content-complete; user sign-off shelved).
 
 ### Gate behavior
 
-WS0.5 is closed in the design sense as of 2026-05-20 (memo v0.4). The **implementation** gates that still apply before Section 6 pilot manifest freeze:
+WS0.5 design is content-complete as of memo v0.4, but **not signed off** (签字搁置) and upstream-blocked. The **implementation** gates that still apply before Section 6 pilot manifest freeze:
 
 1. Three frozen prompt configs committed (T1 topic, T2 entity, T3 signal_profile post-smoke-comparison winner) per memo §9 closure conditions.
 2. `factor_schema.yaml` committed per memo §9 condition #7.
@@ -234,9 +225,9 @@ These are tracked in memo §10 schedule (S1-S5 sessions).
 | Type | Path | Purpose |
 |---|---|---|
 | code | `src/r5a/operators/p_logprob.py`, `src/r5a/backends/vllm_logprob.py`, `src/r5a/analysis/logprob_metrics.py` | operator, backend, and `E_CTS`/`E_PCSG`/`E_PCSG_capacity_curve` calculations |
-| config | `config/fleet/r5a_fleet.yaml` (white-box section, 10 checkpoints) | white-box checkpoint pinning per `docs/DECISION_20260427_pcsg_redefinition.md` |
+| config | `config/fleet/r5a_fleet.yaml` (white-box section, 12 checkpoints) | white-box checkpoint pinning per `docs/DECISION_20260427_pcsg_redefinition.md` |
 | data | `data/pilot/logprob_traces/*.parquet` | token-level traces |
-| data | `data/pilot/hidden_states/<model_id>/<case_id>.safetensors` | per-(model,case) layer activations for 30-article WS6 subset (added 2026-04-29; see Section 5.2A and `plans/ws1-cloud-execution.md` Stage 2.7) |
+| data | `data/pilot/hidden_states/<model_id>/<case_id>.safetensors` | per-(model,case) layer activations for 30-article WS6 subset (hidden-state contract in §11.2 / §10.4; pre-compute in `plans/ws1-cloud-execution.md` Stage 2.7) |
 
 ### Required implementation shape
 
@@ -284,7 +275,7 @@ Decision point: if prompt-logprob extraction through vLLM is incomplete or misal
 - Thinking mode is logged as `off` for 100% of traces.
 - `E_CTS`, `E_PCSG` (cross-version Qwen pair on common-vocab subset), and `E_PCSG_capacity_curve` (Qwen2.5 5-point + Qwen3 4-point) tables can be generated end-to-end for the smoke set with no missing rows on the temporal pair or capacity members.
 - Full pilot run later yields less than 1% un-recovered trace failures after retries.
-- Path E `cutoff_observed` is published for every white-box model.
+- The empirical-knowledge-horizon probe (`empirical_knowledge_horizon`) is published for every white-box model as a *validation-only* anchor (it never feeds any metric; the PRIMARY exposure covariate is the declared fleet-YAML `cutoff_date`). Probe = manual review for all 16 models, no auto red/yellow/green gate. Pointers: `refine-logs/reviews/REOPEN_R1_R6/R1a_cutoff_exposure/R1a_DECISIONS.md` + `refine-logs/reviews/REOPEN_R1_R6/R1a_cutoff_exposure/cutoff_probe_DECISIONS.md`.
 
 ### Risks and mitigations
 
@@ -293,7 +284,7 @@ Decision point: if prompt-logprob extraction through vLLM is incomplete or misal
 | backend or tokenizer mismatch | invalid or missing `P_logprob` traces | use completion endpoint first, validate tokenizer SHA equality, keep offline HF fallback |
 | local GPU instability on 14B models | run failures or OOM | cap concurrency at 16, queue models separately, allow cloud fallback while preserving checkpoint SHA |
 
-## 5.3 WS2: `P_predict` nine-model pipeline
+## 5.3 WS2: `P_predict` pipeline (14 P_predict-eligible models)
 
 ### Deliverables
 
@@ -343,7 +334,7 @@ Decision point: if any provider falls below 95% valid JSON rate on the 20-case z
 
 ### Exit criteria
 
-- All 9 models pass a 20-case zero-shot smoke test with at least 95% valid JSON on first pass and at least 99% after one repair/retry cycle.
+- All 14 P_predict-eligible models pass a 20-case zero-shot smoke test with at least 95% valid JSON on first pass and at least 99% after one repair/retry cycle.
 - `explicit_memory_reference` or `explicit_memory_reference_heuristic` is populated for 100% of parsed records.
 - Provider fingerprint coverage is 100% for all successful calls.
 - DeepSeek concurrency is capped at 20 and vLLM at 16 in code and runtime config.
@@ -356,14 +347,19 @@ Decision point: if any provider falls below 95% valid JSON rate on the 20-case z
 | schema drift or hidden server cache | parse failures or compressed deltas | keep semantic layer fixed, randomize order, use duplicate reruns with cache bypass |
 | rate limits or API instability | pilot delays | provider semaphores, exponential backoff, run-level resume support |
 
-## 5.4 WS3: `C_FO` and `C_NoOp` perturbation generation plus human audit
+## 5.4 WS3: `C_NoOp` perturbation generation plus human audit
+
+`C_NoOp` is the only live Phase 7 confirmatory perturbation. Per R-6's canonical
+decision, the confirmatory family's counterfactual perturbation targeting
+case-result memory is deferred to R-2 (form / backbone TBD; pointer to
+`refine-logs/reviews/REOPEN_R1_R6/R6_pred_target_cfo/R6_DECISIONS.md`).
 
 ### Deliverables
 
 | Type | Path | Purpose |
 |---|---|---|
-| code | `src/r5a/perturbations/c_fo.py`, `src/r5a/perturbations/c_noop.py`, `src/r5a/perturbations/shared.py` | generation logic and diff metadata |
-| config | `config/perturbations/c_fo_rules.yaml`, `config/perturbations/c_noop_clause_bank.yaml` | rule tables and deterministic clause bank |
+| code | `src/r5a/perturbations/c_noop.py`, `src/r5a/perturbations/shared.py` | generation logic and diff metadata |
+| config | `config/perturbations/c_noop_clause_bank.yaml` | rule tables and deterministic clause bank |
 | code | `scripts/build_perturbation_audit_batch.py`, `scripts/merge_perturbation_audit.py`, `scripts/audit_app.py` | audit export, merge, and UI |
 | data | `data/pilot/perturbations/*.jsonl`, `data/pilot/audit/*.jsonl` | artifacts and adjudicated labels |
 
@@ -387,7 +383,6 @@ class PerturbationArtifact(BaseModel):
 The generation functions should look like:
 
 ```python
-def generate_false_outcome(article: ArticleRecord, rules: FORuleSet) -> PerturbationArtifact: ...
 def generate_noop(article: ArticleRecord, bank: NoOpClauseBank) -> PerturbationArtifact: ...
 ```
 
@@ -397,17 +392,11 @@ def generate_noop(article: ArticleRecord, bank: NoOpClauseBank) -> PerturbationA
 
 | Field | Type | Applies to | Meaning |
 |---|---|---|---|
-| `verified_outcome` | bool | `C_FO` | whether the article contains a verified true outcome |
-| `fo_slotable` | bool | `C_FO` | whether a clean, replaceable outcome slot exists |
-| `fo_slot_topology` | enum | `C_FO` | one of `single-point`, `multi-point-linked`, `narrative-entailed` |
-| `slot_span` | object | `C_FO` | character start/end span for the edited outcome slot |
-| `ineligible_reason` | string | `C_FO` and `C_NoOp` | required whenever `eligible=false` or `fo_slotable=false` |
+| `ineligible_reason` | string | `C_NoOp` | required whenever `eligible=false` |
 | `host_category` | enum | `C_NoOp` | one of `policy`, `corporate`, `industry`, `macro` |
 | `noop_bank_id` | string | `C_NoOp` | clause-bank identifier used for the insertion |
 | `noop_eligibility_rule_id` | string | `C_NoOp` | category-specific admissibility rule that was passed |
 | `placebo_variant` | enum | `C_NoOp` | one of `none`, `c_noop`, `c_noop_placebo` |
-
-`slot_span` should be stored as character offsets relative to `source_text`. For `multi-point-linked` and `narrative-entailed` slots, the primary span must still be recorded and any linked spans should be enumerated in `edit_spans`.
 
 ### 5.4B Host-aware `C_NoOp` library and exploratory placebo
 
@@ -420,30 +409,26 @@ Throughout Phase 7, `E_NoOp` should be described as a **robustness / template-br
 ### Steps and decision points
 
 1. Define the pilot event-type taxonomy before generating any perturbation and write any collapse rule to `docs/DECISION_20260417_pilot_event_taxonomy.md`.
-2. Implement `C_FO` as rule-based slot editing only. The generator must record `verified_outcome` and `fo_slotable` separately, must replace only verified known outcomes, and must refuse generation when the slot cannot be localized cleanly.
-3. Implement `C_NoOp` as deterministic insertion from a versioned, host-aware clause bank. Insertion should happen in a medial position only, should record the exact insertion index, and should log the category-specific bank and eligibility rule used.
-4. Emit machine-readable diff metadata for every edit. This is required for the human audit UI and for debugging failure cases.
-5. Audit **all** pilot-generated `C_FO` and primary `C_NoOp` variants rather than a subsample. `C_NoOp_placebo` is exploratory-only and should be generated only after the confirmatory `C_NoOp` artifacts are frozen.
-6. Compute the frozen quality-gate thresholds from adjudicated labels and later pilot deltas. `C_NoOp_placebo` summaries must be reported separately and must not be folded into the confirmatory gate denominator.
-
-Decision point: if the pool cannot yield at least 60 pre-cutoff cases with `verified_outcome=true` and enough `fo_slotable=true` cases for clean `C_FO` edits, rebalance the sample before reducing the perturbation. Do not weaken the edit rules to “make quota.”
+2. Implement `C_NoOp` as deterministic insertion from a versioned, host-aware clause bank. Insertion should happen in a medial position only, should record the exact insertion index, and should log the category-specific bank and eligibility rule used.
+3. Emit machine-readable diff metadata for every edit. This is required for the human audit UI and for debugging failure cases.
+4. Audit **all** pilot-generated primary `C_NoOp` variants rather than a subsample. `C_NoOp_placebo` is exploratory-only and should be generated only after the confirmatory `C_NoOp` artifacts are frozen.
+5. Compute the frozen quality-gate thresholds from adjudicated labels and later pilot deltas. `C_NoOp_placebo` summaries must be reported separately and must not be folded into the confirmatory gate denominator.
 
 ### Exit criteria
 
-- `C_FO` generator produces eligible artifacts for at least 60 pre-cutoff pilot cases and stores `verified_outcome`, `fo_slotable`, `fo_slot_topology`, `slot_span`, and `ineligible_reason`.
-- `C_NoOp` generator produces eligible artifacts for at least 90 of 100 pilot cases, with the target goal being full coverage, and records `host_category`, `noop_bank_id`, and `noop_eligibility_rule_id`.
+- `C_NoOp` generator produces eligible artifacts for at least 72 of the 80 pre-cutoff pilot cases, with the target goal being full coverage, and records `host_category`, `noop_bank_id`, and `noop_eligibility_rule_id`.
 - Every perturbation artifact stores event type, edit span metadata, and generator version.
 - Human audit labels exist for every generated pilot artifact.
-- Cohen’s kappa on adjudication-free pass/fail labels is at least 0.70 overall for each perturbation, with dimension-level kappa not falling below 0.60. Lower agreement triggers rubric repair and re-audit before the gate can be evaluated.
+- Cohen’s kappa on adjudication-free pass/fail labels is at least 0.70 overall for `C_NoOp`, with dimension-level kappa not falling below 0.60. Lower agreement triggers rubric repair and re-audit before the gate can be evaluated.
 
 ### Risks and mitigations
 
 | Risk | Impact | Mitigation |
 |---|---|---|
-| ambiguous `C_FO` slots or cue-leaking `C_NoOp` clauses | low eligibility or false signal | separate `verified_outcome` from `fo_slotable`, use host-aware clause banks, reject ambiguous edits, and audit all confirmatory variants |
+| cue-leaking `C_NoOp` clauses | false signal | use host-aware clause banks, reject ambiguous edits, and audit all confirmatory variants |
 | reviewer disagreement | unreliable quality gate | double review all items, adjudicate formally, version the rubric |
 
-## 5.5 WS4: `N=100` pilot execution
+## 5.5 WS4: `N=780` pilot execution
 
 ### Deliverables
 
@@ -471,7 +456,7 @@ retry_count, fingerprint, seed_requested, seed_supported, seed_effective,
 response_id, ts_start, ts_end
 ```
 
-The orchestration layer should treat `baseline`, `C_FO`, `C_NoOp`, and `C_NoOp_placebo` requests as first-class request items under the same lineage model.
+The orchestration layer should treat `baseline`, `C_NoOp`, and `C_NoOp_placebo` requests as first-class request items under the same lineage model.
 
 ### Steps and decision points
 
@@ -479,23 +464,23 @@ The orchestration layer should treat `baseline`, `C_FO`, `C_NoOp`, and `C_NoOp_p
 2. Compute the effective sample-size matrix **before** any model run. If any confirmatory estimand × factor × model cell is below 15, rebalance the manifest and rerun the checker.
 3. Freeze the pilot manifest by writing per-case hashes, publish dates, target strings, factor bins, and perturbation eligibility flags.
 4. Initialize `data/pilot/runstate.db` and issue a UUID `request_id` for every planned baseline and perturbation request before launch.
-5. Run `P_logprob` on the 5 white-box models for baseline articles only.
-6. Run `P_predict` baseline on all 9 models.
-7. Run `P_predict` on `C_FO` and `C_NoOp` variants after audit-approved artifacts are available. Run `C_NoOp_placebo` only after the confirmatory perturbation branch is frozen and only for secondary analysis.
+5. Run `P_logprob` on the 12 P_logprob-eligible white-box models for baseline articles only.
+6. Run `P_predict` baseline on all 14 P_predict-eligible models.
+7. Run `P_predict` on `C_NoOp` variants after audit-approved artifacts are available. Run `C_NoOp_placebo` only after the confirmatory perturbation branch is frozen and only for secondary analysis.
 8. Execute the duplicate-subset reruns for cache and seed diagnostics. The diagnostic subset must cover both baseline requests and matched baseline-plus-perturbation delta requests.
-9. Assemble estimand tables under `src/r5a/estimands/confirmatory.py` or an equivalent module. The pilot must yield usable tables for `E_CMMD`, `E_PCSG`, `E_CTS`, `E_FO`, and `E_NoOp`.
+9. Assemble estimand tables under `src/r5a/estimands/confirmatory.py` or an equivalent module. The pilot must yield usable tables for `E_PCSG`, `E_CTS`, and `E_NoOp`. (`E_CMMD` was cut at R-4 construct-validity 2026-05-31.)
 10. Produce a QC report summarizing parse rates, trace success, missingness, audit gates, duplicate-rerun stability, and request-lineage completeness.
 
 Decision point: if any confirmatory operator has unresolved missingness above threshold after retries, the pilot is not “done” and WS5 should not start.
 
 ### Exit criteria
 
-- A 100-case manifest is frozen and signed.
+- A 780-case manifest is frozen and signed.
 - The effective sample-size checker reports `min cell >= 15` after approved bin-collapsing rules.
 - End-to-end missingness is below 2% per operator × model cell after retries.
 - `data/pilot/runstate.db` exists and every launched request has a terminal lineage state with no orphan `pending` rows at pilot closeout.
 - Duplicate reruns show no provider-specific drift severe enough to invalidate delta interpretation. A practical threshold is absolute direction disagreement under 5% on duplicate baseline prompts for deterministic providers; any breach must be written up in the QC report.
-- All five confirmatory estimands are materialized as analysis-ready tables, even if some later fail quality gates and become exploratory.
+- All retained confirmatory estimands (`E_CTS`, `E_PCSG`, `E_NoOp`) are materialized as analysis-ready tables, even if some later fail quality gates and become exploratory.
 
 ### Risks and mitigations
 
@@ -517,16 +502,16 @@ Decision point: if any confirmatory operator has unresolved missingness above th
 
 ### Steps and decision points
 
-1. Write `PREREG_STAGE1_PILOT.md` before the first full 100-case run.
+1. Write `PREREG_STAGE1_PILOT.md` before the first full 780-case run.
 2. Estimate pilot coefficients and standardized effect sizes for every confirmatory estimand × factor target.
-3. Compute the pairwise correlation matrix over the 5 confirmatory estimands on the common eligible subset. If the frozen automatic regrouping rule in Section 8.4 fires, retain `E_PCSG` as confirmatory and demote `E_CTS` to corroborative without opening a memo.
+3. Compute the pairwise correlation matrix over the retained confirmatory estimands (`E_CTS`, `E_PCSG`, `E_NoOp`) on the common eligible subset. If the frozen automatic regrouping rule in Section 8.4 fires, retain `E_PCSG` as confirmatory and demote `E_CTS` to corroborative without opening a memo.
 4. Add Challenger `B1` by creating a `model_capability` covariate table sourced from pre-registered benchmark scores such as CFinBench or another explicitly documented Chinese-finance-capable benchmark. Store raw score, normalized score, source date, and any interpolation notes.
 5. Add Challenger `C3` by defining a baseline-confidence covariate and a percentile-based mid-range sensitivity check. This is sensitivity-only and must not reparameterize the primary confirmatory family.
 6. Run `BL1` simple baseline predictor models, the `BL2` post-cutoff negative control checks, and the exploratory `C_NoOp_placebo` robustness-identification summary. The placebo branch must be reported as secondary analysis only.
-7. Simulate main-run power at `N=2560` under the legal Stage 2 family states using scenario-based priors, observed variance components, and empirical cross-estimand covariance under Westfall-Young stepdown max-T.
+7. Simulate main-run **detectability** (per-estimand effect size + 95 % CI precision at the SESOI — §8.8) at `N=2560` under the legal Stage 2 family state `S20`, using scenario-based priors, observed variance components, and empirical cross-estimand covariance. The formal multiplicity procedure is **[PENDING — 待下一轮 R-4 走查]**; R-4a Lock 1 leans estimation-first (no NHST family). Pointer: `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/R4a_DECISIONS.md` (Lock 1).
 8. Populate the Stage 2 preregistration skeleton with only the fields the Stage 1 protocol allows to change.
 
-Decision point: if pilot-implied power for the 2,560-case main run is too low for the retained confirmatory family under the scenario range, the team must either narrow the family under the frozen demotion rules or reopen sample-size planning. Phase 8 should not start on a single optimistic perturbation-rich point estimate.
+Decision point: if pilot-implied detectability for the 2,560-case main run is too low for the retained confirmatory family under the scenario range, the team must reopen sample-size planning (or open a new decision memo to revisit the family) — the old demotion ladder is retired (§7.1A), so there is no automatic family-shrink path. Phase 8 should not start on a single optimistic perturbation-rich point estimate.
 
 ### Exit criteria
 
@@ -544,7 +529,9 @@ Decision point: if pilot-implied power for the 2,560-case main run is too low fo
 | noisy pilot variance or incomplete capability benchmarks | unstable power or weak B1 covariate | use bootstrap intervals, scenario-based priors, and pre-register fallback benchmark sources |
 | high confirmatory redundancy | wasted alpha in Phase 8 | regroup only through the frozen `r > 0.8` trigger |
 
-## 6. Pilot Case Sampling Strategy (`N=100`)
+## 6. Pilot Case Sampling Strategy (`N=780`)
+
+> **[PENDING — sampling design is BLOCKED on R-5.]** This section predates the R-0 corpus / sampling-pool architecture and uses ad-hoc bucket/quota vocabulary. The concrete sampling design — the pool structure (Pool B base + optional G/H/I stratification + D/E/F extension), the dedupe / per-article-cap policy, and degenerate-case filtering — is **not yet finalized** and is **blocked on the still-unstarted R-5 sampling session**. Treat the buckets and quotas below as a *placeholder heuristic illustrating intent*, NOT as the final sampling plan. The 80/700 macro split (§2.3) is robust and stays; everything finer-grained is pending R-5. Pointers: `refine-logs/reviews/REOPEN_R1_R6/R5_sampling/R5_memo.md` (pool vocabulary + sampling design) + `refine-logs/reviews/REOPEN_R1_R6/R0_corpus_arch/R0_DECISIONS.md` (corpus architecture).
 
 ### 6.1 Source and philosophy
 
@@ -563,50 +550,57 @@ The script should pull from:
 
 ### 6.2 Proposed manifest composition
 
-The default `N=430` pilot manifest should target:
+The default `N=780` pilot manifest should target:
 
 | Bucket | Count | Rationale |
 |---|---|---|
-| Pre-cutoff, verified-outcome, perturbation-rich | 60 | supports `C_FO` eligibility, `C_NoOp`, and main temporal analyses |
-| Pre-cutoff, factor-coverage supplement | 20 | broadens factor range without forcing all cases into `C_FO` |
-| **Post-cutoff negative controls** | **350** | supports `BL2` TOST equivalence test at SESOI = 0.15 (~60% power at true effect = 0); expanded from 20 on 2026-04-29 per `docs/DECISION_20260429_gate_removal.md` §3.3 because the original n=20 was mathematically incapable of satisfying the TOST rule |
+| Pre-cutoff, verified-outcome, perturbation-rich | 60 | supports `C_NoOp`, the deferred counterfactual perturbation (R-2 re-scope), and main temporal analyses |
+| Pre-cutoff, factor-coverage supplement | 20 | broadens factor range |
+| **Post-cutoff negative controls** | **700** | supports `BL2` TOST equivalence test at SESOI = 0.15 (~96% power at true effect = 0); see `docs/DECISION_20260429_gate_removal.md` §3.3 for the TOST sizing rationale |
 
-Within the 80 pre-cutoff cases, date windows should be balanced as follows:
+Within the 80 pre-cutoff cases, date windows should be spread across a
+calendar range to give the exposure contrasts coverage. The split below is a
+**calendar-spread heuristic**; the specific boundary dates are **[PENDING —
+PROVISIONAL]** pending the empirical `cutoff_probe` + R-1e (the
+reference-window right endpoint = `min(model_cutoff)` is itself deferred to
+R-1e, and per-model cutoff centers are provisional until the probe). Do not
+treat these dates as final boundaries. Pointers:
+`refine-logs/reviews/REOPEN_R1_R6/R1a_cutoff_exposure/R1a_DECISIONS.md` §3 +
+`refine-logs/reviews/REOPEN_R1_R6/R1a_cutoff_exposure/cutoff_probe_DECISIONS.md`.
 
-| Date window | Target count | Why it matters |
+| Date window (provisional) | Target count | Why it matters |
 |---|---|---|
 | `<= 2023-10-31` | 20 | before the earliest Qwen temporal-pair cutoff; low expected temporal advantage |
 | `2023-11-01` to `2024-06-30` | 30 | between early Qwen2.5 and mid-2024 models; supports monotone exposure contrasts |
 | `2024-07-01` to `2025-01-31` | 30 | between mid-2024 and Qwen3 cutoffs; critical for temporal-pair A/B |
 
-The post-cutoff 350 cases are sampled from `>= 2026-02-01` (≥ 6-month
+The post-cutoff 700 cases are sampled from `>= 2026-02-01` (≥ 6-month
 safety gap after the latest core-fleet cutoff Claude Sonnet 4.6
 ~ 2025-08). They preserve the same broad category mix
-(policy / corporate / industry / macro per Section 6.3 quotas, scaled
-linearly from the original 20-case template). Because the post-cutoff
-bucket is for negative-control identification only (no perturbations,
-no audit), it does not enter the C_FO / C_NoOp eligibility funnel and
-adds only `P_predict` (14 P_predict-eligible models) + `P_logprob` (12 P_logprob-eligible white-box models, including 2 Llama P_logprob-only) calls.
+(policy / corporate / industry / macro per Section 6.3 quotas). Because
+the post-cutoff bucket is for negative-control identification only (no
+perturbations, no audit), it does not enter the `C_NoOp` eligibility
+funnel and adds only `P_predict` (14 P_predict-eligible models) +
+`P_logprob` (12 P_logprob-eligible white-box models, including 2 Llama
+P_logprob-only) calls.
 
-**Operational note (2026-04-29).** Sampling 350 articles from
-`>= 2026-02-01` requires extending the existing CLS extraction beyond
-what the original 20-case bucket needed. This extraction is tracked as
-a separate operational task to be triggered when WS4 reaches the
-sampling step. Implementation must NOT silently fall back to fewer
-than 350 articles without a memo.
+**Operational note.** Sampling 700 articles from `>= 2026-02-01`
+requires extending the existing CLS extraction. This extraction is
+tracked as a separate operational task to be triggered when WS4 reaches
+the sampling step. Implementation must NOT silently fall back to fewer
+than 700 articles without a memo.
 
-These windows ensure enough "between-cutoff" cases for temporal contrasts, enough "before all" cases for low-signal anchors, and the post-cutoff 350 give the BL2 negative control statistical authority.
+These windows ensure enough "between-cutoff" cases for temporal contrasts, enough "before all" cases for low-signal anchors, and the post-cutoff 700 give the BL2 negative control statistical authority.
 
 ### 6.3 Factor and event-type quotas
 
-Factor values and event-type labels are produced by the WS0.5 factor pipeline (see Section 5.1A; scope locked per `docs/DECISION_20260518_ws0_5_thales_alignment.md` v0.4). The sampling script must consume the frozen factor schema at `config/factors/factor_schema.yaml` (memo §9 closure condition #7) rather than hard-coding bin thresholds. The sampling script should enforce four additional quota families:
+Factor values and event-type labels are produced by the WS0.5 factor pipeline (see Section 5.1A; design content-complete per `docs/DECISION_20260518_ws0_5_thales_alignment.md` v0.4, user sign-off shelved). The sampling script must consume the frozen factor schema at `config/factors/factor_schema.yaml` (memo §9 closure condition #7) rather than hard-coding bin thresholds. The sampling script should enforce the following additional quota families (subject to the R-5 sampling design — see §6 banner):
 
 1. Each top-level news category (`policy`, `corporate`, `industry`, `macro`) should appear at least 15 times.
-2. The pilot event-type taxonomy used for `C_FO` should have at least 12 cases per super-type if five super-types are used, or at least 15 per super-type if collapsed to four.
-3. For each core case-level factor after pilot binning, both sides of the binary split should retain at least 20 pre-cutoff cases overall and at least 15 `C_FO`-eligible cases where `E_FO` needs them.
-4. `C_FO` feasibility must be tracked as a two-step funnel: `verified_outcome` counts and `fo_slotable` counts should both be reported before manifest freeze, rather than collapsing them into one eligibility number.
-5. `C_NoOp` host-aware clause-bank eligibility should be tracked by category. The manifest should record the intended host category for every pre-cutoff case so each of `policy`, `corporate`, `industry`, and `macro` has auditable insertion coverage.
-6. The post-cutoff bucket should preserve the same broad category mix as the pre-cutoff bucket as much as corpus availability allows.
+2. The pilot event-type taxonomy should have at least 12 cases per super-type if five super-types are used, or at least 15 per super-type if collapsed to four.
+3. For each confirmatory case-level factor in the R-1e-selected set (size + identity pending R-1e + pilot — see §7.1A) after pilot binning, both sides of the binary split should retain at least 20 pre-cutoff cases overall.
+4. `C_NoOp` host-aware clause-bank eligibility should be tracked by category. The manifest should record the intended host category for every pre-cutoff case so each of `policy`, `corporate`, `industry`, and `macro` has auditable insertion coverage.
+5. The post-cutoff bucket should preserve the same broad category mix as the pre-cutoff bucket as much as corpus availability allows.
 
 ### 6.4 Effective sample-size matrix (`B2`)
 
@@ -620,13 +614,16 @@ using the actual eligibility mask and the estimand-specific analysis unit:
 
 | Estimand | Analysis unit for `n_eff` | Eligibility mask |
 |---|---|---|
-| `E_CTS` | case × model | all 100 cases on the 5 white-box models |
+| `E_CTS` | case × model | all pre-cutoff cases on the 12 P_logprob-eligible white-box models |
 | `E_PCSG` | case × tokenizer-matched pair | white-box same-tokenizer temporal pairs only |
-| `E_CMMD` | case | all 100 cases after fleet aggregation |
-| `E_FO` | case × model | `C_FO`-eligible subset |
 | `E_NoOp` | case × model | `C_NoOp`-eligible subset |
 
-For case × model estimands, `n_eff` counts eligible case-model rows after fixed model availability is applied. For `E_PCSG`, the unit is a tokenizer-matched temporal pair rather than an individual model. For `E_CMMD`, the unit is the fleet-aggregated case, so the checker should not fabricate a model dimension that the estimand no longer has.
+(`E_CMMD` was cut at R-4 construct-validity 2026-05-31 — it does not enter
+the `n_eff` matrix.)
+
+For case × model estimands, `n_eff` counts eligible case-model rows after fixed model availability is applied. For `E_PCSG`, the unit is a tokenizer-matched temporal pair rather than an individual model.
+
+> **[PENDING — case×model factor count.]** This matrix currently treats Cutoff Exposure as the *only* case×model factor. R-1f (Entity Age) is a **possible 2nd case×model factor**; if it is admitted at R-1e, the per-estimand analysis-unit assignment and the random-effect structure get revisited (R-4b). Do not hard-code "one case×model factor." Pointer: `refine-logs/reviews/REOPEN_R1_R6/R1f_entity_age/R1f_DECISIONS.md`.
 
 The rule is:
 
@@ -642,10 +639,10 @@ The `15` threshold is a lower-bound stability rule for pilot mixed-model estimat
 
 `docs/PREREG_STAGE1_PILOT.md` should be committed before the first full pilot run. It must include:
 
-- frozen confirmatory family as inherited from `R5A_FROZEN_SHORTLIST.md`;
+- the confirmatory family (nominal authority `R5A_FROZEN_SHORTLIST.md`; the *final* estimand + factor inventory is fixed at R-1e + R-2 + pilot — see §7.1A, not by this plan);
 - pilot manifest policy and rebalancing rules;
 - fleet and thinking-mode policy;
-- quality-gate thresholds for `C_FO` and `C_NoOp`;
+- quality-gate thresholds for `C_NoOp`;
 - seed, cache, fingerprint, and rerun policy;
 - effective sample-size matrix rule;
 - correlation-regrouping trigger (`r > 0.8`);
@@ -660,34 +657,61 @@ requirements verbatim (note: gate condition 3 was removed 2026-04-29; see
 
 | Estimand | Requirement 1 (gate) | Requirement 2 (descriptive) |
 |---|---|---|
-| `E_FO` | audit pass rate `>= 85%` overall, no event type `< 75%` — items failing audit are removed from the eligible pool | eligible case coverage reported per perturbation × event type; coverage `< 60%` becomes a methods-section caveat (no demotion) |
 | `E_NoOp` | audit pass rate `>= 85%` overall, no event type `< 75%` — items failing audit are removed from the eligible pool | eligible case coverage reported per perturbation × event type; coverage `< 60%` becomes a methods-section caveat (no demotion) |
 
-E_FO and E_NoOp remain unconditional confirmatory members of the
-20-coefficient family; the demotion ladder is retired (see Section 7.1A).
+`E_NoOp` remains an unconditional confirmatory member; the demotion ladder
+is retired (see Section 7.1A). The confirmatory family size is **pending**
+R-1e (factors) + R-2 (the deferred counterfactual estimand) + the R-6 待定②
+real-return estimand — it is **not** a fixed count. See §7.1A.
 
-### 7.1A Stage 2 family state (collapsed to S20 only as of 2026-04-29)
+### 7.1A Stage 2 family state (single state `S20`; demotion ladder retired)
 
-Stage 1 freezes the single legal Stage 2 confirmatory family state:
+Stage 1 freezes a single legal Stage 2 confirmatory family state, `S20`,
+with no demotion ladder. `S20` is now purely a **state name** meaning "the
+single legal confirmatory family" — it carries no fixed member or coefficient
+count. The literal number of coefficients is the (per-estimand primary
+coefficient set) × (confirmatory factor set), and **both inputs are pending**:
 
-| state id | family size | trigger | alpha split |
-|---|---|---|---|
-| `S20` | 20 coefficients (5 estimands × 4 factors) | default and only state | Westfall-Young family-wise `alpha = 0.05` over 20 |
+- The **confirmatory factor set** is the R-1e-selected set — size and identity
+  are **[PENDING — R-1e + pilot]** (the candidate pool may exceed four). The
+  four named closed constructs (Cutoff Exposure / Historical Family Recurrence /
+  Target Salience / Template Rigidity) are the **current candidate set**, not a
+  frozen four; R-1f Entity Age is a possible additional case×model factor.
+  Pointers: `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/four_layer_candidate_pools.md`
+  (L1 factor pool) + the per-factor `R1*_DECISIONS.md` under
+  `refine-logs/reviews/REOPEN_R1_R6/`.
+- The **confirmatory estimand family** is live = `E_PCSG`, `E_CTS` (familiarity /
+  white-box logprob channel) + `E_NoOp` (perturbation channel). `E_FO`/`C_FO`
+  were dropped at R-6; `E_CMMD` was cut at R-4 (D5). The family additionally
+  gains the **R-2 counterfactual estimand** (the perturbation-route target that
+  carries the dropped-`C_FO` "case-result memory"; form/backbone **[PENDING —
+  R-2]**) and the **R-6 待定② real-return memory estimand** (see §8.1A). So the
+  final family size — and hence the literal coefficient count — is **pending
+  R-1e (factors) + R-2 (counterfactual estimand)**.
+
+> **Multiplicity procedure is [PENDING].** The formal multiplicity / GO
+> procedure is **待下一轮 R-4 走查裁定** — it is NOT locked. R-4a Lock 1 sets the
+> main path as **estimation-first**: per-estimand effect size + 95 % CI
+> (simultaneous / per-estimand CIs), **no NHST p-value family**. Any
+> Westfall-Young stepdown machinery is at most an *optional sensitivity*
+> overlay, not the frozen procedure. Pointer:
+> `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/R4a_DECISIONS.md`
+> (Lock 1). The per-estimand `n_eff` / SESOI logic (§6.4) and the BL2 TOST
+> equivalence test (§8.6) are R-4a-endorsed and stay intact.
 
 **Demotion ladder retired (`docs/DECISION_20260429_gate_removal.md`).**
 The previous states `S16a` / `S16b` / `S12` were defined for the case
-where E_FO or E_NoOp failed quality gate condition 3. Condition 3 was
-removed as a methodological anti-pattern (it gated measurement of X on
-the magnitude of X), so the demotion mechanism no longer fires. E_FO
-and E_NoOp are unconditional confirmatory members; the family is
-always 20 coefficients.
+where a perturbation estimand failed quality gate condition 3. Condition 3
+was removed as a methodological anti-pattern (it gated measurement of X on
+the magnitude of X), so the demotion mechanism no longer fires. Retained
+perturbation estimands are unconditional confirmatory members; there is no
+size-reduction ladder.
 
 **Estimand readiness failure** (separate from gates): if a confirmatory
 estimand has fewer than `n_eff = 15` cells per the Section 6.4
 matrix — for example, if PCSG common-vocab eligibility collapses for
-all probe articles, or if `C_FO` produces zero `fo_slotable=true`
-cases — that is an estimand-implementation failure requiring a new
-decision memo before pre-registration freeze. This is a data-availability
+all probe articles — that is an estimand-implementation failure requiring a
+new decision memo before pre-registration freeze. This is a data-availability
 check, not a gate, and is rare. It must not be confused with the
 retired demotion ladder.
 
@@ -711,7 +735,7 @@ Stage 1 should contain an explicit evidence package block with the following fie
 
 `docs/PREREG_STAGE2_MAIN_SKELETON.md` should be prepared in Phase 7 but only completed after the pilot. It may update only:
 
-- which estimands remain confirmatory after quality gates under `S20`, `S16a`, `S16b`, or `S12`;
+- which estimands remain confirmatory after quality gates under the single `S20` family state (the `S16a` / `S16b` / `S12` demotion ladder is retired — see Section 7.1A);
 - whether any reserve estimand is promoted under its frozen trigger and the Phase 7b contingency memo;
 - whether the automatic `E_PCSG` / `E_CTS` regrouping rule in Section 8.4 fired;
 - pilot-informed power statements and any resulting sample-size or family-size decision;
@@ -720,7 +744,7 @@ Stage 1 should contain an explicit evidence package block with the following fie
 
 It may not update:
 
-- the four core factors;
+- the R-1e-selected confirmatory factor set (size + identity pending R-1e + pilot — see §7.1A; once fixed it is frozen for Stage 2);
 - the meaning of any retained estimand;
 - the fleet roster without a separate availability memo;
 - semantic prompt wording, task description, or few-shot content;
@@ -752,10 +776,21 @@ Phase 7 should pre-plan these memo slots:
 The pilot analysis has five jobs:
 
 1. estimate operationally relevant effect sizes;
-2. determine whether `E_FO` and `E_NoOp` survive confirmatory quality gating;
+2. determine whether `E_NoOp` survives confirmatory quality gating;
 3. quantify redundancy among confirmatory estimands;
 4. test whether simple metadata baselines explain the same variation;
-5. project main-run power under the frozen multiplicity procedure.
+5. project main-run **detectability** (per-estimand effect size + 95 % CI precision at the SESOI) under the still-pending multiplicity procedure (§8.8; R-4a Lock 1 leans estimation-first).
+
+> **Convergent validity, not synthesis.** The two confirmatory channels — the
+> familiarity channel (`E_PCSG`/`E_CTS`, white-box logprob) and the
+> perturbation / resistance channel (`E_NoOp`, plus the R-2 counterfactual) —
+> are designed to **corroborate** each other; they are **not** assumed to
+> synthesize into a single number. Resistance is the framework's sole main
+> quantity (R-4 D3). Cross-signal correlation is a **post-hoc** observation,
+> **not** a preset gate. Pointers:
+> `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/P0_DECISIONS.md` +
+> `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/R4_construct_validity_decisions.md`
+> (D4).
 
 ### 8.1A Estimand-specific analysis units and scalar scores
 
@@ -763,25 +798,48 @@ The confirmatory estimand contract should be frozen before any pilot inference:
 
 | estimand | analysis unit | scalar score | eligibility mask |
 |---|---|---|---|
-| `E_CTS` | case × model | Min-K++ continuous score (bottom-`K%` average) | all 100 |
+| `E_CTS` | case × model | Min-K++ continuous score (bottom-`K%` average) | all pre-cutoff cases |
 | `E_PCSG` | case × tokenizer-matched pair | `logprob(late) - logprob(early)` on matched tokens | white-box same-tokenizer pairs only |
-| `E_CMMD` | case (fleet-aggregated) | cross-cutoff separation score across the 14 P_predict-eligible models | all 100 |
-| `E_FO` | case × model (`FO`-eligible) | signed-score non-compliance to visible false outcome | `C_FO`-eligible subset |
-| `E_NoOp` | case × model (`NoOp`-eligible) | `|signed_base - signed_noop|` absolute stability loss | `C_NoOp`-eligible subset |
+| `E_NoOp` | case × model (`NoOp`-eligible) | `|signed_base - signed_noop|` absolute stability loss (signed-score form **[PENDING — R-6 待定①]**, see below) | `C_NoOp`-eligible subset |
 
-For `P_predict`-derived scores, freeze:
+`E_CMMD` is not a live confirmatory estimand. The live confirmatory channels
+are the familiarity channel (`E_PCSG`, `E_CTS`) + the perturbation channel
+(`E_NoOp`).
+
+> **[PENDING family member — R-6 待定② real-return memory estimand.]** R-6
+> mandates **one estimand that evaluates memory against REAL returns**. Its
+> form (signed vs magnitude), its confirmatory status, and its
+> capability / sampling-noise removal are **pending the "estimand 逐个分析"
+> session**. It is registered here as a pending confirmatory-family member; it
+> is deliberately NOT given a scalar-score row above and NOT entered into the
+> power simulation numerically until that session fixes it. Pointer:
+> `refine-logs/reviews/REOPEN_R1_R6/R6_pred_target_cfo/R6_DECISIONS.md` (待定②).
+
+> **[PENDING — `E_NoOp` signed-score form, R-6 待定①.]** The `signed_score`
+> formula below currently bakes in a `0-100` **self-reported** confidence. The
+> `P_predict` output FORM (direction bins, confidence scale, `memory_flag`) is
+> **not yet decided** — pending R-6 待定①. Self-reported confidence is
+> **diagnostic-only / unreliable**; the confidence/familiarity channel for
+> confirmatory inference uses the **white-box logprob** signal, not the model's
+> stated number. Treat the formula as a placeholder pending the R-6 待定①
+> output-form decision. Pointers:
+> `refine-logs/reviews/REOPEN_R1_R6/R6_pred_target_cfo/R6_DECISIONS.md` (待定①)
+> + `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/P0_DECISIONS.md`
+> (four-layer §4.3: CI uses white-box logprob only).
+
+For `P_predict`-derived scores, the placeholder form (pending R-6 待定①) is:
 
 ```text
 signed_score = sign(direction) * logit((confidence + 0.5) / 101)
 ```
 
-where `confidence` is the parsed `0-100` confidence value from `P_predict`. `E_CMMD` should first map each model prediction to `signed_score`, then aggregate to a case-level cross-cutoff separation score before entering the confirmatory model. `E_NoOp` remains a robustness / template-brittleness signal rather than a direct memorization claim.
+where `confidence` is the parsed `0-100` confidence value from `P_predict`. `E_NoOp` remains a robustness / template-brittleness signal rather than a direct memorization claim.
 
 ### 8.2 Mixed-model form
 
 The confirmatory model family should be parameterized **per estimand**, not forced into one universal `Y_ijm` form. The common fixed-effect skeleton is the same across estimands, but the response notation and random-effect structure follow the analysis unit frozen in Section 8.1A.
 
-For case × model estimands (`E_CTS`, `E_FO`, `E_NoOp`), fit:
+For case × model estimands (`E_CTS`, `E_NoOp`), fit:
 
 ```text
 score_im^(j) = beta0^(j)
@@ -804,35 +862,32 @@ score_ip^(PCSG) = beta0
 
 where `p` indexes a tokenizer-matched temporal pair rather than a model.
 
-For the fleet-aggregated case-level estimand (`E_CMMD`), fit:
+`E_CMMD` is not fit (the fleet-aggregated case-level cross-cutoff-separation
+model form is not part of the live confirmatory family).
 
-```text
-score_i^(CMMD) = beta0
-               + beta1 * fleet_cutoff_separation_i
-               + beta2 * factor_i
-               + beta3 * fleet_cutoff_separation_i * factor_i
-               + e_i
-```
-
-with case-cluster bootstrap inference rather than a model random effect, because the fleet aggregation has already collapsed the model dimension.
+> **[PENDING — case×model factor count.]** The `cutoff_exposure_im` term above
+> treats Cutoff Exposure as the only case×model factor. If R-1f (Entity Age) is
+> admitted at R-1e as a 2nd case×model factor, this skeleton needs a second
+> case×model term and its random-effect structure is revisited (R-4b). Pointer:
+> `refine-logs/reviews/REOPEN_R1_R6/R1f_entity_age/R1f_DECISIONS.md`.
 
 Coefficient-of-interest rules:
 
 - for the `Cutoff Exposure` factor, the primary coefficient is `beta1`;
-- for the other three factors, the primary pilot coefficient is `beta3`, the interaction with cutoff exposure;
+- for each remaining confirmatory factor in the R-1e-selected set (count pending R-1e — see §7.1A), the primary pilot coefficient is `beta3`, its interaction with cutoff exposure;
 - `E_TDR` remains separate and is represented by its own `cutoff * dose` interaction in exploratory sensitivity models only.
 
 `baseline_confidence` is intentionally excluded from the primary confirmatory parameterization. It enters only through the sensitivity analyses in Section 8.3.
 
 ### 8.3 Baseline-confidence covariate (`C3`)
 
-`baseline_confidence` is a sensitivity-only covariate for the `P_predict` family (`E_CMMD`, `E_FO`, `E_NoOp`). It should not appear in the primary confirmatory models in Section 8.2 and should not change confirmatory family membership, quality gates, or power planning.
+`baseline_confidence` is a sensitivity-only covariate for the `P_predict`-derived confirmatory estimand (`E_NoOp`; `E_CMMD` was cut at R-4). It should not appear in the primary confirmatory models in Section 8.2 and should not change confirmatory family membership, quality gates, or power planning.
 
 Within the sensitivity pass, `baseline_confidence_im` should be centered within model to absorb trivial ceiling/floor behavior in `P_predict` outputs. The mid-range sensitivity analysis should retain only observations whose baseline confidence lies between the model-specific 20th and 80th percentiles. Percentile-based bands are preferred over a hard 20-80 numeric threshold because confidence scales can drift by provider.
 
 ### 8.4 Confirmatory-estimand correlation matrix (`C1`)
 
-The pilot should compute pairwise Pearson and Spearman correlations across the 5 confirmatory estimands on their common eligible subset after standardizing on the estimand’s own analysis unit. Use bootstrap resampling over cases to obtain stability intervals. The default Stage 1 regrouping rule is deterministic:
+The pilot should compute pairwise Pearson and Spearman correlations across the retained confirmatory estimands (`E_CTS`, `E_PCSG`, `E_NoOp`) on their common eligible subset after standardizing on the estimand’s own analysis unit. Use bootstrap resampling over cases to obtain stability intervals. The default Stage 1 regrouping rule is deterministic:
 
 - `Pearson r > 0.80`, and
 - the sign is stable in at least 90% of bootstrap resamples.
@@ -841,12 +896,13 @@ If both conditions hold for the `E_CTS` / `E_PCSG` pair, retain `E_PCSG` as conf
 
 ### 8.5 Simple baseline predictors (`BL1`)
 
-The baseline ablation should fit metadata-only models that predict each estimand outcome from:
+The baseline ablation should fit metadata-only models that predict each
+estimand outcome from the **R-1e-selected confirmatory factor set** (size +
+identity pending R-1e + pilot — see §7.1A; current candidate set =
+cutoff exposure / historical family recurrence / target salience /
+template rigidity, plus any additional admitted factor such as R-1f Entity
+Age), together with:
 
-- cutoff exposure;
-- historical family recurrence;
-- target salience;
-- template rigidity;
 - structured event type;
 - category and date-window indicators as nuisance controls.
 
@@ -860,11 +916,11 @@ Grouped cross-validation must split on the **case** as the grouping unit, not on
 
 ### 8.6 Post-cutoff negative control (`BL2`)
 
-For the **350 post-cutoff controls** (per Section 6.2 expansion 2026-04-29),
-rerun the same `E_CMMD`, `E_PCSG`, and `E_CTS` analysis logic. The expected
-outcome is near-zero temporal signal because all relevant models should
-lack exposure. `BL2` should use a preregistered equivalence test rather
-than the old attenuation heuristic.
+For the **700 post-cutoff controls** (per Section 6.2),
+rerun the same `E_PCSG` and `E_CTS` analysis logic (`E_CMMD` was cut at R-4;
+see §8.1A). The expected outcome is near-zero temporal signal because all
+relevant models should lack exposure. `BL2` should use a preregistered
+equivalence test rather than the old attenuation heuristic.
 
 Use case-cluster bootstrap resampling with `n_boot = 2000` to estimate the post-cutoff effect interval on a standardized effect scale. Standardization should use the pre-cutoff pilot standard deviation of the corresponding estimand score so the post-cutoff and pre-cutoff magnitudes live on the same scale.
 
@@ -872,30 +928,42 @@ Freeze the equivalence rule as:
 
 - SESOI (Smallest Effect Size Of Interest) `= 0.15` standardized effect units
 - `BL2` passes only if the 95% post-cutoff bootstrap confidence interval lies fully inside `[-0.15, +0.15]`
-- TOST power calibration: at `n_post = 350`, simulated TOST power at
-  true effect = 0 is approximately 60%; at `n_post = 700` it is
-  approximately 96%. The 350 figure is the conservative GO size; if
-  Stage 2 power simulation flags 60% as inadequate for the negative
-  control's evidentiary role, expand to 700 under the same Option I
-  rebalance without a memo.
+- TOST power calibration: at `n_post = 700`, simulated TOST power at
+  true effect = 0 is approximately 96%.
 - Failure to establish equivalence blocks automatic Phase 8 GO and requires explicit design review.
 
-**Why n=350 rather than the original n=20.** R5A_DESIGN_REVIEW_20260427
-Statistical lens computed that at `n_post = 20`, even when the true
-effect is exactly 0, the 95% CI half-width is ~0.44 — about 3× the
-SESOI of 0.15. The probability that the 95% CI falls fully inside
-`[-0.15, +0.15]` is approximately 0%. The TOST rule was therefore
-mathematically impossible to satisfy at the original sample size. See
+**Why the post-cutoff bucket must be large.** The Statistical lens computed
+that at a small `n_post` (e.g. 20), even when the true effect is exactly 0,
+the 95% CI half-width is ~0.44 — about 3× the SESOI of 0.15, so the
+probability that the CI falls fully inside `[-0.15, +0.15]` is approximately
+0% and the TOST rule is mathematically impossible to satisfy. The `n_post = 700`
+bucket gives the equivalence test ~96% power at true effect = 0. See
 `docs/DECISION_20260429_gate_removal.md` §3.3 for the full audit.
 
 ### 8.6A Same-cutoff early-warning ratio
 
-Compute an architecture-noise early-warning ratio on the `E_CMMD` separation scale:
+Compute an architecture-noise early-warning ratio that contrasts a same-cutoff
+pair against a temporal pair:
 
 ```text
 ratio = |effect(GLM-4-9B <-> GPT-4.1 same-cutoff pair)|
         / |effect(Qwen2.5-7B <-> Qwen3-8B temporal pair)|
 ```
+
+> **[PENDING — same-cutoff pairing is probe-contingent.]** The GLM-4-9B ↔
+> GPT-4.1 "same-cutoff" pairing relies on both models' currently
+> *operator-inferred* cutoff dates. It holds only if the empirical
+> `cutoff_probe` does NOT revise either model's cutoff; if the probe moves
+> either date, re-select the same-cutoff pair. Per-model cutoff centers are
+> provisional until the probe. Pointer:
+> `refine-logs/reviews/REOPEN_R1_R6/R1a_cutoff_exposure/cutoff_probe_DECISIONS.md`.
+
+> **Scale note.** This ratio was originally defined on the `E_CMMD`
+> cross-model separation scale; `E_CMMD` was cut at R-4 construct-validity
+> 2026-05-31 (see §8.1A). The architecture-noise warning therefore needs to be
+> recomputed on a surviving estimand scale (a `P_predict`-derived signed-score
+> separation, or the `E_PCSG` temporal-pair scale) — pending the estimand
+> re-scope. The decision logic below is unchanged.
 
 If `ratio > 0.5`, Phase 8 does not automatically fail, but the Phase 8 go/no-go memo must strengthen the architecture/capability caveat and cite the same-cutoff warning explicitly. If the denominator is near zero or not estimable, treat the ratio as warning-triggered rather than silently dropping the check.
 
@@ -913,9 +981,24 @@ Create `data/reference/model_capability_scores.csv` with:
 
 This covariate is only a partial adjustment. `docs/CAVEAT_model_capability.md` should state that benchmark scores do not identify architecture, training data, or multilingual finance specialization cleanly.
 
-### 8.8 Power analysis for the 2,560-case main run (`M2`)
+### 8.8 Detectability / precision analysis for the 2,560-case main run (`M2`)
 
-The exact main-run multiplicity procedure is Westfall-Young stepdown max-T, so pilot power should be simulated rather than approximated by a univariate closed form. Power planning must be **scenario-based** and must not use a single perturbation-rich pilot point estimate as the Phase 8 planning prior.
+The main path is **estimation-first** (R-4a Lock 1): the planning quantity is
+each estimand's **effect size + 95 % CI precision / detectability at the
+SESOI**, not an NHST rejection rate. Because the estimand-specific mixed
+models have correlated random effects, the precision still needs to be
+**simulated** rather than read off a univariate closed form. Power planning
+must be **scenario-based** and must not use a single perturbation-rich pilot
+point estimate as the Phase 8 planning prior.
+
+> **[PENDING — formal multiplicity procedure.]** The formal multiplicity / GO
+> procedure is **待下一轮 R-4 走查裁定** — NOT locked. R-4a Lock 1 leans
+> estimation-first: per-estimand effect size + simultaneous (per-estimand) CIs,
+> **no NHST family**; a Westfall-Young stepdown max-T family-wise test is at
+> most an *optional sensitivity* overlay, not the frozen procedure. Pointer:
+> `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/R4a_DECISIONS.md`
+> (Lock 1). The per-estimand `n_eff` / SESOI logic (§6.4) and the BL2 TOST
+> equivalence test (§8.6) are R-4a-endorsed and unchanged.
 
 Freeze at least three prior scenarios:
 
@@ -925,7 +1008,7 @@ Freeze at least three prior scenarios:
 | `reweighted_phase8` | reweight coefficients to the expected Phase 8 `category × cutoff window` composition | planning prior for population shift |
 | `shrinkage_0.5` | shrink pilot coefficients toward `0` by factor `0.5` | conservative stress test |
 
-For each scenario, and for each legal family state (`S20`, `S16a`, `S16b`, `S12`):
+For each scenario, under the single legal family state `S20` (the `S16a` / `S16b` / `S12` demotion ladder is retired — see Section 7.1A):
 
 1. Estimate the pilot coefficient vector `hat(beta)` and residual covariance `hat(Sigma)` for the retained confirmatory estimands.
 2. Simulate `B = 2000` main-run datasets at `N_case = 2560`, with the
@@ -938,24 +1021,31 @@ For each scenario, and for each legal family state (`S20`, `S16a`, `S16b`, `S12`
    - cross-estimand covariance from the pilot;
    - the scenario-specific prior effect vector.
 3. Refit the planned estimand-specific models on each synthetic dataset.
-4. Apply Westfall-Young stepdown max-T across the confirmatory family in each replicate.
-5. Estimate detection power for each primary coefficient as:
+4. For each primary coefficient `j`, summarize across the `B` replicates:
+   - the mean estimated effect size and its simulated sampling SD;
+   - the mean 95 % CI half-width (precision);
+   - the **detectability** fraction = share of replicates whose 95 % CI
+     excludes 0 while the point estimate is on the expected side, i.e. the
+     effect is resolved at the SESOI:
 
 ```text
-power_j = (1 / B) * sum_{b=1}^B I[p_j^(WY, b) < alpha]
+detect_j = (1 / B) * sum_{b=1}^B I[ CI95_j^(b) excludes 0 and |hat(beta)_j^(b)| >= SESOI ]
 ```
 
-where `alpha = 0.05` family-wise.
+(If the still-pending R-4 round adopts a formal family-wise procedure, the
+same simulation harness can additionally report a Westfall-Young-adjusted
+rejection rate as a sensitivity overlay — but that is not the primary planning
+quantity.)
 
-For every reported power value, also report:
+For every reported value, also report:
 
-- Monte Carlo standard error `SE(power_j) = sqrt(power_j * (1 - power_j) / B)`
+- Monte Carlo standard error `SE(detect_j) = sqrt(detect_j * (1 - detect_j) / B)`
 - a 95% Monte Carlo interval
 - realized missingness under the scenario and family state
 
 The planning output should therefore be a **range** over scenarios and legal family states, not a single optimistic number.
 
-## 9. Human Audit Protocol for `C_FO` and `C_NoOp`
+## 9. Human Audit Protocol for `C_NoOp`
 
 ### 9.1 Review roles
 
@@ -988,7 +1078,7 @@ The UI should write JSONL records directly to `data/pilot/audit/raw/`.
 
 ### 9.3 Rubric
 
-Every `C_FO` and `C_NoOp` item is judged on four frozen dimensions:
+Every `C_NoOp` item is judged on four frozen dimensions:
 
 1. natural CLS style;
 2. target-local edit;
@@ -997,7 +1087,7 @@ Every `C_FO` and `C_NoOp` item is judged on four frozen dimensions:
 
 Overall pass means all four dimensions pass. “Uncertain” is allowed during first-pass labeling but must be resolved during adjudication.
 
-For `C_FO`, reviewers must verify that the stored `verified_outcome`, `fo_slotable`, `fo_slot_topology`, and `slot_span` metadata match the actual edit. For `C_NoOp`, reviewers must verify that the stored `host_category` and clause-bank choice match the article register.
+For `C_NoOp`, reviewers must verify that the stored `host_category` and clause-bank choice match the article register.
 
 Dimension 4, “no unintended cues,” should be expanded into the following six-class cue-fail checklist:
 
@@ -1032,7 +1122,7 @@ If the OPEN 4 fallback path is used and only one reviewer is available, replace 
 
 The merge step must publish overall pass rate by perturbation, pass rate by perturbation × event type (`BL4`), per-dimension pass rate, disagreement counts, kappa or test-retest table, cue-fail counts by the six classes in Section 9.3, and adjudication notes for failed event types.
 
-The final audit export JSONL should also preserve the gate-relevant artifact metadata used by later analysis and hashing: `verified_outcome`, `fo_slotable`, `fo_slot_topology`, `slot_span`, `host_category`, `noop_bank_id`, `noop_eligibility_rule_id`, and `ineligible_reason`.
+The final audit export JSONL should also preserve the gate-relevant artifact metadata used by later analysis and hashing: `host_category`, `noop_bank_id`, `noop_eligibility_rule_id`, and `ineligible_reason`.
 
 ## 10. Infrastructure and Reproducibility
 
@@ -1127,9 +1217,9 @@ Each pilot run should emit `data/pilot/manifests/run_{timestamp}.json` containin
 - article manifest hash;
 - perturbation manifest hash;
 - audit manifest hash;
-- **`cutoff_observed: dict[str, date]`** — per-model empirical cutoff from Path E (added 2026-04-27);
-- **`cutoff_date_yaml: dict[str, date]`** — per-model declared cutoff from fleet YAML, for robustness comparison (added 2026-04-27);
-- **`quant_scheme: dict[str, str]`** — per-model precision regime (added 2026-04-27);
+- **`cutoff_date_yaml: dict[str, date]`** — per-model **declared** cutoff from the fleet YAML (manually revised after probe + owner sign-off). This is the **PRIMARY exposure covariate** that feeds the metric;
+- **`empirical_knowledge_horizon: dict[str, date]`** — per-model empirical horizon from the cutoff probe. **Validation-only**: it is recorded for sanity-checking the declared cutoff and **never feeds any metric**. The probe is **manual review for all 16 models** (no auto red/yellow/green gate). Pointers: `refine-logs/reviews/REOPEN_R1_R6/R1a_cutoff_exposure/R1a_DECISIONS.md` + `refine-logs/reviews/REOPEN_R1_R6/R1a_cutoff_exposure/cutoff_probe_DECISIONS.md`;
+- **`quant_scheme: dict[str, str]`** — per-model precision regime;
 - **`pcsg_pair_registry_hash: str`** — canonicalized hash of the `pcsg_pairs` block (added 2026-04-27);
 - **`hidden_state_subset_hash: str`** — SHA256 of the WS6 30-case subset selection JSON (added 2026-04-29);
 - **`quality_gate_thresholds: dict[str, int]`** — per-rule K values resolved from the strict-majority formula at run time (added 2026-04-29).
@@ -1145,7 +1235,7 @@ Phase 7 should add `data/pilot/` as the authoritative artifact root, `data/refer
 | Workstream | Estimated elapsed time |
 |---|---|
 | WS0 | 1-2 working days |
-| WS0.5 | design closed 2026-05-20 (`docs/DECISION_20260518_ws0_5_thales_alignment.md` v0.4); implementation estimate per memo §10 schedule — S1 (Track B coverage + T1 auto-tune), S2 (T2 auto-tune + ancillary smoke), S3 (T3 smoke comparison + auto-tune), S4 (recurrence pipeline R1-R5 + pilot factor inference), S5 (commit + checklist tick). Budget ledgers per memo §7 give actual spend on completion. |
+| WS0.5 | design content-complete (memo v0.4, `docs/DECISION_20260518_ws0_5_thales_alignment.md`); user sign-off shelved (签字搁置) and implementation upstream-blocked (see §4 upstream block). Implementation estimate per memo §10 schedule — S1 (Track B coverage + T1 auto-tune), S2 (T2 auto-tune + ancillary smoke), S3 (T3 smoke comparison + auto-tune), S4 (recurrence pipeline R1-R5 + pilot factor inference), S5 (commit + checklist tick). Budget ledgers per memo §7 give actual spend on completion. |
 | WS1 | 2-3 working days |
 | WS2 | 2-3 working days |
 | WS3 | 3-4 working days including audit |
@@ -1156,8 +1246,8 @@ Phase 7 should add `data/pilot/` as the authoritative artifact root, `data/refer
 
 | Component | Approximate runtime | Notes |
 |---|---|---|
-| `P_logprob` smoke (30 cases × 12 P_logprob-eligible white-box) | 1-4 hours | depends on 32B throughput and batch size; capacity-curve sanity check included; +2 Llama bf16 models (2026-04-29) |
-| `P_logprob` full pilot (430 cases × 12 P_logprob-eligible white-box) | 7-12 hours | 80 pre-cutoff + 350 post-cutoff (BL2 expansion); trace saving and per-model queuing included; +2 Llama bf16 models (2026-04-29) |
+| `P_logprob` smoke (30 cases × 12 P_logprob-eligible white-box) | 1-4 hours | depends on 32B throughput and batch size; capacity-curve sanity check included; includes 2 Llama bf16 models |
+| `P_logprob` full pilot (780 cases × 12 P_logprob-eligible white-box) | 7-12 hours | 80 pre-cutoff + 700 post-cutoff; trace saving and per-model queuing included; includes 2 Llama bf16 models |
 | Hidden-state extraction (30 cases × 12 P_logprob-eligible white-box, WS6 prep) | ~6 hours | offline_hf backend; WS1 cloud Stage 2.7 (Path C eager pre-compute) |
 | Path E cutoff probe (2,160 articles × 12 P_logprob-eligible white-box) | ~2.5 hours | shares same instance, see WS1 cloud plan Stage 2.5; Llama probes are sanity anchors per `docs/DECISION_20260429_llama_addition.md` §2.4 |
 
@@ -1167,24 +1257,25 @@ part of the WS1 data bundle at
 `data/pilot/exposure_horizon/probe_set_monthly60_36mo.json`. The script
 writes a seeded JSON envelope with monthly realized counts so cloud
 execution can detect underfilled months before scoring.
-| AWQ-vs-fp16 calibration audit (Qwen2.5-7B bf16 × 430 pilot cases) | ~3 hours | new Stage 2.8; closes Adversarial A3 per `docs/DECISION_20260429_llama_addition.md` §2.5 |
+| AWQ-vs-fp16 calibration audit (Qwen2.5-7B bf16 × 780 pilot cases) | ~3 hours | Stage 2.8; closes Adversarial A3 per `docs/DECISION_20260429_llama_addition.md` §2.5 |
 | `P_predict` smoke (20 cases × 14 models) | 30-90 minutes | includes repair/retry overhead |
-| `P_predict` full pilot baseline + perturbations (430 cases × 14 models, perturbations on pre-cutoff only) | 8-14 hours | depends on provider latency and retry rate |
+| `P_predict` full pilot baseline + perturbations (780 cases × 14 models, perturbations on pre-cutoff only) | 8-14 hours | depends on provider latency and retry rate |
 | duplicate reruns | 1-2 hours | 5% diagnostic subset |
 | full human audit | 6-10 reviewer-hours | unchanged — perturbations only generated on the 80 pre-cutoff cases |
 | pilot analysis + power simulation | 2-6 hours compute | mostly CPU, simulation scales with `B` |
 
 ### 11.3 API and token budget
 
-For planning purposes, Phase 7 should budget roughly:
+For planning purposes, Phase 7 should budget roughly (baseline `P_predict`
+runs on all 780 cases × 14 P_predict-eligible models; perturbations run on
+the 80 pre-cutoff cases only):
 
-- baseline `P_predict`: `100 cases x 9 models = 900` calls;
-- `C_FO`: approximately `60 eligible cases x 9 models = 540` calls;
-- `C_NoOp`: approximately `90-100 eligible cases x 9 models = 810-900` calls;
-- exploratory `C_NoOp_placebo`: approximately `100 eligible cases x 9 models = 900` calls;
+- baseline `P_predict`: `780 cases x 14 models = 10,920` calls;
+- `C_NoOp`: approximately `72-80 eligible pre-cutoff cases x 14 models = 1,008-1,120` calls;
+- exploratory `C_NoOp_placebo`: approximately `80 eligible pre-cutoff cases x 14 models = 1,120` calls;
 - duplicate reruns: roughly `5%` overhead.
 
-That implies roughly `3.2k-3.4k` model calls before retries. The exact USD cost is provider-price dependent and should be converted from token logs on run day rather than hard-coded in this plan. Because `C_NoOp_placebo` is exploratory-only, it should be the first branch dropped if token accounting threatens the confirmatory path. A practical planning rule is:
+The exact USD cost is provider-price dependent and should be converted from token logs on run day rather than hard-coded in this plan. Because `C_NoOp_placebo` is exploratory-only, it should be the first branch dropped if token accounting threatens the confirmatory path. A practical planning rule is:
 
 - set a hard pilot spend cap of `USD 300`;
 - emit live token accounting during the run;
@@ -1196,14 +1287,14 @@ This keeps the pilot bounded without pretending that current provider prices are
 
 | ID | Risk | Trigger | Response |
 |---|---|---|---|
-| R1 | both `C_FO` and `C_NoOp` fail quality gates | overall pass `<85%` or an event type `<75%` | demote both to exploratory, shrink confirmatory family, update Stage 2 prereg accordingly |
+| R1 | `C_NoOp` fails the audit data-quality gate | overall pass `<85%` or an event type `<75%` | remove failing items from the eligible pool and report coverage as a methods caveat; `E_NoOp` stays an unconditional confirmatory member (the demotion ladder is retired — §7.1A). If too few eligible items remain to estimate `E_NoOp` at `n_eff >= 15`, treat it as an estimand-readiness failure requiring a new decision memo |
 | R2 | `P_logprob` unavailable on one or more white-box models | prompt-logprob extraction fails smoke test | switch affected model to offline HF scorer with same checkpoint SHA |
 | R3 | hidden provider caching compresses deltas | duplicate reruns are suspiciously identical or response IDs repeat in an implausible pattern | document provider behavior, widen rerun subset, downgrade provider-specific claims if needed |
 | R4 | same-cutoff falsification pair shows large signal | Section 8.6A early-warning ratio `> 0.5` | flag architecture/capability confounding, strengthen caveat text, consider narrowing main-text claims |
 | R5 | post-cutoff negative control does not establish equivalence | Section 8.6 post-cutoff CI is not fully inside `[-0.15, +0.15]` | block automatic Phase 8 GO until sampling, scoring, or cutoff coding is reviewed |
 | R6 | confirmatory estimands are redundant | pilot correlation `r > 0.8` | apply the automatic Section 8.4 tie-break where pre-registered; require a memo only for non-default regrouping |
 | R7 | model-capability covariate unavailable or too noisy | benchmark sources missing for some models | use a transparent fallback source, mark caveat, avoid overinterpreting adjusted coefficients |
-| R8 | pilot power implies underpowered main run | simulated Phase 8 power too low at `N=2560` | pause Phase 8 and revisit sample size or confirmatory family under frozen rules |
+| R8 | pilot detectability implies underpowered main run | simulated Phase 8 detectability too low at `N=2560` | pause Phase 8 and reopen sample-size planning (or open a new memo to revisit the family); the demotion ladder is retired (§7.1A) |
 | R9 | `BL2` equivalence pass is over-read as proof of zero effect | readers treat TOST passage as “no signal exists” rather than “signal is within SESOI” | write explicit equivalence-language caveat in the Phase 8 memo and paper methods |
 | R10 | zero-shot parse failures exceed 5% on one or more models | 20-case smoke shows strict-JSON success `<95%` | delay Phase 7 launch, apply adapter hardening only, and do not change prompt semantics or add few-shot examples |
 | R11 | WS0.5 factor pipeline not ready in time for pilot manifest freeze | Thales-alignment session does not close before WS4 prep | pause WS4 until the factor schema is deterministic; do not substitute ad-hoc factor labels |
@@ -1215,14 +1306,18 @@ Phase 8 may start only if all of the following hold:
 
 1. `src/r5a/` operator and perturbation pipelines run end-to-end on the frozen pilot manifest.
 2. A signed Stage 1 preregistration exists and the Stage 2 skeleton is populated from pilot outputs only.
-3. `P_logprob` succeeds on all **12 P_logprob-eligible white-box models** with pinned tokenizer/checkpoint provenance, **and Path E `cutoff_observed` (or rejected-with-CI) is published for every P_logprob-eligible white-box model** (per `docs/DECISION_20260427_pcsg_redefinition.md` §3.3 + `docs/DECISION_20260429_llama_addition.md` §2.4).
+3. `P_logprob` succeeds on all **12 P_logprob-eligible white-box models** with pinned tokenizer/checkpoint provenance, **and the validation-only `empirical_knowledge_horizon` probe is published (manual review) for every P_logprob-eligible white-box model** — it sanity-checks the declared YAML cutoff and never feeds the metric (pointers: `refine-logs/reviews/REOPEN_R1_R6/R1a_cutoff_exposure/R1a_DECISIONS.md` + `refine-logs/reviews/REOPEN_R1_R6/R1a_cutoff_exposure/cutoff_probe_DECISIONS.md`).
 4. `P_predict` succeeds on all **14 models** with fingerprint logging and acceptable parse rates.
-5. The effective sample-size matrix passes `min cell >= 15` on the 80 pre-cutoff cases (post-cutoff 350 enters BL2 only and does not require the same matrix).
-6. **Data-quality requirements** for `C_FO` and `C_NoOp` are complete: audit pass rate `>=85%` overall with no event type `<75%` (items failing audit removed before analysis); eligible case coverage reported per perturbation × event type as a methods-section descriptive metric. **Gate condition 3 (baseline delta non-degeneracy) is no longer evaluated** — removed 2026-04-29 per `docs/DECISION_20260429_gate_removal.md`. E_FO and E_NoOp remain unconditional confirmatory members of `S20`.
-7. `BL2` passes the Section 8.6 TOST equivalence rule **on `n_post = 350`** and the Section 8.6A same-cutoff early-warning ratio is documented; if the ratio exceeds `0.5`, the go/no-go memo must adopt strengthened caveat language rather than ignoring the warning.
+5. The effective sample-size matrix passes `min cell >= 15` on the 80 pre-cutoff cases (the 700 post-cutoff cases enter BL2 only and do not require the same matrix).
+6. **Data-quality requirements** for `C_NoOp` are complete: audit pass rate `>=85%` overall with no event type `<75%` (items failing audit removed before analysis); eligible case coverage reported per perturbation × event type as a methods-section descriptive metric. **Gate condition 3 (baseline delta non-degeneracy) is no longer evaluated** — removed 2026-04-29 per `docs/DECISION_20260429_gate_removal.md`. `E_NoOp` remains an unconditional confirmatory member of `S20`.
+7. `BL2` passes the Section 8.6 TOST equivalence rule **on `n_post = 700`** and the Section 8.6A same-cutoff early-warning ratio is documented; if the ratio exceeds `0.5`, the go/no-go memo must adopt strengthened caveat language rather than ignoring the warning.
 8. Correlation/regrouping trigger has been evaluated and documented.
-9. **WS6 hidden-state extraction is complete** (30-case subset across 12 P_logprob-eligible white-box models — 10 full-operator + 2 Llama bf16, per `docs/DECISION_20260429_llama_addition.md` §3.4 — pre-computed in WS1 Stage 2.7). WS6 mechanistic analysis is unconditional (no behavioral trigger required); analysis can proceed in WS5 regardless of E_FO behavioral magnitude.
-10. Main-run power at `N=2560` is acceptable for the retained confirmatory family under the Section 8.8 scenario range. Automatic GO requires at least one temporal-route estimand (`E_CMMD` or `E_PCSG`) **and** one perturbation-route estimand (`E_FO` or `E_NoOp`) to simultaneously reach Westfall-Young-adjusted `80%` power for the primary cutoff-exposure coefficient; a single-channel success is insufficient.
+9. **WS6 hidden-state extraction is complete** (30-case subset across 12 P_logprob-eligible white-box models — 10 full-operator + 2 Llama bf16, per `docs/DECISION_20260429_llama_addition.md` §3.4 — pre-computed in WS1 Stage 2.7). This extraction is a model-agnostic logprob/hidden-state pre-compute and is unconditional (no behavioral trigger required); the artifacts are ready for WS5. The mechanistic-analysis target that consumes these hidden states is pending the R-2 / estimand re-scope and must not be assumed live.
+10. Main-run **detectability** at `N=2560` is acceptable for the retained confirmatory family under the Section 8.8 scenario range. The GO gate is **two-channel** and each channel is judged on its OWN target — the two channels corroborate but are not assumed to synthesize (post-hoc cross-signal correlation only; §8.1):
+    - **familiarity channel** (`E_PCSG` / `E_CTS`): its effect is detectable at the SESOI on the **cutoff anchor** (this is the only cutoff-anchored channel);
+    - **perturbation / resistance channel** (`E_NoOp`, plus the R-2 counterfactual estimand once fixed): its effect is detectable on **its own resistance / factor-interaction target — NOT on cutoff**. Per P0 / R-4 (D2/D4) the resistance family has **no predicted cutoff behavior**, so the gate must not demand cutoff-coefficient power from this channel.
+
+    A single-channel success is insufficient; both channels must clear their own target. (The formal pass/adjust rule rides on the still-pending multiplicity procedure — §8.8; R-4a Lock 1 leans estimation-first, no NHST family.) Pointers: `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/P0_DECISIONS.md` + `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/R4_construct_validity_decisions.md` (D2/D4) + `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/four_layer_candidate_pools.md` §5.
 11. `docs/DECISION_20260417_phase8_go_no_go.md` records the retained family, risks, and run-day operational caps.
 
 The Phase 8 gate is about measurement readiness, not about obtaining a “positive” pilot. Null pilot findings are allowed; unidentified or unstable pilot findings are not.
@@ -1234,13 +1329,11 @@ The Phase 8 gate is about measurement readiness, not about obtaining a “positi
 ```text
 config/fleet/r5a_fleet.yaml
 config/runtime/r5a_runtime.yaml
-config/perturbations/c_fo_rules.yaml
 config/perturbations/c_noop_clause_bank.yaml
 config/pilot_sampling.yaml
 src/r5a/contracts.py
 src/r5a/operators/p_predict.py
 src/r5a/operators/p_logprob.py
-src/r5a/perturbations/c_fo.py
 src/r5a/perturbations/c_noop.py
 src/r5a/analysis/power.py
 scripts/sample_phase7_pilot.py
@@ -1259,31 +1352,26 @@ data/reference/model_capability_scores.csv
 
 ### 14.2 Config keys that should exist
 
-> **Note (last updated 2026-04-29).** The example below is the **historical
-> 9-model schema** (5 white-box + 4 black-box). The current authoritative
-> fleet is **16 models** total (12 white-box + 4 black-box), split-tier:
->   * 10 full-operator white-box (5 Qwen2.5 + 4 Qwen3 + 1 GLM) +
->     4 black-box = **14 P_predict-eligible**
->   * +2 P_logprob-only Llama (Llama-3-8B + Llama-3.1-8B, both bf16) =
->     **12 P_logprob-eligible**
->   * 2 confirmatory PCSG temporal pairs (`temporal_qwen_cross_version`,
->     `temporal_llama_cross_version`)
->
-> See `config/fleet/r5a_fleet.yaml` for the live source of truth and
-> `docs/DECISION_20260427_pcsg_redefinition.md` + `docs/DECISION_20260429_llama_addition.md`
-> for the design memos. The example here is preserved as documentation
-> of the schema shape; for current member roster, `cutoff_source`,
-> `quant_scheme`, `hf_repo`, and `pcsg_pairs` keys consult the YAML
-> directly. PCSG eligibility is declared via `pcsg_pairs[].tokenizer_compat:
-> qwen2_class` plus `max_token_id_inclusive`, NOT inferred from
-> `tokenizer_family` equality. P_logprob-only models (Llama-3.x family)
-> declare `p_predict: null` rather than a `p_predict:` block.
+The live fleet roster is the **16-model split-tier** fleet in
+`config/fleet/r5a_fleet.yaml` (the single source of truth): 12 white-box
+(10 full-operator [5 Qwen2.5 + 4 Qwen3 + 1 GLM] + 2 Llama P_logprob-only,
+both bf16) + 4 black-box (DeepSeek V4 Pro / GPT-4.1 / GPT-5.1 / Claude
+Sonnet 4.6); 14 P_predict-eligible, 12 P_logprob-eligible; 2 confirmatory
+PCSG temporal pairs (`temporal_qwen_cross_version`, `temporal_llama_cross_version`).
+Consult the YAML directly for the member roster and the per-model
+`cutoff_source`, `quant_scheme`, `hf_repo`, and `pcsg_pairs` keys. PCSG
+eligibility is declared via `pcsg_pairs[].tokenizer_compat: qwen2_class`
+plus `max_token_id_inclusive`, NOT inferred from `tokenizer_family`
+equality. P_logprob-only models (Llama-3.x family) declare `p_predict: null`
+rather than a `p_predict:` block.
 
-`config/fleet/r5a_fleet.yaml` should minimally define a per-model × per-operator matrix:
+`config/fleet/r5a_fleet.yaml` should minimally define a per-model × per-operator
+matrix. The schema shape, with one white-box and one black-box model shown for
+illustration (the live file carries the full 16-model roster):
 
 ```yaml
 models:
-  qwen2.5-7b:
+  qwen2.5-7b:               # white-box, full-operator
     family: qwen
     access: white_box
     provider: vllm
@@ -1299,12 +1387,12 @@ models:
     p_predict:
       thinking_control: default_deployed
       prompt_overlay_policy: baseline_only
-  qwen2.5-14b:
-    family: qwen
+  llama-3.1-8b:             # white-box, P_logprob-only (P_predict-ineligible)
+    family: llama
     access: white_box
     provider: vllm
-    cutoff_date: 2023-10-31
-    tokenizer_family: qwen
+    cutoff_date: <model-cutoff>
+    tokenizer_family: llama3
     tokenizer_sha: <tokenizer-sha>
     hf_commit_sha: <model-sha>
     p_logprob:
@@ -1312,92 +1400,8 @@ models:
       prompt_overlay_policy: none
       route_lock_required: hf_commit_sha
       echo_supported: true
-    p_predict:
-      thinking_control: default_deployed
-      prompt_overlay_policy: baseline_only
-  glm-4-9b:
-    family: glm
-    access: white_box
-    provider: vllm
-    cutoff_date: 2024-06-30
-    tokenizer_family: glm4
-    tokenizer_sha: <tokenizer-sha>
-    hf_commit_sha: <model-sha>
-    p_logprob:
-      thinking_control: system_message_toggle
-      prompt_overlay_policy: none
-      route_lock_required: hf_commit_sha
-      echo_supported: false
-      fallback: offline_hf_scorer
-    p_predict:
-      thinking_control: default_deployed
-      prompt_overlay_policy: baseline_only
-  qwen3-8b:
-    family: qwen
-    access: white_box
-    provider: vllm
-    cutoff_date: 2025-01-31
-    tokenizer_family: qwen3
-    tokenizer_sha: <tokenizer-sha>
-    hf_commit_sha: <model-sha>
-    p_logprob:
-      thinking_control: append_no_think_sentinel
-      prompt_overlay_policy: none
-      route_lock_required: hf_commit_sha
-      echo_supported: true
-    p_predict:
-      thinking_control: default_deployed
-      prompt_overlay_policy: baseline_only
-  qwen3-14b:
-    family: qwen
-    access: white_box
-    provider: vllm
-    cutoff_date: 2025-01-31
-    tokenizer_family: qwen3
-    tokenizer_sha: <tokenizer-sha>
-    hf_commit_sha: <model-sha>
-    p_logprob:
-      thinking_control: append_no_think_sentinel
-      prompt_overlay_policy: none
-      route_lock_required: hf_commit_sha
-      echo_supported: true
-    p_predict:
-      thinking_control: default_deployed
-      prompt_overlay_policy: baseline_only
-  deepseek-v4-pro:
-    family: deepseek
-    access: black_box
-    provider: deepseek
-    api_model_name: deepseek-v4-pro
-    cutoff_date: 2026-04-24
-    cutoff_source: operator_inferred
-    p_predict:
-      thinking_control: default_deployed
-      prompt_overlay_policy: baseline_only
-      route_lock_required: provider_model_id
-  gpt-4.1:
-    family: openai
-    access: black_box
-    provider: openai
-    api_model_name: gpt-4.1-2025-04-14
-    cutoff_date: 2024-06-01
-    cutoff_source: vendor_stated
-    p_predict:
-      thinking_control: default_deployed
-      prompt_overlay_policy: baseline_only
-      route_lock_required: provider_model_id
-  gpt-5.1:
-    family: openai
-    access: black_box
-    provider: openai
-    api_model_name: gpt-5.1-2025-11-13
-    cutoff_date: 2024-09-30
-    cutoff_source: vendor_stated
-    p_predict:
-      thinking_control: default_deployed
-      prompt_overlay_policy: baseline_only
-      route_lock_required: provider_model_id
-  claude-sonnet-4.6:
+    p_predict: null
+  claude-sonnet-4.6:        # black-box
     family: anthropic
     access: black_box
     provider: anthropic
@@ -1479,7 +1483,7 @@ conda run -n rag_finance python scripts/run_phase7_pilot.py `
 
 conda run -n rag_finance python scripts/simulate_phase8_power.py `
   --pilot-results data/pilot/analysis/pilot_effects.parquet `
-  --family-states S20,S16a,S16b,S12 `
+  --family-states S20 `
   --scenario unweighted_pilot `
   --scenario reweighted_phase8 `
   --scenario shrinkage_0.5 `
@@ -1495,10 +1499,10 @@ git tag -s prereg/phase7-stage1-v1.0 -m "Phase 7 Stage 1 prereg"
 ### 14.4 Minimal sign-off checklist
 
 - interfaces signed
-- [✓ design 2026-05-20; implementation pending S1-S5 per memo §10] WS0.5 Thales-alignment session closed, decision memo committed (`docs/DECISION_20260518_ws0_5_thales_alignment.md` v0.4), factor schema lock file path = `config/factors/factor_schema.yaml`
+- [design content-complete memo v0.4; user sign-off SHELVED (签字搁置); implementation pending S1-S5 per memo §10 + upstream-blocked] WS0.5 Thales-alignment design memo (`docs/DECISION_20260518_ws0_5_thales_alignment.md` v0.4), factor schema lock file path = `config/factors/factor_schema.yaml`
 - zero-shot 20-case smoke parse success `>=95%`
 - `runstate.db` initialized and request lineage validated
-- 100-case manifest signed
+- 780-case manifest signed
 - pilot manifest hash recorded
 - perturbation audit complete
 - audit manifest hash recorded
@@ -1508,15 +1512,3 @@ git tag -s prereg/phase7-stage1-v1.0 -m "Phase 7 Stage 1 prereg"
 - `BL2` equivalence test and same-cutoff warning ratio evaluated
 - scenario-based power table written
 - Phase 8 go/no-go memo written
-
-## 15. Changelog
-
-- `A01` froze the estimand contract by adding Section 8.1A, defining analysis units, scalar scores, and the `signed_score` mapping. Section 6.4 now computes `n_eff` on the estimand’s own analysis unit, and Section 8.2 now uses per-estimand parameterization rather than one shared `Y_ijm` form.
-- `A02` replaced the old `BL2` attenuation heuristic with a preregistered TOST equivalence rule in Section 8.6 and moved the post-cutoff window in Section 6.2 to `>= 2026-02-01`. Section 8.6A now adds the same-cutoff early-warning ratio and Section 13 cites only these hard numerical checks.
-- `A03` froze the legal Stage 2 family states in Section 7.1A and made the `E_CTS` / `E_PCSG` regrouping rule deterministic in Section 8.4. Section 7.2 now narrows allowed prompt edits to adapter hardening, and Section 13 item 9 now requires one temporal-route and one perturbation-route estimand to meet the automatic GO power target.
-- `A04` hardened `C_FO` and `C_NoOp` admissibility by splitting `verified_outcome` from `fo_slotable`, adding slot-topology metadata, and converting `C_NoOp` to a host-aware clause-bank design. The plan also adds `C_NoOp_placebo` as exploratory-only and consistently narrows `E_NoOp` language to robustness / template-brittleness rather than direct memorization evidence.
-- `A05` made `config/fleet/r5a_fleet.yaml` the operator/runtime source of truth across WS0, `P_logprob`, `P_predict`, and the reproducibility section. Appendix 14.2 now includes an explicit per-model × per-operator YAML example covering the full frozen 9-model fleet.
-- `A06` replaced coarse resume semantics with request-item lineage via `data/pilot/runstate.db`, frozen request IDs, and status fields. Seed semantics and fingerprint logging are now normalized in Sections 10.2-10.4, and duplicate reruns now cover both baseline outputs and perturbation deltas.
-- `A07` added the Stage 1 evidence package in Section 7.1B and a non-critical-path Phase 7b reserve-promotion contingency in Section 7.2A. The audit staffing table remains intact, but Section 9.1 now carries the OPEN 4 note and fallback path.
-- `A08` hardened `BL1` and power planning by adding a text-light challenger, grouped-CV-by-case, and scenario-based power priors with Monte Carlo error reporting. Section 13 now explicitly forbids treating a single perturbation-rich pilot point estimate as the Phase 8 planning prior.
-- `A09` reserved `WS0.5: Thales alignment prerequisites` as a named but intentionally-unspecified workstream in Section 5.1A. Scope, deliverables, file paths, and effort are all deferred to a separate follow-up session and tracked in root-level `PENDING.md`. Section 4 workstream map, Section 6.3 factor-quota note, Section 11.1 time budget, Section 12 risks `R11`/`R12`, and Section 14.4 sign-off checklist now point at the WS0.5 gate without prescribing its implementation. The T1/T2/T3 verification questions are preserved as a briefing note, not as a commitment to any specific resolution path.

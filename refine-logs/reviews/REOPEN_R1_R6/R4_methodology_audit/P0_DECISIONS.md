@@ -2,7 +2,7 @@
 
 > **定位**:本文是 P0 闸门的决策正本。后续所有操作化会议(P2–P7、扰动会议、因子扩展会议)以此为前提。
 > **上游约束**:R-4 构念效度定调(`R4_construct_validity_decisions.md`)、四层候选池(`four_layer_candidate_pools.md`)、开题报告 §2.2 / §4.6。
-> **推理过程**:见 `P0_audit_trail.md`。
+> **推理过程**:见 `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/P0_audit_trail.md`。
 
 ---
 
@@ -138,7 +138,7 @@
 
 - 带方向的先验因子(实体好恶倾向、结构性方向先验)仍在「Type A 良性闸门」后。
 - 行情因子族(真实涨跌方向/幅度/市值当案例标签)的正式身份在此拍。
-- 方向标注来源见 `directional_label_probe.md`。
+- 方向标注来源见 `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/directional_label_probe.md`。
 
 **pilot**
 

@@ -5,7 +5,7 @@
 > - **L2 扰动 / L3 算子 / L4 指标仍为 living 候选池**:随时可加 / 改,正式 lock-in 在各自
 >   review 时产出干净 DECISIONS;下游 agent 别把这三层当 canonical decision。
 >
-> **上游**:`MEASUREMENT_FRAMEWORK.md`(四层术语)+ `algorithm_deepaudit.md`(estimand leans)
+> **上游**:`MEASUREMENT_FRAMEWORK.md`(四层术语)+ `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/algorithm_deepaudit.md`(estimand leans)
 > + `R4_next_construct_validity_agenda.md`(P0–P7)。因子层 brainstorm 已 archive(见 `_archive/`)。
 
 ---
@@ -269,5 +269,5 @@ C_FO(假结局扰动)在 R-6 close 时**删除**(canonical:`R6_pred_target_cfo/R
    架构上它们 = 算子衍生变量 × 指标比较,**不是独立层**(§4.3)。
 7. **P_predict schema 落地** —— §3.1 三段(挂 R-6 + WS2)。
 8. **F_template 机制** —— 进 confirmatory 前须过"记忆 vs 表面熟悉度"论证。
-9. **并入 algorithm_deepaudit §8 残项**:TOST/SESOI=0.15 来历、Gwet AC1、power MC sim、
+9. **并入 archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/algorithm_deepaudit.md §8 残项**:TOST/SESOI=0.15 来历、Gwet AC1、power MC sim、
    同-cutoff ratio、tier label 统计含义、整体一致性扫。

@@ -2,8 +2,8 @@
 
 **Status**: LOCKED 2026-05-23
 **Audit trail**(下游 agent 不需要读;只在需要 debate / 看推导过程时翻):
-- `whiteboard_analysis.md` —— 阶段 1 白板独立分析 + 阶段 2 对照
-- `subfield_lit_scan.md` —— 15 篇 2022-2026 子领域代表作扫描
+- `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/whiteboard_analysis.md` —— 阶段 1 白板独立分析 + 阶段 2 对照
+- `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/subfield_lit_scan.md` —— 15 篇 2022-2026 子领域代表作扫描
 
 ---
 

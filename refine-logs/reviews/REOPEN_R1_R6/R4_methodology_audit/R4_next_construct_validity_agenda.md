@@ -6,7 +6,7 @@
 
 **Status**: **P0 已定稿 → `P0_DECISIONS.md`(2026-05-31);P2–P7 仍 OPEN — 议程,非决策**;供 R-4 下一轮 walkthrough 逐条敲定。
 **来源**: novelty factor session(R-1d,2026-05-30,主对话 4 轮第一性原理推理)+ codex clean-room review(`.scratch/codex_runs/20260530-fpscope/final_detailed.md`)。
-**上游**: 接 `algorithm_deepaudit.md` §8 agenda 第 2/3 条(自我证伪 null 判据 + estimand 去留辩论);承 construct-validity 框架(数据集=测量仪器,cutoff=验证锚,post-cutoff null=效度锚)。
+**上游**: 接 `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/algorithm_deepaudit.md` §8 agenda 第 2/3 条(自我证伪 null 判据 + estimand 去留辩论);承 construct-validity 框架(数据集=测量仪器,cutoff=验证锚,post-cutoff null=效度锚)。
 **下游(2026-05-31 R-4 session 已把一批 leans 升为定调)**: `R4_construct_validity_decisions.md`(D1–D9)+ `four_layer_candidate_pools.md`(四池)。
 
 ---
@@ -26,7 +26,7 @@ novelty session 想给 benchmark 加一个 case-level「信息新颖度 / 答案
 
 ## 开放条目(建议顺序,可调)
 
-### P0 — 核心 estimand 范式 【CLOSED 2026-05-31 → 定稿 `P0_DECISIONS.md`;推理 `P0_audit_trail.md`;开场白 `.scratch/session_kickoff_p0_estimand_paradigm.md`】
+### P0 — 核心 estimand 范式 【CLOSED 2026-05-31 → 定稿 `P0_DECISIONS.md`;推理 `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/P0_audit_trail.md`;开场白 `.scratch/session_kickoff_p0_estimand_paradigm.md`】
 
 > **⚠️ 以下 7 行是 2026-05-30 的旧框架,已被溶解,留作 audit trail。** 当前 P0 scope:
 > **resistance 是框架实存的唯一主量**(E_FO/E_SR/E_NoOp 全是 same-case clean↔扰动 差值);
@@ -69,7 +69,7 @@ novelty session 想给 benchmark 加一个 case-level「信息新颖度 / 答案
 ### P7 — 因子是否同时调制能力与记忆 【ABANDONED 2026-06-02,resistance 差分 + 各因子 session 已覆盖】
 > **弃因**:resistance = 配对差值(原文 − 扰动变体),纯能力部分在差分中扣掉——模型能力强但不记忆,应跟着扰动走而非抵抗。剩余边角(模板刚性的"表面捷径"机制存疑)已在 R-1d scope 内,要求先过机制论证才进 confirmatory。不需要独立 session。
 
-### 并入:algorithm_deepaudit §8 原 agenda 残项
+### 并入 algorithm_deepaudit §8 原 agenda 残项
 - #5 TOST/SESOI=0.15 来历 + 标准化、#7 Gwet AC1、#9 power MC sim、#11 同-cutoff 证伪 ratio、#12 tier labels 统计含义、整体一致性扫(§6 frozen 残余清理)。
 - 与 P0–P7 合并成下一轮完整 walkthrough。
 

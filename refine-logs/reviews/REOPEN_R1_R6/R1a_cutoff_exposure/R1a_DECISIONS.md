@@ -3,8 +3,8 @@
 **状态**: 机制锁定 2026-05-27(定义 + 候选池准入);各模型 cutoff 中心值 **provisional**,待 §6 验证探针 + owner sign-off 后人工修正(§6 / §11)。
 **结局**: 进入 R-1e 候选池(β1 载体,几乎必进 primary)。
 **Audit trail**(下游 agent 不需要读;只在需要 debate / 看推导过程时翻):
-- `whiteboard_codex.md` —— Codex clean-room 白板(6 决策点独立分析)
-- `cutoff_deep_research_gpt.md` —— GPT deep research 对 16 模型 cutoff 可信度调查
+- `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R1a_cutoff_exposure/whiteboard_codex.md` —— Codex clean-room 白板(6 决策点独立分析)
+- `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R1a_cutoff_exposure/cutoff_deep_research_gpt.md` —— GPT deep research 对 16 模型 cutoff 可信度调查
 - `cutoff_probe_protocol_codex.md` —— Codex 设计的黑白盒通用 cutoff 验证探针协议
 
 ---
@@ -41,7 +41,7 @@
 | Path-E / 行为探针 | **不作主来源**,只验证(见 §6)|
 | 月内归一约定 | cutoff 归当月**末日**(采"最宽容训练 cutoff"口径;对结果影响极小,口径干净可复现)|
 | knowledge vs training cutoff | exposure 要的是"有机会见过"= **training cutoff**(更晚、更宽容);manifest 多只给 knowledge cutoff(偏早)→ 中心是保守下界 |
-| 中心值状态 | **PROVISIONAL** —— 现值保留 yaml;deep research(`cutoff_deep_research_gpt.md`)已标几个低可信度模型的候选修正(Qwen3 ~2024-10、DeepSeek ~2025-05、GLM-4 弱证据 2024-01..04、Claude training=Jan 2026 / 知识 May–Aug 2025 矛盾),但**不自动改 manifest**,经 §6 探针 + owner sign-off 后人工修正 |
+| 中心值状态 | **PROVISIONAL** —— 现值保留 yaml;deep research(`archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R1a_cutoff_exposure/cutoff_deep_research_gpt.md`)已标几个低可信度模型的候选修正(Qwen3 ~2024-10、DeepSeek ~2025-05、GLM-4 弱证据 2024-01..04、Claude training=Jan 2026 / 知识 May–Aug 2025 矛盾),但**不自动改 manifest**,经 §6 探针 + owner sign-off 后人工修正 |
 | reference window 右端点 | = `min(model_cutoff)`(对相关子队列取 min);**具体日期 + 哪些子队列计入 min 待 R-1e 裁定 — pending R-1e**。R-1b/R-1c/R-1d 共用同一端点定义,数值随 R-1e 裁定同步。 |
 
 ---

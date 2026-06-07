@@ -6,9 +6,9 @@
 方可进入 pilot。未通过此闸门 → 直接 DROP,不重开 R-1d 定义。
 
 **审计轨迹**(下游 agent 不需要读;只在 debate / 翻推导过程时查):
-- `whiteboard_analysis.md` — session 摘要(Q1–Q6 对话)
-- `channel_analysis.md` — 四条影响通道 + pilot 预期特征
-- `subfield_lit_scan.md` — Codex 文献扫描:NLP 中量化文本模板化程度的方法
+- `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R1d_template_rigidity/whiteboard_analysis.md` — session 摘要(Q1–Q6 对话)
+- `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R1d_template_rigidity/channel_analysis.md` — 四条影响通道 + pilot 预期特征
+- `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R1d_template_rigidity/subfield_lit_scan.md` — Codex 文献扫描:NLP 中量化文本模板化程度的方法
 
 ---
 
@@ -26,7 +26,7 @@ Template Rigidity 量的是:**一篇文章有多大比例由 CLS 语料库高频
 | 因子类型 | **Type 1**(语料固有属性;把所有模型拿走,这个属性还在) |
 | 粒度 | **article 级**(同一 article_id → 同一 rigidity,不因 focal entity 而异) |
 | 泄露机制链环节 | **③ 可记忆性**(文本结构影响模型如何处理/存储内容) |
-| 影响通道(经验性,不预判) | 近邻记忆 / 偏见强化 / 泛化替代 / 纯表面熟悉度(详见 `channel_analysis.md`) |
+| 影响通道(经验性,不预判) | 近邻记忆 / 偏见强化 / 泛化替代 / 纯表面熟悉度(详见 `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R1d_template_rigidity/channel_analysis.md`) |
 
 **方法论先例**:
 - **Lang & Stice-Lawrence (2015)** *Textual Analysis and International
@@ -191,7 +191,7 @@ Template Rigidity 是 case 级因子;扰动设计与之正交。
 
 ### R-4b(pilot 统计)
 R-1d 给 pilot 的输入:`template_rigidity`(主变量,聚合方式 TBD)、分布、
-与 R-1b/R-1c 的 correlation/VIF、通道特征 pattern(见 `channel_analysis.md`)。
+与 R-1b/R-1c 的 correlation/VIF、通道特征 pattern(见 `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R1d_template_rigidity/channel_analysis.md`)。
 
 ### R-5(采样)
 Pool G 分层:R-5 若启用,可用 `template_rigidity` 分层(若增加超出 R-1b/R-1c

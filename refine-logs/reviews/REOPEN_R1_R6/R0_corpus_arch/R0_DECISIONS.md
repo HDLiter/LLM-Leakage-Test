@@ -2,7 +2,7 @@
 
 **Status**: LOCKED 2026-05-23 PM late
 **Audit trail**(下游 agent 不需要读;只在需要 debate / 看推导过程时翻):
-- `whiteboard_analysis.md` —— Codex Pass A 白板独立分析 + 用户 7 段切片走查 deltas
+- `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R0_corpus_arch/whiteboard_analysis.md` —— Codex Pass A 白板独立分析 + 用户 7 段切片走查 deltas
 
 ---
 

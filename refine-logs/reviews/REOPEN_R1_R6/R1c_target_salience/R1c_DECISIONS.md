@@ -2,9 +2,9 @@
 
 **Status**: LOCKED 2026-05-25
 **Audit trail**(下游 agent 不需要读;只在需要 debate / 看推导过程时翻):
-- `whiteboard_analysis.md` —— Codex 主白板(两阶段 clean-room)
-- `whiteboard_analysis_claude.md` —— Claude sub-agent 并行独立白板(双源对照)
-- `whiteboard_analysis_stage1_codex_draft.md` —— Codex 阶段 1 草稿
+- `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R1c_target_salience/whiteboard_analysis.md` —— Codex 主白板(两阶段 clean-room)
+- `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R1c_target_salience/whiteboard_analysis_claude.md` —— Claude sub-agent 并行独立白板(双源对照)
+- `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R1c_target_salience/whiteboard_analysis_stage1_codex_draft.md` —— Codex 阶段 1 草稿
 
 ---
 

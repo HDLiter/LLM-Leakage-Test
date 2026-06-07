@@ -2,7 +2,7 @@
 
 > **status**:本轮**已定调**的决策(canonical for downstream)。OPEN 议程(P0–P7)仍见
 > `R4_next_construct_validity_agenda.md`;四池候选见 `four_layer_candidate_pools.md`;
-> 偏见 catalog + arxiv 查新见 `bias_catalog.md` / `arxiv_scan_20260531.md`。
+> 偏见 catalog + arxiv 查新见 `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/bias_catalog.md` / `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/arxiv_scan_20260531.md`。
 > 这份只记**拍了板的**;leans / 待敲不在此。
 >
 > **缘起**:用户要求从第一性原理 + 构念效度重走实验。走查产出一批硬决策 + 一份四池总表
@@ -24,7 +24,7 @@
 - exact 记忆(文本/事件/case 结局)cutoff 后该归零;**养成的偏见**(实体/因子/共现/乐观/
   基准率…)cutoff 后**不归零**。
 - **实体/持续偏见并入"记忆"大构念**(通过不同因子+扰动测),**不当混杂剔除**。
-- 文献坐实:偏见 catalog 16 族,机制统一 = "拿语料先验顶替眼前文本"(见 `bias_catalog.md`)。
+- 文献坐实:偏见 catalog 16 族,机制统一 = "拿语料先验顶替眼前文本"(见 `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/bias_catalog.md`)。
 
 ### D2 — 无记忆基线:各测量指标的基线不同(取代"cutoff 后一刀切读零")
 - E_PCSG → post-cutoff **≈ 0**(模型没见过 cutoff 后的新闻 → 熟悉度差归零);
@@ -106,4 +106,4 @@
   - MemGuard-Alpha(2603.26797)→ 坐实 E_CMMD 砍对(D5)。
 - **P0 弹药**(下一轮用):lift 极有 LAP(2512.23847)/alpha-decay(2601.13770)/PAM(2602.18733);
   resistance 极有机制背书(2603.21658)。
-- 详见 `arxiv_scan_20260531.md`。
+- 详见 `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/arxiv_scan_20260531.md`。

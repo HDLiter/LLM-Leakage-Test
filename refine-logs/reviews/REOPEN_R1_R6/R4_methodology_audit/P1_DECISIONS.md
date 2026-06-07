@@ -2,7 +2,7 @@
 
 > **定位**:纯文档清理。不重开已锁决策、不挑 backbone、不重设计估计量。
 > **上游**:P0 定稿(`P0_DECISIONS.md`)+ R-4 定调(`R4_construct_validity_decisions.md`)。
-> **推理**:见 `P1_audit_trail.md`。
+> **推理**:见 `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/P1_audit_trail.md`。
 
 ---
 
@@ -52,12 +52,12 @@ E_FO 的 FO = False Outcome(假结局),不是 Future Outcome(未来结局)。
 ## 2. E_FO 消歧
 
 **问题**:E_FO 在正式文档里一致指"假结局抵抗";但在 novelty session 口头和
-algorithm_deepaudit §4 推理链中,"E_FO"曾滑向"预测真实未来结局"的含义。
+`archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/algorithm_deepaudit.md` §4 推理链中,"E_FO"曾滑向"预测真实未来结局"的含义。
 
 **决策**:
 - E_FO **只保留**"假结局抵抗"一个含义。
 - "预测真实涨跌"一律称**真实涨跌对照**(P0 决策3:pilot 旁证,不设独立估计量)。
-- algorithm_deepaudit §4 已加消歧注。
+- `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/algorithm_deepaudit.md` §4 已加消歧注。
 
 ---
 
@@ -68,7 +68,7 @@ algorithm_deepaudit §4 推理链中,"E_FO"曾滑向"预测真实未来结局"�
 | 文档 | 改动 |
 |---|---|
 | `R4_construct_validity_decisions.md` D2 | `memory_lift` → E_PCSG;`raw_score` → 模型预测;resistance 从"≈ 0"行移除(per P0:抗扰动族 post-cutoff 行为不预测);SUPERSEDED 注补 P1 术语退役说明 |
-| `algorithm_deepaudit.md` §4 | 加消歧注:E_FO = 假结局抵抗,"真结局"指 C_FO 机制,非预测真实涨跌 |
+| `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/algorithm_deepaudit.md` §4 | 加消歧注:E_FO = 假结局抵抗,"真结局"指 C_FO 机制,非预测真实涨跌 |
 | `four_layer_candidate_pools.md` §5 | `raw_score` → 模型预测;拆分"抗扰动差值 / E_PCSG"为两行(E_PCSG → ≈ 0;抗扰动差值 → 不预测,per P0) |
 | `R4_next_construct_validity_agenda.md` P1 | 标 CLOSED |
 
@@ -79,7 +79,7 @@ algorithm_deepaudit §4 推理链中,"E_FO"曾滑向"预测真实未来结局"�
 | `MEASUREMENT_FRAMEWORK.md` | E_FO 一致指假结局抵抗;已有 SUPERSEDED 注覆盖 |
 | `RESEARCH_PROPOSAL.md` | E_FO = "假结果抵抗",正确;R-2 重开中 |
 | `P0_DECISIONS.md` | 不含 E_FO;不含 memory_lift;用"原始预测准确率"(旧名,不追溯改) |
-| `P0_audit_trail.md` | 引用 memory_lift 是在解释旧问题;audit trail 不改 |
+| `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/P0_audit_trail.md` | 引用 memory_lift 是在解释旧问题;audit trail 不改 |
 
 ### 全仓库 E_FO 不再同名两物
 

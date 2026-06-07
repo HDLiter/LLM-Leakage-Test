@@ -2,10 +2,10 @@
 
 **Status**: LOCKED 2026-05-24
 **Audit trail**(下游 agent 不需要读;只在需要 debate / 看推导过程时翻):
-- `whiteboard_analysis.md` —— 主分析文档
-- `construct_stress_test.md` —— (a) construct 段 stress-test
-- `construct_second_opinion_claude.md` —— (a) blind second opinion
-- `bch_second_opinion_claude.md` —— (b)(c)(h) blind second opinion
+- `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R1b_recurrence/whiteboard_analysis.md` —— 主分析文档
+- `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R1b_recurrence/construct_stress_test.md` —— (a) construct 段 stress-test
+- `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R1b_recurrence/construct_second_opinion_claude.md` —— (a) blind second opinion
+- `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R1b_recurrence/bch_second_opinion_claude.md` —— (b)(c)(h) blind second opinion
 
 ---
 

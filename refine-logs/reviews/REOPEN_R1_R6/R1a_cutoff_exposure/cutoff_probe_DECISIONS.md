@@ -3,7 +3,7 @@
 **Status**: **DRAFT 2026-05-28** — subordinate to R-1a DRAFT(见 `R1a_DECISIONS.md` 头)。
 - 本 doc 是 cutoff probe walkthrough L1–L10 的 canonical 落地(< 200 行,for downstream agents)。
 - Pending **joint freeze with proposed case-level Information Novelty (N) factor**(新 session:`.scratch/session_kickoff_novelty_factor.md`)。
-- 走查 audit trail = `.scratch/cutoff_probe_decisions_running.md`;协议草案 = `cutoff_probe_protocol_codex.md`;manifest 调查 = `cutoff_deep_research_gpt.md`;文献综述 = `cutoff_probe_litreview_codex.md`。
+- 走查 audit trail = `.scratch/cutoff_probe_decisions_running.md`;协议草案 = `cutoff_probe_protocol_codex.md`;manifest 调查 = `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R1a_cutoff_exposure/cutoff_deep_research_gpt.md`;文献综述 = `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R1a_cutoff_exposure/cutoff_probe_litreview_codex.md`。
 
 > **总定位**:**验证非定义** —— 体检 manifest + 偏差人工复核;**永不自动改 manifest、永不喂 exposure 指标**(守 R-0 §2 约束 5,防与 logprob estimand E_CTS 自闭环)。
 > **关键准则(§10)**:probe 真正想测的是模型对"理论上从 cutoff 前信息**不可推断**的事实"是否答得对——其余题污染信号、verification 失效。

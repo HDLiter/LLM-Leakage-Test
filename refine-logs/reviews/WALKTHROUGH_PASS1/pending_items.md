@@ -58,8 +58,8 @@
   依赖的共同上游。
   - **R-0 closed 2026-05-23 PM late** → canonical lock-in =
     `refine-logs/reviews/REOPEN_R1_R6/R0_corpus_arch/R0_DECISIONS.md`
-    (time-static 决策清单);audit trail = 同目录 `whiteboard_analysis.md`
-    Codex Pass A 白板 545 行 + 用户 7 段切片走查 deltas。
+    (time-static 决策清单);audit trail(已归档)→
+    `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R0_corpus_arch/`。
   - **下游解锁**:R-1b(用户点名重点,2026-05-24 ✔ closed)/ R-1c / R-5 /
     B-2 `run_inputs.per_task` schema finalize。R-2 仍部分卡 R-6(C_FO 机制);
     R-3 / R-4b 仍卡上游。
@@ -82,7 +82,7 @@
       clean-room-first 协议本轮再次坐实有效。
 - **R-1b Historical Family Recurrence(R-0 解锁后第一个 closed factor session)** ——
   在 R-0 锁定的 4 层容器内选 construct + family 粒度 + lookup window。
-  - **R-1b closed 2026-05-24** → canonical lock-in = `refine-logs/reviews/REOPEN_R1_R6/R1b_recurrence/R1b_DECISIONS.md`(time-static 决策清单);audit trail = 同目录 `whiteboard_analysis.md` + `construct_stress_test.md` + `construct_second_opinion_claude.md` + `bch_second_opinion_claude.md`。
+  - **R-1b closed 2026-05-24** → canonical lock-in = `refine-logs/reviews/REOPEN_R1_R6/R1b_recurrence/R1b_DECISIONS.md`(time-static 决策清单);audit trail(已归档)→ `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R1b_recurrence/`。
   - **下游解锁**:R-1c Target Salience / R-1e 因子最终选择 / R-5 Pool G 分层依据 / B-2 `historical_family_recurrence` schema 字段。R-1a / R-1d / R-2 / R-6 与 R-1b 正交不变;R-3 / R-4b 仍卡上游。
   - **方法论 highlights**(R-1b 元层观察,只在此处记 —— DECISIONS.md 是 time-static 不放历史叙事):
     - **stress-test 改判**:Codex Pass A 主白板初稿选 A 立场(pure text exposure proxy);owner 走查时 surface "Recurrence 是 outcome-leakage proxy 还是 pure exposure proxy" 的 meta-question(R-1b kickoff prompt 没显式 framing),Codex 二轮在 outcome-leakage framing 下推翻自己,改 B 立场。
@@ -92,7 +92,7 @@
     - **documentation pattern 新立项目惯例**(见 memory `feedback_doc_for_llm_context` 2026-05-24 update):每个 R-X 决策 session 产 audit-trail + 一份 < 200 行 time-static `R{X}_DECISIONS.md`(canonical for downstream agents);其它文档只 reference DECISIONS.md, 不重复内容(single source of truth)。R-1b 是第一个按此 pattern 产出的 session。
 - **R-1c Target Salience(R-1b 解锁后第二个 closed factor session)** ——
   在 R-0 4 层容器 + R-1b construct framework 下选 Salience 的 framing / construct / family / window / tradable filter / discriminant fallback / robustness。
-  - **R-1c closed 2026-05-25** → canonical lock-in = `refine-logs/reviews/REOPEN_R1_R6/R1c_target_salience/R1c_DECISIONS.md`(time-static 决策清单);audit trail = 同目录 `whiteboard_analysis.md`(Codex)+ `whiteboard_analysis_claude.md`(Claude sub-agent)+ `whiteboard_analysis_stage1_codex_draft.md`。
+  - **R-1c closed 2026-05-25** → canonical lock-in = `refine-logs/reviews/REOPEN_R1_R6/R1c_target_salience/R1c_DECISIONS.md`(time-static 决策清单);audit trail(已归档)→ `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R1c_target_salience/`。
   - **下游解锁**:R-1e 因子最终选择(R-1c Option C 显式把降级路径交给 R-1e)/ R-5 Pool G 分层依据可切到 R-1c metric / B-2 `target_salience` schema 字段 / R-4b 追加 R-1b retrospective tail-leverage check。R-1a / R-1d / R-2 / R-6 与 R-1c 正交不变;R-3 仍卡上游。
   - **方法论 highlights**(R-1c 元层观察,只在此处记 —— DECISIONS.md 是 time-static 不放历史叙事):
     - **双白板并行(Codex + Claude sub-agent 用同一 prompt)**:首次在 R-X session 同时跑两个独立 agent(此前 R-0 / R-1b 是 Codex 主 + Claude blind second opinion 顺序模式)。双源在 8 决策点上 **6/8 收敛**(framing C / L1 mention / target only / log1p(count) / 共享 fixed window / 不加 tradable),验证了 R-1c upstream lock(R-0 / R-4a / R-1b)的清晰度。
@@ -103,7 +103,7 @@
     - **R-1 系列 robust 风格分家(Framework D)**:R-1c 选 1 个 pre-commit tail-leverage appendix,不 mirror R-1b 的 0 pre-commit + 1 conditional 风格。R-1c L1 mention + target only 比 R-1b L2 subject + tradable + target × super_type 尾部更 acute,distribution robustness 更必要。R-4b 追加 R-1b retrospective tail-leverage(不算 R-1b 重开,算 R-4b implementation choice)以维持 paper §robustness 段一致性。
 - **R-1a Cutoff Exposure(R-1b/R-1c 解锁后第三个 closed factor session)** ——
   全 fleet 唯一 case×model 因子,承载主效应 β1。
-  - **R-1a closed 2026-05-27(机制锁;cutoff 中心值 provisional 待探针验证)** → canonical lock-in = `refine-logs/reviews/REOPEN_R1_R6/R1a_cutoff_exposure/R1a_DECISIONS.md`(time-static);audit trail = 同目录 `whiteboard_codex.md`(单 Codex 白板)+ `cutoff_deep_research_gpt.md`(GPT deep research 16 模型 cutoff 可信度)+ `cutoff_probe_protocol_codex.md`(黑白盒通用验证探针协议)。
+  - **R-1a closed 2026-05-27(机制锁;cutoff 中心值 provisional 待探针验证)** → canonical lock-in = `refine-logs/reviews/REOPEN_R1_R6/R1a_cutoff_exposure/R1a_DECISIONS.md`(time-static);audit trail(已归档)→ `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R1a_cutoff_exposure/`(含单 Codex 白板 + GPT deep research 16 模型 cutoff 可信度);验证探针协议 `refine-logs/reviews/REOPEN_R1_R6/R1a_cutoff_exposure/cutoff_probe_protocol_codex.md`(黑白盒通用)仍 live。
   - **锁定**:event date = published_at(日精度)/ cutoff = fleet yaml(归当月末,与 R-1b/c min(cutoff) 同源,Llama-3 2023-03 不变)/ metric = **tanh((published−cutoff signed 连续月)/w),w=2 月主 + 1/3/6 稳健性**/ sign = pre-cutoff 正 / case×model cross join 存 `delta_days`+`cutoff_exposure` / 二元 pre/post 按符号现切作 BL2 负对照 / in-text event date 子集(确定性抽取)作唯一 robustness / Path-E + 黑白盒行为探针作**验证轨**(不喂指标、报警触发人工复核)。
   - **下游解锁**:R-1e(Cutoff Exposure 作 β1 载体,几乎必进 primary)/ R-4b(case×model 进混合模型 + cutoff 误分类模拟)/ R-5 Pool I(cutoff-balanced)。R-1d 与 R-1a 正交不变;探针建+跑排进 fleet 部署。
   - **方法论 highlights**(只在此处记 —— DECISIONS.md time-static 无 history):
@@ -154,9 +154,9 @@
   - **R-4a closed 2026-05-23** → canonical lock-in =
     `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/R4a_DECISIONS.md`
     (time-static 决策清单 — 8 框架级 lock + E_CMMD 定义 + 负对照具体处理
-    + scope boundary + downstream session anchor);audit trail = 同目录
-    `whiteboard_analysis.md` 阶段 1 白板独立分析(从"目的"自推该用什么)
-    + `subfield_lit_scan.md` 15 篇 2022-2026 代表作扫描双源证据。
+    + scope boundary + downstream session anchor);audit trail(已归档)→
+    `archive/r4_r5a_lineage/refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/`
+    (含阶段 1 白板独立分析 + 15 篇 2022-2026 代表作子领域 lit scan 双源证据)。
   - **下游解锁**:R-6 因 R-4a 给的容量接口(加新 estimand = 替换 primary
     格子或开新 design memo)解封,可接 parked C_FO/C_SR 漂移调查
     (`refine-logs/reviews/REOPEN_R1_R6/cfo_csr_history_findings.md`);

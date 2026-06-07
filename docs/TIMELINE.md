@@ -1,7 +1,6 @@
 # Project Timeline & Document Index
 
 > 本文档是项目探索过程的时间轴索引，供后续 agent 快速理解项目历史和文档关系。
-> 最后更新：2026-04-16
 
 ## 项目概述
 
@@ -14,8 +13,8 @@
 > 任何新 agent 进入项目，权威文档以下列三份为准；其余 docs/ 与 refine-logs/ 内容均为历史/背景/可行性输入，**不构成当前 spec**：
 >
 > - `refine-logs/reviews/R5A_STEP2/R5A_FROZEN_SHORTLIST.md` — **frozen scope**（确认性/探索性估计量、质量门、晋升规则）
-> - `refine-logs/reviews/R5A_STEP2/MEASUREMENT_FRAMEWORK.md` — **framework definitions**（Factor / Perturbation / Operator / Estimand 四层框架与术语）
-> - `refine-logs/reviews/R5A_FLEET_REVIEW/FLEET_REVIEW_R2_SYNTHESIS.md` — **frozen 9-model fleet**（5 white-box + 4 black-box；thinking-mode policy 见 MEASUREMENT_FRAMEWORK）
+> - `refine-logs/reviews/R5A_STEP2/MEASUREMENT_FRAMEWORK.md` — **framework definitions**（Factor / Perturbation / Operator / Estimand 四层框架与术语；thinking-mode policy 亦在此）
+> - `config/fleet/r5a_fleet.yaml` — **fleet single source of truth**（16-model split-tier：12 white-box [10 full-operator + 2 Llama P_logprob-only] + 4 black-box；origin decision 见 `docs/DECISION_20260429_llama_addition.md`）
 
 ## Archive notice (2026-04-16)
 
@@ -77,9 +76,9 @@ Phase 1-4 的文档（proposals, debates, pilot results, bug audits）已归档�
 
 ### Next: Phase 7 — Pilot implementation
 
-1. P_logprob pipeline（白盒，5 models）
-2. P_predict pipeline（9 models）
-3. C_FO + C_NoOp perturbation generation + quality gates
+1. P_logprob pipeline（白盒）
+2. P_predict pipeline（fleet 见 `config/fleet/r5a_fleet.yaml`，16-model split-tier）
+3. C_NoOp perturbation generation + quality gates
 4. ~100-case pilot run
 5. Power analysis + pre-registration draft
 
@@ -110,14 +109,14 @@ See `git log --oneline -30` for full recent history.
 - `refine-logs/reviews/R5A_STEP2/R5A_FROZEN_SHORTLIST.md` — **R5A 冻结概念 shortlist**。定义确认性/探索性估计量、质量门、晋升规则、Challenger/Cold reader 行动项。
 - `refine-logs/reviews/R5A_STEP2/MEASUREMENT_FRAMEWORK.md` — **四层测量框架**。Factor/Perturbation/Operator/Estimand 定义与术语。
 
-> 注：`docs/DECISION_20260413_mvp_direction.md` 已归档至 `archive/r4_r5a_lineage/docs/`，作为历史决策背景保留，不再列为权威文档（其统计层 12-factor / 6-model / N=3200 等已 pre-freeze）。9-model fleet 与 thinking-mode policy 现以 `refine-logs/reviews/R5A_FLEET_REVIEW/FLEET_REVIEW_R2_SYNTHESIS.md` + `MEASUREMENT_FRAMEWORK.md` 为准。
+> 注：`docs/DECISION_20260413_mvp_direction.md` 已归档至 `archive/r4_r5a_lineage/docs/`，作为历史决策背景保留，不再列为权威文档。Fleet（16-model split-tier）以 `config/fleet/r5a_fleet.yaml` 为权威（origin decision 见 `docs/DECISION_20260429_llama_addition.md`）；thinking-mode policy 以 `MEASUREMENT_FRAMEWORK.md` 为准。
 
 ### docs/（活跃）
 
 > `BENCHMARK_PROPOSAL.md` 与 `CMMD_MODEL_FLEET_SURVEY.md` 已移至 `archive/r4_r5a_lineage/docs/`。
 
 - `FACTOR_LITERATURE_PROVENANCE.md` — pre-freeze 15+2 因子溯源审计。**非当前活跃因子图**；当前因子范围由 `R5A_FROZEN_SHORTLIST.md`（4 core confirmatory + Bloc 0-3 inventory）定义。Old → new 映射见 `refine-logs/reviews/R5A_STEP2/ACTIVE_DOC_REVIEW_SYNTHESIS.md` §2 (Priority B crosswalk)。
-- `LITERATURE_SWEEP_2026_04.md` — 历史 R4 文献扫描（25+ papers），feed into decision-doc v5.3→v6.2。结论中关于 fleet/scope 的部分已被 `FLEET_REVIEW_R2_SYNTHESIS.md` + `R5A_FROZEN_SHORTLIST.md` 取代；保留作为引用溯源。
+- `LITERATURE_SWEEP_2026_04.md` — 历史 R4 文献扫描（25+ papers）；保留作为引用溯源。当前 fleet/scope 权威见 `config/fleet/r5a_fleet.yaml`（fleet）+ `R5A_FROZEN_SHORTLIST.md`（scope）。
 - `MEDIA_COVERAGE_FEASIBILITY.md` — Coverage Breadth 储备因子可行性 memo。**不在冻结 confirmatory family 中**；不读为"第 13 个活跃因子"。
 - `THALES_SIGNAL_PROFILE_REVIEW.md` — Thales quant engine 信号档案；Bloc 3 operationalization input（Structured Event Type / Modality / Authority）。不改变冻结 confirmatory family。
 - `TIMELINE.md` — 本文档。
@@ -129,7 +128,7 @@ post-archive 仅保留以下 R5A 后期文档；R4 系列、R5_KICKOFF、R5A_STE
 - `R5A_STEP2/R5A_FROZEN_SHORTLIST.md` — **权威冻结文档**
 - `R5A_STEP2/MEASUREMENT_FRAMEWORK.md` — **权威四层框架**
 - `R5A_STEP2/ACTIVE_DOC_REVIEW_*.md` — 4 lens reports + synthesis（post-freeze cleanup）
-- `R5A_FLEET_REVIEW/FLEET_REVIEW_R2_SYNTHESIS.md` — current 9-model fleet authority
+- `R5A_FLEET_REVIEW/FLEET_REVIEW_R2_SYNTHESIS.md` — fleet review history（背景；现行 fleet 以 `config/fleet/r5a_fleet.yaml` 为权威，16-model split-tier）
 - `R5A_FLEET_REVIEW/FLEET_SELECTION_LITERATURE.md` — external lit review
 
 ### plans/（活跃）

@@ -38,7 +38,7 @@
 |---|---|
 | Type | **Fixed**(case-independent;Recurrence 保持 case-level factor) |
 | Range start | CLS S0 corpus first available `published_at`(~2020-01) |
-| Range end | `min(model_cutoff)` from `config/fleet/r5a_fleet.yaml`(~2024 年中,GLM-4-9B) |
+| Range end | `min(model_cutoff)` from `config/fleet/r5a_fleet.yaml`(对相关子队列取 min;**具体日期 + 哪些子队列计入 min 待 R-1e 裁定 — pending R-1e**) |
 | Interval | half-open `[start, end)` |
 | Focal article policy | **排除同一 `article_id` 自身**(避免把 focal article 当历史复现);其它不同 `article_id` 的 follow-up / repost 按 no-dedup 计 |
 
@@ -57,7 +57,7 @@ recurrence_count[case] = COUNT( reference_rows r WHERE
 log1p_recurrence_count[case] = log1p(recurrence_count[case])
 ```
 
-**Reference window**: `[CLS corpus first published_at, min(fleet model cutoff))`,半开。
+**Reference window**: `[CLS corpus first published_at, min(fleet model cutoff))`,半开(右端点具体日期 + 计入 min 的子队列待 R-1e 裁定 — pending R-1e)。
 
 **Zero policy**: `recurrence_count = 0` 合法,`log1p(0) = 0` 直接进模型,**不**当 missing 剔除(R-4a 锁,R-0 §4.5.D 锁)。
 
@@ -80,7 +80,7 @@ R-1c session 起跑时,R-1b 给的约束清单:
 ### 5.2 R-1b 给的所有具体选择都是 **参考**(R-1c 自决,不强制继承)
 - construct(R-1b 用 L2 subject + tradable)
 - 是否加 tradable filter(R-1b 加了)
-- window(R-1b 用 fixed `[2020-01, ~2024-mid)`)
+- window(R-1b 用 fixed `[2020-01, min(model_cutoff))`;右端点具体日期 pending R-1e)
 - primary key(R-1b 用单标的)
 - transform(R-1b 用 log1p)
 - event collapse(R-1b 用 event_super_type)
@@ -153,24 +153,7 @@ R-1c session 起跑时,R-1b 给的约束清单:
 
 ### 7.2 名称聚合级别敏感性(R-1f 溢出,pre-commit appendix)
 
-> **来源**:R-1f Entity Age 设计时发现,模型 token 级记忆绑定到具体名称
-> 字符串——"ST海虹"和"海虹控股"在 tokenizer 里是不同序列。同理,
-> "ST海虹"的 recurrence count 不直接强化"海虹控股"的关联记忆信号。
-> 详见 R1f_DECISIONS.md §6。
-
-| 字段 | 值 |
-|---|---|
-| 做法 | 在三个名称聚合级别上分别重算 recurrence_count,重跑 β3 |
-| 级别 ① | **Entity 级**(当前主规格:同一 target_entity_id 的所有 mention,不区分名称形式) |
-| 级别 ② | **字面名级**:只计 reference rows 中与 focal case 使用**完全相同 surface_name** 的 mention |
-| 级别 ③ | **Core_name 级**:只计 reference rows 中 surface_name 的 core_name(人工审核标注)与 focal case **相同**的 mention |
-| 前提 | ER 管线记录 surface_name(R1f_DECISIONS.md §8) |
-| Pre-commit vs conditional | **Pre-commit** |
-| Slot | **Appendix** |
-| 成本 | 近零(名称-时段表已建,换 group-by 即可) |
-| 测的是 | 主规格(entity_id 级)是否因跨名称变体聚合而膨胀了 recurrence;如果三级一致,结论对名称粒度稳健 |
-
-**不改主规格**:R-1b 主变量仍为 entity_id 级 `log1p_recurrence_count`(已 locked)。
+R-1b 的 recurrence_count 适用名称聚合级别敏感性 appendix(entity / 字面名 / core_name 三级重算重跑 β3);规格 canonical 见 `R1f_DECISIONS.md` §6 / §8。**不改主规格**:R-1b 主变量仍为 entity_id 级 `log1p_recurrence_count`(已 locked)。
 
 ### 7.3 显式不在 R-1b 范围内的 construct(不进任何 slot)
 

@@ -54,7 +54,7 @@
 |---|---|
 | Type | **Fixed**(case-independent;R-1c 保持 case-level factor)|
 | Range start | CLS S0 corpus first available `published_at`(~2020-01)|
-| Range end | `min(model_cutoff)` from `config/fleet/r5a_fleet.yaml`(~2024 年中,GLM-4-9B)|
+| Range end | `min(model_cutoff)` from `config/fleet/r5a_fleet.yaml`(对相关子队列取 min;**具体日期 + 哪些子队列计入 min 待 R-1e 裁定 — pending R-1e**)|
 | Interval | half-open `[start, end)` |
 | Focal article policy | **不排除同 `article_id`**(case 自身文章在窗口内时也是 model exposure;per Salience claim)|
 | 与 R-1b 共享同窗口 | **是**(跨因子 metric 可比,discriminant check 在同口径跑)|
@@ -72,7 +72,7 @@ target_salience_count[case] = COUNT( L1 rows r WHERE
 log1p_target_salience[case] = log1p(target_salience_count[case])
 ```
 
-**Reference window**:`[CLS corpus first published_at, min(fleet model cutoff))`,half-open,与 R-1b 同源。
+**Reference window**:`[CLS corpus first published_at, min(fleet model cutoff))`,half-open,与 R-1b 同源(右端点具体日期 + 计入 min 的子队列待 R-1e 裁定 — pending R-1e)。
 
 **Zero policy**:`target_salience_count = 0` 合法,`log1p(0) = 0` 直接进模型,**不**当 missing 剔除(R-4a / R-0 §5 锁)。
 
@@ -113,24 +113,7 @@ log1p_target_salience[case] = log1p(target_salience_count[case])
 
 ### 7.2 名称聚合级别敏感性(R-1f 溢出,pre-commit appendix)
 
-> **来源**:R-1f Entity Age 设计时发现,模型 token 级记忆绑定到具体名称
-> 字符串——"ST海虹"和"海虹控股"在 tokenizer 里是不同序列。同理,
-> "ST海虹"的 mention 在 token 层不直接强化"海虹控股"的曝光频率信号。
-> 详见 R1f_DECISIONS.md §6。
-
-| 字段 | 值 |
-|---|---|
-| 做法 | 在三个名称聚合级别上分别重算 target_salience_count,重跑 β3 |
-| 级别 ① | **Entity 级**(当前主规格:同一 target_entity_id 的所有 L1 mention,不区分名称形式) |
-| 级别 ② | **字面名级**:只计 L1 rows 中与 focal case 使用**完全相同 surface_name** 的 mention |
-| 级别 ③ | **Core_name 级**:只计 L1 rows 中 surface_name 的 core_name(人工审核标注)与 focal case **相同**的 mention |
-| 前提 | ER 管线记录 surface_name(R1f_DECISIONS.md §8) |
-| Pre-commit vs conditional | **Pre-commit** |
-| Slot | **Appendix** |
-| 成本 | 近零(名称-时段表已建,换 group-by 即可) |
-| 测的是 | 主规格(entity_id 级)是否因跨名称变体聚合而膨胀了 salience;如果三级一致,结论对名称粒度稳健 |
-
-**不改主规格**:R-1c 主变量仍为 entity_id 级 `log1p_target_salience`(已 locked)。
+R-1c 的 target_salience_count 适用名称聚合级别敏感性 appendix(entity / 字面名 / core_name 三级重算重跑 β3);规格 canonical 见 `R1f_DECISIONS.md` §6 / §8。**不改主规格**:R-1c 主变量仍为 entity_id 级 `log1p_target_salience`(已 locked)。
 
 ### 7.3 R-1 系列 robust 风格 = Framework D(Distinct)
 

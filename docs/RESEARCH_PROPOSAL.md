@@ -6,7 +6,6 @@ status: |
   DRAFT。锚定部分(研究问题 / 四层框架 / 模型 fleet / 工作流 / 两阶段结构)为定稿;
   操作化部分(因子 / 扰动 / estimand / 预测目标 / 采样过滤 / pilot 统计)标 [R-x],
   内容待 R-1…R-6 结构化重开后逐步完善。
-supersedes: archive/pre_benchmark/docs/RESEARCH_PROPOSAL_v2.md(转向前的 "Task Design Gates" 版本)
 authority: |
   本文件是当前实验的成文研究问题文档(此前缺失 —— Pass-1 走查 flag ①)。
   锚定内容的逐章依据:refine-logs/reviews/WALKTHROUGH_PASS1/section_01..07.md。
@@ -166,7 +165,7 @@ memory `project_english_expansion`)。
 confirmatory 数由 **pilot + R-4b power** 决定(N=2560 对交互项能稳健 confirm
 几个)。frozen 时代的 "5 estimand × 4 factor = 20 系数" 是 Step 2 多 agent
 review 的候选规模示意,**非硬约束** —— R-4a §4 已把因子总数解锁交 R-1e + pilot。
-下表列出 **4 个**核心 confirmatory candidate;candidate-pool review 已完成(R-1g…R-1w),
+下表列出 **4 个**核心 confirmatory candidate;candidate-pool review 已完成(R-1g…R-1x),
 候选池据此扩大 / 定 verdict,汇总索引见
 `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/four_layer_candidate_pools.md` §1
 (逐因子 canonical = 各 `R1*_DECISIONS.md`);未选中的候选进 exploratory(照常计算 + 报告,
@@ -221,14 +220,16 @@ confirmatory、C_SR 角色、主 backbone 选择;用户点名重审 C_NoOp)。
 ### 4.4 estimand 与统计结构 [R-4a 框架已定 2026-05-23;具体清单 R-1/R-2/R-6 重开中]
 
 **当前候选 estimand 池**(2026-04-29 frozen,作为 *候选*,非 primary family
-最终清单):E_CMMD(跨模型 cutoff-单调分歧)、E_PCSG(配对 cutoff 意外度
-差)、E_CTS(校准尾部意外度)、E_FO(假结果抵抗)、E_NoOp(无关插入
-敏感度)。
+最终清单):E_PCSG(配对 cutoff 意外度差)、E_CTS(校准尾部意外度)、
+E_NoOp(无关插入敏感度)。E_CMMD(跨模型 cutoff-单调分歧)已于 R-4 构念效度
+审计删除(D5);E_FO(假结果抵抗)随 C_FO 于 R-6 删除(§4.3)。E_CMMD 删除依据见
+`refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/four_layer_candidate_pools.md` §4.4。
 
 **[R-4a ✔ closed 2026-05-23]** 基于 clean-room 白板独立分析 + 15 篇子领域
-代表作文献扫描双源证据,锁住**框架级方法论 8 条** + **E_CMMD 定义** +
+代表作文献扫描双源证据,锁住**框架级方法论 8 条** +
 **负对照具体处理**(BL2 TOST/SESOI / 同-cutoff ratio reading / BL1
-grouped-CV-by-case,见 §4.5) + **R-4a → R-6 estimand 容量接口**。canonical
+grouped-CV-by-case,见 §4.5) + **R-4a → R-6 estimand 容量接口**(R-4a 当时一并
+锁的 E_CMMD 定义已于后续 R-4 构念效度审计 D5 删除)。canonical
 lock-in(time-static): `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/R4a_DECISIONS.md`。
 
 8 条框架决定的覆盖面:主报路径(effect size + CI per estimand)、tier
@@ -236,9 +237,9 @@ labels(main / primary / supporting / robustness / appendix)、pre-registration
 路径(design memo + sealed split + transparency artifact,见 §6)、每个
 estimand 独立建模 + 聚类、扰动质量审计(Gwet's AC1 + accuracy)、
 baseline_confidence / model_capability 走 sensitivity、TOST/SESOI=0.15 服务
-BL2 等价检验、scenario-based MC power simulation。E_CMMD = Cross-Model
-**Cutoff-Monotone** Disagreement,claim 层与 memorization 解释解耦 ——
-只有与其它 estimand 收敛时才上升到 memorization characterization。
+BL2 等价检验、scenario-based MC power simulation。(R-4a 当时还锁了 E_CMMD =
+Cross-Model **Cutoff-Monotone** Disagreement 的定义,但该 estimand 已于 R-4
+构念效度审计 D5 删除,见上;此条不再生效。)
 
 **[R-1 / R-2 重开] 待定**(R-4a scope 之外的 component-level,留给实现 + pilot
 数据):具体哪些 estimand 进 primary、primary family 大小(S8 / S10 / S12 等)、
@@ -315,8 +316,7 @@ R-5 完成后,在本节新增专门的"抽样分布策略"段(不止"过滤器")
   3. 按 Target Salience 分层抽(高/中/低各 N/3)—— 合理但需明示。
 - 显式回应 Kong 2026 §2.2 警告:本研究 sampling 通过 [R-5 决定的策略]
   保证非按 prominence 排序,因此不引入 Kong 警告的幸存者偏差。
-- 同步:~~R-1c clean-room 复审 Target Salience metric~~ ✔ closed 2026-05-25;
-  R-1c §8.5 已把 Salience × sampling 互动 + Kong §2.2 sanity-check 作为
+- 同步:R-1c §8.5 已把 Salience × sampling 互动 + Kong §2.2 sanity-check 作为
   R-5 input note(canonical 见 R1c_DECISIONS.md §8.5)。
 TODO 起源 + 完整论证 + Kong §2.2 原文引用:
   refine-logs/reviews/CROSS_SYNTH_20260523/synthesis_findings.md §A.🟡-4 修正版
@@ -402,7 +402,7 @@ Phase 7 切成可并行的工作流:
 | WS0.5 | 算因子(事件分类 / 实体抽取 / 复现计数 / 显著度管线) | WS0 |
 | WS1 | "看模型反应"管线(P_logprob 白盒) | WS0 |
 | WS2 | "让模型预测"管线(P_predict) | WS0 |
-| WS3 | 造扰动 + 人工审计(C_FO / C_NoOp) | WS0;读 WS0.5 事件类型标签 |
+| WS3 | 造扰动 + 人工审计(C_NoOp) | WS0;读 WS0.5 事件类型标签 |
 | WS4 | 跑 pilot(冻结清单,跑算子,产出结果表) | WS0.5 + WS1 + WS2 + WS3 |
 | WS5 | pilot 统计 + 预注册 | WS4 |
 
@@ -434,12 +434,12 @@ clean-room-first 方法(先白板独立分析,再对照既往 reviewer 意见)�
 |---|---|
 | R-0 | ✅ closed 2026-05-23 PM late → `refine-logs/reviews/REOPEN_R1_R6/R0_corpus_arch/R0_DECISIONS.md` |
 | R-1 | 4 个 confirmatory 因子:各自的实现方法 → 然后选择(Template Rigidity 从零设计);R-0 已解锁 R-1b / R-1c 的 construct 选择空间 |
-| R-2 | 6 个扰动:各自实现构思 → 然后保留几个 / 哪几个进 confirmatory;perturbation-specific eligibility flag 由本 session 在 R-0 HOOK1 / HOOK2 占位上落地 |
+| R-2 | 5 个扰动(C_FO 已于 R-6 删):各自实现构思 → 然后保留几个 / 哪几个进 confirmatory;perturbation-specific eligibility flag 由本 session 在 R-0 HOOK1 / HOOK2 占位上落地 |
 | R-3 | 负对照的充分性 |
 | R-4a | ✅ closed 2026-05-23 → `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/R4a_DECISIONS.md` |
 | R-4b | pilot 具体数字(power、n_eff、混合模型规格落地、bootstrap),仍开放,等 R-1e / R-2 / R-3 / R-5 |
 | R-5 | 采样准入过滤器 + 分布策略(R-0 已 expose Pool B + G/H/I + D/E/F 扩展位;within-pool 分布 R-5 全权决定) |
-| R-6 | 预测目标 & 是否 / 如何使用真实收益 |
+| R-6 | ✅ closed 2026-06-06 → `refine-logs/reviews/REOPEN_R1_R6/R6_pred_target_cfo/R6_DECISIONS.md`(预测目标 & 是否 / 如何使用真实收益;C_FO 删,解锁 R-2) |
 
 权威清单与每项细节见 `refine-logs/reviews/WALKTHROUGH_PASS1/pending_items.md`。本报告的
 §4 与 §6 相关部分会随 R-1…R-6 的结论逐步更新为定稿。

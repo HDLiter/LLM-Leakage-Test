@@ -33,7 +33,8 @@
 - 外部佐证:2603.03203 / 2604.13997(两量并存)、2603.21658(抗扰动=记忆有机制根据)、
   TempoMed-Bench 2605.13045(cutoff 渐变非阶跃 → 只能为"记忆差值读 0"辩护,不能为 raw_score)。
 
-> **⚠️ resistance 那一行收紧(P0,2026-06-01)**:本条把 `resistance` 和 `memory_lift`/`E_PCSG` 一起列进『post ≈ 0』,读着像定论。按 P0:**干净的 post-cutoff ≈ 0 锚只落在熟悉度通道(E_PCSG/E_CTS,照确切结局记忆)**;**抗扰动族(resistance)主要照成见型记忆,跨 cutoff 强弱不预测,不给它安 post-cutoff 归零判据**。本行『resistance → ≈ 0』实为『pre−post 抵抗能照出确切结局记忆』这个**假说**,非已知事实,别当 confirmatory 判据。正本 `P0_DECISIONS.md` §0/§1/§5-P2。**术语(P1,2026-06-02)**:`memory_lift` 已退役为非正式术语,正式指代用 E_PCSG;`raw_score` 改称"模型预测"。见 `P1_DECISIONS.md`。
+> **资格界定(canonical `P0_DECISIONS.md` §0/§1/§5-P2)**:干净的 post-cutoff ≈ 0 锚**只落在熟悉度通道**(E_PCSG/E_CTS,照确切结局记忆)。**抗扰动族(resistance)主要照成见型记忆,跨 cutoff 强弱不预测,不给它安 post-cutoff 归零判据**;"pre−post 抵抗能照出确切结局记忆"是**假说**、非已知事实,别当 confirmatory 判据。
+> **术语(canonical `P1_DECISIONS.md`)**:`memory_lift` 已退役为非正式术语,正式指代用 E_PCSG;`raw_score` 改称"模型预测"。
 
 ### D3 — resistance 正名;"两范式二选一"降级
 - 框架实存主量 = resistance(E_FO/E_SR/E_NoOp 全是 `P_predict(原)−P_predict(扰动)`)。
@@ -41,16 +42,10 @@
   指纹)之间那道缝"起的名。真问题 = "主量=resistance;要不要、怎么架桥到 false-alpha",
   与 proposal §2.2 黄框同一件事。**故不存在"挑哪个范式"。**
 
-### D4 — 会聚效度是效度主论证
-- 行为通道(P_predict 抗扰动)× 惊讶度通道(P_logprob)两个不同算子**都过锚、都随曝光升**
-  = 强构念效度。**不需要 E_CMMD 当第三条腿。**
-  > **⚠️ 第二条腿措辞校正(P0 决策1,2026-06-01)**:本条『都随曝光升』的『曝光』= `F_salience`/`F_recur`
-  > 这族 **peer 因子**;把它当效度承重轴与 P0『因子一视同仁、实验前不预派任何单一因子当验证轴』冲突。
-  > **第二条腿应读作**:两通道在同一批 case 上**一致指向记忆**、且该一致**不被同一共同混杂(如高频实体)
-  > 带动**(= 通道独立性:两条证据来源不同源、非统计独立——会聚仍要它俩一致);『随曝光升』降为正向端剂量响应旁证(独立性待 pilot)。**『都过锚』腿不变**
-  > (cutoff = 验证锚,合法)。正本见 `P0_DECISIONS.md` §1。
-  >
-  > **⚠️ 再收紧:会聚效度不当预设判据(P0,2026-06-01)**:『会聚效度=效度主论证』+『都过锚』整体降级。按 P0:两个信号各测一面(抗扰动族=成见型记忆、熟悉度类=确切结局记忆),互相佐证但**不假设能合成**;**干净 cutoff 锚只在熟悉度通道,抗扰动族不预设 cutoff 行为**(靠扰动设计本身立)。两通道相关/独立 = 实验出结果后的**观察**,非预设判据。正本 `P0_DECISIONS.md` §0/§1。
+### D4 — 会聚效度(P0 已收紧)
+- 行为通道(P_predict 抗扰动)× 惊讶度通道(P_logprob)两个不同算子各测一面(抗扰动族=成见型记忆、熟悉度类=确切结局记忆),互相佐证但**不假设能合成**,也**不当预设判据**(『会聚效度=效度主论证』整体降级)。
+- 两通道是否一致指向记忆、是否被同一共同混杂(如高频实体)带动(= 通道独立性:来源不同源、非统计独立)= 实验出结果后的**事后观察**。**干净 cutoff 锚只在熟悉度通道,抗扰动族不预设 cutoff 行为**(靠扰动设计本身立)。**不需要 E_CMMD 当第三条腿。**
+- canonical:`P0_DECISIONS.md` §0/§1。
 
 ### D5 — E_CMMD 砍(定调,不再是 lean)
 - 招牌属性 "cutoff-monotone" 无文献出处 + 识别弱 + 代码 stub + 唯一卖点被会聚效度接管;
@@ -77,6 +72,8 @@
 - ✅ **当因子(F_mkt*)** —— 接受为候选(把真实收益从"预测目标"挪到"案例标签":涨的/涨得猛的/
   市值高的新闻是不是更容易被记住)。**与报道语料族正交**(独立生成过程,非共线)。
 
+> **R-6 续(2026-06-06)**:R-6 确定**要有一个用真实涨跌评估记忆的 estimand**(不必然探索性,非主预测目标/非主指标),其形态/是否 confirmatory/去噪/符号 vs 幅度留 estimand 逐个分析拍板。故 D7 此前"真实收益无常设 estimand"的立场被 **R-6 待定项② 取代**;非主指标、可作因子、pilot 对照、当主指标否决等其余结论不变。canonical:`R6_pred_target_cfo/R6_DECISIONS.md` 待定②。
+
 ### D8 — F_temporal 进 L1
 - `F_temporal = 新闻时间线索强度`,既是 C_temporal 派生二级因子、也是独立 primary 因子。
 
@@ -91,7 +88,7 @@
 
 | 项 | 处置 | 谁定 |
 |---|---|---|
-| **C_FO 去留 + E_SR/E_FO 谁当主 backbone** | 挪后面**扰动 decision**;本轮不拍。C_FO 两操作化均存疑(§ four_layer 2.1) | 用户 2026-05-31 |
+| **C_FO 去留 + E_SR/E_FO 谁当主 backbone** | 已决:R-6(2026-06-06)删 C_FO/E_FO,E_SR 作主 backbone;反事实扰动家族设计归 R-2。canonical `R6_pred_target_cfo/R6_DECISIONS.md` | R-6 |
 | **中文语料专属先验** | **完全不拿出来看**(用户对英文语料也不够了解,无从对比) | 用户 2026-05-31 |
 | **年/日历因子 + 其余候选因子** | 挪后面**因子扩展 decision**;本轮只登记 | 用户 2026-05-31 |
 | **其他偏见(catalog 16 族)** | 登记备查,**不强求全覆盖** | 用户 2026-05-31 |
@@ -110,19 +107,3 @@
 - **P0 弹药**(下一轮用):lift 极有 LAP(2512.23847)/alpha-decay(2601.13770)/PAM(2602.18733);
   resistance 极有机制背书(2603.21658)。
 - 详见 `arxiv_scan_20260531.md`。
-
----
-
-## 4. 本轮触动的文档(已加 supersede 注)
-
-- `MEASUREMENT_FRAMEWORK.md` §5.2(E_CMMD 整段 retire)+ §5.3(E_FO/E_SR backbone 注)。
-- `algorithm_deepaudit.md` 头部(§4/§5 E_FO 主-backbone lean 动摇;E_CMMD CUT 升定调)。
-- memory `project_construct_validity_framing` / `research-status` / `lit_landscape` 更新。
-
-### P1 命名漂移拆解(2026-06-02 追加)
-
-- `R4_construct_validity_decisions.md` D2(本文件):memory_lift → E_PCSG、raw_score → 模型预测。
-- `algorithm_deepaudit.md` §4:E_FO 消歧注。
-- `four_layer_candidate_pools.md` §5:raw_score → 模型预测。
-- `R4_next_construct_validity_agenda.md`:P1 标 CLOSED。
-- 新增:`P1_DECISIONS.md`(canonical)+ `P1_audit_trail.md`。

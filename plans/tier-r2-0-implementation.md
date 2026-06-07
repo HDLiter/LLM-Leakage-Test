@@ -9,12 +9,10 @@ review_inputs:
 plan_review_inputs:
   - .scratch/codex_prompts_plan_review/SYNTHESIS.md (cross-lens plan review, 5 Codex xhigh threads)
   - .scratch/codex_prompts_plan_review/REPORT_{sequencing,scope,file_accuracy,tests,risk}.md
-status: post-review v3 (post-simplification pass); single operator; one consolidated commit
-superseded-by: refine-logs/reviews/R5A_TIER_R2_0_IMPL_REVIEW_20260502/IMPLEMENTATION_NOTE.md (post-349efab review fixes; execution mode of this plan is historical, design / acceptance criteria sections still valid as decision context)
-estimated_time: 5-7 hours (after simplification cuts; v2 was 9-13 hr)
+status: single operator; one consolidated commit
+execution authority: refine-logs/reviews/R5A_TIER_R2_0_IMPL_REVIEW_20260502/IMPLEMENTATION_NOTE.md
+estimated_time: 5-7 hours
 shell_environment: Git Bash (Windows). Where commands are PowerShell-incompatible the plan flags it inline; default to Git Bash unless told otherwise.
-simplification_inputs:
-  - .scratch/simplification_proposal.md (first-principles pass; 5 cuts approved + 2 withdrawn + 7 open Qs resolved)
 ---
 
 # Summary
@@ -27,6 +25,12 @@ fixing the wrong-analysis-unit bug in the planning power calculator
 (`cutoff_observed` → `exposure_horizon_observed`; `PerturbationVariant.C_FO` →
 `C_CO`, plus the source-side `E_FO` → `E_OR` sweep across modified files) that
 touch `src/r5a/contracts.py` so the file is opened only once.
+
+> Note: `C_FO` (false-outcome perturbation) was dropped at R-6 close
+> (2026-06-06); whether to retain or remove the `C_CO` perturbation is an
+> open R-2 decision. The rename text in this plan is left intact as the
+> as-planned record.
+
 Exit criteria: (a) `pytest tests/r5a -q` all green; (b)
 `python scripts/smoke_phase7.py --check-config` reports clean
 12 white-box / 4 black-box / 14 P_predict / 12 P_logprob / 2 confirmatory PCSG
@@ -35,43 +39,6 @@ pairs without warnings; (c) `python scripts/ws1_run_logprob.py --help` shows
 commit on `main` and pushed to `origin/main`. After this commit lands, only
 user-side actions (HF Meta license click-through; CLS post-2026-02 corpus
 extraction) remain before WS1 cloud Stage 0 commit.
-
-**This is post-review v3 (post-simplification pass).** v2 was reviewed by
-5 parallel Codex `xhigh` threads. v3 then ran a first-principles
-simplification pass against the actual single-operator + pre-cloud-spend +
-paper-driven threat model and absorbed 5 approved cuts:
-
-- **C.1**: Step B.23 keeps only `tempfile + os.replace` atomic rename;
-  cross-platform file-locking primitive + sentinel `.lock` + stale-lock
-  recovery + Codex MCP design-help escalation cut (single-operator manual
-  pinner has no concurrency).
-- **C.2**: Block F test density 50-56 → ~25-30. F.35's 9 per-clause hard-fail
-  tests collapse into 1 multi-clause integration test + 1 happy-path test
-  (better tests the multi-line-collection contract from Decision #1).
-- **C.3**: Step C.16 (canonical-JSON `_hash_strings`) cut; case_id is
-  programmatically generated ASCII identifiers, no newline collision risk.
-- **C.4**: Step C.14 realized-N keys cut; clause #6 already enforces
-  realized == eligible in confirmatory mode, dev-mode is marked by
-  `mode="dev"` field.
-- **C.5**: Step C.18 (two decision-#11 memo edits) pushed to Tier-R2-1
-  Block G doc sweep (those memo files are heavily edited there for other
-  reasons).
-- **Q4**: Step B.25 (post-patch equality assertion) cut + F.34 #10;
-  pin-field domain is hex-only, the YAML round-trip-quirk scenario is
-  structurally impossible.
-- **Q7**: F.39 `test_pcsg_pairs_empty_lists_and_hash` cut; production
-  path never hits empty pcsg_pairs.
-
-C.6 (output-key rename push) and C.7 (subprocess mandate cut) were
-withdrawn after walkthrough exposed two anti-patterns: (1) "no downstream
-consumer" doesn't imply "deferring is cheaper" — bundling at the open file
-wins; (2) when the plan already says what you'd recommend, your "cut" is
-no-op rewording. v2's prior amendments (Block C reordering, Block B/C
-"validate after each substep" advice removal, Step D.10 `.gitignore`,
-extended `E_FO`→`E_OR` source-side sweep, `gpu_dtype` clause 8, Windows
-hazard flags, soft/mid/hard rollback tiers) all survive into v3. Full
-trail in `.scratch/codex_prompts_plan_review/SYNTHESIS.md` (v2 review)
-and `.scratch/simplification_proposal.md` (v3 simplification).
 
 # Step 0 — Pre-flight
 
@@ -468,7 +435,7 @@ renamed dir.
 
 ---
 
-# Block C — Finalizer hardening (~1.5-2 hr; HIGH-RISK SURFACE; v3 reduced from v2 2-2.5 hr after C.14 / C.16 / C.18 cuts)
+# Block C — Finalizer hardening (~1.5-2 hr; HIGH-RISK SURFACE)
 
 **Risk flag**: this block has the highest regression risk in Tier-R2-0. The
 finalizer is the one artifact joining "fleet + traces + Path E + provenance".
@@ -604,7 +571,7 @@ Edits:
    - Verify: every model has exactly `expected_case_count` cases AND every
      model has the same case set. In confirmatory mode, raise `SystemExit`
      listing per-model missing case_ids.
-   - Hash: `_hash_strings(sorted(case_ids))` (the existing `\n`-join helper; v3 keeps it per simplification C.3 — case_id values are programmatically generated ASCII identifiers without newlines).
+   - Hash: `_hash_strings(sorted(case_ids))` (the existing `\n`-join helper; case_id values are programmatically generated ASCII identifiers without newlines, so no canonical-JSON form is needed — see Step C.16).
 
 2. **In `main()` (line 294-300)**: pass `fleet.p_logprob_eligible_ids()` as `expected_models` and `mode` from the variable computed in Step C.12.
 
@@ -618,7 +585,7 @@ Edits:
 
 **File:** `scripts/ws1_finalize_run_manifest.py`
 
-**v3 simplification**: realized-N keys cut per `.scratch/simplification_proposal.md` C.4. Confirmatory hard-fail clause #6 already enforces realized == eligible at the framework level; dev mode is marked by `mode="dev"` field. Recording realized-N alongside eligible-N is structural redundancy — plan v2 itself acknowledged in sub-step 5 that "if not yet derivable, set equal to eligible". Function signature stays at `(n_p_predict, n_p_logprob)` two arguments.
+**No realized-N keys**: confirmatory hard-fail clause #6 already enforces realized == eligible at the framework level, and dev mode is marked by the `mode="dev"` field, so recording realized-N alongside eligible-N would be structural redundancy. The function signature stays at `(n_p_predict, n_p_logprob)` two arguments.
 
 Edits:
 
@@ -635,7 +602,7 @@ Edits:
 
 **Acceptance criterion**: a partial hidden-state dir or partial traces dir is rejected at clauses 5/6 before manifest construction; ws6 keys do NOT appear in the output dict; **no key in the dict starts with `e_fo_`**; final dict has exactly 6 keys (3 gates × 2 entries each: promotion-N + threshold).
 
-**Reference**: Lens C C.19 (mooted by C.4 cut); decision #11; decision #10 source-side; v3 simplification C.4.
+**Reference**: decision #11; decision #10 source-side.
 
 ## Step C.15 — Replace article-manifest hash misuse for `sampling_config_hash`
 
@@ -656,9 +623,9 @@ real run; missing sampling config raises in confirmatory mode.
 
 **Reference**: R2-C2 #5, Lens A major #7.
 
-## Step C.16 — [CUT v3]
+## Step C.16 — Hidden-state hash keeps the existing `"\n".join` form (no canonical-JSON rewrite)
 
-**v3 simplification (cut per `.scratch/simplification_proposal.md` C.3)**: the canonical-JSON `_hash_strings` rewrite defended against case_id values containing `\n` causing hash collision. case_id is programmatically generated as `cls_<YYYY>_<MM>_<DD>_<seq>`-style ASCII identifiers with no whitespace; the collision input domain doesn't exist in this project. Keep the existing `"\n".join(sorted(items))` form. F.35 #17 (newline-collision test) also cut.
+A canonical-JSON `_hash_strings` rewrite would defend against case_id values containing `\n` causing hash collision. case_id is programmatically generated as `cls_<YYYY>_<MM>_<DD>_<seq>`-style ASCII identifiers with no whitespace; the collision input domain doesn't exist in this project. Keep the existing `"\n".join(sorted(items))` form. No newline-collision test is added.
 
 ## Step C.17 — Populate split-tier roster fields (decision #2)
 
@@ -674,19 +641,17 @@ Edits:
 
 **Acceptance criterion**: a finalized manifest's two roster fields exactly match `fleet.p_predict_eligible_ids()` / `fleet.p_logprob_eligible_ids()`; the `mode` field equals `"confirmatory"` for non-`--allow-tbd` runs.
 
-## Step C.18 — [CUT v3, pushed to Tier-R2-1]
+## Step C.18 — Two decision-#11 memo edits deferred to Tier-R2-1
 
-**v3 simplification (cut per `.scratch/simplification_proposal.md` C.5)**: pushed to Tier-R2-1 Block G doc sweep. Both memo files (`docs/DECISION_20260429_llama_addition.md`, `docs/DECISION_20260427_pcsg_redefinition.md`) are heavily edited in Tier-R2-1 Block G for other reasons (cross-link headers, stale "10 white-box" residue, related_docs front-matter, §3.x text fixes). Bundling these two edits there is strictly cheaper than re-opening the files in Tier-R2-0 just for this. Tier-R2-0 commit no longer touches `docs/DECISION_20260427_*` or `docs/DECISION_20260429_llama_addition*`.
+The two decision-#11 memo edits are handled in the Tier-R2-1 Block G doc sweep, not here. Both memo files (`docs/DECISION_20260429_llama_addition.md`, `docs/DECISION_20260427_pcsg_redefinition.md`) are edited in Tier-R2-1 Block G for other reasons (cross-link headers, stale "10 white-box" residue, related_docs front-matter, §3.x text fixes), so bundling these two edits there is cheaper than re-opening the files in Tier-R2-0 just for this. The Tier-R2-0 commit does not touch `docs/DECISION_20260427_*` or `docs/DECISION_20260429_llama_addition*`.
 
 **Tier-R2-1 picks up** (DECISIONS.md §G.6 + §G.7 already enumerate these):
 - `docs/DECISION_20260429_llama_addition.md` §2.6 WS6 row rewrite
 - `docs/DECISION_20260427_pcsg_redefinition.md` §2.5 supersession note
 
-Both edit bodies retained verbatim in `.scratch/simplification_proposal.md` C.5.
-
 ---
 
-# Block B — Pin-fleet hardening (~1-1.5 hr; HIGH-RISK SURFACE; v3 reduced from v2 2-3 hr after B.23 lock cut + B.25 cut)
+# Block B — Pin-fleet hardening (~1-1.5 hr; HIGH-RISK SURFACE)
 
 **Risk flag**: file locking + atomic rename + scalar serialization is
 fiddly. Many of these edits change error semantics (`SystemExit` instead of
@@ -821,7 +786,7 @@ idempotency test).
 
 **File:** `scripts/ws1_pin_fleet.py`
 
-**v3 simplification (cut per `.scratch/simplification_proposal.md` C.1)**: cross-platform file locking + sentinel `.lock` + retry-with-backoff + stale-lock recovery message + Codex MCP design escalation all cut. The lock defended against concurrent pinner invocations; the pinner is fired once manually after `huggingface-cli download` completes on the AutoDL instance, with no scheduler / daemon / parallel CI / second operator. Concurrency scenario doesn't exist in this threat model. Atomic rename via `tempfile + os.replace` is preserved because `out_path.write_text(...)` is non-atomic on Windows under crash — that defense IS real.
+**No file locking**: there is no cross-platform file lock, sentinel `.lock`, retry-with-backoff, or stale-lock recovery. A lock would defend against concurrent pinner invocations, but the pinner is fired once manually after `huggingface-cli download` completes on the AutoDL instance, with no scheduler / daemon / parallel CI / second operator — the concurrency scenario doesn't exist in this threat model. Atomic rename via `tempfile + os.replace` IS used, because `out_path.write_text(...)` is non-atomic on Windows under crash — that defense is real.
 
 Edits:
 
@@ -834,9 +799,9 @@ Edits:
 3. **Replace `log_path.write_text(...)` (line 390-393)** with `_atomic_write_json(log_path, prior)`.
 4. **Transactional ordering note**: the fleet write and log append are NOT a single transaction. If the process crashes between the fleet write and log append, the fleet has new pins but the log has no entry. Document this in the function docstring: "log append is best-effort post-fleet; if you see fleet changes without a corresponding log entry, the operator must add an entry manually." Single-operator pilot is unlikely to hit this; documentation is for forensic clarity.
 
-**Acceptance criterion**: successful run leaves no `.tmp` residue in either target dir. Steady-state single-operator path is unchanged. (No lock-related tests; F.34 #13 / #14 cut per C.1.)
+**Acceptance criterion**: successful run leaves no `.tmp` residue in either target dir. Steady-state single-operator path is unchanged. (No lock-related tests.)
 
-**Reference**: R2-C5 #6 (atomic-rename portion only); Lens C A.7; v3 simplification C.1.
+**Reference**: R2-C5 #6 (atomic-rename portion only); Lens C A.7.
 
 ## Step B.24 — Refuse multi-snapshot HF cache without explicit `--revision`
 
@@ -859,9 +824,9 @@ clear error when no `--revision` is given; passing the right revision succeeds.
 
 **Reference**: R2-C5 #2, Lens A major #5, Lens C A.10.
 
-## Step B.25 — [CUT v3]
+## Step B.25 — No post-patch equality assertion (pin domain is hex-only)
 
-**v3 simplification (cut per `.scratch/simplification_proposal.md` Q4)**: pin-field domain is hex-only (SHA-1 `hf_commit_sha`, SHA-256 `tokenizer_sha`); no YAML special characters can occur in pin values, so the round-trip-quirk scenario is structurally impossible. Existing defenses cover residual risk: Pydantic re-validation (lines 346-362, already present) catches malformed YAML; F.34 #4 idempotency test catches any round-trip drift transitively. F.34 #10 (post-patch equality test) also cut. If a future pin field domain expands to non-hex values, add B.25 then.
+No post-patch equality assertion is added. The pin-field domain is hex-only (SHA-1 `hf_commit_sha`, SHA-256 `tokenizer_sha`); no YAML special characters can occur in pin values, so the round-trip-quirk scenario is structurally impossible. Existing defenses cover residual risk: Pydantic re-validation (lines 346-362, already present) catches malformed YAML; F.34 #4 idempotency test catches any round-trip drift transitively. If a future pin field domain expands to non-hex values, add this assertion then.
 
 ## Step B.26 — Respect `HF_HUB_CACHE` env var
 
@@ -1046,19 +1011,13 @@ Edits (small Tier-R2-0 doc-side touch; the larger doc sweep is Tier-R2-1):
 
 ---
 
-# Block F — Tests (~1.5-2 hr; v3 reduced from v2 3-4 hr after test density 50-56 → ~25-30)
+# Block F — Tests (~1.5-2 hr)
 
-Per Lens D §B.16-B.20 + suggested outlines, originally expanded by Lens 4 (test
-adequacy) findings to close 22 hardening surfaces. **v3 simplification then
-cut roughly half the Lens-4-driven additions** per `.scratch/simplification_proposal.md`
-C.2 + Q1-Q7: F.34 14 → 9 (cut lock + HF_HUB_CACHE + post-patch + merged digest);
-F.35 23 → 10 (8-clause per-clause tests collapsed to 1 multi-clause integration
-+ 1 happy-path; redundant edge cases dropped); F.36 unchanged (5); F.37 unchanged
-(2); F.38 simplified mutational sentinel to 5-line source-inspection (1);
-F.39 6 → 1 (kept only the detector numerical anchor; empty-pcsg-pairs cut).
-Total new tests: ~50-56 → ~28 (28 in Block F: 9+10+5+2+1+1=28; plus 5 in
-Block A: 2 contract + 3 fleet validator = 33 net new tests at the file level,
-or ~28 if we count per-test-function additions to existing files).
+Per Lens D §B.16-B.20 + suggested outlines, with Lens 4 (test adequacy) findings
+folded in. Per-step test counts: F.34 = 9, F.35 = 10, F.36 = 5, F.37 = 2,
+F.38 = 1, F.39 = 1 (28 new tests in Block F: 9+10+5+2+1+1=28); plus 5 in
+Block A (2 contract + 3 fleet validator). Total ~33 net new tests at the file
+level, or ~28 counting per-test-function additions to existing files.
 
 **General test-style guidance** (per Lens 4 + Lens 5 findings):
 - **Prefer import-based tests over `subprocess.run`**. `subprocess.run` is reserved for genuine end-to-end smoke; for unit assertions on internal helpers, import them directly (e.g., `from scripts.ws1_pin_fleet import _patch_model_block, main`) or run `main()` after `monkeypatch.setattr(sys, "argv", [...])`. Subprocess tests are flaky on Windows due to cwd / quoting / path separators.
@@ -1074,23 +1033,17 @@ or ~28 if we count per-test-function additions to existing files).
 - `_run_pin_fleet_cli(tmp_path, *args, **env)`: helper that calls `main()` after `monkeypatch.setattr(sys, "argv", ["ws1_pin_fleet.py", ...args])`. Returns `(returncode, stdout, stderr)`. Use `capsys` for stdout/stderr capture, `pytest.raises(SystemExit)` for non-zero exit.
 - `MOCK_HF_CACHE` factory: builds a `tmp_path/hf_cache/models--<owner>--<repo>/snapshots/<sha>/tokenizer.json` layout for tests that exercise discovery.
 
-Tests (v3 simplified per `.scratch/simplification_proposal.md` C.2 + Q1 + Q4; 14 → 9):
+Tests (9):
 
 1. `test_patch_model_block_pins_only_target_model` — Lens D verbatim. Uses `_patch_model_block` import directly (NOT subprocess).
 2. `test_pin_json_unknown_model_is_rejected` — uses `_run_pin_fleet_cli` (import-based); covers Step B.19. Pin-json with `{"not-in-fleet": {"hf_commit_sha": "x"}}` → `SystemExit` containing `"not-in-fleet"`.
 3. `test_pin_fleet_check_mode_does_not_write` — `--check` against a TBD fleet leaves the file byte-identical.
-4. `test_pin_fleet_validates_hash_invariant_and_idempotency` — Step B.22; second pin run with same input is byte-identical to first run output. (Transitively guards round-trip drift, replaces cut B.25 #10.)
+4. `test_pin_fleet_validates_hash_invariant_and_idempotency` — Step B.22; second pin run with same input is byte-identical to first run output. (Transitively guards round-trip drift.)
 5. `test_pin_fleet_quoted_tbd_is_patched` — Step B.21; `tokenizer_sha: "<TBD>"` (quoted) is replaced on first run.
 6. `test_pin_fleet_sha256_file_content` — Step B.18; `_sha256_file_content(b"abc")` equals the known SHA-256 (`ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad`).
-7. `test_pin_fleet_image_digest_validation` — Step B.20; parameterized over (a) non-`--check` without `--vllm-image-digest` → SystemExit, (b) `--vllm-image-digest <TBD>` → SystemExit (regex), (c) `--vllm-image-digest sha256:short` → SystemExit (regex requires 64 hex). (Merged from v2 #7 + #8.)
-8. `test_pin_fleet_multi_snapshot_rejected_without_revision` — Step B.24; HF cache fixture with two snapshot subdirs and no `--revision`, raises `SystemExit` mentioning the model ID. (Per Q1: AutoDL bring-up may produce multiple snapshots after retries; without B.24 the pinner silently picks newest, a real silent-wrong-result hazard.)
+7. `test_pin_fleet_image_digest_validation` — Step B.20; parameterized over (a) non-`--check` without `--vllm-image-digest` → SystemExit, (b) `--vllm-image-digest <TBD>` → SystemExit (regex), (c) `--vllm-image-digest sha256:short` → SystemExit (regex requires 64 hex).
+8. `test_pin_fleet_multi_snapshot_rejected_without_revision` — Step B.24; HF cache fixture with two snapshot subdirs and no `--revision`, raises `SystemExit` mentioning the model ID. (AutoDL bring-up may produce multiple snapshots after retries; without B.24 the pinner silently picks newest, a real silent-wrong-result hazard.)
 9. `test_pin_fleet_corrupt_log_rejected` — Step B.27; pre-create `data/pilot/.fleet_pinning_log.json` with invalid JSON or with a non-list root, raises `SystemExit` instead of silently truncating.
-
-**v3 cuts**:
-- v2 #10 `test_pin_fleet_post_patch_equality_assert` — cut per Q4 (B.25 cut; hex-only pin domain).
-- v2 #11 `test_pin_fleet_hf_hub_cache_env_var_precedence` — cut per C.2 (B.26 is a 1-line code change; near-zero regression risk).
-- v2 #13 `test_pin_fleet_lock_pre_existing_blocks_run` — cut per C.1 (lock mechanism cut).
-- v2 #14 `test_pin_fleet_atomic_write_replaces_target_no_tmp_residue` — cut per C.1 (tests stdlib `os.replace`; trivial value).
 
 **Acceptance criterion**: `pytest tests/r5a/test_pin_fleet.py -q` green; 9 tests pass.
 
@@ -1102,11 +1055,11 @@ Tests (v3 simplified per `.scratch/simplification_proposal.md` C.2 + Q1 + Q4; 14
 - `MINIMAL_RUN_FIXTURE(tmp_path)`: builds a tmp_path-scoped directory containing a small fleet YAML, runtime YAML, article manifest JSON, exposure_horizon JSON, traces dir with `.parquet` files matching the fleet's p_logprob members, hidden-states dir with flat `{case_id}__{model_id}.safetensors` layout, sampling config YAML, launch_env JSON. Return paths.
 - `_run_finalize_cli(tmp_path, mode, **overrides)`: helper that calls `main()` via `monkeypatch.setattr(sys, "argv", [...])` against the fixture; allows overriding individual paths or omitting fields.
 
-Tests (v3 simplified per `.scratch/simplification_proposal.md` C.2 + C.3 + C.4 + Q2; 23 → 10):
+Tests (10):
 
-**8-clause hard-fail framework (collapse: 9 per-clause tests → 2 multi-clause tests)**:
+**8-clause hard-fail framework (2 multi-clause tests)**:
 
-The collapse tests directly verify the Decision #1 contract that the framework must "raise `SystemExit` with a multi-line error message listing every failed clause" (i.e., collect-and-report, not fail-fast). Per-clause tests in v2 verified each clause individually but did NOT verify the multi-line collection behavior.
+These two tests directly verify the Decision #1 contract that the framework must "raise `SystemExit` with a multi-line error message listing every failed clause" (i.e., collect-and-report, not fail-fast). A per-clause approach would verify each clause individually but would NOT verify the multi-line collection behavior, so the multi-clause form is used.
 
 1. `test_finalize_confirmatory_lists_all_clause_violations` — build a fixture that simultaneously violates all 8 clauses (zero git SHA via monkeypatch, missing `--vllm-image-digest`, `<TBD>` tokenizer_sha on one P_logprob model, `<TBD>` api_model_name on one black-box, exposure_horizon JSON with one missing model + one extra model, traces dir missing one model's parquet, launch_env JSON missing `CUDA_VISIBLE_DEVICES`, missing `--gpu-dtype`). Run finalizer in confirmatory mode. Assert `SystemExit` raised AND error message contains the literal prefix substrings `"[clause 1]"` through `"[clause 8]"` (one per failed clause). The `[clause N]` format is enforced by `_confirmatory_hard_fail` in Step C.12 — using clause numbers (rather than substring keywords like `"git"` or `"trace"`) prevents coincidental substring matches in unrelated parts of the error message and keeps the assertion list trivially correct as clauses are added/removed.
 2. `test_finalize_confirmatory_happy_path_all_clauses_satisfied` — build a fixture that satisfies all 8 clauses; run finalizer in confirmatory mode; assert manifest file is written, `mode == "confirmatory"`, all required fields populated; reload JSON and validate via `RunManifest.model_validate`.
@@ -1115,7 +1068,7 @@ The collapse tests directly verify the Decision #1 contract that the framework m
 
 3. `test_finalize_dev_mode_skips_hard_fail` — `--allow-tbd` against the same fixture as #1 (8 simultaneous violations) → succeeds with `mode="dev"`. Manifest written with placeholders preserved.
 
-**Helper-level unit tests (per Q2 keep — covers paths integration test doesn't reach)**:
+**Helper-level unit tests (cover paths the integration test doesn't reach)**:
 
 4. `test_validate_traces_dir_dev_tolerates_partial` — Step C.10; dev mode with missing parquet returns the partial mapping without raising. (Integration test only exercises confirmatory; this guards dev-mode helper behavior.)
 5. `test_validate_traces_dir_confirmatory_lists_missing_and_extras` — Step C.10; confirmatory mode raises listing BOTH missing and unexpected files. (Integration asserts clause 6 fires; this asserts the "missing AND extras" granularity in the message.)
@@ -1127,18 +1080,9 @@ The collapse tests directly verify the Decision #1 contract that the framework m
 
 **Threshold dict + roster + sampling-config**:
 
-8. `test_finalize_quality_gate_thresholds_actual_fleet` — assert all 6 expected keys present AND have expected values (eligible 14, 12; thresholds via `_one_third_minimum(14)`, `_strict_majority(14)`, `_strict_majority(14)`); assert `ws6_mechanistic_*` NOT present; assert keys starting with `e_or_` (NOT `e_fo_`) present; assert no `*_realized_n_p_predict` keys (per C.4).
+8. `test_finalize_quality_gate_thresholds_actual_fleet` — assert all 6 expected keys present AND have expected values (eligible 14, 12; thresholds via `_one_third_minimum(14)`, `_strict_majority(14)`, `_strict_majority(14)`); assert `ws6_mechanistic_*` NOT present; assert keys starting with `e_or_` (NOT `e_fo_`) present; assert no `*_realized_n_p_predict` keys (per Step C.14).
 9. `test_finalize_roster_fields_match_fleet` — Step C.17; finalized manifest's `fleet_p_predict_eligible` and `fleet_p_logprob_eligible` exactly equal `fleet.p_predict_eligible_ids()` and `fleet.p_logprob_eligible_ids()`.
 10. `test_finalize_sampling_config_hash_separate_from_article` — Step C.15; manifest's `sampling_config_hash != article_manifest_hash`.
-
-**v3 cuts**:
-- v2 #1-#9 per-clause hard-fail tests → collapsed into v3 #1+#2 per C.2 (multi-line collection contract from Decision #1 is now directly tested; v2's per-clause tests didn't verify collection).
-- v2 #11 `test_finalize_rejects_tbd_without_allow_tbd` — redundant with v3 #1 (covered by clause-3 substring).
-- v2 #16 `test_finalize_hidden_state_subset_hash_rejects_partial_in_confirmatory` — covered by v3 #1's all-clauses fixture transitively.
-- v2 #17 `test_finalize_canonical_json_hash_distinct_for_newline` — cut per C.3 (case_id has no newlines).
-- v2 #19 `test_finalize_quality_gate_thresholds_realized_keys_present` — cut per C.4 (realized-N keys removed).
-- v2 #22 `test_finalize_manifest_file_roundtrip_confirmatory` — covered by v3 #2 (happy-path roundtrip is part of the integration test).
-- v2 #23 `test_finalize_manifest_file_roundtrip_dev` — redundant with v3 #3.
 
 **Acceptance criterion**: `pytest tests/r5a/test_finalize_run_manifest.py -q` green; 10 tests pass; the test file's import surface is `from scripts.ws1_finalize_run_manifest import ...` (NOT subprocess for the unit tests).
 
@@ -1227,7 +1171,7 @@ file regresses.
 
 **File:** `tests/r5a/test_fleet_config.py` (existing — extend)
 
-**v3 simplification (per `.scratch/simplification_proposal.md` C.2 F.38)**: replace v2's mutational sentinel loop with a direct source-inspection check. The drift we want to catch is: "if `PCSGPair` gains a new field, `pcsg_pair_registry_hash()` must be updated to include it in the canonical payload." Source inspection catches this directly without per-field type handling.
+This uses a direct source-inspection check (not a mutational sentinel loop). The drift we want to catch is: "if `PCSGPair` gains a new field, `pcsg_pair_registry_hash()` must be updated to include it in the canonical payload." Source inspection catches this directly without per-field type handling.
 
 ```python
 def test_pcsg_pair_registry_hash_payload_field_coverage():
@@ -1250,22 +1194,15 @@ def test_pcsg_pair_registry_hash_payload_field_coverage():
 
 **File:** `tests/r5a/test_exposure_horizon.py` (renamed from `test_cutoff_probe.py` in Step D.6)
 
-**v3 simplification (per `.scratch/simplification_proposal.md` C.2 F.39 + Q7; 6 → 1)**: the 7 renamed existing tests in test_exposure_horizon.py already cover the detector's happy path, edge inputs, and rejection logic. The Lens D outlines are "if you want extra rigor, here are some" — not Tier-R2-0 hardening of new code. Keep one numerical anchor; drop the rest.
+The 7 renamed existing tests in test_exposure_horizon.py already cover the detector's happy path, edge inputs, and rejection logic, so only one numerical anchor is added here (the broader Lens D outlines are extra-rigor, paper-time work, not Tier-R2-0 hardening of new code).
 
 Test to add (after the renamed existing tests):
 
 1. `test_detect_exposure_horizon_clean_step_exact_ci_bounds` — Lens D outline; asserts EXACT CI bound dates and approximate `drop_ci_lower` for a clean-step fixture. Replaces the loose acceptance assertion in the renamed file. This is the numerical anchor for the piecewise-WLS detector after the rename.
 
-**v3 cuts (Lens D outlines deferred / dropped)**:
-- v2 #2 `test_detect_exposure_horizon_min_side_exact_boundary_rejected` — boundary case the detector handles fine; no in-flight regression risk.
-- v2 #3 `test_detect_exposure_horizon_bootstrap_invalid_guard` — defers paper-time rigor for a not-yet-cloud-spent detector.
-- v2 #4 `test_detect_exposure_horizon_aggregator_mean_vs_median` — covered by the renamed existing tests' aggregator usage.
-- v2 #5 `test_detect_exposure_horizon_high_noise_rejection_pinned` — the renamed `test_detect_high_noise_rejects` (existing) covers the rejection path; pinning exact `drop_ci_lower` is paper-time work.
-- v2 #6 `test_pcsg_pairs_empty_lists_and_hash` (in test_fleet_config.py) — cut per Q7 (production path never hits empty pcsg_pairs; helper behavior on empty input is stdlib-stable).
-
 **Acceptance criterion**: `pytest tests/r5a/test_exposure_horizon.py -q` green; 1 new test passes alongside the 7 renamed existing tests.
 
-**Reference**: Lens D `Suggested test additions`; v3 simplification C.2 F.39 + Q7.
+**Reference**: Lens D `Suggested test additions`.
 
 ---
 
@@ -1354,8 +1291,7 @@ Sources: refine-logs/reviews/R5A_DESIGN_REVIEW_R2_20260429/
   - DECISIONS.md (12 user-confirmed resolutions + Tier-R2-0/R2-1 breakdown)
   - .scratch/codex_prompts_plan_review/SYNTHESIS.md (post-plan review)
 
-Decisions implemented (full rationale in DECISIONS.md;
-v3 simplification cuts in .scratch/simplification_proposal.md):
+Decisions implemented (full rationale in DECISIONS.md):
   #1 mode field + 8-clause confirmatory hard-fail (added gpu_dtype
      per Lens A major #8)
   #2 fleet_p_predict_eligible / fleet_p_logprob_eligible roster fields
@@ -1375,17 +1311,6 @@ v3 simplification cuts in .scratch/simplification_proposal.md):
       DECISION_20260427_pcsg_redefinition.md §2.5) pushed to Tier-R2-1
       Block G doc sweep per simplification C.5
 
-v3 simplification cuts (versus v2):
-  - B.23 file locking + sentinel .lock + Codex MCP escalation cut
-    (single-operator manual pinner, no concurrency)
-  - B.25 post-patch equality assertion cut (pin domain is hex-only)
-  - C.16 canonical-JSON _hash_strings cut (case_id has no newlines)
-  - C.14 realized-N keys cut (clause #6 enforces realized==eligible)
-  - C.18 two memo edits pushed to Tier-R2-1 doc sweep
-  - F-block test density 50-56 -> ~25-30 (per-clause hard-fail
-    collapsed to multi-clause integration; redundant edge-case
-    tests dropped)
-
 Files (renames via git mv preserve history):
   src/r5a/contracts.py, src/r5a/fleet.py, src/r5a/estimands/__init__.py,
   src/r5a/analysis/{cutoff_probe.py -> exposure_horizon.py},
@@ -1401,8 +1326,8 @@ Files (renames via git mv preserve history):
     test_planning_power_calculator.py [new]},
   config/fleet/r5a_fleet.yaml, .gitignore, PENDING.md
 
-(v3: docs/DECISION_20260427_pcsg_redefinition.md and
-docs/DECISION_20260429_llama_addition.md no longer touched in
+(docs/DECISION_20260427_pcsg_redefinition.md and
+docs/DECISION_20260429_llama_addition.md are not touched in
 Tier-R2-0; their edits are bundled into the larger Tier-R2-1 doc
 sweep instead.)
 
@@ -1447,17 +1372,13 @@ push needed (Tier-R2-0 is a fast-forward from `8350d9e`).
 | # | Risk | Why | Mitigation |
 |---|---|---|---|
 | 1 | **Finalizer over-restriction** breaks dev/smoke runs | Block C adds an 8-clause hard-fail; if any fires inappropriately for `--allow-tbd` mode, smoke finalization breaks | Each clause MUST be guarded by `mode == "confirmatory"`. F.35 has the multi-clause integration test (Step F.35 #1) + happy-path (#2) + dev-mode-skip (#3). Run `pytest tests/r5a/test_finalize_run_manifest.py -q` at end of Block C + Block F. |
-| 2 | [CUT v3] | — | — Lock mechanism cut per simplification C.1; only atomic rename via `tempfile + os.replace` retained, which is stdlib-level and doesn't need its own risk entry. |
-| 3 | **Path E rename has cross-cutting surface** in 8 Python files + 3 config/data dirs + `.gitignore` | A missed reference leaves the script suite inconsistent; missing `.gitignore` rename risks staging large generated artifacts | After each step in Block D, run `grep -rn "cutoff_observed\|cutoff_probe" src/ scripts/ tests/ config/ .gitignore`. The `cutoff_date` and `cutoff_source` fleet YAML fields are intentionally NOT renamed (decision #5). Step D.10 covers `.gitignore` per Lens 1 finding. |
-| 4 | **Enum string-value rename** (`"c_fo"` → `"c_co"`, output dict key `e_fo_*` → `e_or_*`, JSON row label `"E_FO_E_NoOp_*"` → `"E_OR_E_NoOp_*"`) | Pickled / persisted artifacts holding the old literal would fail Pydantic validation or downstream key lookup | Tier-R2-0 is pre-cloud-spend (no committed fixtures use these values). Confirm before commit: `grep -rn '"c_fo"\|e_fo_e_noop\|E_FO_E_NoOp' . --exclude-dir=.scratch --exclude-dir=refine-logs --exclude-dir=archive --exclude-dir=docs --exclude-dir=plans` returns zero hits in modified files. Hits in `refine-logs/`, `archive/`, `docs/`, `plans/` are Tier-R2-1 doc sweep territory. (v3 note: full scope retained per C.6 withdrawal — bundling now is cheaper than push to R2-1 because files are open in Block C/E anyway.) |
-| 5 | **`pcsg_pair_registry_hash` tightened from `str \| None` to `str`** | Existing dev manifests with `pcsg_pair_registry_hash=None` will fail to load | Contract test pin (Step A.3) catches this. No checked-in run manifest exists; the only risk is in-flight artifacts on the operator's disk that must be re-finalized after Tier-R2-0. |
-| 6 | **Default trace dir mismatch between runner (D.8) and analyzer (D.7)** would silently re-open R2-C1 | If an operator updates D.7 to the new dir but skips D.8 (or vice versa), `--exposure-horizon-probe` writes to one place and the analyzer reads the other → "no traces matched" | Block G smoke step (G.42 + G.43) checks both `--help` outputs include the renamed paths; Block D acceptance criteria explicitly enforce path-string equality. |
-| 7 | **PowerShell vs Git Bash invocation mismatch** (Lens 5 finding) | Step 0 / G / 44 originally used Bash idioms (`grep`, HEREDOC) that fail in PowerShell. Plan now uses Git Bash by default with PowerShell equivalents inline. | Operator must use Git Bash for all sub-steps unless told otherwise. Step 44 uses `git commit -F file` to avoid HEREDOC entirely (Lens 5 finding P11). |
-| 8 | **Test coverage during transition**: A.1 → A.3, A.1 → C.12, D.5 → D.6 are RED windows where pytest fails mid-batch (Lens 1 finding) | Looks alarming if the operator runs pytest at the wrong moment | Plan now flags each transition as an "atomic pair" with explicit "do NOT run pytest between these substeps" notes. The transitions resolve at the matching pair-end; full Block A green is required before proceeding to Block D, etc. |
-| 9 | **Subprocess-based tests on Windows** (Lens 4 + Lens 5 finding) | `subprocess.run([sys.executable, ...])` tests can be flaky due to cwd / quoting / path separators / `/tmp` portability in some environments | Plan uses `tmp_path` fixture for all test I/O and prefers import-based tests (`monkeypatch.setattr(sys, "argv", ...)` + `main()`) over subprocess. Subprocess reserved for genuine end-to-end smoke. (v3 note: this operator's Git Bash environment has not exhibited the flakiness in practice; mandate kept anyway because import-based tests are also faster + diagnostically better.) |
-| 10 | [CUT v3] | — | — Lock mechanism cut per C.1; stale `.lock` scenario doesn't exist when there is no `.lock`. |
-| 11 | [CUT v3] | — | — Codex MCP escalation for B.23 cut per C.1; lock design no longer needed. |
-| 12 | [CUT v3] | — | — C.18 cut per simplification C.5; memo edits pushed to Tier-R2-1, no scope-creep risk in Tier-R2-0 commit. |
+| 2 | **Path E rename has cross-cutting surface** in 8 Python files + 3 config/data dirs + `.gitignore` | A missed reference leaves the script suite inconsistent; missing `.gitignore` rename risks staging large generated artifacts | After each step in Block D, run `grep -rn "cutoff_observed\|cutoff_probe" src/ scripts/ tests/ config/ .gitignore`. The `cutoff_date` and `cutoff_source` fleet YAML fields are intentionally NOT renamed (decision #5). Step D.10 covers `.gitignore` per Lens 1 finding. |
+| 3 | **Enum string-value rename** (`"c_fo"` → `"c_co"`, output dict key `e_fo_*` → `e_or_*`, JSON row label `"E_FO_E_NoOp_*"` → `"E_OR_E_NoOp_*"`) | Pickled / persisted artifacts holding the old literal would fail Pydantic validation or downstream key lookup | Tier-R2-0 is pre-cloud-spend (no committed fixtures use these values). Confirm before commit: `grep -rn '"c_fo"\|e_fo_e_noop\|E_FO_E_NoOp' . --exclude-dir=.scratch --exclude-dir=refine-logs --exclude-dir=archive --exclude-dir=docs --exclude-dir=plans` returns zero hits in modified files. Hits in `refine-logs/`, `archive/`, `docs/`, `plans/` are Tier-R2-1 doc sweep territory. Full enum-rename scope is bundled here because the relevant files are open in Block C/E anyway. |
+| 4 | **`pcsg_pair_registry_hash` tightened from `str \| None` to `str`** | Existing dev manifests with `pcsg_pair_registry_hash=None` will fail to load | Contract test pin (Step A.3) catches this. No checked-in run manifest exists; the only risk is in-flight artifacts on the operator's disk that must be re-finalized after Tier-R2-0. |
+| 5 | **Default trace dir mismatch between runner (D.8) and analyzer (D.7)** would silently re-open R2-C1 | If an operator updates D.7 to the new dir but skips D.8 (or vice versa), `--exposure-horizon-probe` writes to one place and the analyzer reads the other → "no traces matched" | Block G smoke step (G.42 + G.43) checks both `--help` outputs include the renamed paths; Block D acceptance criteria explicitly enforce path-string equality. |
+| 6 | **PowerShell vs Git Bash invocation mismatch** (Lens 5 finding) | Bash idioms (`grep`, HEREDOC) fail in PowerShell. Plan uses Git Bash by default with PowerShell equivalents inline. | Operator must use Git Bash for all sub-steps unless told otherwise. Step 44 uses `git commit -F file` to avoid HEREDOC entirely (Lens 5 finding P11). |
+| 7 | **Test coverage during transition**: A.1 → A.3, A.1 → C.12, D.5 → D.6 are RED windows where pytest fails mid-batch (Lens 1 finding) | Looks alarming if the operator runs pytest at the wrong moment | Plan flags each transition as an "atomic pair" with explicit "do NOT run pytest between these substeps" notes. The transitions resolve at the matching pair-end; full Block A green is required before proceeding to Block D, etc. |
+| 8 | **Subprocess-based tests on Windows** (Lens 4 + Lens 5 finding) | `subprocess.run([sys.executable, ...])` tests can be flaky due to cwd / quoting / path separators / `/tmp` portability in some environments | Plan uses `tmp_path` fixture for all test I/O and prefers import-based tests (`monkeypatch.setattr(sys, "argv", ...)` + `main()`) over subprocess. Subprocess reserved for genuine end-to-end smoke (import-based tests are also faster + diagnostically better). |
 
 ---
 
@@ -1540,15 +1461,15 @@ treat it as Tier 2 territory.
 
 For reference; do NOT implement in this batch:
 
-- **Doc body sweeps** (Lens 2 confirms these are correctly Tier-R2-1; v3 adds C.18 + output-key items per simplification):
+- **Doc body sweeps** (Lens 2 confirms these are correctly Tier-R2-1):
   - `PENDING.md` body — reorganize Recently-closed / Active / Tier-1 entries (Step E.33 adds ONE line; the rest is Tier-R2-1).
   - `plans/phase7-pilot-implementation.md` residue — `pilot_100_cases` references, "9-model" / "5 white-box" residue, S16a/S16b/S12 retired-state residue, demotion-risk language, plan §8.8 two-tool model paragraph (decision #3 doc-side), plan §8.1A capacity-curve formula spec (decision #9), plan §8.2 `E_OR` analysis spec (decision #10).
   - `plans/ws1-cloud-execution.md` — Stage 1.5 mini-audit gate insertion (decision #7), Stage 2.7 hidden-state count update, Stage 2.8 GREEN/YELLOW/RED revision, budget cap update.
   - `refine-logs/reviews/R5A_STEP2/R5A_FROZEN_SHORTLIST.md` — Llama amendment, `E_PCSG` two-pair definition, `E_FO/E_OR` rename, P_logprob roster 10→12.
   - `refine-logs/reviews/R5A_STEP2/MEASUREMENT_FRAMEWORK.md` + `docs/TIMELINE.md` — supersession banners.
   - Decision memo body fixes:
-    - `docs/DECISION_20260429_llama_addition.md` §2.6 WS6 row rewrite (per simplification C.5; was C.18 Edit 1 in v2).
-    - `docs/DECISION_20260427_pcsg_redefinition.md` §2.5 supersession note (per simplification C.5; was C.18 Edit 2 in v2).
+    - `docs/DECISION_20260429_llama_addition.md` §2.6 WS6 row rewrite.
+    - `docs/DECISION_20260427_pcsg_redefinition.md` §2.5 supersession note.
     - Cross-link `related_docs` headers, stale "10 white-box" residue in §3.x, etc.
 
 - **New analysis scripts**:

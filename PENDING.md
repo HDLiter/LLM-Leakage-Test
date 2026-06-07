@@ -13,14 +13,14 @@
 ## Active open items
 
 ### Phase 8 MC simulation — post-pilot calibration
-- **Context**: `scripts/planning_power_calculator.py` is the closed-form planning power calculator (renamed 2026-04-30 from `simulate_phase8_power.py`); the §8.8 Monte-Carlo simulator is a separate tool that has not yet been written. Per DECISIONS.md decision #3 ("two-tool model") the MC simulator must be calibrated from pilot `hat(beta)` and `hat(Sigma)` and is the prereg-grade power source.
+- **Context**: `scripts/planning_power_calculator.py` is the closed-form planning power calculator; the §8.8 Monte-Carlo simulator is a separate tool that has not yet been written. Per DECISIONS.md decision #3 ("two-tool model") the MC simulator must be calibrated from pilot `hat(beta)` and `hat(Sigma)` and is the prereg-grade power source.
 - **External action needed**: implement the §8.8 MC simulator after pilot data lands. See `plans/phase7-pilot-implementation.md` §8.8 (Tier-R2-1 adds the two-tool-model paragraph).
 - **Blocking**: PREREG_STAGE1 power claims.
 - **Owner**: post-pilot analyst.
 - **Target resolution date**: post-pilot.
 
 ### WS6 — mechanistic analysis (now unconditional, eager pre-compute)
-- **Context**: `docs/DECISION_20260429_gate_removal.md` §2.4 / §3.2 made WS6 unconditional; hidden states pre-computed in WS1 cloud Stage 2.7 (Path C, ~5 hr GPU). The earlier conditional trigger (`>= 5/9` then `>= 5/14`) is retired alongside the gate that produced it.
+- **Context**: `docs/DECISION_20260429_gate_removal.md` §2.4 / §3.2 made WS6 unconditional; hidden states pre-computed in WS1 cloud Stage 2.7 (Path C, ~5 hr GPU).
 - **Investigation needed**: after WS1 Stage 2.7 hidden states are downloaded, scope WS6 analysis modules (DS via logit-lens, layer-wise KL, activation patching) for WS5. No GPU rerun required since hidden states are pre-computed.
 - **Blocking**: dormant until WS1 Stage 2.7 artifacts land locally.
 - **Owner**: post-WS1 session.
@@ -68,16 +68,7 @@
 ## Recently closed
 
 ### WS0.5 — Thales alignment design
-- **v0.4 content complete 2026-05-20 — user sign-off + decision→text walk-through pending**: `docs/DECISION_20260518_ws0_5_thales_alignment.md` v0.4.
-  - **Round-0** (2026-05-18): v0.1 → Codex review → MAJOR-REVISIONS-NEEDED (4 blockers + 4 majors + 1 minor; 9 issues).
-  - **v0.2** (2026-05-19): 9 round-0 issues resolved via interactive user-Claude review (see `refine-logs/reviews/WS0_5_DESIGN/ws0_5_issue_decisions.md`).
-  - **Round-1** (2026-05-19): 3 parallel Codex reviewers (ML engineer / statistician / measurement), all returned MAJOR-REVISIONS-NEEDED with 23 complementary critical issues (E-1…E-10, S-1…S-8, C-1…C-5). No cross-role conflict.
-  - **v0.3** (2026-05-19): all 23 round-1 issues patched in-place.
-  - **Round-2** (2026-05-19): 3 parallel Codex re-reviewers — Measurement APPROVE, ML-engineer APPROVE-WITH-MINOR-PATCHES, Statistician APPROVE-WITH-MINOR-PATCHES. 2 narrow text patches applied in-place to v0.3 (§4.1 MDE preflight q-grid wording, §5.2 R4 cache lookup key).
-  - **v0.4** (2026-05-20): user-directed simplification of §4. The Codex reviews progressively built a heavy "Scheme Y" auto-tune framework (Ladder gate, McNemar / permutation tests, alpha spending, MDE preflight, 7-way fixture split, manifest lock, run-state resume); user judged this over-engineered for a measurement-instrument prompt and replaced §4 with a plain train/dev/test split (tune on train, rank on dev, evaluate the final prompt once on a sealed test split). Supersedes round-1 issues E-1/E-2/E-3/E-4/S-1/S-2/S-3/S-4/S-7; non-§4 issues unaffected. Not Codex-re-reviewed (removes machinery, adds no claim).
-  - **v0.4 cont.** (2026-05-20): the 14 non-§4 round-1/2 issues (C-1..C-5, E-5..E-10, S-5/S-6/S-8) reviewed issue-by-issue with the user; all 14 resolved — 10 produced memo edits, 3 dissolved as byproducts of the C-2/C-3 changes, 1 confirmed already-resolved. Two Codex literature reviews commissioned (E-6 entity disambiguation, S-6 collinearity diagnostics). Every issue confirmed or net-simplified. User sign-off + a final decision→text walk-through still pending.
-  - T1 / T2 / T3 verification answers + reuse-vs-rebuild decisions + simplified auto-tune validation + replay-from-cache determinism + budget ledger all locked. Implementation gates (frozen prompt configs, `factor_schema.yaml`, quota/discriminant/replay artifacts) remain per memo §9 closure conditions; tracked through memo §10 S1-S5 schedule.
-- **Related docs**: `docs/DECISION_20260518_ws0_5_thales_alignment.md` (memo), `refine-logs/reviews/WS0_5_DESIGN/ws0_5_alignment_review.md` (round-0), `refine-logs/reviews/WS0_5_DESIGN/ws0_5_issue_decisions.md` (round-0 → v0.2 decision log), `refine-logs/reviews/WS0_5_DESIGN/ws0_5_round1_*_review.md` (round-1, 3 files), `refine-logs/reviews/WS0_5_DESIGN/ws0_5_round2_*_review.md` (round-2, 3 files), `refine-logs/reviews/R5A_STEP2/R5A_FROZEN_SHORTLIST.md`, `refine-logs/reviews/R5A_STEP2/MEASUREMENT_FRAMEWORK.md`.
+- **Status**: design content-complete (memo v0.4); user sign-off shelved (签字搁置). Canonical: `docs/DECISION_20260518_ws0_5_thales_alignment.md`. Implementation gates (frozen prompt configs, `factor_schema.yaml`, quota/discriminant/replay artifacts) remain per memo §9 closure conditions; tracked through memo §10 S1-S5 schedule.
 
 ### WS1 white-box fleet pinning
 - **Resolved 2026-05-05**: all 12 white-box `hf_commit_sha` and

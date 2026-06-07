@@ -1,4 +1,4 @@
-> **Status (2026-04-16, post-R5A-freeze)**: Historical R4 literature sweep feeding decision-doc v5.3→v6.2. Retained for citation provenance. Current scope conclusions (e.g., "keep 6-model fleet") have been **superseded** by `refine-logs/reviews/R5A_FLEET_REVIEW/FLEET_REVIEW_R2_SYNTHESIS.md` (9-model fleet) and `refine-logs/reviews/R5A_STEP2/R5A_FROZEN_SHORTLIST.md` (four-layer measurement scope). Detector pool / D1-D12 terminology has been replaced by Factor / Perturbation / Operator / Estimand framework.
+> **Scope**: Historical R4 literature sweep (2026-04-14) feeding decision-doc v5.3→v6.2; a point-in-time citation-provenance record. Its fleet and scope verdicts are as-of-sweep and are not current state — current fleet is the 16-model split-tier fleet (`config/fleet/r5a_fleet.yaml`); current scope is the four-layer Factor / Perturbation / Operator / Estimand framework (`refine-logs/reviews/R5A_STEP2/R5A_FROZEN_SHORTLIST.md`).
 
 # FinMem-Bench — R4 Literature Sweep (2026-04-14)
 

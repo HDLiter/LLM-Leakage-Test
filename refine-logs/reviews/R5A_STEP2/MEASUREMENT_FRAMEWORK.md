@@ -4,7 +4,6 @@ stage: R5A Step 2, framework revision (post-user-review)
 date: 2026-04-15
 status: USER-REVIEWED — terminology locked, most open items closed, P_schema open for next session
 author: Claude Code orchestrator + user design input
-supersedes: The implicit "detector pool" framing used in R5A Step 1, R5A_DEFAULTS.md, and R5A_STEP2_SYNTHESIS.md
 decisions_made:
   - "L1-L4 terminology locked: Factor / Perturbation / Operator / Estimand"
   - "E_CTS confirmatory: YES (literature anchor)"
@@ -52,7 +51,9 @@ A useful test for layer assignment: if you can describe the concept without ment
 
 ## 2. L1 — Factors
 
-### Primary factors (from corpus metadata, frozen in v6.2)
+### Primary factors (from corpus metadata)
+
+The factor set below is the candidate scope (illustrative, not a hard constraint): the confirmatory subset is power-bounded and decided at pilot + R-4b; the candidate pool may grow (see §9 and `../REOPEN_R1_R6/R4_methodology_audit/four_layer_candidate_pools.md` §1).
 
 | Bloc | Factor | Type |
 |---|---|---|
@@ -79,7 +80,6 @@ Each perturbation in L2 implies a secondary factor that records whether a given 
 | Perturbation | Derived secondary factor | Meaning |
 |---|---|---|
 | C_SR | Text Reversibility Score | How cleanly can the article's polarity be reversed? |
-| C_FO | Known Outcome Availability | Does the article contain a verifiable, replaceable outcome slot? |
 | C_NoOp | NoOp Eligibility | Is the article structurally suitable for clause insertion? (length, discourse structure) |
 | C_anon | Entity Span Quality | How clean are the entity annotations? Does anonymization destroy economic meaning? |
 | C_temporal | Temporal Anchor Recoverability | Does the article contain removable (adjunct-type) temporal cues? (Also a primary factor) |
@@ -94,7 +94,6 @@ Each perturbation is a controlled text transformation with a specific design int
 |---|---|---|---|---|---|
 | **C_anon** | Entity anonymization | Replace target and/or non-target entities with type-preserving placeholders | Isolate identity-keyed memory from event-content memory | Masking must not destroy the economic proposition; matched placeholder controls for tokenization artifacts | Entity Span Quality |
 | **C_SR** | Semantic polarity reversal | Minimally reverse the financially material direction (bullish ↔ bearish) while holding the event shell fixed | Test whether the model follows edited semantics or clings to cached polarity | Rule-based antonym/operator maps per event type; ≥ 85% human-audit pass rate; event types without clean reversals are ineligible | Text Reversibility |
-| **C_FO** | False outcome slot replacement | Replace the critical outcome value (number, status, verdict) with a specific false value while keeping setup, timing, and entities fixed | Test whether the model ignores visible counterfactual evidence in favor of memorized outcome slots | Rule-based slot schema per event type; restricted to cases with verified known outcomes; ≥ 85% audit pass rate | Known Outcome Availability |
 | **C_NoOp** | Irrelevant clause insertion | Insert one rule-generated, irrelevant-but-plausible CLS clause (same time window, different entity, different cluster, non-entailing) | Test whether memorization manifests as brittle template matching distractible by finance-plausible clutter | Deterministic clause bank with auditable target-irrelevance proofs; ~8-16 Chinese characters; medial position only; ≥ 85% audit pass rate | NoOp Eligibility |
 | **C_temporal** | Temporal cue degradation | Progressively remove temporal anchors (2-3 dose levels: full → weakened → absent) | Test whether memorization signals depend on retrievable time anchors as lookup keys | Length-matched non-temporal deletion control mandatory; adjunct-type coverage ≥ 50% of corpus required | Temporal Anchor Recoverability |
 | **C_ADG** | As-of date prompt manipulation | Modify the system/user prompt to include an "as of" date before or after the event (D4b: no text temporal cues available; D4a: text cues present and potentially contradictory) | Test whether the model respects prompt-level temporal gating when text provides no/contradictory time anchors | Matched-date control (as-of date = event date) required for D4a | — (prompt-level, not text-level) |
@@ -119,7 +118,7 @@ C_anon is redesigned from a binary perturbation (mask / don't mask) to a **multi
 
 ### Perturbation quality protocol
 
-All text-level perturbations (C_SR, C_FO, C_NoOp, C_temporal, C_anon) share a common quality protocol:
+All text-level perturbations (C_SR, C_NoOp, C_temporal, C_anon) share a common quality protocol:
 
 1. **Generation**: rule-based first, LLM-assisted fluency repair only within the allowed edit envelope.
 2. **Audit**: human audit on four dimensions — natural CLS style, target-local edit only, economic consistency outside the edited slot, no unintended cues introduced.
@@ -134,12 +133,12 @@ The entire R5A pool uses only **3 operators** (+ 1 candidate):
 
 | ID | Operator | Computation | Access | Fleet coverage | Cost per case×model |
 |---|---|---|---|---|---|
-| **P_logprob** | Token tail surprise | Compute token-level log probabilities; score = calibrated mean of bottom-K% tokens (Min-K++/CTS) | White-box (logprobs required) | 5 models (Qwen2.5-7B, Qwen2.5-14B, Qwen3-8B, Qwen3-14B, GLM-4-9B) | 1 forward pass |
-| **P_predict** | Standardized prediction | Present the article with a frozen task prompt; record the model's sentiment/direction/alpha prediction and associated confidence/logit | Black-box sufficient | Full fleet (9 models) | 1 API call |
+| **P_logprob** | Token tail surprise | Compute token-level log probabilities; score = calibrated mean of bottom-K% tokens (Min-K++/CTS) | White-box (logprobs required) | 12 P_logprob-eligible models (single source of truth: `config/fleet/r5a_fleet.yaml`) | 1 forward pass |
+| **P_predict** | Standardized prediction | Present the article with a frozen task prompt; record the model's sentiment/direction/alpha prediction and associated confidence/logit | Black-box sufficient | 14 P_predict-eligible models | 1 API call |
 
-**Design note on P_predict (user insight, 2026-04-15):** P_predict's baseline output may not be strongly discriminative on its own — most models can produce reasonable predictions on CLS news. Its real value is as the **carrier for perturbation-based estimands**: the prediction baseline alone is uninteresting, but the *delta* between baseline and perturbed variants (C_anon, C_SR, C_FO, C_NoOp, C_temporal) is where memorization evidence lives. This is the key reframing that motivated the four-layer framework: what Step 2 lenses called "detectors" (SR/FO, NoOp, EAD) are actually perturbations applied to this single core operator.
-| **P_extract** | Masked span completion | Mask critical spans (numbers, entities, outcome phrases) in the article's latter half; prompt the model to continue/complete; score exact and fuzzy match against the ground truth | Black-box sufficient | Full fleet (9 models) | 1-3 API calls (multiple prompt variants) |
-| **P_schema** | Schema completion (candidate) | Present the opening of a CLS wire (schema-type prefix); score the model's completion for fidelity to real CLS continuations | Black-box sufficient | Full fleet (9 models) | 1 API call |
+**Design note on P_predict (user insight, 2026-04-15):** P_predict's baseline output may not be strongly discriminative on its own — most models can produce reasonable predictions on CLS news. Its real value is as the **carrier for perturbation-based estimands**: the prediction baseline alone is uninteresting, but the *delta* between baseline and perturbed variants (C_anon, C_SR, C_NoOp, C_temporal) is where memorization evidence lives. This is the key reframing that motivated the four-layer framework: what Step 2 lenses called "detectors" (SR, NoOp, EAD) are actually perturbations applied to this single core operator.
+| **P_extract** | Masked span completion | Mask critical spans (numbers, entities, outcome phrases) in the article's latter half; prompt the model to continue/complete; score exact and fuzzy match against the ground truth | Black-box sufficient | 14 P_predict-eligible models | 1-3 API calls (multiple prompt variants) |
+| **P_schema** | Schema completion (candidate) | Present the opening of a CLS wire (schema-type prefix); score the model's completion for fidelity to real CLS continuations | Black-box sufficient | 14 P_predict-eligible models | 1 API call |
 
 ### Notes on operators
 
@@ -163,49 +162,36 @@ Estimands are the analytical quantities that enter the statistical model. Each e
 
 **Relationship**: E_CTS and E_PCSG share the same operator (P_logprob) and the same raw data (logprob traces). E_PCSG is computed from E_CTS values on model pairs. They test different hypotheses: E_CTS tests absolute familiarity; E_PCSG tests whether familiarity tracks the cutoff boundary.
 
-### 5.2 Cross-model family (P_predict, no perturbation)
-
-> **⚠️ SUPERSEDED — E_CMMD CUT(2026-05-31 R-4 construct-validity session)**。E_CMMD 已**砍**:
-> (a) 招牌属性 "cutoff-monotone" 在源头无文献出处;(b) 识别力弱、代码仍 stub;(c) 唯一卖点
-> (黑盒覆盖)已被会聚效度(P_predict 抗扰动 × P_logprob 两通道)接管;(d) 2026-05-31 arxiv 查新
-> 坐实 MemGuard-Alpha(arXiv 2603.26797)已公开占先 "CMMD = Cross-Model Memorization Disagreement"
-> 名+思路。**本节整段 retire**;canonical 见 `../REOPEN_R1_R6/R4_methodology_audit/four_layer_candidate_pools.md` §4.4。
-
-| ID | Estimand | Formula | Old ID | Analytical meaning |
-|---|---|---|---|---|
-| ~~**E_CMMD**~~ | ~~Cross-Model Memorization Disagreement~~ | ~~Cutoff-monotone disagreement pattern across the full fleet on P_predict outputs~~ | D1 | **CUT(2026-05-31)** — 见上 supersede 注。 |
-
-**Note**: ~~E_CMMD is the only behavioral estimand that requires no perturbation.~~ (CUT)
-
-### 5.3 Perturbation-based family (P_predict + perturbations)
+### 5.2 Perturbation-based family (P_predict + perturbations)
 
 All of these share the same operator (P_predict) and follow the same logic: run P_predict on the original text and on the perturbed variant, then compare.
 
 | ID | Estimand | Formula | Old ID | Perturbation | Analytical meaning |
 |---|---|---|---|---|---|
-| **E_FO** | False Outcome Resistance | P_predict(original, m) − P_predict(C_FO(text), m) | D5-FO | C_FO | Does the model ignore visible counterfactual evidence? High delta = slot-anchor memorization. **⚠️ 2026-05-31:C_FO 操作化存疑(见 ../REOPEN_R1_R6/R4_methodology_audit/four_layer_candidate_pools.md §2.1),E_FO 主-backbone 资格动摇,去留挪扰动 decision。** |
-| **E_SR** | Semantic Reversal Resistance | P_predict(original, m) − P_predict(C_SR(text), m) | D5-SR | C_SR | Does the model resist polarity reversal? High delta = cached directional conclusion. **⚠️ 2026-05-31:E_SR 上位为主记忆 backbone 候选(C_SR 更干净/普适)。** |
+| **E_SR** | Semantic Reversal Resistance | P_predict(original, m) − P_predict(C_SR(text), m) | D5-SR | C_SR | Does the model resist polarity reversal? High delta = cached directional conclusion. E_SR is the main memorization-resistance backbone (C_SR cleaner/more universal than the dropped C_FO). |
 | **E_NoOp** | NoOp Sensitivity | P_predict(original, m) − P_predict(C_NoOp(text), m) | D6 | C_NoOp | Does irrelevant clutter change the prediction? High sensitivity = brittle template matching. |
 | **E_EAD_t** | Target Entity Dependency | P_predict(original, m) − P_predict(C_anon_target(text), m) | D7-target | C_anon (target) | How much does the prediction depend on knowing the target's identity? |
 | **E_EAD_nt** | Non-target Entity Distraction | P_predict(original, m) − P_predict(C_anon_nontarget(text), m) | D7-nontarget | C_anon (non-target) | How much does competing-entity identity distract the prediction? |
 | **E_ADG** | Temporal Gate Compliance | P_predict(text, prompt_after) − P_predict(text, prompt_before), on cases where text temporal cues are masked | D4b | C_ADG + C_temporal | Does the model properly withhold knowledge when the prompt says "as of" a date before the event? |
 | **E_ADG_conflict** | ADG Contradiction Mode | P_predict(text_with_cues, prompt_conflicting_date) response pattern | D4a | C_ADG | Diagnostic only: how does the model resolve prompt-date vs text-date conflicts? |
 
-### 5.4 Temporal sensitivity (meta-estimand)
+**Note**: The false-outcome perturbation (C_FO) and its estimand (E_FO) were dropped at R-6 (2026-06-06); see `../REOPEN_R1_R6/R6_pred_target_cfo/R6_DECISIONS.md`. The case-result-memory target C_FO chased now migrates to the counterfactual perturbation × pre/post-cutoff × salience slicing (counterfactual-family backbone choice deferred to R-2).
+
+### 5.3 Temporal sensitivity (meta-estimand)
 
 | ID | Estimand | Formula | Old ID | Analytical meaning |
 |---|---|---|---|---|
-| **E_TDR** | Temporal Dose-Response | Slope of E_CMMD (or E_FO) across C_temporal dose levels | D11 | Does the memorization signal decay as temporal anchors are progressively removed? A positive slope = the signal partially depends on time-cue-mediated retrieval, not just generic event familiarity. |
+| **E_TDR** | Temporal Dose-Response | Slope of a memorization-resistance estimand (e.g. E_SR) across C_temporal dose levels | D11 | Does the memorization signal decay as temporal anchors are progressively removed? A positive slope = the signal partially depends on time-cue-mediated retrieval, not just generic event familiarity. |
 
-**Note**: E_TDR is a **second-order estimand** — it measures how another estimand (E_CMMD) changes under a perturbation (C_temporal). It is a sensitivity analysis, not a standalone measurement.
+**Note**: E_TDR is a **second-order estimand** — it measures how another estimand changes under a perturbation (C_temporal). It is a sensitivity analysis, not a standalone measurement.
 
-### 5.5 Extraction family (P_extract)
+### 5.4 Extraction family (P_extract)
 
 | ID | Estimand | Formula | Old ID | Analytical meaning |
 |---|---|---|---|---|
 | **E_extract** | Extraction Hit Rate | P_extract(masked_text, m) — exact/fuzzy match rate per case×model | D8 | Can the model recover hidden CLS spans verbatim? Hard-edge evidence of memorization that is qualitatively different from behavioral indicators. |
 
-### 5.6 Schema family (P_schema, candidate)
+### 5.5 Schema family (P_schema, candidate)
 
 | ID | Estimand | Formula | Old ID | Analytical meaning |
 |---|---|---|---|---|
@@ -217,19 +203,19 @@ All of these share the same operator (P_predict) and follow the same logic: run 
 
 | Old ID | Old name | L2 Perturbation | L3 Operator | L4 Estimand(s) | What changed |
 |---|---|---|---|---|---|
-| D1 | CMMD | — | P_predict | E_CMMD | Reframed as estimand on P_predict with no perturbation |
+| D1 | CMMD | — | — | — | Dropped (E_CMMD cut at R-4, 2026-05-31; see four_layer_candidate_pools.md §4.4) |
 | D2 | PCSG | — | P_logprob | E_PCSG | Reframed as estimand (paired difference) on P_logprob |
 | D3 | Min-K++/CTS | — | P_logprob | E_CTS | Reframed as baseline estimand on P_logprob |
 | D4a | ADG contradiction | C_ADG | P_predict | E_ADG_conflict | Reframed as perturbation + estimand; diagnostic only |
 | D4b | ADG misdirection | C_ADG + C_temporal | P_predict | E_ADG | Reframed as perturbation + estimand |
 | D5-SR | Semantic Reversal | C_SR | P_predict | E_SR | **No longer a "detector"** — it is a perturbation applied to P_predict |
-| D5-FO | False Outcome | C_FO | P_predict | E_FO | **No longer a "detector"** — it is a perturbation applied to P_predict |
+| D5-FO | False Outcome | — | — | — | Dropped (C_FO/E_FO dropped at R-6, 2026-06-06; see R6_pred_target_cfo/R6_DECISIONS.md; target migrated to counterfactual × cutoff × salience) |
 | D6 | FinMem-NoOp | C_NoOp | P_predict | E_NoOp | **No longer a "detector"** — it is a perturbation applied to P_predict |
 | D7 | EAD | C_anon | P_predict (or any) | E_EAD_t, E_EAD_nt | **No longer a "detector"** — it is a perturbation. T1 tension dissolved. |
 | D8 | Extraction | — (masking is internal) | P_extract | E_extract | Reframed as separate operator + estimand |
 | D9 | RAVEN | — | — | — | Dropped (Step 2 unanimous) |
 | D10 | Debias Delta | — | — | — | Dropped (Step 2 unanimous) |
-| D11 | Temporal Dose-Response | C_temporal | P_predict via E_CMMD | E_TDR | Reframed as second-order estimand (sensitivity protocol) |
+| D11 | Temporal Dose-Response | C_temporal | P_predict via a resistance estimand (e.g. E_SR) | E_TDR | Reframed as second-order estimand (sensitivity protocol) |
 | D12 | Schema-Completion | — | P_schema | E_schema | Reframed as separate operator + estimand; candidate status |
 
 ---
@@ -241,8 +227,8 @@ All of these share the same operator (P_predict) and follow the same logic: run 
 | Tension | Old framing | New framing | Resolution |
 |---|---|---|---|
 | **T1 (EAD standalone vs field)** | Is D7 a standalone detector or a cross-detector field? | C_anon is a perturbation; E_EAD_t and E_EAD_nt are estimands. They are not a separate operator. | Dissolved. No "standalone vs field" choice needed. C_anon is applied; the resulting deltas are estimands that can be analyzed alongside other P_predict estimands. |
-| **T2 (SR/FO one detector or two)** | Are SR and FO one detector slot or two? | C_SR and C_FO are two perturbations. E_SR and E_FO are two estimands. They share P_predict. | Dissolved. There is no "detector slot" to count. Both estimands exist; both enter the analysis; the question of "one or two" was a category error. |
-| **D11 status** | Is D11 a detector, a protocol, or a field? | E_TDR is a second-order estimand (sensitivity analysis on E_CMMD across C_temporal levels). | Dissolved. E_TDR is naturally secondary/exploratory — it is a sensitivity check, not a primary measurement. |
+| **T2 (SR/FO one detector or two)** | Are SR and FO one detector slot or two? | C_SR and C_FO would be two perturbations with two estimands sharing P_predict. (C_FO/E_FO later dropped at R-6, 2026-06-06; the counterfactual target now rides C_SR-style counterfactual × cutoff × salience.) | Dissolved. There was never a "detector slot" to count; the question of "one or two" was a category error. |
+| **D11 status** | Is D11 a detector, a protocol, or a field? | E_TDR is a second-order estimand (sensitivity analysis on a resistance estimand across C_temporal levels). | Dissolved. E_TDR is naturally secondary/exploratory — it is a sensitivity check, not a primary measurement. |
 | **D6 "detector or not"** | Is NoOp a real detector or just a robustness check? | C_NoOp is a perturbation; E_NoOp is an estimand. Its analytical status depends on C_NoOp's quality gate, not on whether it "counts" as a detector. | Reframed. The question is no longer "detector slot?" but "does this perturbation pass its admissibility gate?" |
 
 ### Tensions that remain (but are clearer)
@@ -251,7 +237,7 @@ All of these share the same operator (P_predict) and follow the same logic: run 
 |---|---|
 | **E_PCSG confirmatory status** | E_CTS and E_PCSG share P_logprob. Both are estimands. Should both spend confirmatory alpha, or only E_PCSG (the better-identified one)? This is a pure multiplicity question. |
 | **E_NoOp confirmatory status** | Conditional on C_NoOp passing its quality gate. If yes, E_NoOp is confirmatory. If no, E_NoOp is exploratory. Binary decision, quality-gated. |
-| **E_ADG main text vs reserve** | E_ADG requires both C_ADG and C_temporal. Is the incremental information over E_CMMD (which also targets Bloc 0 without any perturbation) worth the page budget? |
+| **E_ADG main text vs reserve** | E_ADG requires both C_ADG and C_temporal. Is the incremental information over the other Bloc 0 estimands (E_PCSG / E_CTS) worth the page budget? |
 | **E_extract main text vs reserve** | P_extract is a separate operator with its own power characteristics. Is the hit rate high enough for confirmatory use? Pilot-dependent. |
 | **E_schema inclusion** | P_schema is a candidate operator. Is it partially independent from P_logprob? Pilot-dependent. |
 | **Bloc 3 coverage** | Interaction-menu stratification is the baseline. E_schema is the upgrade option, but only after Bloc 3 ontology freezes. |
@@ -264,10 +250,10 @@ All of these share the same operator (P_predict) and follow the same logic: run 
 
 Only 3-4 operators need to be implemented as software:
 
-1. **P_logprob pipeline**: one forward pass per (text, model) on 5 white-box models. Batch-friendly. Run once; reuse traces for both E_CTS and E_PCSG.
-2. **P_predict pipeline**: one API call per (text, model) on 9 models. This is the workhorse — it serves E_CMMD and all perturbation-based estimands.
-3. **P_extract pipeline**: 1-3 API calls per (text, model) on 9 models. Independent from P_predict.
-4. **P_schema pipeline** (candidate): one API call per (prefix, model) on 9 models. Independent.
+1. **P_logprob pipeline**: one forward pass per (text, model) on the 12 P_logprob-eligible white-box models. Batch-friendly. Run once; reuse traces for both E_CTS and E_PCSG.
+2. **P_predict pipeline**: one API call per (text, model) on the 14 P_predict-eligible models. This is the workhorse — it serves all perturbation-based estimands.
+3. **P_extract pipeline**: 1-3 API calls per (text, model) on the 14 P_predict-eligible models. Independent from P_predict.
+4. **P_schema pipeline** (candidate): one API call per (prefix, model) on the 14 P_predict-eligible models. Independent.
 
 ### Perturbation generation is the real engineering effort
 
@@ -280,15 +266,16 @@ The hard work is in L2, not L3. Each perturbation needs:
 
 Under the old framing, compute was estimated per "detector." Under the new framing:
 
-| Component | Calls | Notes |
-|---|---|---|
-| P_logprob baseline (all cases × 5 WB models) | ~12,800 forward passes | Run once; serves E_CTS + E_PCSG |
-| P_predict baseline (all cases × 9 models) | ~23,040 API calls | Run once; serves E_CMMD |
-| P_predict × each perturbation variant × 9 models | ~23,040 per perturbation | C_anon (×2 mask types), C_SR, C_FO, C_NoOp, C_temporal (×2-3 dose levels), C_ADG (×2 prompt dates) |
-| P_extract (all cases × 9 models × 1-3 prompts) | ~23,040 to ~69,120 | Independent run |
-| **Total P_predict calls** (baseline + ~8-10 perturbation variants) | **~210,000-250,000** | Dominant cost |
+(Per-case call counts below are order-of-magnitude illustrations; exact totals follow from N and the live fleet counts in `config/fleet/r5a_fleet.yaml`.)
 
-This makes it clear that **P_predict is the bottleneck** and perturbation count is the cost driver. Adding a perturbation adds ~23K calls; adding an operator adds ~12-23K calls.
+| Component | Notes |
+|---|---|
+| P_logprob baseline (all cases × 12 P_logprob-eligible WB models) | Run once; serves E_CTS + E_PCSG |
+| P_predict baseline (all cases × 14 P_predict-eligible models) | Run once; serves all perturbation-based estimands |
+| P_predict × each perturbation variant × 14 P_predict-eligible models | C_anon (×2 mask types), C_SR, C_NoOp, C_temporal (×2-3 dose levels), C_ADG (×2 prompt dates) |
+| P_extract (all cases × 14 P_predict-eligible models × 1-3 prompts) | Independent run |
+
+This makes it clear that **P_predict is the bottleneck** and perturbation count is the cost driver. Adding a perturbation adds one P_predict pass over the fleet; adding an operator adds a comparable pass.
 
 ---
 
@@ -296,27 +283,23 @@ This makes it clear that **P_predict is the bottleneck** and perturbation count 
 
 Under the new framework, the confirmatory/exploratory partition applies to **estimands**, not "detectors."
 
-### Proposed confirmatory estimands
+### Candidate confirmatory estimands
 
-| Estimand | Operator | Perturbation | Core factors tested (4 per estimand) |
+| Estimand | Operator | Perturbation | Core factors tested |
 |---|---|---|---|
-| **E_CMMD** | P_predict | — | Cutoff Exposure, Historical Family Recurrence, Target Salience, Template Rigidity |
-| **E_PCSG** | P_logprob | — | same 4 |
-| **E_CTS** | P_logprob | — | same 4 |
-| **E_FO** | P_predict | C_FO | same 4 (conditional on C_FO quality gate) |
-| **E_NoOp** | P_predict | C_NoOp | same 4 (conditional on C_NoOp quality gate) |
+| **E_SR** | P_predict | C_SR | Cutoff Exposure, Historical Family Recurrence, Target Salience, Template Rigidity (memorization-resistance backbone; conditional on C_SR quality gate) |
+| **E_PCSG** | P_logprob | — | same set |
+| **E_CTS** | P_logprob | — | same set |
+| **E_NoOp** | P_predict | C_NoOp | same set (conditional on C_NoOp quality gate) |
 
-**Total confirmatory coefficients**: 5 estimands × 4 factors = **20** (unchanged from Step 2 Stats recommendation).
+The confirmatory **count is power-bounded, not a preset magic number**: how many estimand × factor interactions get confirmatory status is decided by pilot + R-4b (how many interactions N=2,560 can robustly confirm), not fixed in advance. The candidate factor pool may exceed 4 (see `../REOPEN_R1_R6/R4_methodology_audit/four_layer_candidate_pools.md` §1); after the pilot the strongest are confirmed and the rest go exploratory. The §2 factor table is read the same way (illustrative candidate scope, not a hard constraint).
 
-> **⚠ SUPERSEDED (2026-05-26)**: 这里的 "4 factors / 20 coefficients (unchanged)" 是 frozen v6.2 的 Step 2 多 agent review recommendation,**不是 power 计算输出**。R-4a §4 已把 "confirmatory 因子总数 + 身份" 解锁交给 R-1e + pilot;用户 2026-05-26 进一步决定 **confirmatory 数 = power-bounded,不预设魔数**(由 pilot + R-4b 算 N=2560 能稳健 confirm 几个交互项)。候选因子池可 >4(见 `../REOPEN_R1_R6/R4_methodology_audit/four_layer_candidate_pools.md` §1),pilot 后选最强的、其余进 exploratory。**本表的 "4 / 20" 仅作历史候选规模示意,非硬约束。** §2 factor 表的 "frozen in v6.2" 同此处理。
-
-### Proposed exploratory estimands
+### Candidate exploratory estimands
 
 | Estimand | Reason for exploratory status |
 |---|---|
-| E_SR | Secondary to E_FO within the counterfactual perturbation family |
 | E_EAD_t, E_EAD_nt | Perturbation-derived; informative but not independent constructs |
-| E_ADG | Reserve; incremental over E_CMMD not yet demonstrated |
+| E_ADG | Reserve; incremental over the other Bloc 0 estimands not yet demonstrated |
 | E_TDR | Second-order estimand; sensitivity analysis |
 | E_extract | Sparse hits; insufficient power for confirmatory factor interactions |
 | E_schema | Candidate operator; independence from P_logprob unverified |
@@ -334,26 +317,26 @@ The four-layer framework maps naturally to a methods section structure:
    - Factor definitions, annotation protocol, inter-annotator agreement
 
 2. **Perturbation protocol** (L2)
-   - 6 perturbations with design intent, generation rules, and quality gates
+   - The L2 perturbations (see §3) with design intent, generation rules, and quality gates
    - Audit results: pass rates per perturbation × event type
 
 3. **Operators** (L3)
-   - P_logprob: Min-K++/CTS on 5 white-box models (thinking OFF)
-   - P_predict: standardized prediction on 9-model fleet (default mode)
-   - P_extract: masked span completion on 9-model fleet
+   - P_logprob: Min-K++/CTS on the 12 P_logprob-eligible white-box models (thinking OFF)
+   - P_predict: standardized prediction on the 14 P_predict-eligible models (default mode)
+   - P_extract: masked span completion on the 14 P_predict-eligible models
 
 4. **Estimands and statistical model** (L4)
-   - 5 confirmatory estimands with pre-registered factor interactions
+   - Power-bounded confirmatory estimands with pre-registered factor interactions (see §9)
    - Exploratory estimands with shrinkage
-   - Multiplicity control: Westfall-Young stepdown max-T on the 20-coefficient confirmatory family
+   - Multiplicity control: Westfall-Young stepdown max-T on the confirmatory family
 
-### Display budget (Editor recommendation, updated)
+### Display budget (Editor recommendation)
 
 - **Table 1**: Four-layer framework overview (factor, perturbation, operator, estimand mapping)
 - **Table 2**: Fleet composition with design pairings
-- **Figure 1**: Main estimand × factor results matrix (5 confirmatory estimands × 4 factors)
-- **Figure 2**: Temporal panel (E_CMMD + E_TDR sensitivity)
-- **Figure 3**: Perturbation panel (E_FO / E_NoOp qualitative examples)
+- **Figure 1**: Main estimand × factor results matrix (confirmatory estimands × factors)
+- **Figure 2**: Temporal panel (E_PCSG + E_TDR sensitivity)
+- **Figure 3**: Perturbation panel (E_SR / E_NoOp qualitative examples)
 
 ---
 
@@ -380,7 +363,7 @@ The user noted that the working names may need revision. Candidate terminology f
 
 ### 12.2 E_EAD_t confirmatory — CLOSED ✅
 
-**Decision**: E_EAD_t is **exploratory**. The paper's core narrative is about the benchmark architecture and factor-driven analysis, not about identity-keyed memory specifically. E_EAD_t will still be computed, reported with effect sizes, and visualized — but it will not spend confirmatory alpha. This keeps the confirmatory budget at 20 coefficients (5 estimands × 4 factors).
+**Decision**: E_EAD_t is **exploratory**. The paper's core narrative is about the benchmark architecture and factor-driven analysis, not about identity-keyed memory specifically. E_EAD_t will still be computed, reported with effect sizes, and visualized — but it will not spend confirmatory alpha. (The confirmatory budget is power-bounded, not a preset count; see §9.)
 
 Note: C_anon is redesigned as a **multi-level dose-response perturbation** (see §3 addendum below). The single E_EAD_t delta is replaced conceptually by an information-stripping gradient (L0 original → L1 detailed category → L2 coarse category → L3 minimal → L4 full anonymization). This gradient analysis is naturally exploratory and is a richer contribution than a single binary delta.
 
@@ -418,9 +401,4 @@ These are potentially distinct operators (each defines a different (text, model)
 
 ## 13. Artifacts
 
-This document supersedes the implicit "detector pool" framing in:
-- `R5A_STEP1_SYNTHESIS.md` §1 detector matrix
-- `R5A_DEFAULTS.md` §2-§5 tension positions and detector evaluations
-- `R5A_STEP2_SYNTHESIS.md` §2-§4 verdict matrix and shortlist
-
-The mapping table in §6 provides the translation key between old and new terminology.
+The mapping table in §6 provides the translation key between the earlier "detector pool" terminology (R5A_STEP1_SYNTHESIS.md / R5A_DEFAULTS.md / R5A_STEP2_SYNTHESIS.md) and the four-layer framework here.

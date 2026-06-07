@@ -1,4 +1,4 @@
-> **Status (2026-04-16, post-R5A-freeze)**: Pre-freeze factor provenance audit (15+2 factors with spine/secondary/auxiliary hierarchy). Retained for literature evidence; **NOT the current active factor map**. Current factor scope is defined by `refine-logs/reviews/R5A_STEP2/R5A_FROZEN_SHORTLIST.md` (4 core confirmatory factors + Bloc 0-3 inventory). See `refine-logs/reviews/R5A_STEP2/ACTIVE_DOC_REVIEW_SYNTHESIS.md` §2 (Priority B crosswalk) for old-factor-name → new-framework mapping.
+> **Scope**: Pre-freeze factor provenance audit (15+2 factors with spine/secondary/auxiliary hierarchy). This is a literature-evidence record, not the current active factor map. Current factor scope: `refine-logs/reviews/R5A_STEP2/R5A_FROZEN_SHORTLIST.md`.
 
 # FinMem-Bench — Per-Factor Literature Provenance Audit
 

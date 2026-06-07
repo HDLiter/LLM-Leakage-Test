@@ -2,13 +2,12 @@
 title: WS1 Cloud Execution Plan — P_logprob on AutoDL RTX PRO 6000
 stage: Phase 7 / WS1
 date: 2026-04-26
-last_amended: 2026-05-05
-status: APPROVED — revised for fleet expansion + GPU upgrade + Stage 2.7 (WS6 Path C eager pre-compute) + Llama integration + AutoDL non-Docker vLLM runtime
+status: APPROVED / current
 authority: plans/phase7-pilot-implementation.md §5.2 (WS1 spec)
 related_decisions:
-  - docs/DECISION_20260426_phase7_interfaces.md (WS0 sign-off; partly superseded by 0427+0429)
+  - docs/DECISION_20260426_phase7_interfaces.md (WS0 sign-off; see DECISION_20260427 + DECISION_20260429 for later refinements)
   - docs/DECISION_20260427_pcsg_redefinition.md (PCSG redefinition + fleet expansion + Path E)
-  - docs/DECISION_20260429_gate_removal.md (gate removal + WS6 unconditional via Stage 2.7 Path C eager pre-compute + BL2 n_post 350)
+  - docs/DECISION_20260429_gate_removal.md (gate removal + WS6 unconditional via Stage 2.7 Path C eager pre-compute)
   - docs/DECISION_20260429_llama_addition.md (Llama-3 + Llama-3.1 P_logprob-only addition; second confirmatory PCSG pair; AWQ-vs-fp16 calibration audit)
   - docs/DECISION_20260504_autodl_nondocker_runtime.md (AutoDL container instances do not support nested Docker; use host vLLM runtime provenance digest)
 gpu_decision: RTX PRO 6000 (Blackwell, 96 GB) single-card on AutoDL
@@ -17,7 +16,7 @@ quantization_decision:
   qwen3_family:   AWQ-INT4 (4 sizes — official Qwen AWQ; 1.7B not available officially, skipped)
   glm_family:     fp16 (no official GLM-4-9B AWQ)
   llama3_family:  bf16 (no clean same-maintainer AWQ pair for Llama-3 + 3.1; verification §3 of refine-logs/reviews/PCSG_PAIR_HUNT/llama_family_verification_20260429.md)
-budget_cap_usd: 45  # raised 2026-04-29 from 35 -> 45 to accommodate Llama (2 models × 1.5 hr Stage 2 + Path E + hidden-state ≈ 6 hr) and Stage 2.8 AWQ-vs-fp16 audit (Qwen2.5-7B bf16 × 430 cases ≈ 3 hr); ~$9 extra
+budget_cap_usd: 45  # accommodates Llama (2 models × 1.5 hr Stage 2 + Path E + hidden-state ≈ 6 hr) and Stage 2.8 AWQ-vs-fp16 audit (Qwen2.5-7B bf16 × 780 cases ≈ 3 hr)
 ---
 
 # WS1 Cloud Execution Plan
@@ -25,8 +24,8 @@ budget_cap_usd: 45  # raised 2026-04-29 from 35 -> 45 to accommodate Llama (2 mo
 ## 1. Goal
 
 Produce token-level `LogProbTrace` parquet artifacts for all **12
-P_logprob-eligible white-box fleet members** (post-2026-04-29
-split-tier: 10 full-operator + 2 Llama P_logprob-only per
+P_logprob-eligible white-box fleet members** (split-tier:
+10 full-operator + 2 Llama P_logprob-only per
 `docs/DECISION_20260429_llama_addition.md`) on the Phase 7 pilot
 articles (baseline only, no perturbation), then derive:
 
@@ -45,8 +44,8 @@ load-bearing **knee-detector calibration** anchor (single-point
 absolute calibration + 9-month differential calibration per
 `docs/DECISION_20260429_llama_addition.md` §2.4).
 
-WS1 also runs a new **Stage 2.8 AWQ-vs-fp16 calibration audit** on
-the same instance (Qwen2.5-7B in bf16 over the 430 pilot cases)
+WS1 also runs a **Stage 2.8 AWQ-vs-fp16 calibration audit** on
+the same instance (Qwen2.5-7B in bf16 over the 780 pilot cases)
 per `docs/DECISION_20260429_llama_addition.md` §2.5; this closes
 Adversarial A3 (cross-precision E_CTS pooling).
 
@@ -109,7 +108,7 @@ within-family OLS regression of paired logprob delta on `log₂(params)`.
 |---|---|
 | RTX PRO 6000 @ ~¥8/hr × 14 hr (12 models pilot + Path E + smoke + provisioning; +2 Llama bf16 ≈ +3 hr) | ~¥112 (~$15.5) |
 | **Stage 2.7 hidden-state extraction (~6 hr offline_hf, 12 models × 30 cases)** | **~¥48 (~$6.6)** |
-| **Stage 2.8 AWQ-vs-fp16 calibration audit (~3 hr Qwen2.5-7B bf16 × 430 cases)** | **~¥24 (~$3.3)** |
+| **Stage 2.8 AWQ-vs-fp16 calibration audit (~3 hr Qwen2.5-7B bf16 × 780 cases)** | **~¥24 (~$3.3)** |
 | 100 GB persistent data disk × 40 hr (12 checkpoints + Path E + 30-65 GB hidden states + bf16 audit) | ~¥20 (~$2.8) |
 | **Expected total** | **~$28** |
 | **Hard stop budget** | **$45** |
@@ -177,8 +176,8 @@ Same flow per model, in this order (low-risk first, batch by family for warm che
 7. `qwen3-4b` — same family, smaller; smoke + pilot
 8. `qwen3-14b` — same family, larger; smoke + pilot
 9. `qwen3-32b` — same family, largest Qwen3; smoke + pilot
-10. `llama-3-8b-instruct` — first bf16 backend bring-up; gated repo (verify HF token has Meta access); smoke + pilot. **No P_predict** (P_logprob-only role per `docs/DECISION_20260429_llama_addition.md` §2.2). Added 2026-04-29.
-11. `llama-3.1-8b-instruct` — same backend reuse; smoke + pilot. P_logprob-only. Added 2026-04-29.
+10. `llama-3-8b-instruct` — first bf16 backend bring-up; gated repo (verify HF token has Meta access); smoke + pilot. **No P_predict** (P_logprob-only role per `docs/DECISION_20260429_llama_addition.md` §2.2).
+11. `llama-3.1-8b-instruct` — same backend reuse; smoke + pilot. P_logprob-only.
 12. `glm-4-9b` — first verification of vLLM `echo=True` support; if it fails, fall back to `offline_hf` backend with the same checkpoint SHA
 
 **Hidden-state extraction (WS6 prep)**: for each white-box model, additionally save
@@ -222,11 +221,11 @@ Smoke gate per model:
 
 ### Stage 2.7 — Hidden-state extraction for WS6 (~5 hr, same instance)
 
-Added 2026-04-29 per `docs/DECISION_20260429_gate_removal.md` §3.2.
+Per `docs/DECISION_20260429_gate_removal.md` §3.2,
 WS6 (mechanistic memorization localization, Wang et al. 2025-style
-DS / KL / activation patching) is now an **unconditional** exploratory
+DS / KL / activation patching) is an **unconditional** exploratory
 follow-up. Hidden states are eagerly pre-computed in this stage so
-WS6 has its data regardless of behavioral E_FO outcomes.
+WS6 has its data regardless of behavioral outcomes.
 
 **Subset selection** (run locally before cloud, commit to manifest):
 
@@ -236,7 +235,7 @@ WS6 has its data regardless of behavioral E_FO outcomes.
 #     WS6 false-outcome mechanism analysis)
 #   - stratification: equal allocation across the pilot event-type
 #     taxonomy (e.g. 5 super-types × 6 articles, or 4 × 7-8)
-#   - cross-model alignment: same 30 case_ids for ALL 10 white-box
+#   - cross-model alignment: same 30 case_ids for ALL 12 white-box
 #     models so activation-patching can compare layer representations
 #     across cases
 python scripts/ws1_select_hidden_state_subset.py \
@@ -331,11 +330,11 @@ saved traces (no second GPU pass).
 
 ### Stage 2.8 — AWQ-vs-fp16 calibration audit (~3 hr, same instance)
 
-Added 2026-04-29 per `docs/DECISION_20260429_llama_addition.md` §2.5
-to close Adversarial A3 (cross-precision E_CTS pooling). Llama is bf16,
+Per `docs/DECISION_20260429_llama_addition.md` §2.5,
+this closes Adversarial A3 (cross-precision E_CTS pooling). Llama is bf16,
 which means a bf16 backend is already loaded on the same instance for
 Stage 2 / 2.5 / 2.7; we reuse it to score Qwen2.5-7B in bf16 over the
-full 430-case pilot manifest.
+full 780-case pilot manifest.
 
 ```bash
 # Reload Qwen2.5-7B in bf16 (no AWQ) on the same instance:
@@ -442,7 +441,7 @@ decision memo before publishing PCSG results).
 
 - [x] AWQ availability for 4 Qwen models confirmed (HF, 2026-04-26)
 - [x] GLM AWQ unavailable → fp16 path locked
-- [x] RTX PRO 6000 chosen, budget approved (raised to $45 on 2026-04-29)
+- [x] RTX PRO 6000 chosen, budget approved ($45 hard stop)
 - [x] HF fine-grained read-only token created (user, 2026-04-26)
 - [x] **HF Meta license click-through complete for both Llama-3-8B-Instruct and Llama-3.1-8B-Instruct** (verified 2026-05-03 via authenticated `config.json` HEAD checks for `meta-llama/Meta-Llama-3-8B-Instruct` and `meta-llama/Llama-3.1-8B-Instruct`; no weight files downloaded).
 - [x] Stage 0 modules + tests merged into `main` (2026-05-03, `main` fast-forwarded to `859ed79`)
@@ -459,15 +458,14 @@ decision memo before publishing PCSG results).
 - [ ] Llama differential calibration check passes (`cutoff_observed(llama-3.1) - cutoff_observed(llama-3) ≈ 9 months` within bootstrap CI; per `docs/DECISION_20260429_llama_addition.md` §2.4)
 - [ ] Instance + data disk torn down
 
-## 9. Handoff State (2026-05-03)
+## 9. Handoff State
 
-This handoff is now on `main` as of commit `859ed79` (fast-forwarded
-from `r2-tier1-cloud-closure`). The Stage 0 modules/tests merge item is
-closed; the next session can start from `main`.
+Stage 0 is merged on `main` and Stage 2 all-12 smoke is validated on the
+AutoDL instance. The next session resumes from this state.
 
-Local closure already completed:
+Local closure:
 
-- Fleet is `r5a-v2.3-2026-05-03`; the cardinality sentinel remains
+- Fleet `r5a-v2.3-2026-05-03`; cardinality sentinel
   14 P_predict-eligible / 12 P_logprob-eligible / 2 temporal PCSG pairs.
 - Black-box provider smoke passed with `scripts/smoke_provider_slugs.py`:
   DeepSeek official `deepseek-v4-pro`, OpenRouter `openai/gpt-4.1`,
@@ -481,11 +479,11 @@ Local closure already completed:
   locally and is intentionally ignored; ship it with the WS1 cloud data
   bundle.
 - `data/cls_telegraph_raw/` is an ignored local snapshot copied from
-  Thales on 2026-05-03 (2,316 top-level files, 975,459,494 bytes,
-  through 2026-05-03). Sampling/probe scripts now default to this local
-  snapshot rather than reading the Thales repo directly.
+  Thales (2,316 top-level files, 975,459,494 bytes). Sampling/probe
+  scripts default to this local snapshot rather than reading the Thales
+  repo directly.
 
-Last local verification before handoff:
+Last local verification:
 
 ```text
 pytest tests/r5a -q
@@ -499,68 +497,37 @@ p_logprob_eligible (12)
 pcsg.temporal_pairs (2)
 ```
 
-Recommended next-session order:
+Cloud runtime (AutoDL):
 
-1. Merge or explicitly deploy `r2-tier1-cloud-closure`; do not launch
-   cloud work from stale `main`.
-2. Reserve the Stage 1 GPU instance and run the provisioning script.
-3. Download/pin all 12 white-box HF snapshots and record the vLLM runtime
-   digest.
-4. Run `scripts/ws1_pin_fleet.py --hf-cache <path>
-   --vllm-image-digest sha256:<64-hex>` and commit the pinned fleet.
-5. Run the 30-case smoke fixture first. Full pilot-manifest traces still
-   depend on WS0.5/WS3/WS4 manifest freeze; Path E can run from the
-   prebuilt 2,160-article probe set.
-
-Stage 1 attempt update (2026-05-04):
-
-- AutoDL SSH reached `connect.westd.seetacloud.com:10349` as `root`.
-- GPU sanity passed: `NVIDIA RTX PRO 6000 Blackwell Server Edition`
-  with 97,887 MiB VRAM.
-- `/data` was created as a symlink to `/root/autodl-tmp/data`; the
-  backing disk reports 550 GB available.
-- The current tracked repo was staged to `/data/repo`, `.env` was copied
-  with mode `0600`, and
-  `data/pilot/exposure_horizon/probe_set_monthly60_36mo.json` was copied
-  to the cloud repo.
-- `scripts/ws1_provision_autodl.sh` completed Python dependency install
-  and HF auth (`HDLiter`, private endpoint `https://hf-mirror.com`) after
-  CRLF cleanup, then stopped before vLLM image pull because AutoDL
-  container instances have no nested Docker support (`docker: command not
-  found`).
-- No model snapshots, runtime digest, fleet pinning, smoke traces, or
-  full-run artifacts were produced in this attempt.
-- Follow-up decision `docs/DECISION_20260504_autodl_nondocker_runtime.md`
-  converts WS1 to the non-Docker host vLLM runtime path while preserving
-  the `sha256:<64-hex>` hard provenance gate via
+- Use only the data-disk venv `/data/venvs/ws1-cu128`, which inherits the
+  AutoDL base `torch==2.8.0+cu128` (`sm_120`, Blackwell-compatible) via
+  `--system-site-packages` and installs `vllm==0.10.2`. WS1 runs the
+  non-Docker host vLLM runtime path per
+  `docs/DECISION_20260504_autodl_nondocker_runtime.md`, preserving the
+  `sha256:<64-hex>` hard provenance gate via
   `/data/vllm_runtime_provenance.json`.
-- Follow-up non-Docker provision completed on the same instance at repo HEAD
-  `f378d86`, with runtime digest
-  `sha256:a5f57079381be329fa35e18101b52027f5feaea01098dbef4040fe6d10b102dd`,
-  `vllm==0.10.0`, `torch==2.7.1+cu126`, `transformers==4.57.6`, and
-  `huggingface_hub==0.36.2`. The runtime venv and caches are on the data
-  disk; system disk remained at roughly 320 MB used, while `/data` used
-  roughly 13 GB.
-- Current blocker: Torch reports that RTX PRO 6000 Blackwell has CUDA
-  capability `sm_120`, while the installed Torch wheel supports only through
-  `sm_90`. Stop before all-model snapshot pinning or the 30-case smoke until
-  a Blackwell-compatible vLLM/Torch runtime is selected, or explicitly approve
-  a tiny `qwen2.5-7b` compatibility smoke as a bounded failure probe.
-- Follow-up on 2026-05-05 confirmed the AutoDL base image already had
-  `torch==2.8.0+cu128` with `sm_120`; the stale isolated WS1 venv was the
-  cu126 source. A replacement data-disk venv at `/data/venvs/ws1-cu128`
-  inherits base Torch via `--system-site-packages`, installs `vllm==0.10.2`,
-  and writes runtime digest
-  `sha256:75e40429893cdcad6cdf69a765ae252716aeff05b80f5ccec7d7d2029c8a8d2e`.
-  `Qwen/Qwen2.5-7B-Instruct-AWQ` downloaded to `/data/models/qwen2.5-7b`;
-  vLLM launched with `--quantization awq_marlin --max-model-len 4096`; direct
-  `/tokenize` + `/v1/completions echo/logprobs` passed; the project backend
-  passed after adding `/tokenize` fallback and top-logprob trimming; and the
-  30-case smoke wrote 30 traces under `/data/traces/qwen2.5-7b-smoke-probe`.
-  Blackwell runtime compatibility is no longer the blocker. Continue with
-  all-model snapshot/tokenizer pinning using this runtime path.
+- Provisioning installs `accelerate==1.13.0` by default so the GLM
+  `offline_hf` fallback does not depend on a manual runtime repair.
+- Current validated runtime digest:
+  `sha256:ba5b8d6150af7f5943f7e52a5b40ab0463066317303a02af25c32f58aa523fc5`.
+- GPU: `NVIDIA RTX PRO 6000 Blackwell Server Edition`, 97,887 MiB VRAM;
+  `/data` is a symlink to `/root/autodl-tmp/data`.
 
-AutoDL operator notes from bring-up:
+Stage 2 smoke validation (current):
+
+- All 12 `P_logprob` white-box models passed the 30-case smoke set under
+  `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z`.
+  Qwen2.5 and Qwen3 ran through vLLM AWQ, Llama ran through vLLM bf16, and
+  GLM ran through the fleet-declared `offline_hf` fp16 fallback.
+- Smoke validation confirmed 30 rows per model, `thinking_off_pct=100.0`,
+  trace-level runtime digest matches, and trace-level tokenizer/checkpoint
+  hashes match the pinned fleet.
+- Cloud cleanup after smoke: no vLLM server process, port 8000 closed,
+  GPU memory 0 MiB.
+- Still not run without separate approval: full pilot, long Path E,
+  Stage 2.7 hidden-state extraction, and Stage 2.8 AWQ-vs-fp16 audit.
+
+AutoDL operator notes:
 
 - SSH may transiently fail after TCP connect with `Error reading SSH protocol
   banner`; wait 30-60 seconds and retry before changing credentials or
@@ -573,33 +540,17 @@ AutoDL operator notes from bring-up:
 - If `/data` disappears after an AutoDL image/container switch but
   `/root/autodl-tmp/data` remains, recreate the symlink:
   `[ -e /data ] || ln -s /root/autodl-tmp/data /data`.
-- Use only `/data/venvs/ws1-cu128`; the old `/data/venvs/ws1` isolated venv
-  installed `torch==2.7.1+cu126` and should stay removed.
 - Stop probe vLLM servers after smoke/compatibility checks so GPU memory and
   port 8000 are free for the next model.
 
-Stage 2 smoke validation update (2026-05-05):
+Recommended next order:
 
-- `origin/main` reached `cff859e` after recording the all-model smoke
-  validation; AutoDL `/data/repo` was fast-forwarded to the same commit and
-  remained clean.
-- Provisioning now installs `accelerate==1.13.0` by default after vLLM/Torch
-  resolution so the GLM `offline_hf` fallback does not depend on a manual
-  runtime repair.
-- Current validated runtime digest:
-  `sha256:ba5b8d6150af7f5943f7e52a5b40ab0463066317303a02af25c32f58aa523fc5`.
-- All 12 `P_logprob` white-box models passed the 30-case smoke set under
-  `/data/traces/ws1_stage2_all12_smoke_20260505T131200Z`.
-  Qwen2.5 and Qwen3 ran through vLLM AWQ, Llama ran through vLLM bf16, and
-  GLM ran through the fleet-declared `offline_hf` fp16 fallback.
-- Smoke validation confirmed 30 rows per model, `thinking_off_pct=100.0`,
-  trace-level runtime digest matches, and trace-level tokenizer/checkpoint
-  hashes match the pinned fleet.
-- Final cloud cleanup after smoke: no vLLM server process, port 8000 closed,
-  GPU memory 0 MiB, `/data` about 393 GB free.
-- Still not run without separate approval: full pilot, long Path E, Stage 2.7
-  hidden-state extraction, and Stage 2.8 AWQ-vs-fp16 audit.
-- Recommended next order is to confirm/freeze the pilot article manifest
-  before any Stage 2 full pilot execution. If the manifest is not frozen, keep
-  WS0.5 / WS3 / WS4 on the critical path and leave the AutoDL instance idle or
-  reserved only if economically justified.
+1. Confirm/freeze the pilot article manifest before any Stage 2 full pilot
+   execution. If the manifest is not frozen, keep WS0.5 / WS3 / WS4 on the
+   critical path and leave the AutoDL instance idle or reserved only if
+   economically justified.
+2. Run the 30-case smoke fixture first. Full pilot-manifest traces still
+   depend on WS0.5/WS3/WS4 manifest freeze; Path E can run from the
+   prebuilt 2,160-article probe set.
+3. After pilot run: pin the fleet via `scripts/ws1_pin_fleet.py --hf-cache
+   <path> --vllm-image-digest sha256:<64-hex>` and join the RunManifest.

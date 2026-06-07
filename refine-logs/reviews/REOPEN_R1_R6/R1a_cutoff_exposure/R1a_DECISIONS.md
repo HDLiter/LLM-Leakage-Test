@@ -42,7 +42,7 @@
 | 月内归一约定 | cutoff 归当月**末日**(采"最宽容训练 cutoff"口径;对结果影响极小,口径干净可复现)|
 | knowledge vs training cutoff | exposure 要的是"有机会见过"= **training cutoff**(更晚、更宽容);manifest 多只给 knowledge cutoff(偏早)→ 中心是保守下界 |
 | 中心值状态 | **PROVISIONAL** —— 现值保留 yaml;deep research(`cutoff_deep_research_gpt.md`)已标几个低可信度模型的候选修正(Qwen3 ~2024-10、DeepSeek ~2025-05、GLM-4 弱证据 2024-01..04、Claude training=Jan 2026 / 知识 May–Aug 2025 矛盾),但**不自动改 manifest**,经 §6 探针 + owner sign-off 后人工修正 |
-| 对上游无扰动 | 最早 cutoff = Llama-3 **2023-03**(Medium 可信、不变)→ R-1b/R-1c 用的 `min(model_cutoff)` 不动,**已 closed 的 R-1b/R-1c 不受影响** |
+| reference window 右端点 | = `min(model_cutoff)`(对相关子队列取 min);**具体日期 + 哪些子队列计入 min 待 R-1e 裁定 — pending R-1e**。R-1b/R-1c/R-1d 共用同一端点定义,数值随 R-1e 裁定同步。 |
 
 ---
 

@@ -8,7 +8,7 @@ authority: |
   retires plan §7.1A Stage 2 family states S16a / S16b / S12 (S20 is the only legal default state);
   amends DECISION_20260427_pcsg_redefinition.md §2.5 (WS6 trigger language).
 related_docs:
-  - docs/DECISION_20260427_pcsg_redefinition.md (PCSG redefinition + Path E + WS6 conditional — partly superseded here)
+  - docs/DECISION_20260427_pcsg_redefinition.md (PCSG redefinition + Path E + WS6 conditional; this memo amends its §2.5 WS6 trigger)
   - refine-logs/reviews/R5A_DESIGN_REVIEW_20260427/SYNTHESIS.md (Round 1 design review that surfaced the gate ambiguity)
   - refine-logs/reviews/R5A_STEP2/R5A_FROZEN_SHORTLIST.md (frozen scope; amendments header updated to point here)
   - plans/phase7-pilot-implementation.md (master plan; §7.1, §7.1A, §13 affected)

@@ -52,7 +52,7 @@ Template Rigidity 量的是:**一篇文章有多大比例由 CLS 语料库高频
 | 语料 universe | **L1 去重文章集**(L1 entity-matched rows 按 `article_id` 去重) |
 | 为什么是 L1 而非 S0 | 过滤掉非金融内容(国际/政治/体育);DF 含义 = "在金融实体相关的 CLS 新闻里有多常见" |
 | 为什么不是 L2 | L2 加了 `is_subject` + `tradable` 过滤,跟文本结构无关;会排除有用的模板信号 |
-| 参考窗口 | `[CLS 语料起始, min(fleet model cutoff))`,半开,跟 R-1b/R-1c 同源 |
+| 参考窗口 | `[CLS 语料起始, min(fleet model cutoff))`,半开,跟 R-1b/R-1c 同源(右端点具体日期 + 计入 min 的子队列待 R-1e 裁定 — pending R-1e) |
 | 去重 | 按 `article_id`;一篇文章不论匹配到多少实体只计一次 |
 
 ---

@@ -1,25 +1,9 @@
 ---
 title: R5A Frozen Conceptual Shortlist
 stage: R5A Step 2 closure
-date: 2026-04-16
-last_amended: 2026-04-29
-status: FROZEN — conceptual scope locked; PCSG redefined; quality gates removed; WS6 unconditional; implementation scope determined at pilot
+status: FROZEN — conceptual scope locked; implementation scope determined at pilot
 author: Claude Code orchestrator + user design input
-supersedes: R5A_STEP2_SYNTHESIS.md §3 shortlist, MEASUREMENT_FRAMEWORK.md §9 partition
 depends_on: MEASUREMENT_FRAMEWORK.md (four-layer framework definitions)
-amendments:
-  - "2026-04-27 (docs/DECISION_20260427_pcsg_redefinition.md): E_PCSG redefined as cross-version Qwen pair on token-intersection vocab; E_PCSG_capacity_curve added as exploratory; fleet expanded to 10 white-box; cutoff dates flagged as operator-asserted pending Path-E empirical probe"
-  - "2026-04-29 (docs/DECISION_20260429_gate_removal.md): E_FO/E_NoOp gate condition 3 (mean |delta| > 0 on ≥ K/N) REMOVED — anti-pattern (gates measurement of X on magnitude of X). Gate condition 2 demoted to descriptive coverage report. Gate condition 1 retained as data-quality gate. WS6 (E_FO_mech) made unconditional (Path C eager hidden-state pre-compute in WS1 Stage 2.7). Stage 2 family states S16a/S16b/S12 retired — S20 is the only default. Reserve promotion thresholds rescaled to strict-majority rule (`⌊N/2⌋+1` for confirmatory-style, `⌈N/3⌉` for one-third-style). Fleet expansion alone no longer triggers shortlist amendment as long as the formulas are honored."
-  - "2026-05-23 (refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/whiteboard_analysis.md + subfield_lit_scan.md): R-4a methodology framework audit closed. Clean-room whiteboard analysis + 15-paper subfield literature scan (Carlini 2023 / Tirumala 2022 / Nasr 2023 / Shi 2024 / Duan 2024 / Oren 2024 / Golchin 2024 / PaCoST 2024 / LiveBench 2025 / AntiLeakBench 2025 / Yang 2023 / Wu 2024 / Mirzadeh 2025 / Glasserman 2023 / Gao 2025) provided dual-source evidence that current frozen statistical machinery is reviewer-ratcheted. Framework-level locks (8 items): (1) NO family-wise multiplicity correction — report effect size + 95% CI per-estimand from mixed-model clustered-robust SE; subfield 15/15 do not use Bonferroni/Holm/Westfall-Young, FDR/BH only in 2026 theoretical preprints. (2) Label vocabulary switched to main/primary/supporting/robustness/appendix; `confirmatory`/`exploratory` retired (0/15 subfield hits). (3) `Pre-registration` terminology dropped — replaced by **design memo + sealed pilot/test split + transparency artifact** (subfield 0/15 formal preregistration); see RESEARCH_PROPOSAL.md §6. (4) Mixed-model fit per-estimand separately (case/model/pair clustering); case-level aggregates (e.g. E_CMMD) use case-level inference. (5) Perturbation quality audit changed to **Gwet's AC1 + accuracy** matrix (per-perturbation × event-type); ≥85% pass-rate hard gate removed — failure → methods-section caveat, NOT exclusion. AntiLeakBench 2025 is the closest subfield analog (3 annotators + Gwet's AC1 + accuracy). (6) `baseline_confidence` exits primary → sensitivity only; `model_capability` covariate likewise sensitivity. (7) TOST/SESOI=0.15 confined to BL2 negative-control equivalence test, not extended to main coefficients. (8) Scenario-based MC power simulation retained but decoupled from Westfall-Young max-T. PLUS: E_CMMD renamed Cross-Model **Cutoff-Monotone** Disagreement (claim-layer separation from memorization interpretation). Specific estimand/factor/family-size choices NOT locked by R-4a — deferred to R-1/R-2/R-6 implementation + pilot data. §1 confirmatory/exploratory labels, §1 Westfall-Young default, §4 E_extract→24-coef confirmatory promotion path: SUPERSEDED — to be rewritten when R-1/R-2 land. R-4b (specific power numbers, n_eff matrix, mixed-model spec implementation) remains open."
-session_decisions:
-  - "P_schema: Continuation RESERVE (pilot-gated appendix), Cloze DEFER, QA DEFER"
-  - "E_TDR: redefined as mixed-model interaction term (cutoff × dose), not standalone estimand"
-  - "E_NoOp: 3-condition quality gate for confirmatory status"
-  - "E_ADG: 3-trigger promotion rule for reserve → main-text exploratory"
-  - "E_extract: 2-tier promotion rule (hit rate thresholds)"
-  - "Bloc 3 coverage: interaction-menu stratification sufficient; no additional operator needed"
-  - "Construct validity strategy: multi-signal convergence + Qwen CPT causal anchor"
-  - "English expansion: conditional stretch goal, 5-trigger evaluation after Chinese pilot"
 ---
 
 # R5A Frozen Conceptual Shortlist
@@ -28,36 +12,34 @@ session_decisions:
 
 This document freezes the **conceptual measurement scope** of the R5A benchmark. It defines what we measure, not how we implement it. Implementation decisions (prompt wording, scoring thresholds, batch sizes) are deferred to pilot.
 
-**Frozen** means: no estimand can be added to or removed from the confirmatory family without a new review cycle. Exploratory and reserve items can be promoted via their stated decision rules, but not ad hoc.
+**Frozen** means: no estimand can be added to or removed from the primary family without a new review cycle. Exploratory and reserve items can be promoted via their stated decision rules, but not ad hoc.
 
 ---
 
-## 1. Confirmatory estimands (5 × 4 factors = 20 coefficients)
+## 1. Primary estimands (candidate pool)
 
-> **Note (2026-05-23 R-4a amendment).** Section title and multiplicity
-> language below are **superseded** by the R-4a framework audit
-> (see frontmatter amendment + `refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/`).
-> Specifically: (a) `confirmatory/exploratory` labels retired in favor of
-> `main / primary / supporting / robustness / appendix`; (b) Westfall-Young
-> stepdown max-T is NO LONGER the default — no family-wise correction is
-> applied, effect sizes + 95% CIs are reported per-estimand instead; (c) the
-> "5 × 4 = 20 coefficients" carve-up is no longer locked — final primary
-> family size and composition are deferred to R-1/R-2/R-6 + pilot data.
-> The estimand inventory below remains accurate as a *candidate pool*; only
-> the labels and statistical defaults are deprecated. This section will be
-> rewritten once R-1/R-2 reopen lands.
+Per the R-4a framework audit (`refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/`),
+no family-wise multiplicity correction is applied: effect sizes + 95% CIs are
+reported per-estimand from mixed-model clustered-robust SE. The final primary
+family size and composition are determined at R-1/R-2/R-6 + pilot data; the
+inventory below is the candidate pool, not a locked count.
 
-Multiplicity control: Westfall-Young stepdown max-T across the 20-coefficient family.
+| Estimand | Operator | Perturbation | What it measures |
+|---|---|---|---|
+| **E_PCSG** | P_logprob | — | Paired cutoff surprise gap on the **cross-version Qwen pair `(qwen2.5-7B, qwen3-8B)`**, restricted to articles whose tokens stay in the Qwen2Tokenizer base vocab (`max_token_id ≤ 151664`). See PCSG note below. |
+| **E_CTS** | P_logprob | — | Calibrated tail surprise (Min-K++/CTS absolute familiarity) |
+| **E_NoOp** | P_predict | C_NoOp | NoOp sensitivity: does irrelevant clutter change the prediction? |
 
-| Estimand | Operator | Perturbation | What it measures | Conditional? |
-|---|---|---|---|---|
-| **E_CMMD** | P_predict | — | Cutoff-monotone fleet disagreement on sentiment/alpha predictions | No |
-| **E_PCSG** | P_logprob | — | Paired cutoff surprise gap on the **cross-version Qwen pair `(qwen2.5-7B, qwen3-8B)`**, restricted to articles whose tokens stay in the Qwen2Tokenizer base vocab (`max_token_id ≤ 151664`). See amendment below. | No |
-| **E_CTS** | P_logprob | — | Calibrated tail surprise (Min-K++/CTS absolute familiarity) | No |
-| **E_FO** | P_predict | C_FO | False outcome resistance: does the model ignore visible counterfactual evidence? | No (gate removed 2026-04-29) |
-| **E_NoOp** | P_predict | C_NoOp | NoOp sensitivity: does irrelevant clutter change the prediction? | No (gate removed 2026-04-29) |
+E_CMMD (cross-model cutoff-monotone disagreement) was CUT at R-4 construct
+validity, decision D5 (`refine-logs/reviews/REOPEN_R1_R6/R4_methodology_audit/R4_construct_validity_decisions.md`).
 
-> **Amendment 2026-04-27 (PCSG)**. The original same-tokenizer same-cutoff pairs `(qwen2.5-7B, qwen2.5-14B)` and `(qwen3-8B, qwen3-14B)` do not provide a cutoff-exposure differential — they share cutoff dates within-pair. The Stats lens of the WS0/WS1 code review identified this as a measurement-design defect. PCSG is therefore re-anchored on the cross-version Qwen pair, which (i) shares the `Qwen2Tokenizer` class with byte-identical core vocab `0..151664`, (ii) differs in cutoff (`2023-10-31` operator-asserted vs `2025-01-31` operator-asserted; both subject to Path-E empirical probe), and (iii) keeps the same dense topology and instruct paradigm. The same-cutoff within-version pairs are **not discarded** — they are repurposed as the `E_PCSG_capacity_curve` exploratory estimand (§3) measuring capacity-mediated memorization (Carlini 2021/2022). See `docs/DECISION_20260427_pcsg_redefinition.md`.
+E_FO (false-outcome resistance) and its C_FO perturbation were DROPPED at R-6
+close (2026-06-06). The case-result-memory target E_FO chased is now carried by
+counterfactual perturbation × pre/post-cutoff × salience slicing; the
+counterfactual-family backbone choice is deferred to R-2
+(`refine-logs/reviews/REOPEN_R1_R6/R6_pred_target_cfo/R6_DECISIONS.md`).
+
+> **PCSG anchoring.** The same-tokenizer same-cutoff pairs `(qwen2.5-7B, qwen2.5-14B)` and `(qwen3-8B, qwen3-14B)` do not provide a cutoff-exposure differential — they share cutoff dates within-pair. PCSG is therefore anchored on the cross-version Qwen pair, which (i) shares the `Qwen2Tokenizer` class with byte-identical core vocab `0..151664`, (ii) differs in cutoff (both endpoints operator-asserted, subject to Path-E empirical probe), and (iii) keeps the same dense topology and instruct paradigm. The same-cutoff within-version pairs are repurposed as the `E_PCSG_capacity_curve` exploratory estimand (§3) measuring capacity-mediated memorization (Carlini 2021/2022). See `docs/DECISION_20260427_pcsg_redefinition.md`.
 
 ### 4 core factors (each estimand tested against all 4)
 
@@ -70,45 +52,35 @@ Multiplicity control: Westfall-Young stepdown max-T across the 20-coefficient fa
 
 ### E_CTS + E_PCSG co-presence rationale
 
-Both share P_logprob traces (zero marginal cost). E_CTS provides literature anchor (Min-K++, ICLR 2024/2025). E_PCSG provides the better-identified paired contrast. Pre-registered interpretation: report as progressive narrative ("absolute → paired"), not independent discoveries.
+Both share P_logprob traces (zero marginal cost). E_CTS provides literature anchor (Min-K++, ICLR 2024/2025). E_PCSG provides the better-identified paired contrast. Interpretation: report as progressive narrative ("absolute → paired"), not independent discoveries.
 
-The 2026-04-27 PCSG redefinition does **not** invalidate this rationale. The cross-version pair shares the same `Qwen2Tokenizer` class and the analysis restricts to common-vocab articles, so paired identification is preserved. The cost is one new caveat in pre-registration: E_PCSG now also reflects pretraining-recipe / training-data-composition differences between Qwen2.5 and Qwen3 in addition to cutoff exposure, which we control for through `E_PCSG_capacity_curve` and the Path-E empirical cutoff probe.
+The cross-version PCSG anchoring preserves this rationale. The cross-version pair shares the same `Qwen2Tokenizer` class and the analysis restricts to common-vocab articles, so paired identification holds. The cost is one new caveat: E_PCSG now also reflects pretraining-recipe / training-data-composition differences between Qwen2.5 and Qwen3 in addition to cutoff exposure, which we control for through `E_PCSG_capacity_curve` and the Path-E empirical cutoff probe.
 
 ---
 
-## 2. Data-quality requirements for E_FO / E_NoOp (formerly "quality gates")
+## 2. Data-quality requirements for E_NoOp
 
-> **Note (added 2026-04-29, see `docs/DECISION_20260429_gate_removal.md`).**
-> The original three-condition quality gate is no longer a gate. Condition 3
-> (`mean |delta| > 0 on ≥ K/N models`) was removed as an anti-pattern: it
-> conditioned further analysis on the very signal we want to measure, and
-> would have rejected the strongest possible memorization signal (perfect
-> override produces `|delta| ≈ 0`). Condition 2 was demoted to a descriptive
-> coverage report. Only condition 1 (audit pass rate on perturbation
-> artifacts) remains a true gate, and it operates on individual perturbation
-> items, not on aggregate estimand behavior. Both E_FO and E_NoOp are
-> **unconditional confirmatory**; the 20-coefficient family `S20` is the
-> only default Stage 2 state.
+The data-quality check is a per-artifact audit on individual perturbation
+items, not a gate on aggregate estimand behavior. E_NoOp is unconditional
+primary.
 
-### E_FO and E_NoOp data-quality requirements (C_FO and C_NoOp perturbations)
+### E_NoOp data-quality requirements (C_NoOp perturbation)
 
 | # | Requirement | Threshold | Role |
 |---|---|---|---|
 | 1 | Per-artifact human audit (natural CLS style, target-local edit, economic consistency, no unintended cues) | Overall ≥ 85%, no event type below 75% | **Gate** — items failing audit are removed from the eligible pool before analysis |
-| 2 | Eligible case coverage (cases with verified known outcomes / total pre-cutoff for C_FO; insertion-eligible for C_NoOp) | Reported per perturbation × event type; coverage below 60% becomes a methods-section caveat | **Descriptive only — not a gate** |
-| ~3~ | ~Baseline delta non-degeneracy~ | ~Removed 2026-04-29~ | **Removed — see DECISION_20260429** |
+| 2 | Eligible case coverage (insertion-eligible cases / total) | Reported per perturbation × event type; coverage below 60% becomes a methods-section caveat | **Descriptive only — not a gate** |
 
 **If condition 1 fails for an entire event type**: that event type is
 excluded from analysis with an audit-quality caveat; the estimand
-remains in the confirmatory family on the surviving event types.
+remains in the primary family on the surviving event types.
 Failure does NOT demote the estimand.
 
 **Estimand readiness failure** (separate from gates): if PCSG
-common-vocab eligibility, FO slotability, or NoOp insertion eligibility
-collapses to fewer than `n_eff = 15` cells per the Section 6.4 matrix,
-treat as an estimand-implementation failure and open a new decision
-memo before pre-registration freeze. This is not the same as a gate;
-it is a data-availability check.
+common-vocab eligibility or NoOp insertion eligibility collapses to fewer
+than `n_eff = 15` cells per the Section 6.4 matrix, treat as an
+estimand-implementation failure and open a new decision memo before scope
+freeze. This is not the same as a gate; it is a data-availability check.
 
 ---
 
@@ -116,11 +88,10 @@ it is a data-availability check.
 
 | Estimand | Operator | Perturbation | Status | Notes |
 |---|---|---|---|---|
-| **E_PCSG_capacity_curve** | P_logprob | — | Exploratory (added 2026-04-27) | log₂(params)-regression of paired logprob delta within-version (cutoff held fixed). Carlini-style capacity-memorization scaling. Members: Qwen2.5 `[1.5B, 3B, 7B, 14B, 32B]` (5 points) and Qwen3 `[4B, 8B, 14B, 32B]` (4 points). Reuses the same `LogProbTrace` artifacts as E_PCSG and E_CTS. |
-| **E_SR** | P_predict | C_SR | Exploratory | Secondary to E_FO within counterfactual family |
+| **E_PCSG_capacity_curve** | P_logprob | — | Exploratory | log₂(params)-regression of paired logprob delta within-version (cutoff held fixed). Carlini-style capacity-memorization scaling. Members: Qwen2.5 `[1.5B, 3B, 7B, 14B, 32B]` (5 points) and Qwen3 `[4B, 8B, 14B, 32B]` (4 points). Reuses the same `LogProbTrace` artifacts as E_PCSG and E_CTS. |
+| **E_SR** | P_predict | C_SR | Exploratory | Semantic-reversal resistance within counterfactual family |
 | **E_EAD_t** | P_predict | C_anon (target) | Exploratory | Identity-keyed memory; C_anon multi-level gradient (L0-L4) enables dose-response analysis |
 | **E_EAD_nt** | P_predict | C_anon (non-target) | Exploratory | Competing-entity distraction |
-| **E_FO_mech** (DS / KL / patch) | P_logprob + offline-HF hidden states | C_FO | Exploratory, **unconditional** (amended 2026-04-29) | Layer-wise localization of memorization-vs-evidence override (Wang et al. 2025 methodology adapted). Hidden states pre-computed eagerly in WS1 cloud Stage 2.7 (Path C, ~5 hr GPU). Conditional trigger removed; analysis runs regardless of E_FO behavioral magnitude. See `docs/DECISION_20260429_gate_removal.md` §2.4. |
 | **E_ADG** | P_predict | C_ADG + C_temporal | Reserve (see §4) | Temporal gate compliance |
 | **E_ADG_conflict** | P_predict | C_ADG | Diagnostic only | Prompt-date vs text-date conflict resolution pattern; never enters statistical model |
 | **E_TDR** | — | C_temporal | Not a standalone estimand | Redefined as cutoff × dose interaction term in mixed-effects model (see §5) |
@@ -133,27 +104,23 @@ All exploratory estimands reported with: effect sizes, simultaneous CIs, hierarc
 
 ## 4. Reserve promotion rules
 
-> **Note (added 2026-04-29).** All "K/N models" thresholds in this section
-> use the **strict-majority denominator rule** from
+> **Note.** All "K/N models" thresholds in this section use the
+> **strict-majority denominator rule** from
 > `docs/DECISION_20260429_gate_removal.md` §2.6:
 > - "majority" thresholds → `K = ⌊N/2⌋ + 1`
 > - "one-third" thresholds → `K = ⌈N/3⌉`
-> where N is the operator-eligible fleet size at run time. For the
-> current 14-model fleet (10 white-box + 4 black-box, all P_predict
-> eligible): `5/9 → 8/14`; `3/9 → 5/14`. Trigger #2 below is also
-> obsolete because the gate that produced "demotion" was removed; it is
-> kept here as historical context but cannot fire under the post-2026-04-29
-> design.
+> where N is the operator-eligible fleet size at run time. The current
+> 16-model split-tier fleet (12 white-box + 4 black-box; 14 P_predict-eligible)
+> is the single source of truth in `config/fleet/r5a_fleet.yaml`.
 
 ### E_ADG: reserve → main-text exploratory
 
-**Trigger** (any 1 of 3 sufficient):
+**Trigger** (any 1 of 2 sufficient):
 
 | # | Trigger | Logic |
 |---|---|---|
-| 1 | E_CMMD signal weak in pilot (effect size d < 0.2 across fleet) | Bloc 0 primary channel fails; need within-model temporal gating evidence |
-| 2 | ~E_FO or E_NoOp demoted from confirmatory (quality gate failure)~ | **Obsolete (2026-04-29)** — gate removed; demotion path no longer exists. Trigger retained as historical context only. |
-| 3 | E_TDR interaction term shows strong temporal-cue dependency (p < 0.05 in pilot) | Time anchors are key mediator; E_ADG's prompt-level gating becomes causally important |
+| 1 | Bloc 0 temporal channel weak in pilot (effect size d < 0.2 across fleet) | Need within-model temporal gating evidence |
+| 2 | E_TDR interaction term shows strong temporal-cue dependency (p < 0.05 in pilot) | Time anchors are key mediator; E_ADG's prompt-level gating becomes causally important |
 
 **Default if no trigger**: stays in reserve, reported in appendix with effect size + CI.
 
@@ -162,7 +129,7 @@ All exploratory estimands reported with: effect sizes, simultaneous CIs, hierarc
 | Tier | Condition | Promotion to |
 |---|---|---|
 | Main-text exploratory | Pilot exact+fuzzy hit rate ≥ 5% on `≥ ⌈N/3⌉ = 5/14` models | Main text, marginal effects only (no factor interactions) + qualitative case gallery |
-| Confirmatory | Hit rate ≥ 15% on `≥ ⌊N/2⌋+1 = 8/14` models AND partial corr with E_CTS < 0.5 | Confirmatory family (→ 24 coefficients). Expected unlikely. |
+| Primary | Hit rate ≥ 15% on `≥ ⌊N/2⌋+1 = 8/14` models AND partial corr with E_CTS < 0.5 | Primary family. Expected unlikely. |
 | Demoted | Hit rate < 5% on all models | Qualitative case gallery only, no quantitative estimand |
 
 ### E_schema_cont: reserve → appendix exploratory
@@ -220,23 +187,31 @@ Where:
 
 ### Operators (3 confirmed + 1 candidate)
 
+Fleet = 16-model split-tier: 12 white-box (10 full-operator [5 Qwen2.5 + 4 Qwen3
++ 1 GLM] + 2 Llama P_logprob-only) + 4 black-box; 14 P_predict-eligible,
+12 P_logprob-eligible. Single source of truth: `config/fleet/r5a_fleet.yaml`.
+
 | ID | Operator | Access | Fleet | Status |
 |---|---|---|---|---|
-| P_logprob | Token tail surprise (Min-K++/CTS) + cross-version PCSG + capacity curve | White-box | **10 models** (post-2026-04-27 expansion: 5 Qwen2.5 + 4 Qwen3 + 1 GLM) | Confirmed |
-| P_predict | Standardized sentiment/alpha prediction | Black-box sufficient | **14 models** (10 white-box + 4 black-box) | Confirmed |
+| P_logprob | Token tail surprise (Min-K++/CTS) + cross-version PCSG + capacity curve | White-box | **12 models** (10 full-operator + 2 Llama logprob-only) | Confirmed |
+| P_predict | Standardized sentiment/alpha prediction | Black-box sufficient | **14 models** (10 white-box full-operator + 4 black-box) | Confirmed |
 | P_extract | Masked span completion | Black-box sufficient | **14 models** | Confirmed; also reused for Path-E empirical cutoff probe |
 | P_schema | CLS prefix continuation | Black-box sufficient | **14 models** | Candidate (reserve) |
 
-### Perturbations (6 confirmed)
+### Perturbations (5 confirmed)
 
 | ID | Perturbation | Design | Status |
 |---|---|---|---|
 | C_anon | Entity anonymization | Multi-level dose-response (L0-L4 gradient); pilot uses L0 vs L4 binary | Confirmed |
 | C_SR | Semantic polarity reversal | Rule-based antonym/operator maps per event type | Confirmed |
-| C_FO | False outcome slot replacement | Rule-based slot schema per event type; known-outcome cases only | Confirmed |
 | C_NoOp | Irrelevant clause insertion | Deterministic clause bank; 8-16 chars; medial position | Confirmed |
 | C_temporal | Temporal cue degradation | 2-3 dose levels; length-matched non-temporal deletion control mandatory | Confirmed |
 | C_ADG | As-of date prompt manipulation | D4b (no text cues) primary; D4a (conflicting cues) diagnostic | Confirmed |
+
+C_FO (false-outcome slot replacement) was DROPPED at R-6 close (2026-06-06); the
+case-result-memory target is now carried by counterfactual perturbation ×
+pre/post-cutoff × salience slicing, backbone choice deferred to R-2
+(`refine-logs/reviews/REOPEN_R1_R6/R6_pred_target_cfo/R6_DECISIONS.md`).
 
 ---
 
@@ -296,15 +271,5 @@ Where:
 
 ---
 
-## 11. Document lineage
-
-```
-R5A_DEFAULTS.md (Step 1 opening positions)
-  → R5A_STEP1_SYNTHESIS.md (Step 1 pool)
-    → {quant,nlp,stats,editor}_lens.md (Step 2 lenses)
-      → R5A_STEP2_SYNTHESIS.md (Step 2 convergence)
-        → MEASUREMENT_FRAMEWORK.md (four-layer reframe)
-          → R5A_FROZEN_SHORTLIST.md (this document)  ← AUTHORITATIVE
-```
-
-All prior documents are superseded for scope decisions. MEASUREMENT_FRAMEWORK.md remains authoritative for framework definitions and terminology.
+This document is authoritative for conceptual scope decisions.
+`MEASUREMENT_FRAMEWORK.md` remains authoritative for framework definitions and terminology.

@@ -1,7 +1,6 @@
 # Paper Index
 
-> **Last sync:** 2026-05-19 (WS0.5 round-0 SOTA batch)
-> **Previous sync:** 2026-05-07 (added Phase 8 goal-frame / sycophancy / LLM-measurement sweep)
+> **Last updated:** 2026-05-19
 > **Total PDFs in `related papers/`:** 158
 > **Status legend:** `IN_LIBRARY` = PDF on disk; `REFERENCED_ONLY` = cited in project docs / sweeps but no PDF in `related papers/`.
 
@@ -177,7 +176,7 @@ This file at repo root is the human-facing categorical index that ties paper fil
 | `Propagation Pitfalls Knowledge Editing.pdf` | Hua et al. 2024 | Editing fails on reasoning chains | IN_LIBRARY |
 | `MIRAGE Model Internals Answer Attribution.pdf` | — | Internals-based answer attribution | IN_LIBRARY |
 | `TRAK Attributing Model Behavior at Scale.pdf` | Park et al. 2023 | Training-data attribution at scale | IN_LIBRARY |
-| `When Truth Is Overridden Internal Origins Sycophancy.pdf` | Wang et al. 2025 (arxiv 2508.02087) | Decision-Score logit-lens + KL divergence + activation patching localize sycophancy override to late layers; methodology directly transferable to WS6 C_FO mechanistic study | IN_LIBRARY |
+| `When Truth Is Overridden Internal Origins Sycophancy.pdf` | Wang et al. 2025 (arxiv 2508.02087) | Decision-Score logit-lens + KL divergence + activation patching localize sycophancy override to late layers; logit-lens / activation-patching methodology transferable to counterfactual-perturbation mechanistic studies (the C_FO perturbation it originally referenced was dropped at R-6) | IN_LIBRARY |
 
 ## 10. Entity representation, temporal latents, knowledge conflicts
 
@@ -326,10 +325,10 @@ This file at repo root is the human-facing categorical index that ties paper fil
 
 | R5A confirmatory estimand | Anchor papers in library |
 |---|---|
-| **E_CMMD** (cross-model disagreement) | MemGuard-Alpha, AntiLeakBench, MMLU-CF, LiveBench, Cross-Model Memorization Statistical Internal, FLEET_SELECTION_LITERATURE.md |
+| **E_CMMD** (cross-model disagreement) — **CUT at R-4 construct-validity (D5, 2026-05-31); no longer a live estimand** | MemGuard-Alpha, AntiLeakBench, MMLU-CF, LiveBench, Cross-Model Memorization Statistical Internal, FLEET_SELECTION_LITERATURE.md |
 | **E_PCSG** (paired cutoff surprise gap) | Detecting Pretraining Data (Min-K%), Min-K++, Quantifying Memorization, MIA From First Principles, Inherent Challenges Post-Hoc MIA |
 | **E_CTS** (calibrated tail surprise) | Min-K++, Pretraining Data Detection Divergence Calibration, Probabilistic Extraction Memorization |
-| **E_FO** (false-outcome resistance) | Reasoning or Reciting Counterfactual Tasks, GSM-Symbolic, Assessing Look-Ahead Bias GPT Sentiment, Anonymization and Information Loss |
+| **E_FO** (false-outcome resistance) — **DROPPED at R-6 close (2026-06-06) along with the C_FO perturbation; the case-result-memory target migrated to counterfactual-perturbation × pre/post-cutoff × salience slicing (backbone choice deferred to R-2). No longer a live estimand.** | Reasoning or Reciting Counterfactual Tasks, GSM-Symbolic, Assessing Look-Ahead Bias GPT Sentiment, Anonymization and Information Loss |
 | **E_NoOp** (NoOp clutter sensitivity) | GSM-Symbolic, RE-IMAGINE Symbolic Benchmark Synthesis, RAVEN Linguistic Novelty LMs |
 | **E_extract** (masked span extraction, reserve) | Extracting Training Data 2020, Scalable Extraction, Probabilistic Extraction Memorization, Entity-level Memorization, OWL Cross-Lingual Recall |
 | **E_EAD_t / E_EAD_nt** (entity anonymization, exploratory) | Anonymization and Information Loss, Company-specific Biases Financial Sentiment LLMs, Assessing Look-Ahead Bias GPT Sentiment, Causal View Entity Bias LLMs, Entity Cells, Entity Identification |
@@ -340,29 +339,7 @@ This file at repo root is the human-facing categorical index that ties paper fil
 
 ---
 
-## Footer
-
-**Last sync:** 2026-05-19 (WS0.5 round-0 SOTA batch).
-**Previous sync:** 2026-05-07.
-
-**What changed since 2026-05-07:**
-- Added 22 local PDFs from `refine-logs/reviews/WS0_5_DESIGN/ws0_5_autotune_sota_search.md`: ten prompt-optimization papers, five adaptive-analysis / multiple-look papers, two NLP statistical-evaluation papers, and five annotation-methodology papers.
-- Added referenced-only rows for nine industry documentation/blog sources that were decision inputs but are not PDF papers.
-- Added two WS0.5 thematic notes: `related papers/notes/prompt_optimization.md` and `related papers/notes/adaptive_analysis_reusable_holdout.md`.
-
-**What changed since 2026-04-27:**
-- Added six local PDFs from the incremental targeted sweep: `Ask Dont Tell Reducing Sycophancy LLMs.pdf`, `AI Assisted Economics Measurement From Survey.pdf`, `From Model Choice to Model Belief.pdf`, `A Financial Brain Scan of the LLM.pdf`, `Sycophantic AI Decreases Prosocial Intentions.pdf`, and `Training Language Models Warm Accuracy Sycophancy.pdf`.
-- Added two SSRN papers as `REFERENCED_ONLY` because direct PDF download returned 403 during the 2026-05-07 sync: Shaffer & Wang, *Scaling Core Earnings Measurement with Large Language Models*; Cao, Wang & Xiang, *When LLMs Go Abroad*.
-- Added the Phase 8 `C_GoalFrame` exploratory cross-reference. This does not alter the frozen confirmatory family.
-
-**Earlier 2026-04-16 sync summary:**
-- Total PDFs grew from 60 -> 128 (+68 net of dedupe). Most additions came from the **R4 literature sweep Sessions 1 + 2** (~25 papers added 2026-04-14/15: MIA foundations + skepticism, chrono-control precursors, look-ahead-bench family, finance memorization papers, construct-validity stack) and from the **R5A fleet review** (cross-model + cross-fleet contamination & memorization comparators).
-- New top-level categories: **MIA family + skepticism** (§2), **Chronological controls / look-ahead bias** (§3), **Finance memorization / leakage benchmarks** (§4, expanded), **Counterfactual / perturbation methodology** (§5), **Construct validity / benchmark methodology** (§6), **Cross-model / cross-fleet memorization** (§8).
-- Existing "Memorization, Contamination & Data Extraction" was split into §1 (foundations) + §7 (contamination detection) + §2 (MIA) for clarity.
-- Added cross-reference table tying papers to R5A confirmatory + exploratory estimands defined in `refine-logs/reviews/R5A_STEP2/R5A_FROZEN_SHORTLIST.md`.
-- The previous "Not Yet Downloaded" section is folded into per-category `REFERENCED_ONLY` rows.
-
-**Source documents consulted for this sync:**
+**Source documents underlying this index:**
 - `refine-logs/reviews/R5A_STEP2/R5A_FROZEN_SHORTLIST.md`
 - `refine-logs/reviews/R5A_FLEET_REVIEW/FLEET_SELECTION_LITERATURE.md`
 - `refine-logs/reviews/LIT_SWEEP_DOWNLOAD_SUMMARY.md`
@@ -370,5 +347,5 @@ This file at repo root is the human-facing categorical index that ties paper fil
 - `archive/r4_r5a_lineage/refine-logs/reviews/LIT_SWEEP_D_CITED_BUT_UNREAD.md`
 - `archive/r4_r5a_lineage/refine-logs/reviews/LIT_SWEEP_E_CONSTRUCT_VALIDATION.md`
 - `refine-logs/reviews/WS0_5_DESIGN/ws0_5_autotune_sota_search.md`
-- `related papers/notes/_paper_catalog.json` (machine catalog, 158 entries after WS0.5 update)
+- `related papers/notes/_paper_catalog.json` (machine catalog, 158 entries)
 - Filesystem listing of `related papers/*.pdf` (158 files, sorted alphabetically)

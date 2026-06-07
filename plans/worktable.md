@@ -85,7 +85,7 @@ R-1 因子层对 **R-1e** 的依赖已清空、**只剩 pilot 数据**(选 / 降
 | R-1d | Template Rigidity:从零设计 | 无 | **✔ closed 2026-06-02** → `R1d_template_rigidity/R1d_DECISIONS.md`;进 R-1e 候选池(操作化 open items 待 pilot 前用户审计) |
 | R-1g…x | 因子候选池快速评审(f/g/h/i/k/l/m/u/v/w/x 进池 · j/n/o/p/q/r/s/t DROP) | R-0 / R-4(已解锁) | **✔ closed 2026-06-05** → 汇总索引 `R4_methodology_audit/four_layer_candidate_pools.md` §1;逐因子 `R1*_DECISIONS.md` |
 | R-1e | 因子最终选择确认(从候选池选 / 降级,数 power-bounded) | 因子层已全 closed · **pilot 数据** | ⛔ **待 pilot**(因子层依赖已清,选 / 降级靠实证) |
-| R-2 | 反事实扰动家族设计 → 选保留几个进 primary(重审 C_NoOp;**C_FO 已删** 见 R6_DECISIONS;主 backbone 选择);perturbation-specific eligibility flag 在 R-0 HOOK1/HOOK2 占位落地 | R-6 已 closed · R-0 已 closed | ✅ **可动**(R-6 已解锁) |
+| R-2 | **扰动层(L2)设计**(与 R-1 因子层对仗,非仅反事实家族):盘点现有扰动去留 / tier(C_SR / C_NoOp / C_anon / C_temporal / C_ADG)+ 发掘新扰动 + 反事实家族 backbone(承接 R-6 删 C_FO 的结果记忆目标);perturbation-specific eligibility flag 在 R-0 HOOK1/HOOK2 占位落地。kickoff → `REOPEN_R1_R6/R2_perturbation_design/R2_kickoff.md` | R-6 已 closed · R-0 已 closed | ✅ **可动**(R-6 已解锁;kickoff 已写) |
 | R-5 | 采样:R-0 expose 的 Pool B + G/H/I + D/E/F 扩展位;within-pool 分布(R-0 不强制叠加 G/H/I,row-random 合法)+ 准入过滤器 + per-article cap/dedupe 规则;反直觉案例过滤仍需 R-6 真实股价 | R-0 已 closed + R-6 已 closed(反直觉案例) | ✅ **可动**(within-pool 分布 + dedupe 规则 + 反直觉案例段均已解锁)|
 | R-3 | 负对照充分性 | R-1e · R-2(需知最终因子 / 扰动) | ⛔ 待上游 |
 | R-4b | pilot 具体统计(power 计算 / n_eff 矩阵 / 混合模型规格落地 / bootstrap 实施)—— R-4a 已锁 TOST/SESOI、scenario-based MC power 等框架 | R-1e · R-2 · R-3 · R-5(操作化定了才能算 power;R-4a 框架已就位) | ⛔ 待上游 |

@@ -3,7 +3,7 @@
 # FinMem-Bench — R4 Literature Sweep (2026-04-14)
 
 **Status:** Session 1 of the sweep — Sub-tasks A, B, C completed. Sub-tasks D (cited-but-unread) and E (3-bloc construct-collapse validation) deferred to Session 2 by design (user mid-sweep checkpoint).
-**Kickoff:** `refine-logs/reviews/BENCHMARK_R4_LIT_SWEEP_KICKOFF.md`
+**Kickoff:** `archive/r4_r5a_lineage/refine-logs/reviews/BENCHMARK_R4_LIT_SWEEP_KICKOFF.md`
 **Related outputs:** `docs/FACTOR_LITERATURE_PROVENANCE.md` (per-factor detail) + `refine-logs/reviews/LIT_SWEEP_A_FACTOR_PROVENANCE.md` / `LIT_SWEEP_B_BROAD_SWEEP.md` / `LIT_SWEEP_C_CHRONO_BASELINES.md` (raw Codex outputs)
 **Version of decision doc this sweep feeds into:** v5.3 → proposed v6 (edit proposals in `refine-logs/reviews/LIT_SWEEP_V6_EDIT_PROPOSALS.md`)
 **Sweep persona for all 3 Codex calls:** senior NLP / memorization researcher, fresh session, no R1-R4 attachment, systematic bibliographer, aggressive arxiv+web_search user, no reliance on training-data memory for state of the art

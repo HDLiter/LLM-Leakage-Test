@@ -66,9 +66,9 @@ Phase 1-4 的文档（proposals, debates, pilot results, bug audits）已归档�
 ### Phase 6: R5A — Benchmark design（2026-04-12 ~ 2026-04-16）
 
 - **R4 文献综合（Apr 12-15）**: 4 轮 benchmark 审阅（R1-R3 已归档到 `archive/benchmark_r1_r3/`；R4 保留在 `refine-logs/reviews/`）。文献扫描产出 `docs/LITERATURE_SWEEP_2026_04.md` 和 `docs/FACTOR_LITERATURE_PROVENANCE.md`。Decision doc 从 v5.2 迭代到 v6.2 → `docs/DECISION_20260413_mvp_direction.md`。
-- **R5A Step 1（Apr 14-15）**: 10 候选 estimand candidates 的 4-lens opening positions → convergence synthesis。产出 `refine-logs/reviews/R5A_STEP1/`（已归档）。
-- **R5A Fleet Review（Apr 14-15）**: 9-model core fleet selection (FLEET_REVIEW R2) with 25+ paper survey。产出 `refine-logs/reviews/R5A_FLEET_REVIEW/`。Same-cutoff falsification pair (GLM-4-9B ↔ GPT-4.1) 是文献中的新设计。
-- **R5A Temporal Cue（Apr 15）**: C_temporal perturbation deep dive → E_TDR design。产出 `refine-logs/reviews/R5A_TEMPORAL_CUE/`。
+- **R5A Step 1（Apr 14-15）**: 10 候选 estimand candidates 的 4-lens opening positions → convergence synthesis。产出 `archive/r4_r5a_lineage/refine-logs/reviews/R5A_STEP1/`（已归档）。
+- **R5A Fleet Review（Apr 14-15）**: 9-model core fleet selection (FLEET_REVIEW R2) with 25+ paper survey。产出 `archive/r4_r5a_lineage/refine-logs/reviews/R5A_FLEET_REVIEW/`。Same-cutoff falsification pair (GLM-4-9B ↔ GPT-4.1) 是文献中的新设计。
+- **R5A Temporal Cue（Apr 15）**: C_temporal perturbation deep dive → E_TDR design。产出 `archive/r4_r5a_lineage/refine-logs/reviews/R5A_TEMPORAL_CUE/`。
 - **R5A Step 2（Apr 15-16）**: 4-lens convergence → **四层测量框架** (Factor/Perturbation/Operator/Estimand)，溶解 4 个设计张力。产出 `refine-logs/reviews/R5A_STEP2/MEASUREMENT_FRAMEWORK.md`。
 - **R5A Freeze Session（Apr 16）**: P_schema 讨论（4-lens, Continuation=RESERVE, Cloze/QA=DEFER）→ 仲裁点闭合 → Challenger pass（10 项，3 高严重度全部关闭）→ Cold reader pass（Codex Reviewer 2, 构念效度攻击 → 三道防线）→ **概念 shortlist 冻结**。
 - **关键提交**: `b6d20ae`（R5A Step 1）、`99a9e5c`（R5A Step 2 + four-layer framework）。
@@ -115,7 +115,7 @@ See `git log --oneline -30` for full recent history.
 
 > `BENCHMARK_PROPOSAL.md` 与 `CMMD_MODEL_FLEET_SURVEY.md` 已移至 `archive/r4_r5a_lineage/docs/`。
 
-- `FACTOR_LITERATURE_PROVENANCE.md` — pre-freeze 15+2 因子溯源审计。**非当前活跃因子图**；当前因子范围由 `R5A_FROZEN_SHORTLIST.md`（4 core confirmatory + Bloc 0-3 inventory）定义。Old → new 映射见 `refine-logs/reviews/R5A_STEP2/ACTIVE_DOC_REVIEW_SYNTHESIS.md` §2 (Priority B crosswalk)。
+- `FACTOR_LITERATURE_PROVENANCE.md` — pre-freeze 15+2 因子溯源审计。**非当前活跃因子图**；当前因子范围由 `R5A_FROZEN_SHORTLIST.md`（4 core confirmatory + Bloc 0-3 inventory）定义。Old → new 映射见 `archive/r4_r5a_lineage/refine-logs/reviews/R5A_STEP2/ACTIVE_DOC_REVIEW_SYNTHESIS.md` §2 (Priority B crosswalk)。
 - `LITERATURE_SWEEP_2026_04.md` — 历史 R4 文献扫描（25+ papers）；保留作为引用溯源。当前 fleet/scope 权威见 `config/fleet/r5a_fleet.yaml`（fleet）+ `R5A_FROZEN_SHORTLIST.md`（scope）。
 - `MEDIA_COVERAGE_FEASIBILITY.md` — Coverage Breadth 储备因子可行性 memo。**不在冻结 confirmatory family 中**；不读为"第 13 个活跃因子"。
 - `THALES_SIGNAL_PROFILE_REVIEW.md` — Thales quant engine 信号档案；Bloc 3 operationalization input（Structured Event Type / Modality / Authority）。不改变冻结 confirmatory family。

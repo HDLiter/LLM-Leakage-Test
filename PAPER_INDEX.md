@@ -8,7 +8,7 @@ This index is a **categorical pointer view** for fast navigation. The richer per
 
 - **Per-topic notes:** `related papers/notes/*.md` (twelve thematic note files)
 - **Machine-readable catalog:** `related papers/notes/_paper_catalog.json` (not authoritative for newest additions)
-- **WS0.5 round-0 source sweep:** `refine-logs/reviews/WS0_5_DESIGN/ws0_5_autotune_sota_search.md`
+- **WS0.5 round-0 source sweep:** `archive/r4_r5a_lineage/refine-logs/reviews/WS0_5_DESIGN/ws0_5_autotune_sota_search.md`
 
 This file at repo root is the human-facing categorical index that ties paper filenames back to the R5A research design and the v6.2 decision document.
 
@@ -160,7 +160,7 @@ This file at repo root is the human-facing categorical index that ties paper fil
 |---|---|---|---|
 | `Cross-Model Memorization Statistical Internal.pdf` | Chen 2026 | 20-model statistical + internal-level analysis | IN_LIBRARY (also listed in §1) |
 | `OWL Cross-Lingual Recall Memorized Texts.pdf` | 2025 | 11-model cross-lingual recall | IN_LIBRARY (also listed in §1) |
-| (See `refine-logs/reviews/R5A_FLEET_REVIEW/FLEET_SELECTION_LITERATURE.md` for the full 25-paper fleet-design review) | — | Fleet-design literature synthesis | doc-only |
+| (See `archive/r4_r5a_lineage/refine-logs/reviews/R5A_FLEET_REVIEW/FLEET_SELECTION_LITERATURE.md` for the full 25-paper fleet-design review) | — | Fleet-design literature synthesis | doc-only |
 
 ## 9. Mechanistic interpretability — knowledge storage / retrieval
 
@@ -341,11 +341,11 @@ This file at repo root is the human-facing categorical index that ties paper fil
 
 **Source documents underlying this index:**
 - `refine-logs/reviews/R5A_STEP2/R5A_FROZEN_SHORTLIST.md`
-- `refine-logs/reviews/R5A_FLEET_REVIEW/FLEET_SELECTION_LITERATURE.md`
-- `refine-logs/reviews/LIT_SWEEP_DOWNLOAD_SUMMARY.md`
+- `archive/r4_r5a_lineage/refine-logs/reviews/R5A_FLEET_REVIEW/FLEET_SELECTION_LITERATURE.md`
+- `archive/r4_r5a_lineage/refine-logs/reviews/LIT_SWEEP_DOWNLOAD_SUMMARY.md`
 - `archive/r4_r5a_lineage/refine-logs/reviews/BENCHMARK_R5_KICKOFF.md`
 - `archive/r4_r5a_lineage/refine-logs/reviews/LIT_SWEEP_D_CITED_BUT_UNREAD.md`
 - `archive/r4_r5a_lineage/refine-logs/reviews/LIT_SWEEP_E_CONSTRUCT_VALIDATION.md`
-- `refine-logs/reviews/WS0_5_DESIGN/ws0_5_autotune_sota_search.md`
+- `archive/r4_r5a_lineage/refine-logs/reviews/WS0_5_DESIGN/ws0_5_autotune_sota_search.md`
 - `related papers/notes/_paper_catalog.json` (machine catalog, 158 entries)
 - Filesystem listing of `related papers/*.pdf` (158 files, sorted alphabetically)

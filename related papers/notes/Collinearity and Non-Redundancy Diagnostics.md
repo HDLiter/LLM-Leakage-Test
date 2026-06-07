@@ -19,7 +19,7 @@ number, partial/residual correlations, the GVIF apparatus (GVIF = VIF for 1-df
 continuous terms). Mixed-model singular-fit / convergence is a *separate*
 model-fit diagnostic, not a non-redundancy check. Remedy discipline: do not
 mechanically drop a confirmatory factor, do not dichotomize, do not residualize.
-Full review: `refine-logs/reviews/WS0_5_DESIGN/collinearity_diagnostics_20260520.md`.
+Full review: `archive/r4_r5a_lineage/refine-logs/reviews/WS0_5_DESIGN/collinearity_diagnostics_20260520.md`.
 
 ## References
 
@@ -55,5 +55,5 @@ are paywalled books / journal articles, recorded here as the direction
 bibliography (DOIs above).*
 
 ## Pointers
-- Codex methods review: `refine-logs/reviews/WS0_5_DESIGN/collinearity_diagnostics_20260520.md`
+- Codex methods review: `archive/r4_r5a_lineage/refine-logs/reviews/WS0_5_DESIGN/collinearity_diagnostics_20260520.md`
 - Memo decision: `docs/DECISION_20260518_ws0_5_thales_alignment.md` §3.3.3 (S-6)

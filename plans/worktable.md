@@ -92,18 +92,18 @@ R-1 因子层对 **R-1e** 的依赖已清空、**只剩 pilot 数据**(选 / 降
 
 > **TODO[CROSS_SYNTH 🟡-3] → R-2 kickoff** — 候选扰动 C_ES(Entity Substitution /
 > 实体替换:保留语义换实体身份,测原实体事实记忆能否漏出;用户保留态度,替换标准
-> 待 R-2 inventory 讨论)。论证见 `refine-logs/reviews/CROSS_SYNTH_20260523/synthesis_findings.md`。
+> 待 R-2 inventory 讨论)。论证见 `archive/r4_r5a_lineage/refine-logs/reviews/CROSS_SYNTH_20260523/synthesis_findings.md`。
 
 > **TODO[CROSS_SYNTH 🟡-5] → R-2 kickoff** — C_SR / C_ES 关系裁决(都进 main / 选 1 /
 > 合并;注意 `cfo_csr_history_findings.md` 记的实操重合证据)+ C_NoOp 重审(同行 anchor:
 > Mirzadeh 2025 GSM-NoOp + Kong 2026 §3.3 negative controls;两源支持 C_NoOp 保留但定位
-> supporting,见 §7.2)。论证见 `refine-logs/reviews/CROSS_SYNTH_20260523/synthesis_findings.md`。
+> supporting,见 §7.2)。论证见 `archive/r4_r5a_lineage/refine-logs/reviews/CROSS_SYNTH_20260523/synthesis_findings.md`。
 
 > **TODO[CROSS_SYNTH 🟡-4] → R-1c / R-5 / PROPOSAL §4.7** — Kong 2026 §2.2 survivorship
 > bias 警告(媒体曝光偏向存续公司)落地三点:(a) R-1c metric 选择反向 sanity-check;
 > (b) R-5 scope 扩为"准入过滤 + 抽样分布策略"(随机 / 实体均衡 / Salience 分层抽);
 > (c) PROPOSAL §4.7 待 R-5 后加专门 sampling 策略段。论证见
-> `refine-logs/reviews/CROSS_SYNTH_20260523/synthesis_findings.md`。
+> `archive/r4_r5a_lineage/refine-logs/reviews/CROSS_SYNTH_20260523/synthesis_findings.md`。
 
 ### 块 B — 并行轨道(与 A 同时)
 

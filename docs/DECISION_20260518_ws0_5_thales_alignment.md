@@ -18,12 +18,12 @@ related_docs:
   - D:\GitRepos\Thales\prompts\news_processing\topic_classification.py (V3 13-class prompt — 578 lines)
   - D:\GitRepos\Thales\prompts\news_processing\signal_profile.py (v5.5 two-pass — 736 lines)
   - D:\GitRepos\Thales\experiments\prompts\news_summary\fixtures\labeling_prompt_entity.md (dual-agent entity labeling — 629 lines)
-  - refine-logs/reviews/WS0_5_DESIGN/ws0_5_alignment_review.md (Codex round-0 review)
-  - refine-logs/reviews/WS0_5_DESIGN/ws0_5_supertype_analysis.md (Codex super-type Scheme A analysis)
-  - refine-logs/reviews/WS0_5_DESIGN/ws0_5_target_salience_construct.md (Codex Target Salience construct design)
-  - refine-logs/reviews/WS0_5_DESIGN/ws0_5_autotune_sota_search.md (Codex auto-tune SOTA literature search)
-  - refine-logs/reviews/WS0_5_DESIGN/entity_disambig_methods_20260520.md (Codex E-6 entity-disambiguation methods review)
-  - refine-logs/reviews/WS0_5_DESIGN/collinearity_diagnostics_20260520.md (Codex S-6 collinearity-diagnostics methods review)
+  - archive/r4_r5a_lineage/refine-logs/reviews/WS0_5_DESIGN/ws0_5_alignment_review.md (Codex round-0 review)
+  - archive/r4_r5a_lineage/refine-logs/reviews/WS0_5_DESIGN/ws0_5_supertype_analysis.md (Codex super-type Scheme A analysis)
+  - archive/r4_r5a_lineage/refine-logs/reviews/WS0_5_DESIGN/ws0_5_target_salience_construct.md (Codex Target Salience construct design)
+  - archive/r4_r5a_lineage/refine-logs/reviews/WS0_5_DESIGN/ws0_5_autotune_sota_search.md (Codex auto-tune SOTA literature search)
+  - archive/r4_r5a_lineage/refine-logs/reviews/WS0_5_DESIGN/entity_disambig_methods_20260520.md (Codex E-6 entity-disambiguation methods review)
+  - archive/r4_r5a_lineage/refine-logs/reviews/WS0_5_DESIGN/collinearity_diagnostics_20260520.md (Codex S-6 collinearity-diagnostics methods review)
 ---
 
 # Decision Memo — WS0.5 Thales Alignment & Auto-Tune Loop
@@ -156,7 +156,7 @@ Bloc 3 adjunct/covariate**, not a new confirmatory factor.
 |---|---|
 | Prompt template | Reuse `NewsTopicClassificationPrompt` v2.2 (13-class V3) verbatim as V4 Pro starting point |
 | Raw taxonomy | 13-class V3 enum from `_annotation.py` |
-| **Super-type collapse (Scheme A, Codex-recommended)** | 5 active super-types per `refine-logs/reviews/WS0_5_DESIGN/ws0_5_supertype_analysis.md`: `authority_decision` [POLICY+ENFORCEMENT+LEGAL+GEOPOLITICS], `issuer_catalyst` [CORPORATE+PRODUCT+PERSONNEL], `issuer_quant` [EARNINGS+OWNERSHIP], `market_macro_print` [INDICATOR+TRADING], `sector_industry` [INDUSTRY]; OTHER → `exclude_from_pilot=true` |
+| **Super-type collapse (Scheme A, Codex-recommended)** | 5 active super-types per `archive/r4_r5a_lineage/refine-logs/reviews/WS0_5_DESIGN/ws0_5_supertype_analysis.md`: `authority_decision` [POLICY+ENFORCEMENT+LEGAL+GEOPOLITICS], `issuer_catalyst` [CORPORATE+PRODUCT+PERSONNEL], `issuer_quant` [EARNINGS+OWNERSHIP], `market_macro_print` [INDICATOR+TRADING], `sector_industry` [INDUSTRY]; OTHER → `exclude_from_pilot=true` |
 | Host category collapse (4-class for C_NoOp) | `authority_decision → policy`, `issuer_catalyst → corporate`, `issuer_quant → corporate`, `market_macro_print → macro`, `sector_industry → industry` |
 | Calibration target | DeepSeek V4 Pro |
 | Calibration fixtures | `quality_uniform.json` (~370) for tuning; `quality_natural.json` (~600) blind validation (re-sample if any patch touches it) |
@@ -314,7 +314,7 @@ entry length). The choice is recorded in a v0.4-addendum decision.
 - Discriminant rule: no event_type and no month is encoded in Target Salience (those belong to Historical Family Recurrence §5)
 
 **Discriminant check (v0.4 per S-6 — Codex literature review,
-`refine-logs/reviews/WS0_5_DESIGN/collinearity_diagnostics_20260520.md`).** The pre-manifest-freeze
+`archive/r4_r5a_lineage/refine-logs/reviews/WS0_5_DESIGN/collinearity_diagnostics_20260520.md`).** The pre-manifest-freeze
 non-redundancy check is the field-standard minimal pair, not a five-diagnostic
 suite:
 
@@ -1143,7 +1143,7 @@ Reproducibility for `pilot_factor_values.parquet` has two distinct paths,
 serving two distinct users — separating them is what stops design
 ratcheting (a reviewer SLA being conflated with an internal audit tool).
 The Codex repro-norms research
-(`refine-logs/reviews/WS0_5_DESIGN/llm_reproducibility_norms_20260522.md`)
+(`archive/r4_r5a_lineage/refine-logs/reviews/WS0_5_DESIGN/llm_reproducibility_norms_20260522.md`)
 confirms this split matches NeurIPS / ICML / ICLR / ARR / ACL / EMNLP
 norms for closed-API LLM experiments: venues require a path to verify,
 not bit-identical replay; raw-response cache + hard-fail replay are
@@ -1310,7 +1310,7 @@ must include:
 These four items align with the NeurIPS / ARR / ICLR norm for
 closed-API LLM experiments — a path to verify rather than bit-identical
 replay (see
-`refine-logs/reviews/WS0_5_DESIGN/llm_reproducibility_norms_20260522.md`).
+`archive/r4_r5a_lineage/refine-logs/reviews/WS0_5_DESIGN/llm_reproducibility_norms_20260522.md`).
 
 ## 7. Cost protection
 

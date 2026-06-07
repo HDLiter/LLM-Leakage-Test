@@ -4,7 +4,7 @@ date: 2026-04-27
 phase: Phase 7
 authority: supersedes R5A_FROZEN_SHORTLIST.md §1 PCSG definition; extends fleet roster
 related_docs:
-  - refine-logs/reviews/WS1_CODE_REVIEW/stats_lens.md (origin of M1 issue)
+  - archive/r4_r5a_lineage/refine-logs/reviews/WS1_CODE_REVIEW/stats_lens.md (origin of M1 issue)
   - refine-logs/reviews/PCSG_PAIR_HUNT/open_source_landscape.md (fleet candidate scan)
   - plans/ws1-cloud-execution.md
   - plans/phase7-pilot-implementation.md
@@ -264,5 +264,5 @@ update, and the master Phase 7 plan update. Together they constitute
 the methodology delta for the WS1 cloud run.
 
 After commit, the next blocker is **the 6 P0-Critical findings from
-the WS0+WS1 code review** (see `refine-logs/reviews/WS1_CODE_REVIEW/`)
+the WS0+WS1 code review** (see `archive/r4_r5a_lineage/refine-logs/reviews/WS1_CODE_REVIEW/`)
 which must be resolved before any cloud spend.

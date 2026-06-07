@@ -8,7 +8,7 @@ status: |
   内容待 R-1…R-6 结构化重开后逐步完善。
 authority: |
   本文件是当前实验的成文研究问题文档(此前缺失 —— Pass-1 走查 flag ①)。
-  锚定内容的逐章依据:refine-logs/reviews/WALKTHROUGH_PASS1/section_01..07.md。
+  锚定内容的逐章依据:archive/r4_r5a_lineage/refine-logs/reviews/WALKTHROUGH_PASS1/section_01..07.md。
   待重开项 R-1…R-6 的权威清单:refine-logs/reviews/WALKTHROUGH_PASS1/pending_items.md。
   冻结 scope 的名义权威:refine-logs/reviews/R5A_STEP2/R5A_FROZEN_SHORTLIST.md
   (其操作化细节正在重开)。
@@ -94,7 +94,7 @@ anchor。要点:
   diagnosis + framework(自己不做 benchmark);我们给 case-level
   measurement(具体 estimand + 因子 + 操作化)。两层互补。
 草稿与详细论证见:
-  refine-logs/reviews/CROSS_SYNTH_20260523/synthesis_findings.md §A.🟡-1
+  archive/r4_r5a_lineage/refine-logs/reviews/CROSS_SYNTH_20260523/synthesis_findings.md §A.🟡-1
   以及该 session 的对话记录 🟡-1 第 (3) 节。
 落地此 TODO 时同步更新 memory lit_landscape.md(见同份 synthesis §C.1)。
 -->
@@ -319,7 +319,7 @@ R-5 完成后,在本节新增专门的"抽样分布策略"段(不止"过滤器")
 - 同步:R-1c §8.5 已把 Salience × sampling 互动 + Kong §2.2 sanity-check 作为
   R-5 input note(canonical 见 R1c_DECISIONS.md §8.5)。
 TODO 起源 + 完整论证 + Kong §2.2 原文引用:
-  refine-logs/reviews/CROSS_SYNTH_20260523/synthesis_findings.md §A.🟡-4 修正版
+  archive/r4_r5a_lineage/refine-logs/reviews/CROSS_SYNTH_20260523/synthesis_findings.md §A.🟡-4 修正版
   与该 session 对话 🟡-4(用户 2026-05-23 指出此 scope gap)。
 -->
 

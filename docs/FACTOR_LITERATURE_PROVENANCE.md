@@ -3,7 +3,7 @@
 # FinMem-Bench — Per-Factor Literature Provenance Audit
 
 **Date:** 2026-04-14
-**Sweep:** R4 Literature Sweep Sub-task A (see `refine-logs/reviews/BENCHMARK_R4_LIT_SWEEP_KICKOFF.md`)
+**Sweep:** R4 Literature Sweep Sub-task A (see `archive/r4_r5a_lineage/refine-logs/reviews/BENCHMARK_R4_LIT_SWEEP_KICKOFF.md`)
 **Reviewer persona:** senior NLP / memorization researcher, fresh session, no R1-R4 attachment, systematic bibliographer
 **Search method:** arxiv API + web_search, every citation verified in-session
 **Scope:** 15 factors in the v5.3 active+reserve shortlist + 2 possible additions under investigation (Modality, Authority)

@@ -100,7 +100,7 @@
 **未动的内部交叉引用**:
 - WS0.5 memo §3.3.1 / §5.2 / §6.2 / §6.3 内的 "R-0 supersession note" 块 — 这些本身是 §4.5 closure 时记录的 in-memo cross-references,与 §4.5 banner 形成自洽的 audit chain;不更新指向 R0_DECISIONS.md 以保持 §4.5 body 的 audit trail 完整性。
 - R-1b 相关文件(`R1b_DECISIONS.md` / `whiteboard_analysis.md` / `construct_*.md` / `bch_*.md`)— 与本任务正交,不动。
-- `refine-logs/reviews/CROSS_SYNTH_20260523/synthesis_findings.md` — cross-synth 文件,与本任务正交;其中 R-0 / R-4a 引用本身就是 history-style audit,不动。
+- `archive/r4_r5a_lineage/refine-logs/reviews/CROSS_SYNTH_20260523/synthesis_findings.md` — cross-synth 文件,与本任务正交;其中 R-0 / R-4a 引用本身就是 history-style audit,不动。
 
 ---
 

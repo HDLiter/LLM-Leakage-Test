@@ -215,13 +215,43 @@
 
 ## 文档待修(Pass 1 发现)
 
-- **flag ⑤**:phase7 plan 内一批"扩 fleet / 扩 pilot 前的遗留数字"未对齐。
-  ① N=100 vs N=430 —— §5.5/§6 标题、§6.4 n_eff 表、§8.1A 仍写 "100";§5.4
-  "C_NoOp 90 of 100" 与 80 pre-cutoff 矛盾。② "9-model / nine-model" ——
-  §5.1 WS0 可行性闸门、§5.3 标题 "WS2 nine-model pipeline";fleet 已扩到
-  14 P_predict-eligible / 16 总。(注:pilot 现为 80 + 700 = 780。)
-- (Pass 2)FROZEN_SHORTLIST §1 Target Salience 仍写 "ordinal";
-  MEASUREMENT_FRAMEWORK 的 fleet 数字(5 白盒/9 模型)、P_schema 状态过时。
+- **flag ⑤** ✔ 已修(2026-06-07 phase7 对账):pilot N→780、nine-model→14
+  P_predict-eligible / 16 总;phase7 内 N=100 / 9-model 残留已清。
+- (Pass 2)MEASUREMENT_FRAMEWORK fleet 数字已修(5 白盒 / 9 模型 → 12 P_logprob /
+  14 P_predict)。FROZEN_SHORTLIST §1 Target Salience "ordinal" 与 R-1c 一致,非缺陷。
+
+## code-sync 待办 + 等待决策(2026-06-07 文档清理 / phase7 对账 / 归档轮 后新增)
+
+文档层已对齐 R-1…R-6 现状、过程轨迹已归档。以下是**代码层 vs 设计漂移**与**等决策**项,
+均**未动**,各自卡上游。
+
+### 等用户 / 上游决策
+- **pilot N**:N=780(80 + 700)已定为 canonical(2026-06-07)。**待确认**:
+  `data/pilot/manifests/pilot_430_cases.json` 是否已生成真案例——是 → 需重跑采样器抽
+  700 post-cutoff(数据操作);否 → 仅改 config + 同步测试。
+- **参考窗右端点 `min(model_cutoff)` 的具体日期 + 计入 min 的子队列** → 待 **R-1e** 裁定
+  (R1a/b/c/d_DECISIONS 已把日期留空、标 pending R-1e)。
+- **多重比较程序(Westfall-Young 去留)** → 待**下一轮 R-4 走查**(R-4a Lock 1 倾向
+  estimation-first:per-estimand 效应量 + 95% CI,不做 NHST 族;phase7 已按此标 pending)。
+- **WS0.5 sign-off** 仍**签字搁置** —— 解冻与否是用户的决定。
+
+### code-sync 待办(`planning_power_calculator.py` + estimand 模块,等 roster 定死后一次性重写)
+- **pilot N 350/430 → 700/780**:`config/pilot_sampling.yaml`(350/430、manifest_id
+  `phase7-pilot-430`)、`scripts/planning_power_calculator.py:229`(默认 350)、
+  `tests/r5a/test_planning_power_calculator.py`(350/430 断言)。卡 pilot-N 数据确认。
+- **删 E_CMMD 代码**(R-4 D5 已锁砍):`planning_power_calculator.py` 的 `--cmmd-inflation`
+  分支 + `test_cmmd_se_case_level_after_fix` + `fleet.py:82,135` 注释。
+- **`C_CO` / `E_OR`**(= 改名后的 C_FO/E_FO):`contracts.py:42` enum + `fo_slotable` 等
+  schema、perturbations/audit stub、`config/prompts/R5A_OPERATOR_SCHEMA.md`。卡 **R-2**
+  (反事实扰动是否用 C_CO 槽)。
+- **删 Westfall-Young**:`planning_power_calculator.py:25/73/75/119`。卡多重比较裁定。
+- **加真实收益记忆 estimand**(R-6 待定②)→ 卡 **estimand 逐个分析** session;
+  **P_predict 输出形式**(E_NoOp `signed_score` 占位)→ 卡 **R-6 待定① 算子逐个分析**。
+
+### 延后归档
+- `R5A_TIER_R2_0_IMPL_REVIEW_20260502/` 的 `IMPLEMENTATION_NOTE.md` + `TRIAGE_LOG.md`:
+  待 tier-r2-0 PR3a/b 并 + ledger 填完 + NOTE 内 back-ref repoint 后归档(该 session 其余
+  评审稿已于 2026-06-07 归档)。
 
 ## 排序
 
